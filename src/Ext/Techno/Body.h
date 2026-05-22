@@ -14,7 +14,7 @@ class TechnoExt
 public:
 	using base_type = TechnoClass;
 
-	static constexpr DWORD Canary = 0x55555555;
+	static constexpr DWORD Canary = 0xAAAACCCC;
 	static constexpr size_t ExtPointerOffset = 0x34C;
 	static constexpr bool ShouldConsiderInvalidatePointer = true;
 
