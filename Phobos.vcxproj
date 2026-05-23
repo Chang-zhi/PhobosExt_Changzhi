@@ -34,7 +34,6 @@
     <ClCompile Include="src\Utilities\AresHelper.cpp" />
     <ClCompile Include="src\Utilities\Debug.cpp" />
     <ClCompile Include="src\Ext\WarheadType\Body.cpp" />
-    <ClCompile Include="src\Phobos.CRT.cpp" />
     <ClCompile Include="src\Phobos.Ext.cpp" />
     <ClCompile Include="src\Phobos.cpp" />
     <ClCompile Include="src\Utilities\ShapeTextPrinter.cpp" />
@@ -61,7 +60,6 @@
     <ClInclude Include="src\Utilities\SpawnerHelper.h" />
     <ClInclude Include="src\Utilities\Stream.h" />
     <ClInclude Include="src\Utilities\Swizzle.h" />
-    <ClInclude Include="src\Phobos.CRT.h" />
     <ClInclude Include="src\Phobos.version.h" />
     <ClInclude Include="src\Utilities\Container.h" />
     <ClInclude Include="src\Utilities\Debug.h" />

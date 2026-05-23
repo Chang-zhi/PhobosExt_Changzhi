@@ -29,12 +29,3 @@ bool __stdcall DllMain(HANDLE hInstance, DWORD dwReason, LPVOID v)
 	}
 	return true;
 }
-
-//DEFINE_HOOK(0x52F639, _YR_CmdLineParse, 0x5)
-//{
-//	GET(char**, ppArgs, ESI);
-//	GET(int, nNumArgs, EDI);
-//
-//	Debug::LogDeferredFinalize();
-//	return 0;
-//}
