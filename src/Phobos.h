@@ -30,6 +30,9 @@ public:
 	static bool ShouldSave;
 	static std::wstring CustomGameSaveDescription;
 
+	static void ExeRun();
+	static bool DetachFromDebugger();
+
 	class Config
 	{
 	public:
