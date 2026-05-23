@@ -10,13 +10,13 @@
 // ======================== 独立 DLL 版本号 ========================
 // 根据你的项目需求修改以下数值
 #define VERSION_MAJOR 0          // 主版本号
-#define VERSION_MINOR 1          // 次版本号
-#define VERSION_REVISION 0       // 修订号
+#define VERSION_MINOR 0          // 次版本号
+#define VERSION_REVISION 3       // 修订号
 #define VERSION_PATCH 0          // 补丁号
 
-// #define BUILD_NUMBER 1           // 构建号（每次发布递增）
+#define BUILD_NUMBER 3           // 构建号（每次发布递增）
 
-// ------------------------ 编译配置（选择其中一个分支） ------------------------
+// ------------------------ 编译配置 ------------------------
 
 	// 存档兼容ID：由版本号组合而成
 #define SAVEGAME_ID ((VERSION_MAJOR << 24) | (VERSION_MINOR << 16) | (VERSION_REVISION << 8) | VERSION_PATCH)
