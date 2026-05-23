@@ -12,14 +12,16 @@ public:
 	using base_type = WarheadTypeClass;
 
 	static constexpr DWORD Canary = 0xAAAADDDD;
-	static constexpr size_t ExtPointerOffset = 0x18;
+	// static constexpr size_t ExtPointerOffset = 0x20;
 
 	class ExtData final : public Extension<WarheadTypeClass>
 	{
 
 	public:
-		ExtData(WarheadTypeClass* OwnerObject) : Extension<WarheadTypeClass>(OwnerObject)
+		Valueable<bool> TemporalExclusive;
 
+		ExtData(WarheadTypeClass* OwnerObject) : Extension<WarheadTypeClass>(OwnerObject)
+			, TemporalExclusive { false }
 		{ }
 
 		virtual ~ExtData() = default;

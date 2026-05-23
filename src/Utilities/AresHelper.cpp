@@ -73,7 +73,7 @@ void AresHelper::GetGameModulesBaseAddresses()
 				LPVOID nameBuffer;
 				unsigned int nameBufferSize;
 				// 0409 04b0 is language: English (American), codepage: UTF-16
-				if (!VerQueryValue(infoBuffer.data(), "\\StringFileInfo\\040904b0\\OriginalFilename", &nameBuffer, &nameBufferSize))
+				if (!VerQueryValueA(infoBuffer.data(), "\\StringFileInfo\\040904b0\\OriginalFilename", &nameBuffer, &nameBufferSize))
 					continue;
 				const char* originalModuleName = (const char*)nameBuffer;
 				if (!_strcmpi(originalModuleName, "Sun.exe"))

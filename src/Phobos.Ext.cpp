@@ -173,7 +173,7 @@ using PhobosTypeRegistry = TypeRegistry <
 	// Ext classes
 	TActionExt,
 	//TechnoExt,
-	//WarheadTypeExt,
+	WarheadTypeExt,
 	WaypointLabelClass
 	// other classes
 > ;

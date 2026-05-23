@@ -72,7 +72,7 @@ void Debug::FatalErrorAndExit(const char* pFormat, ...)
 	va_start(args, pFormat);
 	LogWithVArgs(pFormat, args);
 	va_end(args);
-	MessageBox(0, StringBuffer, "Fatal error ", MB_ICONERROR);
+	MessageBoxA(0, StringBuffer, "Fatal error ", MB_ICONERROR);
 	FatalExit(static_cast<int>(ExitCode::Undefined));
 }
 
@@ -82,7 +82,7 @@ void Debug::FatalErrorAndExit(ExitCode nExitCode, const char* pFormat, ...)
 	va_start(args, pFormat);
 	LogWithVArgs(pFormat, args);
 	va_end(args);
-	MessageBox(0, StringBuffer, "Fatal error ", MB_ICONERROR);
+	MessageBoxA(0, StringBuffer, "Fatal error ", MB_ICONERROR);
 	FatalExit(static_cast<int>(nExitCode));
 }
 
@@ -128,7 +128,7 @@ bool Console::Create()
 	if (NULL == ConsoleHandle)
 		return false;
 
-	SetConsoleTitle("Phobos Debug Console");
+	SetConsoleTitleA("Phobos Debug Console");
 
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
 	GetConsoleScreenBufferInfo(ConsoleHandle, &csbi);

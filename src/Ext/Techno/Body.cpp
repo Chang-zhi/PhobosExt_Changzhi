@@ -6,7 +6,7 @@
 #include <JumpjetLocomotionClass.h>
 
 #include <Utilities/AresFunctions.h>
-TechnoExt::ExtContainer TechnoExt::ExtMap;
+// TechnoExt::ExtContainer TechnoExt::ExtMap;
 
 TechnoExt::ExtData::~ExtData()
 {

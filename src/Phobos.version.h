@@ -18,7 +18,6 @@
 
 // ------------------------ 编译配置（选择其中一个分支） ------------------------
 
-#ifdef IS_RELEASE_VER
 	// 存档兼容ID：由版本号组合而成
 #define SAVEGAME_ID ((VERSION_MAJOR << 24) | (VERSION_MINOR << 16) | (VERSION_REVISION << 8) | VERSION_PATCH)
 #define FILE_DESCRIPTION "Chang_zhi Custom Phobos Extension"
@@ -26,6 +25,5 @@
 #define FILE_VERSION VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION, VERSION_PATCH
 #define PRODUCT_VERSION "Release Build " FILE_VERSION_STR
 
-#endif
 
 #endif // VERSION_H
