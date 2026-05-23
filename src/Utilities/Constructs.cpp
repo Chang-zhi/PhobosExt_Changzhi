@@ -37,6 +37,7 @@
 #include <Utilities/GeneralUtils.h>
 
 #include "Savegame.h"
+#include "SavegameDef.h"
 #include "Debug.h"
 
 bool CustomPalette::LoadFromINI(
