@@ -1,4 +1,4 @@
-# PhobosExt_Changzhi
+# [PhobosExt_Changzhi](https://github.com/Chang-zhi/PhobosExt_Changzhi)
 
 一个扩展《红色警戒2：尤里的复仇》游戏功能的 DLL，基于 Phobos 开发。
 
