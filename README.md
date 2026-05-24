@@ -18,7 +18,7 @@
 ---
 
 ### 已知问题  
-当单位当前正在使用带有`TemporalExclusive=yes`弹头的武器时, 会强制改变单位的索敌逻辑, 可能会产生bug
+当单位当前正在使用带有`Temporal=yes` 和 `TemporalExclusive=yes`弹头的武器时, 会强制改变单位的索敌逻辑, 可能会产生bug
 
 ---
 
@@ -73,11 +73,16 @@ TemporalExclusive=              ; boolean（布尔值），默认 false
 [TechnoType]
 AutoHunt=                       ; boolean（布尔值），默认 false
 ```
-当科技类型设置`AutoHunt=yes` 时，该类型的所有单位在游戏中会自动强制进入 Hunt 状态,  
-主动搜索并攻击敌方目标，且不受玩家直接操控，若单位正在部署状态会先尝试解除部署。  
-（即玩家无法通过鼠标点击完全控制该单位）  
+当科技类型设置 `AutoHunt=yes` 时，该类型的所有单位（仅限 AI 控制）会自动强制进入 Hunt 状态，主动搜索并攻击敌方目标。
 
-<span style="color: gray;">当玩家操控时, 可以用Phobos的`Convert.ComputerToHuman=`变形成换皮单位来避免强制索敌。</span>
+**行为细节**  
+
+- 仅限 AI：人类玩家控制的单位不会受此影响。
+- 自动索敌：单位会自动强制搜索附近的敌方单位并发起攻击。
+- 载具内无效：如果单位位于载具内，AutoHunt 逻辑不会生效（出来就会了）。
+- 禁止招募：单位的`RecruitableA` 和 `RecruitableB`会强制被设置为`false`。
+- 自动解除部署：如果单位当前处于部署状态，会先尝试解除部署，然后进入 Hunt 状态。
+- 攻击地面修正：如果单位当前攻击目标是单元格（强制攻击地面），会自动清除该目标，转为 Hunt 索敌。
 
 ---
 
