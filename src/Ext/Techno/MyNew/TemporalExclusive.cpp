@@ -79,6 +79,10 @@ void HandleTemporalExclusiveTargeting(TechnoClass* pThis)
 {
     // 1. 首先清理所有无效的锁（防止僵尸占用）
     CleanupInvalidTemporalLocks();
+	// 更新新互斥超时空武器的独占逻辑
+	UpdateTemporalExclusive();
+
+	// Debug::Log("[TemporalExclusive] HandleTemporalExclusiveTargeting: %s\n", pThis->GetTechnoType()->ID);
 
     // 2. 如果当前单位没有独占武器，直接返回
     if (!IsCurrentUseExclusiveTemporalWeapon(pThis))

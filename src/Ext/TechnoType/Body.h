@@ -17,10 +17,10 @@ public:
 	class ExtData final : public Extension<TechnoTypeClass>
 	{
 	public:
-		Valueable<bool> Passengers_JoinTeam;
+		Valueable<bool> AutoHunt;
 
 		ExtData(TechnoTypeClass* OwnerObject) : Extension<TechnoTypeClass>(OwnerObject)
-			, Passengers_JoinTeam {}
+			, AutoHunt { false }
 		{ }
 
 		virtual ~ExtData() = default;

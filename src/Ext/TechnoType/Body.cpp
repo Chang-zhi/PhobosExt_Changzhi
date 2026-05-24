@@ -59,7 +59,7 @@ void TechnoTypeExt::ExtData::LoadFromINIFile(CCINIClass* const pINI)
 	const char* pSection = pThis->ID;
 	INI_EX exINI(pINI);
 
-	this->Passengers_JoinTeam.Read(exINI, pSection, "Passengers.JoinTeam");
+	this->AutoHunt.Read(exINI, pSection, "AutoHunt");
 
 }
 
@@ -82,7 +82,7 @@ template <typename T>
 void TechnoTypeExt::ExtData::Serialize(T& Stm)
 {
 	Stm
-		.Process(this->Passengers_JoinTeam)
+		.Process(this->AutoHunt)
 		;
 }
 void TechnoTypeExt::ExtData::LoadFromStream(PhobosStreamReader& Stm)
