@@ -15,18 +15,21 @@ DEFINE_HOOK(0x6F9E50, TechnoClass_AI, 0x5)
 {
 	GET(TechnoClass*, pThis, ECX);
 
-	// AutoHunt
+	// 帧计数器, 防止频繁调用造成游戏卡顿
 	static unsigned int s_nFrameCounter = 0;
 	s_nFrameCounter++;
 
-	const unsigned int AUTO_HUNT_INTERVAL = 15; // 每15帧执行一次
+	// 每15帧执行一次
+	const unsigned int AUTO_HUNT_INTERVAL = 15; 
 
 	if (s_nFrameCounter % AUTO_HUNT_INTERVAL == 0)
 	{
+		// AutoHunt
 		AutoHunt(pThis);
 	}
 
 	// Temporal exclusive
+	// 这个就是要每帧检测一次的, 无需帧计数器限制
 	HandleTemporalExclusiveTargeting(pThis);
 
 	return 0;
