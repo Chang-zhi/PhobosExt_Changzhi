@@ -77,7 +77,7 @@ AutoHunt=                       ; boolean（布尔值），默认 false
 主动搜索并攻击敌方目标，且不受玩家直接操控。  
 （即玩家无法通过鼠标点击控制该单位的移动、攻击等行为）  
 
-<span style="color: gray;">当玩家操控时可以用Phobos的`Convert.ComputerToHuman=`变形成换皮单位来避免强制索敌。</span>
+<span style="color: gray;">当玩家操控时, 可以用Phobos的`Convert.ComputerToHuman=`变形成换皮单位来避免强制索敌。</span>
 
 ---
 
