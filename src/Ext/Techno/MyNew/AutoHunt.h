@@ -2,4 +2,4 @@
 
 class TechnoClass;
 
-void AutoHunt(TechnoClass* pThis);
+void UpdateAutoHunt(TechnoClass* pThis);
