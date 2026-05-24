@@ -18,7 +18,7 @@
 ---
 
 ### 已知问题  
-当单位当前正在使用带有`Temporal=yes` 和 `TemporalExclusive=yes`弹头的武器时, 会强制改变单位的索敌逻辑, 可能会产生bug
+当单位当前正在使用带有 `Temporal=yes` 和 `TemporalExclusive=yes` 弹头的武器时, 会强制改变单位的索敌逻辑, 可能会产生bug
 
 ---
 
@@ -64,7 +64,7 @@ TemporalExclusive=              ; boolean（布尔值），默认 false
 当弹头同时设置 `Temporal=yes` 和 `TemporalExclusive=yes` 时，  
 该武器无法瞄准已被其他 `TemporalClass` 实例锁定的单位（即正在遭受超时空冻结的单位）。
 
-普通的超时空武器（`Temporal=yes` 但未设置 `TemporalExclusive`）仍可以攻击已被互斥武器锁定的单位。
+普通的超时空武器（ `Temporal=yes` 但未设置 `TemporalExclusive` ）仍可以攻击已被互斥武器锁定的单位。
 
 互斥武器不能攻击被普通超时空武器冻结的目标。
 
@@ -80,7 +80,7 @@ AutoHunt=                       ; boolean（布尔值），默认 false
 - 仅限 AI：人类玩家控制的单位不会受此影响。
 - 自动索敌：单位会自动强制搜索附近的敌方单位并发起攻击。
 - 载具内无效：如果单位位于载具内，AutoHunt 逻辑不会生效（出来就会了）。
-- 禁止招募：单位的`RecruitableA` 和 `RecruitableB`会强制被设置为`false`。
+- 禁止招募：单位的 `RecruitableA` 和 `RecruitableB` 会强制被设置为`false`。
 - 自动解除部署：如果单位当前处于部署状态，会先尝试解除部署，然后进入 Hunt 状态。
 - 攻击地面修正：如果单位当前攻击目标是单元格（强制攻击地面），会自动清除该目标，转为 Hunt 索敌。
 
@@ -105,7 +105,7 @@ AutoHunt=                       ; boolean（布尔值），默认 false
 ### [*FA2SP_HDM_Edition*](https://github.com/handama/FA2sp)（韩大妈版本）
 需要同时修改 FAData_TriggerAndScript.ini 中的 `[English-ActionsRA2]` 和 `[Chinese-ActionsRA2]` 小节。
 
-在`[English-ActionsRA2]`小节中添加:
+在 `[English-ActionsRA2]` 小节中添加:
 ```ini
 [English-ActionsRA2]
 ...
@@ -114,7 +114,7 @@ AutoHunt=                       ; boolean（布尔值），默认 false
 552=Clear All Waypoint Texts... (PhobosExt by Chang_zhi),0,0,0,0,0,0,0,0,0,Clear all waypoint texts displayed on screen.,0,1,904,1
 ...
 ```
-在`[Chinese-ActionsRA2]`小节中中添加:
+在 `[Chinese-ActionsRA2]` 小节中中添加:
 ```ini
 [Chinese-ActionsRA2]
 ...
