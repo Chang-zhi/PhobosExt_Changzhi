@@ -74,8 +74,8 @@ TemporalExclusive=              ; boolean（布尔值），默认 false
 AutoHunt=                       ; boolean（布尔值），默认 false
 ```
 当科技类型设置`AutoHunt=yes` 时，该类型的所有单位在游戏中会自动强制进入 Hunt 状态,  
-主动搜索并攻击敌方目标，且不受玩家直接操控。  
-（即玩家无法通过鼠标点击控制该单位的移动、攻击等行为）  
+主动搜索并攻击敌方目标，且不受玩家直接操控，若单位正在部署状态会先尝试解除部署。  
+（即玩家无法通过鼠标点击完全控制该单位）  
 
 <span style="color: gray;">当玩家操控时可以用Phobos的`Convert.ComputerToHuman=`变形成换皮单位来避免强制索敌。</span>
 
