@@ -11,9 +11,9 @@
 
 ### 兼容性说明
 
-与 Ares 或 Phobos 共存时，本 DLL 已避免使用 ExtPointerOffset，改用独立 unordered_map 存储扩展数据，不会与它们的原生扩展数据冲突。（严格来说可能变慢, 但对现代cpu的影响应该可以忽略不计）
-
 需保证游戏版本为 YR 1.001。
+
+与 Ares 或 Phobos 共存时，本 DLL 已避免使用 ExtPointerOffset，改用独立 unordered_map 存储扩展数据，不会与它们的原生扩展数据冲突。（严格来说可能变慢, 但对现代cpu的影响应该可以忽略不计）
 
 ---
 
