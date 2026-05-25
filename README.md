@@ -1,11 +1,11 @@
 # [PhobosExt](https://github.com/Chang-zhi/PhobosExt_Changzhi)
 
-一个扩展《红色警戒2：尤里的复仇》游戏功能的 DLL，基于 Phobos 开发。
+一个扩展《红色警戒2：尤里的复仇》游戏功能的 DLL，基于 Phobos 开发，作者[Chang_zhi](https://space.bilibili.com/423792550)。
 
 **理论上可以脱离 Ares 和 Phobos 单独运行，但仍建议与原版 Phobos 或 Ares 一同使用**
 
 说是基于 Phobos，其实只是删了删代码 (  
-低创作品，大佬轻喷。
+<span style="color: gray;">低创作品，大佬轻喷。</span>
 
 ---
 
