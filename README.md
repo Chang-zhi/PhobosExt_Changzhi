@@ -1,4 +1,4 @@
-# [PhobosExt_Changzhi](https://github.com/Chang-zhi/PhobosExt_Changzhi)
+# [PhobosExt](https://github.com/Chang-zhi/PhobosExt_Changzhi)
 
 一个扩展《红色警戒2：尤里的复仇》游戏功能的 DLL，基于 Phobos 开发。
 
@@ -26,6 +26,7 @@
 [*Ares*](https://github.com/Ares-Developers/Ares) 项目组  
 [*Phobos*](https://github.com/Phobos-developers/Phobos) 项目组  
 偏微whyffu [*@B站主页*](https://space.bilibili.com/41073096)  
+韩大妈 [*@B站主页*](https://space.bilibili.com/2229647)
 
 <span style="color: gray;">排名不分先后</span>
 
@@ -53,7 +54,17 @@
 - `551` – 清除指定路径点的文本...（参数：路径点索引）
 - `552` – 清除所有路径点文本...
 
-### 2. 超时空武器互斥锁定
+### 2. 动态标签绑定功能
+
+允许将游戏中的单位（小队成员、特定科技类型）与触发器标签（Tag）动态关联，便于后续通过触发器执行逻辑。
+
+**触发动作说明**：
+- `553` – 将指定小队全部成员关联到指定标签...（参数：小队索引，标签索引）
+- `554` – 将指定所属方的指定小队全部成员关联到指定标签...（参数：小队索引，标签索引，所属方国家索引）
+- `555` – 将特定科技类型全部关联到指定标签...（参数：科技类型ID，标签索引）
+- `556` – 将指定所属方的特定科技类型全部关联到指定标签...（参数：科技类型ID，标签索引，所属方国家索引）
+
+### 3. 超时空武器互斥锁定
 
 为 `Temporal=yes` 的弹头增加互斥锁定机制。
 
@@ -68,7 +79,7 @@ TemporalExclusive=              ; boolean（布尔值），默认 false
 
 互斥武器不能攻击被普通超时空武器冻结的目标。
 
-### 3. 自动游猎
+### 4. 自动游猎
 ```ini
 [TechnoType]
 AutoHunt=                       ; boolean（布尔值），默认 false
@@ -78,10 +89,10 @@ AutoHunt=                       ; boolean（布尔值），默认 false
 **行为细节**  
 
 - 仅限 AI：人类玩家控制的单位不会受此影响。
+- 帧间隔优化：每个单位每 `15` 帧执行一次逻辑检查，避免性能浪费。
 - 载具内无效：如果单位位于载具内，AutoHunt 逻辑不会生效（离开载具后自动生效）。
 - 自动解除部署：如果单位当前处于部署状态，会先尝试解除部署，然后进入 Hunt 状态。
 - 目标可达性检查：当单位有攻击目标时，会检查目标单元格是否可达。如果不可达，则跳过本次逻辑。
-- 帧间隔优化：每个单位每 `15` 帧执行一次逻辑检查，每 `60` 帧自动清理无效单位记录，避免性能浪费。
 - 禁止招募：单位的 `RecruitableA` 和 `RecruitableB` 会强制被设置为`false`，并从所属队伍中释放。
 - 攻击地面修正：如果单位当前攻击目标是单元格（强制攻击地面），会自动清除该目标，转为 Hunt 索敌。
 
@@ -100,6 +111,10 @@ AutoHunt=                       ; boolean（布尔值），默认 false
 550=在指定路径点绘制文本... (PhobosExt by Chang_zhi),-4,13,30,6,6,6,0,0,0,在指定路径点绘制文本。\n第三个数值是宽度(像素，1~1000，默认250)。\n第四个数值是背景不透明度(百分比，0~100)。\n第五个数值是颜色(金=0，白=1，红=2，蓝=3，绿=4，黄=5，紫=6，粉=7，淡蓝=8),0,1,902,1
 551=清除指定路径点的文本... (PhobosExt by Chang_zhi),0,0,30,0,0,0,0,0,0,清除指定路径点的文本。,0,1,903,1
 552=清除所有路径点文本... (PhobosExt by Chang_zhi),0,0,0,0,0,0,0,0,0,清除屏幕上所有已设置的路径点文本。,0,1,904,1
+553=将指定小队全部成员关联到指定标签... (PhobosExt by Chang_zhi),0,0,7,38,0,0,0,0,0,将指定小队内所有成员关联到指定标签。,0,1,553,1
+554=将指定所属方的指定小队全部成员关联到指定标签... (PhobosExt by Chang_zhi),0,0,7,38,2,0,0,0,0,将指定所属方下的指定小队所有成员关联到指定标签。,0,1,554,1
+555=将特定科技类型全部关联到指定标签... (PhobosExt by Chang_zhi),-4,46,38,0,0,0,0,0,0,将指定科技类型的所有实例关联到指定标签。,0,1,555,1
+556=将指定所属方的特定科技类型全部关联到指定标签... (PhobosExt by Chang_zhi),-4,46,38,2,0,0,0,0,0,将指定所属方下指定科技类型的所有实例关联到指定标签。,0,1,556,1
 ...
 ```
 
@@ -113,6 +128,10 @@ AutoHunt=                       ; boolean（布尔值），默认 false
 550=Draw Text at Specified Waypoint... (PhobosExt by Chang_zhi),-4,13,30,6,6,6,0,0,0,Draw text at the specified waypoint.\nThe third value is the width in pixels (1~1000，default: 250).\nThe fourth value is the background opacity percentage (0~100).\nThe fifth value is the color (Gold=0，White=1，Red=2，Blue=3，Green=4，Yellow=5，Purple=6，Pink=7，Light Blue=8),0,1,902,1
 551=Clear Text at Specified Waypoint... (PhobosExt by Chang_zhi),0,0,30,0,0,0,0,0,0,Clear the text at the specified waypoint.,0,1,903,1
 552=Clear All Waypoint Texts... (PhobosExt by Chang_zhi),0,0,0,0,0,0,0,0,0,Clear all waypoint texts displayed on screen.,0,1,904,1
+553=Associates all members of the specified team to the specified tag... (PhobosExt by Chang_zhi),0,0,7,38,0,0,0,0,0,Associates all members of the specified team to the tag of the specified index.,0,1,553,1
+554=Associates all members of the specified team under the specified owner to the specified tag... (PhobosExt by Chang_zhi),0,0,7,38,2,0,0,0,0,Associates all members of the specified team under the specified owner to the specified tag.,0,1,554,1
+555=Associates all instances of the specified techno type to the specified tag... (PhobosExt by Chang_zhi),-4,46,38,0,0,0,0,0,0,Associates all instances of the specified techno type to the specified tag.,0,1,555,1
+556=Associates all instances of the specified techno type under the specified owner to the specified tag... (PhobosExt by Chang_zhi),-4,46,38,2,0,0,0,0,0,Associates all instances of the specified techno type under the specified owner to the specified tag.,0,1,556,1
 ...
 ```
 在 `[Chinese-ActionsRA2]` 小节中中添加:
@@ -122,5 +141,9 @@ AutoHunt=                       ; boolean（布尔值），默认 false
 550=在指定路径点绘制文本... (PhobosExt by Chang_zhi),-4,13,30,6,6,6,0,0,0,在指定路径点绘制文本。\n第三个数值是宽度(像素，1~1000，默认250)。\n第四个数值是背景不透明度(百分比，0~100)。\n第五个数值是颜色(金=0，白=1，红=2，蓝=3，绿=4，黄=5，紫=6，粉=7，淡蓝=8),0,1,902,1
 551=清除指定路径点的文本... (PhobosExt by Chang_zhi),0,0,30,0,0,0,0,0,0,清除指定路径点的文本。,0,1,903,1
 552=清除所有路径点文本... (PhobosExt by Chang_zhi),0,0,0,0,0,0,0,0,0,清除屏幕上所有已设置的路径点文本。,0,1,904,1
+553=将指定小队全部成员关联到指定标签... (PhobosExt by Chang_zhi),0,0,7,38,0,0,0,0,0,将指定小队内所有成员关联到指定标签。,0,1,553,1
+554=将指定所属方的指定小队全部成员关联到指定标签... (PhobosExt by Chang_zhi),0,0,7,38,2,0,0,0,0,将指定所属方下的指定小队所有成员关联到指定标签。,0,1,554,1
+555=将特定科技类型全部关联到指定标签... (PhobosExt by Chang_zhi),-4,46,38,0,0,0,0,0,0,将指定科技类型的所有实例关联到指定标签。,0,1,555,1
+556=将指定所属方的特定科技类型全部关联到指定标签... (PhobosExt by Chang_zhi),-4,46,38,2,0,0,0,0,0,将指定所属方下指定科技类型的所有实例关联到指定标签。,0,1,556,1
 ...
 ```
