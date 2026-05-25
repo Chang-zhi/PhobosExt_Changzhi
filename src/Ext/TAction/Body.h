@@ -20,14 +20,17 @@ enum class PhobosTriggerAction : unsigned int
 	// 清除所有路径点文本... 
 	ClearAllWaypointLabels = 552,
 
-	// 将指定小队全部成员关联到指定标签... (by yaoyaojiang)
+	// 将指定小队全部成员关联到指定标签...
 	BindAllTeamMemberToTag = 553,
 
-	// 将特定科技类型全部关联到指定标签...
-	BindAllTechnoTypeToTag = 554,
+    // 将指定所属方的指定小队全部成员关联到指定标签...
+	BindOwnerTeamMemberToTag = 554,
 
-	// 将所属方的特定科技类型全部关联到指定标签...
-	BindOwnerTechnoTypeToTag = 555
+	// 将特定科技类型全部关联到指定标签...
+	BindAllTechnoTypeToTag = 555,
+
+	// 将指定所属方的特定科技类型全部关联到指定标签...
+	BindOwnerTechnoTypeToTag = 556
 };
 
 class TActionExt
@@ -67,6 +70,7 @@ public:
 	ACTION_FUNC(ClearWaypointLabel);
 	ACTION_FUNC(ClearAllWaypointLabels);
 	ACTION_FUNC(BindAllTeamMemberToTag);
+	ACTION_FUNC(BindOwnerTeamMemberToTag);
 	ACTION_FUNC(BindAllTechnoTypeToTag);
 	ACTION_FUNC(BindOwnerTechnoTypeToTag);
 

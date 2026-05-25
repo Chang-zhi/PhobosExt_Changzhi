@@ -10,6 +10,7 @@
 #include <Utilities/SavegameDef.h>
 #include <Utilities/SpawnerHelper.h>
 
+#include <Ext/TAction/MyNew/Helper.h>
 #include <MyNew/WaypointLabelClass.h>
 
 #include <vector>
@@ -63,6 +64,8 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 		return TActionExt::ClearAllWaypointLabels(pThis, pHouse, pObject, pTrigger, location);
 	case PhobosTriggerAction::BindAllTeamMemberToTag:
 		return TActionExt::BindAllTeamMemberToTag(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::BindOwnerTeamMemberToTag:
+		return TActionExt::BindOwnerTeamMemberToTag(pThis, pHouse, pObject, pTrigger, location);
 	case PhobosTriggerAction::BindAllTechnoTypeToTag:
 		return TActionExt::BindAllTechnoTypeToTag(pThis, pHouse, pObject, pTrigger, location);
 	case PhobosTriggerAction::BindOwnerTechnoTypeToTag:
@@ -127,16 +130,12 @@ bool TActionExt::BindAllTeamMemberToTag(TActionClass* pThis, HouseClass* pHouse,
 	int teamIndex = pThis->Param3;
 	int tagIndex = pThis->Param4;
 
-	TagClass* targetTagClass = nullptr;
-	for (auto const pTag : TagClass::Array_Logic_House)
-	{
-		if (!std::strcmp(pTag->Type->get_ID(), std::to_string(tagIndex).c_str()))
-		{
-			targetTagClass = pTag;
-			break;
-		}
-	}
-	if (!targetTagClass) return false;
+	Debug::Log("[TActionExt::BindAllTeamMemberToTag] Startteam \"%d\" to tag \"%d\"\n", teamIndex, tagIndex);
+
+	TagClass* pTagClass = GetTagClassByIndex(tagIndex);
+	if (!pTagClass) return false;
+
+	Debug::Log("[TActionExt::BindAllTeamMemberToTag] Start\n");
 
 	for (auto const pTechno : TechnoClass::Array)
 	{
@@ -146,11 +145,58 @@ bool TActionExt::BindAllTeamMemberToTag(TActionClass* pThis, HouseClass* pHouse,
 			{
 				if (pFoot->BelongsToATeam()
 					&& pFoot->Team
-					&& std::strcmp(pFoot->Team->Type->get_ID(), std::to_string(teamIndex).c_str()) == 0)
+					&& pFoot->Team->Type
+					&& pFoot->Team->Type->get_ID() == ("0" + std::to_string(teamIndex)) )
 				{
 					for (auto pUnit = pFoot->Team->FirstUnit; pUnit; pUnit = pUnit->NextTeamMember)
 					{
-						pUnit->AttachTrigger(targetTagClass);
+						pUnit->AttachTrigger(pTagClass);
+						Debug::Log("[TActionExt::BindAllTeamMemberToTag] successful bind \"%s\" to tag \"%s\"\n", pUnit->get_ID(), pTagClass->Type->get_ID());
+					}
+				}
+			}
+		}
+	}
+
+	return true;
+}
+
+bool TActionExt::BindOwnerTeamMemberToTag(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	int teamIndex = pThis->Param3;
+	int tagIndex = pThis->Param4;
+	int houseIndex = pThis->Param5;
+
+	Debug::Log("[TActionExt::BindOwnerTeamMemberToTag] Startteam \"%d\" to tag \"%d\" house index \"%d\"\n", teamIndex, tagIndex, houseIndex);
+
+	TagClass* pTagClass = GetTagClassByIndex(tagIndex);
+	if (!pTagClass) return false;
+
+	Debug::Log("[TActionExt::BindOwnerTeamMemberToTag] Start\n");
+
+	HouseClass* pOwner = HouseClass::FindByCountryIndex(houseIndex);
+	if (!pOwner) return false;
+
+	Debug::Log("[TActionExt::BindOwnerTeamMemberToTag] Startteam \"%d\" to tag \"%d\" house is \"%s\"\n", teamIndex, tagIndex, pOwner->Name());
+
+	for (auto const pTechno : TechnoClass::Array)
+	{
+		if (pTechno->Owner == pOwner)
+		{
+			if (pTechno->WhatAmI() != AbstractType::BuildingType)
+			{
+				if (FootClass* pFoot = abstract_cast<FootClass*>(pTechno))
+				{
+					if (pFoot->BelongsToATeam()
+						&& pFoot->Team
+						&& pFoot->Team->Type
+						&& pFoot->Team->Type->get_ID() == ("0" + std::to_string(teamIndex)))
+					{
+						for (auto pUnit = pFoot->Team->FirstUnit; pUnit; pUnit = pUnit->NextTeamMember)
+						{
+							pUnit->AttachTrigger(pTagClass);
+							Debug::Log("[TActionExt::BindOwnerTeamMemberToTag] successful bind \"%s\" to tag \"%s\"\n", pUnit->get_ID(), pTagClass->Type->get_ID());
+						}
 					}
 				}
 			}
@@ -165,49 +211,14 @@ bool TActionExt::BindAllTechnoTypeToTag(TActionClass* pThis, HouseClass* pHouse,
 	const char* techno = pThis->Text;
 	int tagIndex = pThis->Param3;
 
-	Debug::Log("[TActionExt::BindAllTechnoTypeToTag] Techno: \"%s\", Tag: \"%d\"\n", techno, tagIndex);
+	TagClass* pTagClass = GetTagClassByIndex(tagIndex);
+	if (!pTagClass) return false;
 
-	TagClass* pTagClass = nullptr;
-	// 先尝试在 TagClass 中获取 pTagClass
-	for (auto const pTag : TagClass::Array_Logic_House)
-	{
-		Debug::Log("[TActionExt::BindAllTechnoTypeToTag] get Tag is \"%s\" \n", pTag->Type->get_ID());
-		if (pTag->Type && pTag->Type->get_ID() == ("0" + std::to_string(tagIndex)))
-		{
-			pTagClass = pTag;
-			break;
-		}
-	}
-	// 获取失败, 尝试根据 TagTypeClass 创建一个 TagClass
-	if (!pTagClass) Debug::Log("[TActionExt::BindAllTechnoTypeToTag] Failed to get pTagClass by TagClass::Array\n");
-
-	Debug::Log("[TActionExt::BindAllTechnoTypeToTag] Try to Create a TayClass instance\n");
-	for (auto pTagType : TagTypeClass::Array)
-	{
-		Debug::Log("[TActionExt::BindAllTechnoTypeToTag] TagTypeClass check \"%s\"\n", pTagType->get_ID());
-		if (pTagType->get_ID() == ("0" + std::to_string(tagIndex)))
-		{
-			pTagClass = TagClass::GetInstance(pTagType);
-			Debug::Log("[TActionExt::BindAllTechnoTypeToTag] successful create a TagClass instance by TagTypeClass\n");
-			break;
-		}
-	}
-
-	// 都没有, 确实找不到了, 返回 false
-	if (!pTagClass)
-	{
-		Debug::Log("[TActionExt::BindAllTechnoTypeToTag] Failed to create a TagClass instance. return false\n");
-		return false;
-	}
-
-	Debug::Log("[TActionExt::BindAllTechnoTypeToTag] successful get pTagClass %s\n", pTagClass->Type->get_ID());
-
+	// 遍历 TechnoClass, 尝试把 TagClass 绑定到 TechnoClass 上
 	for (auto const pTechno : TechnoClass::Array)
 	{
-		Debug::Log("[TActionExt::BindAllTechnoTypeToTag] check \"%s\"\n", pTechno->get_ID());
 		if (pTechno->get_ID() == std::string(techno))
 		{
-			Debug::Log("[TActionExt::BindAllTechnoTypeToTag] try bind \"%s\" to tag \"%s\"\n", pTechno->get_ID(), pTagClass->Type->get_ID());
 			pTechno->AttachTrigger(pTagClass);
 			Debug::Log("[TActionExt::BindAllTechnoTypeToTag] successful bind \"%s\" to tag \"%s\"\n", pTechno->get_ID(), pTagClass->Type->get_ID());
 		}
@@ -219,6 +230,30 @@ bool TActionExt::BindAllTechnoTypeToTag(TActionClass* pThis, HouseClass* pHouse,
 
 bool TActionExt::BindOwnerTechnoTypeToTag(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {
+	const char* techno = pThis->Text;
+	int tagIndex = pThis->Param3;
+	int houseIndex = pThis->Param4;
+
+	TagClass* pTagClass = GetTagClassByIndex(tagIndex);
+	if (!pTagClass) return false;
+
+	HouseClass* pOwner = HouseClass::FindByCountryIndex(houseIndex);
+	if (!pOwner) return false;
+
+	// 遍历 TechnoClass, 尝试把 TagClass 绑定到 TechnoClass 上
+	for (auto const pTechno : TechnoClass::Array)
+	{
+		if (pTechno->Owner == pOwner)
+		{
+			if (pTechno->get_ID() == std::string(techno))
+			{
+				pTechno->AttachTrigger(pTagClass);
+				Debug::Log("[TActionExt::BindOwnerTechnoTypeToTag] successful bind \"%s\" to tag \"%s\"\n", pTechno->get_ID(), pTagClass->Type->get_ID());
+			}
+		}
+	}
+
+	Debug::Log("[TActionExt::BindOwnerTechnoTypeToTag] End\n");
 	return true;
 }
 

@@ -21,6 +21,7 @@
     <ClCompile Include="src\CopyProtection.cpp" />
     <ClCompile Include="src\Ext\TAction\Body.cpp" />
     <ClCompile Include="src\Ext\TAction\Hooks.cpp" />
+    <ClCompile Include="src\Ext\TAction\MyNew\Helper.cpp" />
     <ClCompile Include="src\Ext\TechnoType\Body.cpp" />
     <ClCompile Include="src\Ext\Techno\Body.cpp" />
     <ClCompile Include="src\Ext\Techno\Hooks.cpp" />
@@ -50,6 +51,7 @@
   <ItemGroup>
     <ClInclude Include="src\Commands\NextTeam.h" />
     <ClInclude Include="src\Ext\TAction\Body.h" />
+    <ClInclude Include="src\Ext\TAction\MyNew\Helper.h" />
     <ClInclude Include="src\Ext\TechnoType\Body.h" />
     <ClInclude Include="src\Ext\Techno\MyNew\AutoHunt.h" />
     <ClInclude Include="src\Ext\Techno\MyNew\TemporalExclusive.h" />
