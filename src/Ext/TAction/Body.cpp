@@ -2,6 +2,7 @@
 
 #include <YRpp.h>
 #include <TagClass.h>
+#include <TagTypeClass.h>
 #include <TechnoClass.h>
 #include <ArrayClasses.h>
 #include <MessageListClass.h>
@@ -127,7 +128,7 @@ bool TActionExt::BindAllTeamMemberToTag(TActionClass* pThis, HouseClass* pHouse,
 	int tagIndex = pThis->Param4;
 
 	TagClass* targetTagClass = nullptr;
-	for (auto const pTag : TagClass::Array)
+	for (auto const pTag : TagClass::Array_Logic_House)
 	{
 		if (!std::strcmp(pTag->Type->get_ID(), std::to_string(tagIndex).c_str()))
 		{
@@ -167,7 +168,7 @@ bool TActionExt::BindAllTechnoTypeToTag(TActionClass* pThis, HouseClass* pHouse,
 	Debug::Log("[TActionExt::BindAllTechnoTypeToTag] Techno: \"%s\", Tag: \"%d\"\n", techno, tagIndex);
 
 	TagClass* pTagClass = nullptr;
-	for (auto const pTag : TagClass::Array)
+	for (auto const pTag : TagClass::Array_Logic_House)
 	{
 		Debug::Log("[TActionExt::BindAllTechnoTypeToTag] get Tag is \"%s\" \n", pTag->Type->get_ID());
 		if (pTag->Type && pTag->Type->get_ID() == ("0" + std::to_string(tagIndex)))
@@ -176,7 +177,34 @@ bool TActionExt::BindAllTechnoTypeToTag(TActionClass* pThis, HouseClass* pHouse,
 			break;
 		}
 	}
-	if (!pTagClass) return false;
+	Debug::Log("[TActionExt::BindAllTechnoTypeToTag] foreach Array_Logic_House end\n");
+	if(!pTagClass)
+		for (auto const pTag : TagClass::Array_Logic)
+		{
+			Debug::Log("[TActionExt::BindAllTechnoTypeToTag] get Tag is \"%s\" \n", pTag->Type->get_ID());
+			if (pTag->Type && pTag->Type->get_ID() == ("0" + std::to_string(tagIndex)))
+			{
+				pTagClass = pTag;
+				break;
+			}
+		}
+		Debug::Log("[TActionExt::BindAllTechnoTypeToTag] foreach Array_Logic end\n");
+	if(!pTagClass)
+		for (auto const pTag : TagClass::Array_unknown)
+		{
+			Debug::Log("[TActionExt::BindAllTechnoTypeToTag] get Tag is \"%s\" \n", pTag->Type->get_ID());
+			if (pTag->Type && pTag->Type->get_ID() == ("0" + std::to_string(tagIndex)))
+			{
+				pTagClass = pTag;
+				break;
+			}
+		}
+		Debug::Log("[TActionExt::BindAllTechnoTypeToTag] foreach Array_unknown end\n");
+	if (!pTagClass)
+	{
+        Debug::Log("[TActionExt::BindAllTechnoTypeToTag] Failed to get targetTagClass\n");
+		return false;
+	}
 
 	Debug::Log("[TActionExt::BindAllTechnoTypeToTag] successful get targerTagClass %s\n", pTagClass->Type->get_ID());
 
