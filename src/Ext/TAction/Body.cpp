@@ -130,12 +130,9 @@ bool TActionExt::BindAllTeamMemberToTag(TActionClass* pThis, HouseClass* pHouse,
 	int teamIndex = pThis->Param3;
 	int tagIndex = pThis->Param4;
 
-	Debug::Log("[TActionExt::BindAllTeamMemberToTag] Startteam \"%d\" to tag \"%d\"\n", teamIndex, tagIndex);
-
 	TagClass* pTagClass = GetTagClassByIndex(tagIndex);
 	if (!pTagClass) return false;
 
-	Debug::Log("[TActionExt::BindAllTeamMemberToTag] Start\n");
 
 	for (auto const pTechno : TechnoClass::Array)
 	{
@@ -151,7 +148,6 @@ bool TActionExt::BindAllTeamMemberToTag(TActionClass* pThis, HouseClass* pHouse,
 					for (auto pUnit = pFoot->Team->FirstUnit; pUnit; pUnit = pUnit->NextTeamMember)
 					{
 						pUnit->AttachTrigger(pTagClass);
-						Debug::Log("[TActionExt::BindAllTeamMemberToTag] successful bind \"%s\" to tag \"%s\"\n", pUnit->get_ID(), pTagClass->Type->get_ID());
 					}
 				}
 			}
@@ -167,17 +163,13 @@ bool TActionExt::BindOwnerTeamMemberToTag(TActionClass* pThis, HouseClass* pHous
 	int tagIndex = pThis->Param4;
 	int houseIndex = pThis->Param5;
 
-	Debug::Log("[TActionExt::BindOwnerTeamMemberToTag] Startteam \"%d\" to tag \"%d\" house index \"%d\"\n", teamIndex, tagIndex, houseIndex);
-
 	TagClass* pTagClass = GetTagClassByIndex(tagIndex);
 	if (!pTagClass) return false;
 
-	Debug::Log("[TActionExt::BindOwnerTeamMemberToTag] Start\n");
 
 	HouseClass* pOwner = HouseClass::FindByCountryIndex(houseIndex);
 	if (!pOwner) return false;
 
-	Debug::Log("[TActionExt::BindOwnerTeamMemberToTag] Startteam \"%d\" to tag \"%d\" house is \"%s\"\n", teamIndex, tagIndex, pOwner->Name());
 
 	for (auto const pTechno : TechnoClass::Array)
 	{
@@ -195,7 +187,6 @@ bool TActionExt::BindOwnerTeamMemberToTag(TActionClass* pThis, HouseClass* pHous
 						for (auto pUnit = pFoot->Team->FirstUnit; pUnit; pUnit = pUnit->NextTeamMember)
 						{
 							pUnit->AttachTrigger(pTagClass);
-							Debug::Log("[TActionExt::BindOwnerTeamMemberToTag] successful bind \"%s\" to tag \"%s\"\n", pUnit->get_ID(), pTagClass->Type->get_ID());
 						}
 					}
 				}
@@ -220,11 +211,9 @@ bool TActionExt::BindAllTechnoTypeToTag(TActionClass* pThis, HouseClass* pHouse,
 		if (pTechno->get_ID() == std::string(techno))
 		{
 			pTechno->AttachTrigger(pTagClass);
-			Debug::Log("[TActionExt::BindAllTechnoTypeToTag] successful bind \"%s\" to tag \"%s\"\n", pTechno->get_ID(), pTagClass->Type->get_ID());
 		}
 	}
 
-	Debug::Log("[TActionExt::BindAllTechnoTypeToTag] End\n");
 	return true;
 }
 
@@ -248,12 +237,10 @@ bool TActionExt::BindOwnerTechnoTypeToTag(TActionClass* pThis, HouseClass* pHous
 			if (pTechno->get_ID() == std::string(techno))
 			{
 				pTechno->AttachTrigger(pTagClass);
-				Debug::Log("[TActionExt::BindOwnerTechnoTypeToTag] successful bind \"%s\" to tag \"%s\"\n", pTechno->get_ID(), pTagClass->Type->get_ID());
 			}
 		}
 	}
 
-	Debug::Log("[TActionExt::BindOwnerTechnoTypeToTag] End\n");
 	return true;
 }
 
