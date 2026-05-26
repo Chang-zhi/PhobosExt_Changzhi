@@ -1,6 +1,6 @@
 # [PhobosExt](https://github.com/Chang-zhi/PhobosExt_Changzhi)
 
-一个扩展《红色警戒2：尤里的复仇》游戏功能的 DLL，基于 Phobos 开发，作者[Chang_zhi](https://space.bilibili.com/423792550)。
+一个扩展《红色警戒2：尤里的复仇》游戏功能的 DLL，基于 Phobos 开发，作者[*Chang_zhi*](https://space.bilibili.com/423792550)。
 
 **理论上可以脱离 Ares 和 Phobos 单独运行，但仍建议与原版 Phobos 或 Ares 一同使用**
 
@@ -59,6 +59,8 @@
 
 允许将游戏中的单位（小队成员、特定科技类型）与标签（Tag）动态关联，便于后续通过触发器执行逻辑。  
 若标签（Tag）不存在/已销毁，则会根据标签类型（TagType）创建一个新标签（Tag），确保目标会与标签关联。  
+
+<span style="color: gray;">事实上，触发也会在小队创建时实例化，因此动作 `553` 和 `554` 实际上并没有必要，  只需要在 `作战小队` 的 `挂载标签` 上挂载所需标签即可以实现与该动作相同的效果，但仍保留以备不时之需。（写都写了.jpg）</span>
 
 **触发动作说明**：
 - `553` – 将指定小队全部成员关联到指定标签...（参数：小队索引，标签索引）
