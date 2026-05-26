@@ -14,6 +14,7 @@ enum PhobosTriggerEvent
 {
 	TechnoTypeOfHouseNearWaypoint = 550,
 	TechnoTypeOfHouseAllLeavesWaypoint = 551,
+	TechnoDestroyedByHouse = 552,
 
 	_DummyMaximum,
 };
@@ -50,6 +51,7 @@ public:
 
 
 	static bool TechnoTypeOfHouseNearWaypoint(TEventClass* pThis, ObjectClass* pObject, HouseClass* pHouse);
+	static bool TechnoDestroyedByHouse(TEventClass* pThis, ObjectClass* pAttached);
 
 	class ExtContainer final : public Container<TEventExt>
 	{
