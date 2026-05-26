@@ -4,6 +4,7 @@
 
 //forward declarations
 class TriggerClass;
+class ObjectClass;
 
 class NOVTABLE TagClass : public AbstractClass
 {
