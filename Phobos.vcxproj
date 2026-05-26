@@ -24,7 +24,6 @@
     <ClCompile Include="src\Ext\TAction\MyNew\Helper.cpp" />
     <ClCompile Include="src\Ext\TechnoType\Body.cpp" />
     <ClCompile Include="src\Ext\Techno\Body.cpp" />
-    <ClCompile Include="src\Ext\Techno\MyNew\DetectKiller.cpp" />
     <ClCompile Include="src\Ext\Techno\Hooks.cpp" />
     <ClCompile Include="src\Ext\Techno\Hooks.Firing.cpp" />
     <ClCompile Include="src\Ext\Techno\MyNew\AutoHunt.cpp" />
@@ -57,7 +56,6 @@
     <ClInclude Include="src\Ext\TAction\MyNew\Helper.h" />
     <ClInclude Include="src\Ext\TechnoType\Body.h" />
     <ClInclude Include="src\Ext\Techno\MyNew\AutoHunt.h" />
-    <ClInclude Include="src\Ext\Techno\MyNew\DetectKiller.h" />
     <ClInclude Include="src\Ext\Techno\MyNew\TemporalExclusive.h" />
     <ClInclude Include="src\Ext\TEvent\Body.h" />
     <ClInclude Include="src\Ext\TEvent\MyNew\Helper.h" />

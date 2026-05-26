@@ -9,7 +9,7 @@
 #include <CellClass.h>
 #include <HouseClass.h>
 #include <GeneralStructures.h>
-#include <Ext/Techno/MyNew/DetectKiller.h>
+// #include <Ext/Techno/MyNew/DetectKiller.h>
 
 #include <string>
 
@@ -76,9 +76,8 @@ std::optional<bool> TEventExt::Execute(TEventClass* pThis, int iEvent, HouseClas
 		return TEventExt::TechnoTypeOfHouseNearWaypoint(pThis, pObject, pHouse);
 	case PhobosTriggerEvent::TechnoTypeOfHouseAllLeavesWaypoint:
 		return !TEventExt::TechnoTypeOfHouseNearWaypoint(pThis, pObject, pHouse);
-
-	case PhobosTriggerEvent::TechnoDestroyedByHouse:
-		return TEventExt::TechnoDestroyedByHouse(pThis, pObject);
+	// case PhobosTriggerEvent::TechnoDestroyedByHouse:
+	// 	return TEventExt::TechnoDestroyedByHouse(pThis, pObject);
 
 	default:
 		return std::nullopt;
@@ -108,32 +107,8 @@ bool TEventExt::TechnoTypeOfHouseNearWaypoint(TEventClass* pThis, ObjectClass* p
 
 bool TEventExt::TechnoDestroyedByHouse(TEventClass* pThis, ObjectClass* pAttached)
 {
-	int houseIndex = pThis->Value;	// 从事件参数中读取所属方索引
 
-	HouseClass* pHouse = HouseClass::FindByCountryIndex(houseIndex);
-	if (!pHouse) return false;
-
-	// Debug::Log("[TechnoDestroyedByHouse] House is \"%s\"\n", pHouse->get_ID());
-
-	auto pDetectTech = abstract_cast<TechnoClass*>(pAttached);  // 待监控的单位
-	if(!pDetectTech) return false;
-
-	// Debug::Log("[TechnoDestroyedByHouse] Monitoring techno: \"%s\"\n", pDetectTech->get_ID());
-
-	auto it = Detections.find(pDetectTech);
-	if (it != Detections.end())
-	{
-		if (it->second.isSatisfyEvent)
-		{
-			Detections.erase(it); // 清理掉满足条件的记录, 不然会一直满足条件
-			return true;
-		}
-	}
-	else // 没找到, 新建一个
-	{
-		// Debug::Log("[TechnoDestroyedByHouse] Adding new detection for techno: \"%s\"\n", pDetectTech->get_ID());
-		Detections.insert({ pDetectTech, { pHouse, false } });
-	}
+	// 大败而归
 
 	return false;
 }

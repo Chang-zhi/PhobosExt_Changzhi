@@ -163,6 +163,7 @@ AutoHunt=                       ; boolean（布尔值），默认 false
 ...
 550=路径点附近存在所属方的科技类型... (PhobosExt by Chang_zhi),48,30,0,0,当指定路径点的指定距离内存在触发所属方任意科技类型时，此事件被满足。,0,1,550,1
 551=路径点附近不存在所属方的科技类型... (PhobosExt by Chang_zhi),48,30,0,0,当指定路径点的指定距离内不存在触发所属方任意科技类型时，此事件被满足。,0,1,551,1
+552=关联科技类型是否被指定的所属方摧毁...(PhobosExt by Chang_zhi),0,2,0,0,当关联的科技类型被指定的所属方摧毁时，此事件被满足。,0,1,552,1
 ...
 ```
 
@@ -193,6 +194,7 @@ AutoHunt=                       ; boolean（布尔值），默认 false
 ...
 550=There is a techno type of the house near the waypoint... (PhobosExt by Chang_zhi),48,30,0,0,This event is satisfied when there is any techno type of the triggering house within the specified distance of the specified waypoint.,0,1,550,1
 551=There is no techno type of the house near the waypoint... (PhobosExt by Chang_zhi),48,30,0,0,This event is satisfied when there is no techno type of the triggering house within the specified distance of the specified waypoint.,0,1,551,1
+552=Whether the associated techno type is destroyed by the specified house... (PhobosExt by Chang_zhi),0,2,0,0,This event is satisfied when the associated techno type is destroyed by the specified house.,0,1,552,1
 ...
 ```
 
@@ -201,6 +203,7 @@ AutoHunt=                       ; boolean（布尔值），默认 false
 ...
 550=路径点附近存在所属方的科技类型... (PhobosExt by Chang_zhi),48,30,0,0,当指定路径点的指定距离内存在触发所属方任意科技类型时，此事件被满足。,0,1,550,1
 551=路径点附近不存在所属方的科技类型... (PhobosExt by Chang_zhi),48,30,0,0,当指定路径点的指定距离内不存在触发所属方任意科技类型时，此事件被满足。,0,1,551,1
+552=关联科技类型是否被指定的所属方摧毁...(PhobosExt by Chang_zhi),0,2,0,0,当关联的科技类型被指定的所属方摧毁时，此事件被满足。,0,1,552,1
 ...
 ```
 

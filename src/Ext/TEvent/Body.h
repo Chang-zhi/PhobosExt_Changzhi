@@ -14,7 +14,7 @@ enum PhobosTriggerEvent
 {
 	TechnoTypeOfHouseNearWaypoint = 550,
 	TechnoTypeOfHouseAllLeavesWaypoint = 551,
-	TechnoDestroyedByHouse = 552,
+	// TechnoDestroyedByHouse = 552,
 
 	_DummyMaximum,
 };

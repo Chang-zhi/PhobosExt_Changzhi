@@ -30,10 +30,6 @@ DEFINE_HOOK(0x702E4E, TechnoClass_RegisterDestruction_isSatisfyEvent, 0x6)
 			{
 				it->second.isSatisfyEvent = true;
 			}
-			else // 不是特定所属方的单位杀死了被监视的单位，移除监视, 防止僵尸占用
-			{
-				Detections.erase(it);
-			}
 		}
 	}
 
