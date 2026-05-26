@@ -66,7 +66,16 @@
 - `555` – 将特定科技类型全部关联到指定标签...（参数：科技类型ID，标签索引）
 - `556` – 将指定所属方的特定科技类型全部关联到指定标签...（参数：科技类型ID，标签索引，所属方国家索引）
 
-### 3. 超时空武器互斥锁定
+### 3. 金钱操作功能
+允许动态调整指定所属方（玩家或电脑阵营）的资金数额，支持添加、扣除和直接设置。  
+所有操作均以所属方国家索引（House index）作为目标标识，金额单位为游戏内货币单位（即“钱”）。
+
+**触发动作说明**：
+- `557` – 为指定所属方添加金钱数额...（参数：所属方国家索引，金额数额）
+- `558` – 向指定所属方扣除金钱数额...（参数：所属方国家索引，金额数额）
+- `559` – 设置指定所属方的金钱数额...（参数：所属方国家索引，金额数额）
+
+### 4. 超时空武器互斥锁定
 
 为 `Temporal=yes` 的弹头增加互斥锁定机制。
 
@@ -81,28 +90,28 @@ TemporalExclusive=              ; boolean（布尔值），默认 false
 
 互斥武器不能攻击被普通超时空武器冻结的目标。
 
-### 4. 自动游猎
+### 5. 自动游猎
 ```ini
 [TechnoType]
 AutoHunt=                       ; boolean（布尔值），默认 false
 ```
-当科技类型设置 `AutoHunt=yes` 时，该类型的所有单位（仅限 AI 控制）会自动强制进入 Hunt 状态，主动搜索并攻击敌方目标。
+当科技类型设置 `AutoHunt=yes` 时，该类型的所有单位（仅限 AI 控制）会自动强制进入 `Hunt` 状态，主动搜索并攻击敌方目标。
 
 **行为细节**  
 
 - 仅限 AI：人类玩家控制的单位不会受此影响。
-- 帧间隔优化：每个单位每 `15` 帧执行一次逻辑检查，避免性能浪费。
+- 帧间隔：每个 `AutoHunt=yes` 的单位每 `15` 帧执行一次逻辑检查，避免性能浪费。
 - 载具内无效：如果单位位于载具内，AutoHunt 逻辑不会生效（离开载具后自动生效）。
-- 自动解除部署：如果单位当前处于部署状态，会先尝试解除部署，然后进入 Hunt 状态。
+- 自动解除部署：如果单位当前处于部署状态，会先尝试解除部署，然后进入 `Hunt` 状态。
 - 目标可达性检查：当单位有攻击目标时，会检查目标单元格是否可达。如果不可达，则跳过本次逻辑。
 - 禁止招募：单位的 `RecruitableA` 和 `RecruitableB` 会强制被设置为`false`，并从所属队伍中释放。
-- 攻击地面修正：如果单位当前攻击目标是单元格（强制攻击地面），会自动清除该目标，转为 Hunt 索敌。
+- 攻击地面修正：如果单位当前攻击目标是单元格（强制攻击地面），会自动清除该目标，转为 `Hunt` 索敌。
 
 ---
 
 ## 触发编辑器配置
 
-为了在触发编辑器（FinalAlert 2）中使用新的触发动作（550、551、552），需要修改 `FAData.ini` 或对应版本的配置文件。
+为了在触发编辑器（FinalAlert 2）中使用新的触发动作，需要修改 `FAData.ini` 或对应版本的配置文件。
 
 ### 标准 FinalAlert 2
 编辑 `FAData.ini`，在 `[ActionsRA2]` 小节中添加以下内容：
@@ -117,11 +126,14 @@ AutoHunt=                       ; boolean（布尔值），默认 false
 554=将指定所属方的指定小队全部成员关联到指定标签... (PhobosExt by Chang_zhi),0,0,7,38,2,0,0,0,0,将指定所属方下的指定小队所有成员关联到指定标签。若标签（Tag）不存在/已销毁，则会根据标签类型（TagType）创建一个新标签（Tag），确保目标会与标签关联。,0,1,554,1
 555=将特定科技类型全部关联到指定标签... (PhobosExt by Chang_zhi),-4,46,38,0,0,0,0,0,0,将指定科技类型的所有实例关联到指定标签。若标签（Tag）不存在/已销毁，则会根据标签类型（TagType）创建一个新标签（Tag），确保目标会与标签关联。,0,1,555,1
 556=将指定所属方的特定科技类型全部关联到指定标签... (PhobosExt by Chang_zhi),-4,46,38,2,0,0,0,0,0,将指定所属方下指定科技类型的所有实例关联到指定标签。若标签（Tag）不存在/已销毁，则会根据标签类型（TagType）创建一个新标签（Tag），确保目标会与标签关联。,0,1,556,1
+557=为所属方添加金钱数额...,0,0,2,6,0,0,0,0,0,为指定所属方添加指定的金钱数额。,0,1,557,1
+558=为所属方扣除金钱数额...,0,0,2,6,0,0,0,0,0,为指定所属方扣除指定的金钱数额。,0,1,558,1
+559=设置所属方的金钱数额...,0,0,2,6,0,0,0,0,0,设置指定所属方的金钱数额。,0,1,559,1
 ...
 ```
 
 ### [*FA2SP_HDM_Edition*](https://github.com/handama/FA2sp)（韩大妈版本）
-需要同时修改 FAData_TriggerAndScript.ini 中的 `[English-ActionsRA2]` 和 `[Chinese-ActionsRA2]` 小节。
+需要同时编辑 `FAData_TriggerAndScript.ini` 中的 `[English-ActionsRA2]` 和 `[Chinese-ActionsRA2]` 小节。
 
 在 `[English-ActionsRA2]` 小节中添加:
 ```ini
@@ -134,6 +146,10 @@ AutoHunt=                       ; boolean（布尔值），默认 false
 554=Associate all members of the specified team under the specified owner to the specified tag... (PhobosExt by Chang_zhi),0,0,7,38,2,0,0,0,0,Associate all members of the specified team under the specified owner to the specified tag. If the tag does not exist or has been destroyed，a new tag will be created according to the tag type (TagType) to ensure the target is associated with the tag.,0,1,554,1
 555=Associate all instances of the specified technotype to the specified tag... (PhobosExt by Chang_zhi),-4,46,38,0,0,0,0,0,0,Associate all instances of the specified technotype to the specified tag. If the tag does not exist or has been destroyed，a new tag will be created according to the tag type (TagType) to ensure the target is associated with the tag.,0,1,555,1
 556=Associate all instances of the specified technotype under the specified owner to the specified tag... (PhobosExt by Chang_zhi),-4,46,38,2,0,0,0,0,0,Associate all instances of the specified technotype under the specified owner to the specified tag. If the tag does not exist or has been destroyed，a new tag will be created according to the tag type (TagType) to ensure the target is associated with the tag.,0,1,556,1
+556=Associate all instances of the specified technotype under the specified owner to the specified tag... (PhobosExt by Chang_zhi),-4,46,38,2,0,0,0,0,0,Associate all instances of the specified technotype under the specified owner to the specified tag. If the tag does not exist or has been destroyed，a new tag will be created according to the tag type (TagType) to ensure the target is associated with the tag.,0,1,556,1
+557=Add a specified amount of money to the specified house...,0,0,2,6,0,0,0,0,0,Adds the specified amount of money to the specified house.,0,1,557,1
+558=Deduct a specified amount of money from the specified house...,0,0,2,6,0,0,0,0,0,Deducts the specified amount of money from the specified house.,0,1,558,1
+559=Set the money amount for the specified house...,0,0,2,6,0,0,0,0,0,Sets the money amount for the specified house.,0,1,559,1
 ...
 ```
 
@@ -149,5 +165,8 @@ AutoHunt=                       ; boolean（布尔值），默认 false
 554=将指定所属方的指定小队全部成员关联到指定标签... (PhobosExt by Chang_zhi),0,0,7,38,2,0,0,0,0,将指定所属方下的指定小队所有成员关联到指定标签。若标签（Tag）不存在/已销毁，则会根据标签类型（TagType）创建一个新标签（Tag），确保目标会与标签关联。,0,1,554,1
 555=将特定科技类型全部关联到指定标签... (PhobosExt by Chang_zhi),-4,46,38,0,0,0,0,0,0,将指定科技类型的所有实例关联到指定标签。若标签（Tag）不存在/已销毁，则会根据标签类型（TagType）创建一个新标签（Tag），确保目标会与标签关联。,0,1,555,1
 556=将指定所属方的特定科技类型全部关联到指定标签... (PhobosExt by Chang_zhi),-4,46,38,2,0,0,0,0,0,将指定所属方下指定科技类型的所有实例关联到指定标签。若标签（Tag）不存在/已销毁，则会根据标签类型（TagType）创建一个新标签（Tag），确保目标会与标签关联。,0,1,556,1
+557=为所属方添加金钱数额...,0,0,2,6,0,0,0,0,0,为指定所属方添加指定的金钱数额。,0,1,557,1
+558=为所属方扣除金钱数额...,0,0,2,6,0,0,0,0,0,为指定所属方扣除指定的金钱数额。,0,1,558,1
+559=设置所属方的金钱数额...,0,0,2,6,0,0,0,0,0,设置指定所属方的金钱数额。,0,1,559,1
 ...
 ```
