@@ -92,6 +92,10 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 	//case PhobosTriggerAction::SetObjectRecruitable:
 	//	return TActionExt::SetObjectRecruitable(pThis, pHouse, pObject, pTrigger, location);
 
+
+
+	case PhobosTriggerAction::testAction:
+		return TActionExt::testAction(pThis, pHouse, pObject, pTrigger, location);
 	default:
 		bHandled = false;
 		return true;
@@ -640,6 +644,47 @@ bool TActionExt::BindTagToTechnoTypeOfHouseAtWaypoint(TActionClass* pThis, House
 //
 //	return true;
 //}
+
+bool TActionExt::testAction(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	int tagIndex = pThis->Param3;
+
+	std::string tagIndex_str = ("0" + std::to_string(tagIndex));
+	TagTypeClass* pTagType = TagTypeClass::FindByNameOrID(tagIndex_str.c_str());
+	Debug::Log("Looking for TagType with ID \"%s\".\n", tagIndex_str.c_str());
+
+	Debug::Log("[Array]: Try to check tag.\n");
+	for (TagClass* it : TagClass::Array)
+	{
+		Debug::Log("[Array]: Check tag: \"%s\".\n", it->Type->ID);
+		if(it->Type == pTagType)
+		{
+			Debug::Log("[Array]: Found tag with matching type! Tag ID: \"%s\".\n", it->Type->ID);
+		}
+	}
+
+	Debug::Log("[Array_Logic]: Try to check tag.\n");
+	for (TagClass* it : TagClass::Array_Logic)
+	{
+		Debug::Log("[Array_Logic]: Check tag: \"%s\".\n", it->Type->ID);
+		if (it->Type == pTagType)
+		{
+			Debug::Log("[Array_Logic]: Found tag with matching type! Tag ID: \"%s\".\n", it->Type->ID);
+		}
+	}
+
+	Debug::Log("[Array_unknown]: Try to check tag.\n");
+	for (TagClass* it : TagClass::Array_unknown)
+	{
+		Debug::Log("[Array_unknown]: Check tag: \"%s\".\n", it->Type->ID);
+		if (it->Type == pTagType)
+		{
+			Debug::Log("[Array_unknown]: Found tag with matching type! Tag ID: \"%s\".\n", it->Type->ID);
+		}
+	}
+
+	return true;
+}
 
 // =============================
 // container

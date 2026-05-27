@@ -61,6 +61,10 @@ enum class PhobosTriggerAction : unsigned int
 
 	//// 设置关联单位单位的可招募属性...
 	//SetObjectRecruitable = 566,
+
+
+	// 测试用
+	testAction = 1150,
 };
 
 class TActionExt
@@ -113,6 +117,8 @@ public:
 	ACTION_FUNC(BindTagToTechnoTypeAtWaypoint);
 	ACTION_FUNC(BindTagToTechnoTypeOfHouseAtWaypoint);
 	// ACTION_FUNC(SetObjectRecruitable);
+
+	ACTION_FUNC(testAction);
 
 #undef ACTION_FUNC
 #pragma pop_macro("ACTION_FUNC")
