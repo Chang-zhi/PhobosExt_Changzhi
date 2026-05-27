@@ -190,6 +190,8 @@ AutoHunt=                       ; boolean（布尔值），默认 false
 557=为所属方添加金钱数额...,0,0,2,6,0,0,0,0,0,为指定所属方添加指定的金钱数额。,0,1,557,1
 558=为所属方扣除金钱数额...,0,0,2,6,0,0,0,0,0,为指定所属方扣除指定的金钱数额。,0,1,558,1
 559=设置所属方的金钱数额...,0,0,2,6,0,0,0,0,0,设置指定所属方的金钱数额。,0,1,559,1
+560=在指定路径点添加基地节点...,0,0,2,30,8,0,0,0,0,在指定路径点添加指定所属方的基地节点。,0,1,560,1
+561=移除指定路径点上的所有基地节点...,0,0,2,30,0,0,0,0,0,移除指定路径点上指定所属方的所有基地节点。,0,1,561,1
 ...
 ```
 
@@ -230,6 +232,8 @@ AutoHunt=                       ; boolean（布尔值），默认 false
 557=Add a specified amount of money to the specified house...,0,0,2,6,0,0,0,0,0,Adds the specified amount of money to the specified house.,0,1,557,1
 558=Deduct a specified amount of money from the specified house...,0,0,2,6,0,0,0,0,0,Deducts the specified amount of money from the specified house.,0,1,558,1
 559=Set the money amount for the specified house...,0,0,2,6,0,0,0,0,0,Sets the money amount for the specified house.,0,1,559,1
+560=Add base node at waypoint...,0,0,2,30,8,0,0,0,0,Add base node for specified house at waypoint.,0,1,560,1
+561=Remove all base nodes at waypoint...,0,0,2,30,0,0,0,0,0,Remove all base nodes for specified house at waypoint.,0,1,561,1
 ...
 ```
 
@@ -246,5 +250,7 @@ AutoHunt=                       ; boolean（布尔值），默认 false
 557=为所属方添加金钱数额...,0,0,2,6,0,0,0,0,0,为指定所属方添加指定的金钱数额。,0,1,557,1
 558=为所属方扣除金钱数额...,0,0,2,6,0,0,0,0,0,为指定所属方扣除指定的金钱数额。,0,1,558,1
 559=设置所属方的金钱数额...,0,0,2,6,0,0,0,0,0,设置指定所属方的金钱数额。,0,1,559,1
+560=在指定路径点添加基地节点...,0,0,2,30,8,0,0,0,0,在指定路径点添加指定所属方的基地节点。,0,1,560,1
+561=移除指定路径点上的所有基地节点...,0,0,2,30,0,0,0,0,0,移除指定路径点上指定所属方的所有基地节点。,0,1,561,1
 ...
 ```
