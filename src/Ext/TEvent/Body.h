@@ -14,7 +14,8 @@ enum PhobosTriggerEvent
 {
 	TechnoTypeOfHouseNearWaypoint = 550,
 	TechnoTypeOfHouseAllLeavesWaypoint = 551,
-	// TechnoDestroyedByHouse = 552,
+	TechnoTypeOfHouseExistsAtWaypoint = 552,
+	TechnoTypeOfHouseNotExistsAtWaypoint = 553,
 
 	_DummyMaximum,
 };
@@ -51,7 +52,8 @@ public:
 
 
 	static bool TechnoTypeOfHouseNearWaypoint(TEventClass* pThis, ObjectClass* pObject, HouseClass* pHouse);
-	static bool TechnoDestroyedByHouse(TEventClass* pThis, ObjectClass* pAttached);
+	static bool TechnoTypeOfHouseExistsAtWaypoint(TEventClass* pThis, HouseClass* pHouse);
+	// static bool TechnoDestroyedByHouse(TEventClass* pThis, ObjectClass* pAttached);
 
 	class ExtContainer final : public Container<TEventExt>
 	{
