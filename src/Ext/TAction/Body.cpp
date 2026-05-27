@@ -160,7 +160,8 @@ bool TActionExt::BindAllTeamMemberToTag(TActionClass* pThis, HouseClass* pHouse,
 				{
 					for (auto pUnit = pFoot->Team->FirstUnit; pUnit; pUnit = pUnit->NextTeamMember)
 					{
-						pUnit->AttachTrigger(pTagClass);
+						if (pUnit->AttachedTag) pUnit->ReplaceTag(pTagClass);
+						else pUnit->AttachTrigger(pTagClass);
 					}
 				}
 			}
@@ -199,7 +200,8 @@ bool TActionExt::BindOwnerTeamMemberToTag(TActionClass* pThis, HouseClass* pHous
 					{
 						for (auto pUnit = pFoot->Team->FirstUnit; pUnit; pUnit = pUnit->NextTeamMember)
 						{
-							pUnit->AttachTrigger(pTagClass);
+							if (pUnit->AttachedTag) pUnit->ReplaceTag(pTagClass);
+							else pUnit->AttachTrigger(pTagClass);
 						}
 					}
 				}
@@ -223,7 +225,8 @@ bool TActionExt::BindAllTechnoTypeToTag(TActionClass* pThis, HouseClass* pHouse,
 	{
 		if (pTechno->get_ID() == std::string(techno))
 		{
-			pTechno->AttachTrigger(pTagClass);
+			if (pTechno->AttachedTag) pTechno->ReplaceTag(pTagClass);
+			else pTechno->AttachTrigger(pTagClass);
 		}
 	}
 
@@ -249,7 +252,8 @@ bool TActionExt::BindOwnerTechnoTypeToTag(TActionClass* pThis, HouseClass* pHous
 		{
 			if (pTechno->get_ID() == std::string(techno))
 			{
-				pTechno->AttachTrigger(pTagClass);
+				if (pTechno->AttachedTag) pTechno->ReplaceTag(pTagClass);
+				else pTechno->AttachTrigger(pTagClass);
 			}
 		}
 	}
