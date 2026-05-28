@@ -154,8 +154,9 @@ bool TActionExt::BindAllTeamMemberToTag(TActionClass* pThis, HouseClass* pHouse,
 {
 	int teamIndex = pThis->Param3;
 	int tagIndex = pThis->Param4;
+	int forceNew = pThis->Param5;
 
-	TagClass* pTagClass = GetTagClassByIndex(tagIndex);
+	TagClass* pTagClass = GetTagClassByIndex(tagIndex, forceNew);
 	if (!pTagClass) return false;
 
 	for (auto const pTechno : TechnoClass::Array)
@@ -187,8 +188,9 @@ bool TActionExt::BindOwnerTeamMemberToTag(TActionClass* pThis, HouseClass* pHous
 	int teamIndex = pThis->Param3;
 	int tagIndex = pThis->Param4;
 	int houseIndex = pThis->Param5;
+	int forceNew = pThis->Param6;
 
-	TagClass* pTagClass = GetTagClassByIndex(tagIndex);
+	TagClass* pTagClass = GetTagClassByIndex(tagIndex, forceNew);
 	if (!pTagClass) return false;
 
 
@@ -227,8 +229,9 @@ bool TActionExt::BindAllTechnoTypeToTag(TActionClass* pThis, HouseClass* pHouse,
 {
 	const char* techno = pThis->Text;
 	int tagIndex = pThis->Param3;
+	int forceNew = pThis->Param4;
 
-	TagClass* pTagClass = GetTagClassByIndex(tagIndex);
+	TagClass* pTagClass = GetTagClassByIndex(tagIndex, forceNew);
 	if (!pTagClass) return false;
 
 	// 遍历 TechnoClass, 尝试把 TagClass 绑定到 TechnoClass 上
@@ -249,8 +252,9 @@ bool TActionExt::BindOwnerTechnoTypeToTag(TActionClass* pThis, HouseClass* pHous
 	const char* techno = pThis->Text;
 	int tagIndex = pThis->Param3;
 	int houseIndex = pThis->Param4;
+	int forceNew = pThis->Param5;
 
-	TagClass* pTagClass = GetTagClassByIndex(tagIndex);
+	TagClass* pTagClass = GetTagClassByIndex(tagIndex, forceNew);
 	if (!pTagClass) return false;
 
 	HouseClass* pOwner = HouseClass::FindByCountryIndex(houseIndex);
