@@ -11,22 +11,25 @@
 
 TagClass* GetTagClassByIndex(int Index, bool forceNew)
 {
-	std::string tagIndex = ("0" + std::to_string(Index));
-	TagTypeClass *pTagType = TagTypeClass::FindByNameOrID(tagIndex.c_str());
+	std::string tagIndex = "0" + std::to_string(Index);
+	TagTypeClass* pTagType = TagTypeClass::FindByNameOrID(tagIndex.c_str());
+	if (!pTagType) return nullptr;
 
-	TagClass* pTagClass = nullptr;
-
-	if (forceNew) // 强制新建, 不管有没有同类型的标签. 
+	if (forceNew)
 	{
-		// 在这里new会直接添加到游戏内的动态数组里, 不需要手动添加
-		pTagClass = new TagClass(pTagType);
-	}
-	else // 不强制新建, 先找找看有没有同类型的标签, 没有的话才新建.
-	{
-		// ww 还是有点用的(
-		// finds an instance using the type, or creates one
-		pTagClass = TagClass::GetInstance(pTagType);
-	}
+		// 直接调用原版构造函数，它会自动完成所有初始化并加入全局数组
+		// 必须用游戏的内存分配组件, 不然在dll和游戏内传指针读档会崩
 
-	return pTagClass;
+		// 这个写法太繁琐了, 换下面使用的那个写法
+		// void* pMemory = YRMemory::AllocateChecked(sizeof(TagClass));
+		// if (!pMemory) return nullptr;
+		// TagClass* pNewTag = new (pMemory) TagClass(pTagType);
+
+		TagClass* pNewTag = GameCreate<TagClass>(pTagType);
+		return pNewTag;
+	}
+	else
+	{
+		return TagClass::GetInstance(pTagType);
+	}
 }

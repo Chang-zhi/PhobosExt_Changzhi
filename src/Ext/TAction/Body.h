@@ -59,9 +59,20 @@ enum class PhobosTriggerAction : unsigned int
 	// 为路径点上指定所属方的科技类型绑定标签...
 	BindTagToTechnoTypeOfHouseAtWaypoint = 565,
 
-	//// 设置关联单位单位的可招募属性...
-	SetObjectRecruitable = 566,
+	// 为路径点范围内的指定科技类型绑定标签...
+	BindTagToSpecificTechnoTypeWithinWaypointRange = 566,
 
+	// 为路径点范围内指定所属方的指定科技类型绑定标签...
+	BindTagToSpecificTechnoTypeOfSpecificOwnerWithinWaypointRange = 567,
+
+	// 为路径点范围内的所有科技类型绑定标签...
+	BindTagToAllTechnoTypesWithinWaypointRange = 568,
+
+	// 为路径点范围内指定所属方的所有科技类型绑定标签...
+	BindTagToAllTechnoTypesOfSpecificOwnerWithinWaypointRange = 569,
+
+	// 设置关联单位单位的可招募属性...
+	// SetObjectRecruitable = 566,
 
 	// 测试用
 	testAction = 1150,
@@ -116,7 +127,13 @@ public:
 	ACTION_FUNC(DestroyAllTagByTagTypeSafely);
 	ACTION_FUNC(BindTagToTechnoTypeAtWaypoint);
 	ACTION_FUNC(BindTagToTechnoTypeOfHouseAtWaypoint);
-	ACTION_FUNC(SetObjectRecruitable);
+	ACTION_FUNC(BindTagToSpecificTechnoTypeWithinWaypointRange);
+	ACTION_FUNC(BindTagToSpecificTechnoTypeOfSpecificOwnerWithinWaypointRange);
+	ACTION_FUNC(BindTagToAllTechnoTypesWithinWaypointRange);
+	ACTION_FUNC(BindTagToAllTechnoTypesOfSpecificOwnerWithinWaypointRange);
+
+
+	// ACTION_FUNC(SetObjectRecruitable);
 
 	ACTION_FUNC(testAction);
 
