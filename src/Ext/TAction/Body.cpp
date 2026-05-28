@@ -98,6 +98,8 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 	 	return TActionExt::BindTagToAllTechnoTypesWithinWaypointRange(pThis, pHouse, pObject, pTrigger, location);
 	case PhobosTriggerAction::BindTagToAllTechnoTypesOfSpecificOwnerWithinWaypointRange:
 		return TActionExt::BindTagToAllTechnoTypesOfSpecificOwnerWithinWaypointRange(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::UnifyAllInstancesOfSameTagType:
+		return TActionExt::UnifyAllInstancesOfSameTagType(pThis, pHouse, pObject, pTrigger, location);
 
 
 	//case PhobosTriggerAction::RemoveBaseNodesExceedingAttemptCountForHouse:
@@ -835,6 +837,32 @@ bool TActionExt::testAction(TActionClass* pThis, HouseClass* pHouse, ObjectClass
 		{
 			Debug::Log("[Array_unknown]: Found tag with matching type! Tag ID: \"%s\".\n", it->Type->ID);
 		}
+	}
+
+	return true;
+}
+
+bool TActionExt::UnifyAllInstancesOfSameTagType(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	int tagIndex = pThis->Param3;
+	
+	TagClass* pUnifiedTag = GetTagClassByIndex(tagIndex, true);
+	if (!pUnifiedTag) return false;
+	
+	std::set<TagClass*> tagsToUnify;
+
+	for(TechnoClass *pTechno : TechnoClass::Array)
+	{
+		if(pTechno->AttachedTag && pTechno->AttachedTag->Type == pUnifiedTag->Type)
+		{
+			tagsToUnify.insert(pTechno->AttachedTag);
+			pTechno->ReplaceTag(pUnifiedTag);
+		}
+	}
+
+	for(TagClass* it : tagsToUnify)
+	{
+		it->Destroy();
 	}
 
 	return true;
