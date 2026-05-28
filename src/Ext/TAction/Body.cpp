@@ -100,6 +100,8 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 		return TActionExt::BindTagToAllTechnoTypesOfSpecificOwnerWithinWaypointRange(pThis, pHouse, pObject, pTrigger, location);
 	case PhobosTriggerAction::UnifyAllInstancesOfSameTagType:
 		return TActionExt::UnifyAllInstancesOfSameTagType(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::SetRecruitableForFoot:
+		return TActionExt::SetRecruitableForFoot(pThis, pHouse, pObject, pTrigger, location);
 
 
 	//case PhobosTriggerAction::RemoveBaseNodesExceedingAttemptCountForHouse:
@@ -107,8 +109,6 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 	//case PhobosTriggerAction::SetObjectRecruitable:
 	//	return TActionExt::SetObjectRecruitable(pThis, pHouse, pObject, pTrigger, location);
 
-	case PhobosTriggerAction::testAction:
-		return TActionExt::testAction(pThis, pHouse, pObject, pTrigger, location);
 	default:
 		bHandled = false;
 		return true;
@@ -760,88 +760,6 @@ bool TActionExt::BindTagToAllTechnoTypesOfSpecificOwnerWithinWaypointRange(TActi
 	return true;
 }
 
-bool TActionExt::testAction(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
-{
-	int tagIndex = pThis->Param3;
-
-	std::string tagIndex_str = ("0" + std::to_string(tagIndex));
-	TagTypeClass* pTagType = TagTypeClass::FindByNameOrID(tagIndex_str.c_str());
-	Debug::Log("Looking for TagType with ID \"%s\".\n", tagIndex_str.c_str());
-
-	Debug::Log("[Array]: Try to check tag.\n");
-	for (TagClass* it : TagClass::Array)
-	{
-		Debug::Log("[Array]: Check tag: \"%s\".\n", it->Type->ID);
-		if (it->Type == pTagType)
-		{
-			Debug::Log("[Array]: Found tag with matching type! Tag ID: \"%s\".\n", it->Type->ID);
-		}
-	}
-
-	Debug::Log("[Array_Logic]: Try to check tag.\n");
-	for (TagClass* it : TagClass::Array_Logic)
-	{
-		Debug::Log("[Array_Logic]: Check tag: \"%s\".\n", it->Type->ID);
-		if (it->Type == pTagType)
-		{
-			Debug::Log("[Array_Logic]: Found tag with matching type! Tag ID: \"%s\".\n", it->Type->ID);
-		}
-	}
-
-	Debug::Log("[Array_unknown]: Try to check tag.\n");
-	for (TagClass* it : TagClass::Array_unknown)
-	{
-		Debug::Log("[Array_unknown]: Check tag: \"%s\".\n", it->Type->ID);
-		if (it->Type == pTagType)
-		{
-			Debug::Log("[Array_unknown]: Found tag with matching type! Tag ID: \"%s\".\n", it->Type->ID);
-		}
-	}
-
-	Debug::Log("[testAction]: test 2 part.\n");
-
-	// 在这里new会直接创建一个标签并添加到游戏内的动态数组里
-	// TagClass * pNewTag = new TagClass(pTagType);
-
-
-
-	Debug::Log("[testAction]: Get and Destroying Instance.\n");
-	TagClass* pTag = TagClass::GetInstance(pTagType);
-	pTag->Destroy();
-
-	Debug::Log("[Array]: Try to check tag.\n");
-	for (TagClass* it : TagClass::Array)
-	{
-		Debug::Log("[Array]: Check tag: \"%s\".\n", it->Type->ID);
-		if (it->Type == pTagType)
-		{
-			Debug::Log("[Array]: Found tag with matching type! Tag ID: \"%s\".\n", it->Type->ID);
-		}
-	}
-
-	Debug::Log("[Array_Logic]: Try to check tag.\n");
-	for (TagClass* it : TagClass::Array_Logic)
-	{
-		Debug::Log("[Array_Logic]: Check tag: \"%s\".\n", it->Type->ID);
-		if (it->Type == pTagType)
-		{
-			Debug::Log("[Array_Logic]: Found tag with matching type! Tag ID: \"%s\".\n", it->Type->ID);
-		}
-	}
-
-	Debug::Log("[Array_unknown]: Try to check tag.\n");
-	for (TagClass* it : TagClass::Array_unknown)
-	{
-		Debug::Log("[Array_unknown]: Check tag: \"%s\".\n", it->Type->ID);
-		if (it->Type == pTagType)
-		{
-			Debug::Log("[Array_unknown]: Found tag with matching type! Tag ID: \"%s\".\n", it->Type->ID);
-		}
-	}
-
-	return true;
-}
-
 bool TActionExt::UnifyAllInstancesOfSameTagType(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {
 	int tagIndex = pThis->Param3;
@@ -863,6 +781,24 @@ bool TActionExt::UnifyAllInstancesOfSameTagType(TActionClass* pThis, HouseClass*
 	for(TagClass* it : tagsToUnify)
 	{
 		it->Destroy();
+	}
+
+	return true;
+}
+
+
+bool TActionExt::SetRecruitableForFoot(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	bool recruitableA = pThis->Param3;
+	bool recruitableB = pThis->Param4;
+
+	for (FootClass* pFoot : FootClass::Array)
+	{
+		if (pFoot && pFoot->AttachedTag && pFoot->AttachedTag->ContainsTrigger(pTrigger))
+		{
+			pFoot->RecruitableA = recruitableA;
+			pFoot->RecruitableB = recruitableA;
+		}
 	}
 
 	return true;
