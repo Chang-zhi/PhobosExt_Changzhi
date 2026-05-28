@@ -60,7 +60,7 @@ enum class PhobosTriggerAction : unsigned int
 	BindTagToTechnoTypeOfHouseAtWaypoint = 565,
 
 	//// 设置关联单位单位的可招募属性...
-	//SetObjectRecruitable = 566,
+	SetObjectRecruitable = 566,
 
 
 	// 测试用
@@ -116,7 +116,7 @@ public:
 	ACTION_FUNC(DestroyAllTagByTagTypeSafely);
 	ACTION_FUNC(BindTagToTechnoTypeAtWaypoint);
 	ACTION_FUNC(BindTagToTechnoTypeOfHouseAtWaypoint);
-	// ACTION_FUNC(SetObjectRecruitable);
+	ACTION_FUNC(SetObjectRecruitable);
 
 	ACTION_FUNC(testAction);
 

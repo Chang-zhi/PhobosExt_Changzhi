@@ -630,29 +630,29 @@ bool TActionExt::BindTagToTechnoTypeOfHouseAtWaypoint(TActionClass* pThis, House
 	return true;
 }
 
-//bool TActionExt::SetObjectRecruitable(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
-//{
-//	bool recruitableA = pThis->Param3;
-//	bool recruitableB = pThis->Param4;
-//
-//	if(pThis->TagType)
-//	{
-//		Debug::Log("This TagType is \"%s\".\n", pThis->TagType);
-//	}
-//
-//	if (pObject)
-//	{
-//		Debug::Log("Object \"%s\" is being processed.\n", pObject->GetTechnoType()->ID);
-//	}
-//
-//	if(auto pTechno = abstract_cast<TechnoClass*>(pObject))
-//	{
-//		pTechno->RecruitableA = recruitableA;
-//		pTechno->RecruitableB = recruitableB;
-//	}
-//
-//	return true;
-//}
+bool TActionExt::SetObjectRecruitable(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	bool recruitableA = pThis->Param3;
+	bool recruitableB = pThis->Param4;
+
+	if(pThis->TagType)
+	{
+		Debug::Log("This TagType is \"%s\".\n", pThis->TagType);
+	}
+
+	if (pObject)
+	{
+		Debug::Log("Object \"%s\" is being processed.\n", pObject->GetTechnoType()->ID);
+	}
+
+	if(auto pTechno = abstract_cast<TechnoClass*>(pObject))
+	{
+		pTechno->RecruitableA = recruitableA;
+		pTechno->RecruitableB = recruitableB;
+	}
+
+	return true;
+}
 
 bool TActionExt::testAction(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {
