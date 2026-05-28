@@ -369,7 +369,7 @@ bool TActionExt::RemoveAllBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseC
 		}
 	}
 
-	// 2. 对每个涉及到的建筑类型，清理正在进行的生产（仿照第二个函数）
+	// 2. 对每个涉及到的建筑类型，清理正在进行的生产
 	for (int buildTypeIndex : typesToClean)
 	{
 		if (buildTypeIndex < 0 || buildTypeIndex >= BuildingTypeClass::Array.Count)
