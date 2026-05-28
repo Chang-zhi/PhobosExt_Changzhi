@@ -83,8 +83,8 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 		return TActionExt::RemoveAllBaseNodeForHouseAtWaypoint(pThis, pHouse, pObject, pTrigger, location);
 	case PhobosTriggerAction::RemoveBaseNodesOfBuildingTypeForHouse:
 		return TActionExt::RemoveBaseNodesOfBuildingTypeForHouse(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::DestroyTagSafely:
-		return TActionExt::DestroyTagSafely(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::DestroyAllTagByTagTypeSafely:
+		return TActionExt::DestroyAllTagByTagTypeSafely(pThis, pHouse, pObject, pTrigger, location);
 	case PhobosTriggerAction::BindTagToTechnoTypeAtWaypoint:
 		return TActionExt::BindTagToTechnoTypeAtWaypoint(pThis, pHouse, pObject, pTrigger, location);
 	case PhobosTriggerAction::BindTagToTechnoTypeOfHouseAtWaypoint:
@@ -157,7 +157,6 @@ bool TActionExt::BindAllTeamMemberToTag(TActionClass* pThis, HouseClass* pHouse,
 
 	TagClass* pTagClass = GetTagClassByIndex(tagIndex);
 	if (!pTagClass) return false;
-
 
 	for (auto const pTechno : TechnoClass::Array)
 	{
@@ -516,22 +515,28 @@ bool TActionExt::RemoveBaseNodesOfBuildingTypeForHouse(TActionClass* pThis, Hous
 	return true;
 }
 
-bool TActionExt::DestroyTagSafely(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+bool TActionExt::DestroyAllTagByTagTypeSafely(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {
 	int tagIndex = pThis->Param3;
 
-	// 因为没有标签会尝试创建一个, 所以不会崩溃(大概)
-	TagClass* pTagClass = GetTagClassByIndex(tagIndex);
+	std::string tagIndex_str = ("0" + std::to_string(tagIndex));
+	TagTypeClass* pTagType = TagTypeClass::FindByNameOrID(tagIndex_str.c_str());
 
-	for (auto pTechno : TechnoClass::Array)
+	std::vector<TagClass*> tagsToDestroy;
+
+	for(TagClass* pTag : TagClass::Array)
 	{
-		if (pTechno->AttachedTag && pTechno->AttachedTag->Type == pTagClass->Type)
+		if (pTag && !pTag->Destroyed && pTag->Type == pTagType)
 		{
-			pTechno->AttachedTag->Destroy();
+			tagsToDestroy.push_back(pTag);
 		}
 	}
 
-	pTagClass->Destroy();
+	for (auto pTag : tagsToDestroy)
+	{
+		pTag->Destroy();
+	}
+
 	return true;
 }
 
@@ -658,6 +663,47 @@ bool TActionExt::testAction(TActionClass* pThis, HouseClass* pHouse, ObjectClass
 	{
 		Debug::Log("[Array]: Check tag: \"%s\".\n", it->Type->ID);
 		if(it->Type == pTagType)
+		{
+			Debug::Log("[Array]: Found tag with matching type! Tag ID: \"%s\".\n", it->Type->ID);
+		}
+	}
+
+	Debug::Log("[Array_Logic]: Try to check tag.\n");
+	for (TagClass* it : TagClass::Array_Logic)
+	{
+		Debug::Log("[Array_Logic]: Check tag: \"%s\".\n", it->Type->ID);
+		if (it->Type == pTagType)
+		{
+			Debug::Log("[Array_Logic]: Found tag with matching type! Tag ID: \"%s\".\n", it->Type->ID);
+		}
+	}
+
+	Debug::Log("[Array_unknown]: Try to check tag.\n");
+	for (TagClass* it : TagClass::Array_unknown)
+	{
+		Debug::Log("[Array_unknown]: Check tag: \"%s\".\n", it->Type->ID);
+		if (it->Type == pTagType)
+		{
+			Debug::Log("[Array_unknown]: Found tag with matching type! Tag ID: \"%s\".\n", it->Type->ID);
+		}
+	}
+
+	Debug::Log("[testAction]: test 2 part.\n");
+
+	// 在这里new会直接创建一个标签并添加到游戏内的动态数组里
+	// TagClass * pNewTag = new TagClass(pTagType);
+
+
+
+	 Debug::Log("[testAction]: Get and Destroying Instance.\n");
+	 TagClass* pTag = TagClass::GetInstance(pTagType);
+	 pTag->Destroy();
+
+	Debug::Log("[Array]: Try to check tag.\n");
+	for (TagClass* it : TagClass::Array)
+	{
+		Debug::Log("[Array]: Check tag: \"%s\".\n", it->Type->ID);
+		if (it->Type == pTagType)
 		{
 			Debug::Log("[Array]: Found tag with matching type! Tag ID: \"%s\".\n", it->Type->ID);
 		}

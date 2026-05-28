@@ -51,7 +51,7 @@ enum class PhobosTriggerAction : unsigned int
 	RemoveBaseNodesOfBuildingTypeForHouse = 562,
 
 	// 安全地销毁标签...
-	DestroyTagSafely = 563,
+	DestroyAllTagByTagTypeSafely = 563,
 
 	// 为路径点上的科技类型绑定标签...
 	BindTagToTechnoTypeAtWaypoint = 564,
@@ -113,7 +113,7 @@ public:
 	ACTION_FUNC(AddBaseNodeForHouseAtWaypoint);
 	ACTION_FUNC(RemoveAllBaseNodeForHouseAtWaypoint);
 	ACTION_FUNC(RemoveBaseNodesOfBuildingTypeForHouse);
-	ACTION_FUNC(DestroyTagSafely);
+	ACTION_FUNC(DestroyAllTagByTagTypeSafely);
 	ACTION_FUNC(BindTagToTechnoTypeAtWaypoint);
 	ACTION_FUNC(BindTagToTechnoTypeOfHouseAtWaypoint);
 	// ACTION_FUNC(SetObjectRecruitable);
