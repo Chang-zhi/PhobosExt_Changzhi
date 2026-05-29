@@ -47,7 +47,6 @@
 [*Ares*](https://github.com/Ares-Developers/Ares) 项目组  
 [*Phobos*](https://github.com/Phobos-developers/Phobos) 项目组  
 [*YRpp*](https://github.com/Phobos-developers/YRpp) 项目组  
-AuY1234 [*@B站主页*](https://space.bilibili.com/621813784)  
 韩大妈 [*@B站主页*](https://space.bilibili.com/2229647)  
 九千天华 [*@B站主页*](https://space.bilibili.com/362533219)  
 偏微whyffu [*@B站主页*](https://space.bilibili.com/41073096)  
@@ -227,6 +226,16 @@ AutoHunt=                       ; boolean（布尔值），默认 false
 - 目标可达性检查：当单位有攻击目标时，会检查目标单元格是否可达。如果不可达，则跳过本次逻辑。
 - 禁止招募：单位的 `RecruitableA` 和 `RecruitableB` 会强制被设置为`false`，并从所属队伍中释放。
 - 攻击地面修正：如果单位当前攻击目标是单元格（强制攻击地面），会自动清除该目标，转为 `Hunt` 索敌。
+
+---
+
+### 9. 自动游猎
+```ini
+[TechnoType]
+LegalTargetWhenAIOwner=                       ; boolean（布尔值），默认 true
+```
+当 `LegalTargetWhenAIOwner=no` 时，该单位不会被其他单位选为普通武器攻击对象。  
+（但仍可被 C4 爆破、受到伤害反馈等）
 
 ---
 
