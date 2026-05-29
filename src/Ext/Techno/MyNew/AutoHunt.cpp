@@ -9,16 +9,16 @@
 
 // 全局 map，Key 1: `单位`，Key 2: `帧计数`
 // 记录每个单位上次执行 AutoHunt 的帧计数
-static std::unordered_map<FootClass*, unsigned int> g_AutoHuntFrameMap;
+static std::unordered_map<FootClass*, size_t> g_AutoHuntFrameMap;
 
-constexpr static const unsigned int AUTOHUNT_CHECK_FRAME = 15;
-constexpr static const unsigned int AUTO_HUNT_CLEANUP_INTERVAL = 60;
+constexpr static const size_t AUTOHUNT_CHECK_FRAME = 15;
+constexpr static const size_t AUTO_HUNT_CLEANUP_INTERVAL = 60;
 
 // helper: 清理无效条目
 static void CleanupInvalidAutoHuntEntries()
 {
-	static unsigned int lastCleanupFrame = 0;
-	unsigned int currentFrame = Unsorted::CurrentFrame;
+	static size_t lastCleanupFrame = 0;
+	size_t currentFrame = Unsorted::CurrentFrame;
 
 	if (currentFrame - lastCleanupFrame >= AUTO_HUNT_CLEANUP_INTERVAL)
 	{
@@ -65,6 +65,8 @@ bool IsShouldUpdateAutoHunt(FootClass* pThis)
 void UpdateAutoHunt(FootClass* pThis)
 {
 	if (!pThis) return;
+
+	// 运输载具内的单位不启用逻辑
 	if (pThis->Transporter) return;
 
 	 // 如果是人类控制，不启用逻辑
@@ -94,7 +96,7 @@ void UpdateAutoHunt(FootClass* pThis)
 			}
 		}
 
-		// 禁止招募
+		// 禁止招募, 从队伍中释放
 		if (pThis->RecruitableA) pThis->RecruitableA = false;
 		if (pThis->RecruitableB) pThis->RecruitableB = false;
 		if (pThis->Team)
