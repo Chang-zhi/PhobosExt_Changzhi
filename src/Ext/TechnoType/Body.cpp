@@ -60,6 +60,7 @@ void TechnoTypeExt::ExtData::LoadFromINIFile(CCINIClass* const pINI)
 	INI_EX exINI(pINI);
 
 	this->AutoHunt.Read(exINI, pSection, "AutoHunt");
+	this->LegalTargetWhenAIOwner.Read(exINI, pSection, "LegalTargetWhenAIOwner");
 
 }
 
@@ -83,6 +84,7 @@ void TechnoTypeExt::ExtData::Serialize(T& Stm)
 {
 	Stm
 		.Process(this->AutoHunt)
+		.Process(this->LegalTargetWhenAIOwner)
 		;
 }
 void TechnoTypeExt::ExtData::LoadFromStream(PhobosStreamReader& Stm)

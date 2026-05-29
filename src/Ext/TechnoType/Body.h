@@ -18,9 +18,11 @@ public:
 	{
 	public:
 		Valueable<bool> AutoHunt;
+		Valueable<bool> LegalTargetWhenAIOwner;
 
 		ExtData(TechnoTypeClass* OwnerObject) : Extension<TechnoTypeClass>(OwnerObject)
 			, AutoHunt { false }
+			, LegalTargetWhenAIOwner { true }
 		{ }
 
 		virtual ~ExtData() = default;

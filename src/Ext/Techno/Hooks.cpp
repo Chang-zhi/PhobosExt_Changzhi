@@ -2,6 +2,7 @@
 
 #include <Utilities/Debug.h>
 #include <Ext/Techno/MyNew/AutoHunt.h>
+#include <Ext/Techno/MyNew/LegalTargetAI.h>
 #include <Ext/Techno/MyNew/TemporalExclusive.h>
 
 // Avoid secondary jump
@@ -15,8 +16,8 @@ DEFINE_HOOK(0x6F9E50, TechnoClass_AI, 0x5)
 {
 	GET(TechnoClass*, pThis, ECX);
 
-
 	// Temporal exclusive
+	HandleLegalTargetAITargeting(pThis);
 	HandleTemporalExclusiveTargeting(pThis);
 
 	return 0;
