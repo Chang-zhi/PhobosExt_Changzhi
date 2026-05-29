@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhobosExt 文档 - 红警2尤里的复仇扩展</title>
+    <style>
+        /* 全局重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 页面基础 - 红白简约底色 */
+        body {
+            background: #fefefe;
+            font-family: "Microsoft Yahei", "Segoe UI", Roboto, system-ui, sans-serif;
+            line-height: 1.65;
+            color: #222;
+            padding: 2rem 0.8rem;
+        }
+
+        /* 主容器 极简卡片 */
+        .doc-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            padding: 2rem 2.2rem 3rem;
+        }
+
+        /* 响应式小屏 */
+        @media (max-width: 700px) {
+            .doc-container { 
+                padding: 1.2rem; 
+            }
+        }
+
+        /* 标题层级统一 */
+        h1, h2, h3, h4 {
+            font-weight: 600;
+            margin-top: 1.8em;
+            margin-bottom: 0.6em;
+            line-height: 1.35;
+        }
+
+        /* 一级主标题 红色主题 */
+        .doc-title {
+            font-size: 2rem;
+            color: #d92929;
+            border-bottom: 2px solid #d92929;
+            display: inline-block;
+            padding-bottom: 0.3em;
+            margin-top: 0.2em;
+            margin-bottom: 1em;
+        }
+
+        /* 标题附属标签 */
+        .doc-title__sub {
+            font-size: 0.9rem;
+            font-weight: normal;
+            background: #f8f0f0;
+            color: #d92929;
+            padding: 0.2rem 0.6rem;
+            border-radius: 2px;
+            margin-left: 0.8rem;
+            vertical-align: middle;
+        }
+
+        /* 二级标题 左侧红条 */
+        .doc-heading--secondary {
+            font-size: 1.6rem;
+            border-left: 4px solid #d92929;
+            padding-left: 12px;
+            background: #fdf7f7;
+        }
+
+        /* 三级标题 细红线底 */
+        .doc-heading--tertiary {
+            font-size: 1.3rem;
+            color: #b81c1c;
+            border-bottom: 1px solid #f0c8c8;
+            padding-bottom: 0.2em;
+        }
+
+        /* 链接 默认+hover */
+        .doc-link, .doc-link-unnormal {
+            color: #d92929;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: 0.2s;
+        }
+        .doc-link:hover {
+            border-bottom-color: #d92929;
+        }
+
+        /* 目录容器 浅红背景 */
+        .doc-toc {
+            background: #fdf7f7;
+            border-radius: 3px;
+            padding: 20px;
+            margin: 1.5rem 0;
+            border-left: 3px solid #d92929;
+        }
+        .doc-toc__title {
+            color: #d92929;
+            font-size: 1.3rem;
+            margin-top: 0;
+            margin-bottom: 14px;
+        }
+        .doc-toc__list {
+            list-style: none;
+        }
+        .doc-toc__item {
+            margin: 8px 0;
+        }
+        .doc-toc__link {
+            color: #333;
+            text-decoration: none;
+            padding: 2px 6px;
+            border-radius: 2px;
+            transition: background 0.2s;
+        }
+        .doc-toc__link:hover {
+            background: #f8e8e8;
+            color: #d92929;
+        }
+        .doc-toc__sublist {
+            padding-left: 20px;
+            border-left: 1px dashed #e5b8b8;
+            margin-top: 6px;
+        }
+
+        /* 代码样式 深色简约 */
+        code, pre {
+            font-family: "Consolas", "JetBrains Mono", monospace;
+            border-radius: 3px;
+        }
+        .doc-code--inline {
+            padding: 0.15rem 0.4rem;
+            font-size: 0.9em;
+            color: #d92929;
+            background: #f8f0f0;
+        }
+        .doc-code--block {
+            padding: 1rem;
+            overflow-x: auto;
+            background: #2b2b2b;
+            color: #e6e6e6;
+            margin: 1rem 0;
+            font-size: 0.85rem;
+        }
+        .doc-code--ini {
+            background: #252525;
+        }
+        .doc-code--block .doc-code--inline {
+            background: transparent;
+            color: #ff6b6b;
+            padding: 0;
+        }
+
+        /* 表格 简约线框 */
+        .doc-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.2rem 0;
+            font-size: 0.9rem;
+        }
+        .doc-table__th, .doc-table__td {
+            border: 1px solid #ddd;
+            padding: 9px 12px;
+            text-align: left;
+            vertical-align: top;
+        }
+        .doc-table__th {
+            background: #f8f0f0;
+            color: #b81c1c;
+            font-weight: 600;
+        }
+        .doc-table--action .doc-table__td:first-child {
+            background: #fef9f9;
+            font-weight: 500;
+        }
+
+        /* 分割线 细红线 */
+        .doc-hr {
+            margin: 2rem 0;
+            border: none;
+            height: 1px;
+            background: #f0c8c8;
+        }
+
+        /* 提示框 简约配色 */
+        .doc-notice--tip {
+            background: #fff9e8;
+            border-left: 4px solid #e6a23c;
+            padding: 0.8rem 1rem;
+            margin: 1rem 0;
+            border-radius: 2px;
+        }
+        .doc-notice--warning {
+            background: #fef0f0;
+            border-left: 4px solid #d92929;
+            padding: 0.8rem 1rem;
+            margin: 1rem 0;
+            border-radius: 2px;
+        }
+
+        /* 辅助文本样式 */
+        .doc-text--gray {
+            color: #666;
+            margin: 2% 0;
+        }
+        .doc-title--gray {
+            color: #666;
+        }
+        .doc-badge {
+            background: #eee;
+            padding: 0.1rem 0.5rem;
+            border-radius: 2px;
+            font-size: 0.75rem;
+        }
+
+        /* 列表样式 */
+        .doc-list--thanks,
+        .doc-list--content {
+            margin: 0 4%;
+            line-height: 1.8;
+        }
+        .doc-list--thanks .doc-link,
+        .doc-list--content .doc-link {
+            color: #d92929;
+        }
+
+        /* 段落边距 */
+        .doc-paragraph--wrapped {
+            margin: 2% 2%;
+        }
+        .doc-paragraph--only-vertical {
+            margin: 1% 0;
+        }
+
+        /* 页脚 */
+        .doc-footer {
+            margin-top: 3rem;
+            padding-top: 1.2rem;
+            text-align: center;
+            border-top: 1px solid #eee;
+            font-size: 0.85rem;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <!-- 主容器：包含所有文档内容 -->
+    <div class="doc-container">
+        <!-- 文档主标题 -->
+        <h1 class="doc-title">
+            <a href="https://github.com/Chang-zhi/PhobosExt_Changzhi" 
+               target="_blank" 
+               class="doc-link" 
+               style="border-bottom: none;">PhobosExt</a>
+            <span class="doc-title__sub">扩展 DLL</span>
+        </h1>
+
+        <!-- 文档简介 -->
+        <p>一个扩展《红色警戒2：尤里的复仇》游戏功能的 DLL，基于 Phobos 开发，作者<a href="https://space.bilibili.com/423792550" target="_blank" class="doc-link"><strong>Chang_zhi</strong></a>。</p>
+        <p><strong>理论上可以脱离 Ares 和 Phobos 单独运行，但仍建议与原版 Phobos 或 Ares 一同使用</strong><br>
+        说是基于 Phobos，其实只是删了删代码 ( <span class="doc-title--gray">低创作品，大佬轻喷。</span> )</p>
+
+        <!-- 目录区域 -->
+        <div class="doc-toc">
+            <h2 class="doc-toc__title">目录</h2>
+            <ul class="doc-toc__list">
+                <li class="doc-toc__item"><a href="#compatibility" class="doc-toc__link">兼容性说明</a></li>
+                <li class="doc-toc__item"><a href="#known-issues" class="doc-toc__link">已知问题</a></li>
+                <li class="doc-toc__item"><a href="#thanks" class="doc-toc__link">致谢</a></li>
+                <li class="doc-toc__item"><a href="#license" class="doc-toc__link">许可</a></li>
+                <li class="doc-toc__item">
+                    <a href="#features" class="doc-toc__link">新增功能</a>
+                    <ul class="doc-toc__sublist">
+                        <li class="doc-toc__item"><a href="#waypoint-label" class="doc-toc__link">1. 路径点文本显示</a></li>
+                        <li class="doc-toc__item"><a href="#dynamic-tag" class="doc-toc__link">2. 动态标签绑定功能</a></li>
+                        <li class="doc-toc__item"><a href="#money-op" class="doc-toc__link">3. 金钱操作功能</a></li>
+                        <li class="doc-toc__item"><a href="#base-node" class="doc-toc__link">4. 基地节点操作功能</a></li>
+                        <li class="doc-toc__item"><a href="#coord-check" class="doc-toc__link">5. 科技类型坐标检测</a></li>
+                        <li class="doc-toc__item"><a href="#recruitable" class="doc-toc__link">6. 单位可招募属性设置</a></li>
+                        <li class="doc-toc__item"><a href="#temporal-exclusive" class="doc-toc__link">7. 超时空武器互斥锁定</a></li>
+                        <li class="doc-toc__item"><a href="#auto-hunt" class="doc-toc__link">8. 自动游猎</a></li>
+                        <li class="doc-toc__item"><a href="#legal-target" class="doc-toc__link">9. AI 所属单位目标判定</a></li>
+                    </ul>
+                </li>
+                <li class="doc-toc__item"><a href="#fa2-config" class="doc-toc__link">触发编辑器配置</a></li>
+            </ul>
+        </div>
+
+        <!-- 兼容性说明 -->
+        <h2 id="compatibility" class="doc-heading--secondary">兼容性说明</h2>
+        <p>需保证游戏版本为 YR 1.001。</p>
+        <p>本 DLL 已避免使用 <code class="doc-code--inline">ExtPointerOffset</code> ，改用独立 <code class="doc-code--inline">unordered_map</code> 存储扩展数据，<br>
+        不会与 Ares 或 Phobos 的原生扩展数据冲突。(严格来说可能变慢, 但对现代cpu的影响应该可以忽略不计)</p>
+
+        <!-- 已知问题 -->
+        <h2 id="known-issues" class="doc-heading--secondary">已知问题</h2>
+        <p>当单位当前正在使用带有 <code class="doc-code--inline">Temporal=yes</code> 和 <code class="doc-code--inline">TemporalExclusive=yes</code> 弹头的武器时, 会强制改变单位的索敌逻辑, 可能会产生bug。</p>
+
+        <!-- 致谢 -->
+        <h2 id="thanks" class="doc-heading--secondary">致谢</h2>
+        <ul class="doc-list--thanks">
+            <li><a href="https://github.com/Ares-Developers/Ares" target="_blank" class="doc-link">Ares</a> 项目组</li>
+            <li><a href="https://github.com/Phobos-developers/Phobos" target="_blank" class="doc-link">Phobos</a> 项目组</li>
+            <li><a href="https://github.com/Phobos-developers/YRpp" target="_blank" class="doc-link">YRpp</a> 项目组</li>
+            <li>韩大妈 <a href="https://space.bilibili.com/2229647" target="_blank" class="doc-link">@B站主页</a></li>
+            <li>九千天华 <a href="https://space.bilibili.com/362533219" target="_blank" class="doc-link">@B站主页</a></li>
+            <li>偏微whyffu <a href="https://space.bilibili.com/41073096" target="_blank" class="doc-link">@B站主页</a></li>
+            <li>妖妖酱 <a href="https://github.com/yaoyaojiang" target="_blank" class="doc-link">@GitHub</a></li>
+        </ul>
+        <p style="text-align: left; color: #666; margin-top: 12px;">排名不分先后</p>
+
+        <!-- 许可 -->
+        <h2 id="license" class="doc-heading--secondary">许可</h2>
+        <p>本项目代码采用与 Phobos 相同的 <code class="doc-code--inline">GPL-3.0 license</code> 许可证。<br>
+        《红色警戒2：尤里的复仇》及其相关素材归 Electronic Arts 所有。</p>
+
+        <!-- 新增功能 大标题 -->
+        <h2 id="features" class="doc-heading--secondary">新增功能</h2>
+
+        <!-- 1. 路径点文本显示 -->
+        <h3 id="waypoint-label" class="doc-heading--tertiary">1. 路径点文本显示</h3>
+        <p>在地图路径点上绘制自定义文本。</p>
+        <p class="doc-paragraph--only-vertical"><strong>特性：</strong></p>
+        <ul class="doc-list--content">
+            <li>可自定义文本内容、显示宽度(像素)、背景不透明度。</li>
+            <li>可分别设置文本颜色和边框颜色(预定义 9 种颜色)。</li>
+            <li>鼠标移动到文本框上时，文本会暂时停止绘制(避免遮挡操作)。</li>
+        </ul>
+        <p><strong>触发动作说明：</strong></p>
+        <ul class="doc-list--content">
+            <li><code class="doc-code--inline">550</code> - 在指定路径点绘制文本...(参数：路径点索引，文本内容，宽度，不透明度，颜色)</li>
+            <li><code class="doc-code--inline">551</code> - 清除指定路径点的文本...(参数：路径点索引)</li>
+            <li><code class="doc-code--inline">552</code> - 清除所有路径点文本...</li>
+        </ul>
+        <p>在 <code class="doc-code--inline">[General]</code> 的增加新变量，用来控制当路径点在黑幕里时是否绘制。</p>
+        <pre class="doc-code--block"><code>[General]
+ShowWaypointLabelInShroud=              ; boolean(布尔值)，默认 true</code></pre>
+        <p><strong>注:</strong> 仅判断路径点本身是否被黑幕遮挡, 不检测整个标签。</p>
+
+        <!-- 2. 动态标签绑定功能 -->
+        <h3 id="dynamic-tag" class="doc-heading--tertiary">2. 动态标签绑定功能</h3>
+        <div class="doc-notice--warning">
+            <strong>注意!</strong> 触发系统事实上很复杂，需读者了解其组成和运行机制。<br>
+            这里默认读者已经具备了相关知识，可以阅读 <code class="doc-code--inline">Handama</code> 的 <code class="doc-code--inline">触发系统.docx</code> 以了解相关知识。
+        </div>
+        <p>允许将游戏中的科技类型实例与标签(Tag)动态关联，便于后续通过触发器执行逻辑。<br>
+        若标签不存在/已销毁，则会根据标签类型(TagType)创建一个新标签，确保目标会与标签关联。</p>
+        <p class="doc-text--gray">事实上，触发也会在小队创建时实例化，因此动作 <code class="doc-code--inline">553</code> 和 <code class="doc-code--inline">554</code> 实际上可能并没有必要，
+        只需要在 <code class="doc-code--inline">作战小队</code> 的 <code class="doc-code--inline">挂载标签</code> 上挂载所需标签即可以实现与该动作类似的效果，但仍保留以备不时之需。<br>
+        (写都写了.jpg，不过确实有所不同)</p>
+
+        <h4>触发动作说明</h4>
+        <div class="doc-table--action">
+            <table class="doc-table">
+                <thead>
+                    <tr>
+                        <th class="doc-table__th">ID</th>
+                        <th class="doc-table__th">名称</th>
+                        <th class="doc-table__th">参数说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="doc-table__td">553</td>
+                        <td class="doc-table__td">将指定小队全部成员关联到指定标签...</td>
+                        <td class="doc-table__td">小队索引，标签索引，布尔值</td>
+                    </tr>
+                    <tr>
+                        <td class="doc-table__td">554</td>
+                        <td class="doc-table__td">将指定所属方的指定小队全部成员关联到指定标签...</td>
+                        <td class="doc-table__td">小队索引，标签索引，所属方国家索引，布尔值</td>
+                    </tr>
+                    <tr>
+                        <td class="doc-table__td">555</td>
+                        <td class="doc-table__td">将特定科技类型全部关联到指定标签...</td>
+                        <td class="doc-table__td">科技类型ID，标签索引，布尔值</td>
+                    </tr>
+                    <tr>
+                        <td class="doc-table__td">556</td>
+                        <td class="doc-table__td">将指定所属方的特定科技类型全部关联到指定标签...</td>
+                        <td class="doc-table__td">科技类型ID，标签索引，所属方国家索引，布尔值</td>
+                    </tr>
+                    <tr>
+                        <td class="doc-table__td">563</td>
+                        <td class="doc-table__td">安全地销毁指定标签类型的所有实例...</td>
+                        <td class="doc-table__td">标签索引</td>
+                    </tr>
+                    <tr>
+                        <td class="doc-table__td">564</td>
+                        <td class="doc-table__td">为路径点上的指定科技类型绑定标签...</td>
+                        <td class="doc-table__td">路径点索引，科技类型ID，标签索引，布尔值</td>
+                    </tr>
+                    <tr>
+                        <td class="doc-table__td">565</td>
+                        <td class="doc-table__td">为路径点上指定所属方的指定科技类型绑定标签...</td>
+                        <td class="doc-table__td">路径点索引，科技类型ID，标签索引，所属方国家索引，布尔值</td>
+                    </tr>
+                    <tr>
+                        <td class="doc-table__td">566</td>
+                        <td class="doc-table__td">为路径点范围内的指定科技类型绑定标签...</td>
+                        <td class="doc-table__td">路径点索引，科技类型ID，标签索引，范围(单元格)，布尔值</td>
+                    </tr>
+                    <tr>
+                        <td class="doc-table__td">567</td>
+                        <td class="doc-table__td">为路径点范围内触发所属方的指定科技类型绑定标签...</td>
+                        <td class="doc-table__td">路径点索引，科技类型ID，标签索引，范围，布尔值</td>
+                    </tr>
+                    <tr>
+                        <td class="doc-table__td">568</td>
+                        <td class="doc-table__td">为路径点范围内的所有科技类型绑定标签...</td>
+                        <td class="doc-table__td">路径点索引，标签索引，范围，布尔值</td>
+                    </tr>
+                    <tr>
+                        <td class="doc-table__td">569</td>
+                        <td class="doc-table__td">为路径点范围内指定所属方的所有科技类型绑定标签...</td>
+                        <td class="doc-table__td">路径点索引，所属方国家索引，标签索引，范围，布尔值</td>
+                    </tr>
+                    <tr>
+                        <td class="doc-table__td">570</td>
+                        <td class="doc-table__td">统一指定标签类型的所有实例...</td>
+                        <td class="doc-table__td">标签索引</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p><strong>范围</strong>：整数，以单元格为单位的圆形半径。<br>
+        <strong>布尔值</strong>：<code class="doc-code--inline">0</code> 或 <code class="doc-code--inline">1</code>，控制是否强制创建一个新的标签实例。(见下文注意事项第9条)</p>
+
+        <h4>注意事项</h4>
+        <ol class="doc-list--content">
+            <li>使用本组触发时，会更新指定标签的 <code class="doc-code--inline">InstanceCount</code>(引用计数)。</li>
+            <li>由本组触发创建的标签可以被原版动作 <code class="doc-code--inline">70</code>(摧毁标签... )安全销毁而不会弹框。</li>
+            <li>即使想要绑定的科技类型<strong>正在建造中</strong>，也会被关联到指定标签，但是建筑造出来之前触发不起作用。</li>
+            <li>通过本组触发给小队成员关联的标签，在小队解散后标签不会自动消失。</li>
+            <li>对于动作 <code class="doc-code--inline">564</code>、<code class="doc-code--inline">565</code>，若科技类型为建筑，则<strong>每一格都会检测</strong> (矩形地基)，当前<strong>不支持 Ares 自定义建筑地基</strong>。</li>
+            <li>当指定对象已经拥有标签时，新标签会<strong>覆盖</strong>原有标签，并且原有标签的 <code class="doc-code--inline">InstanceCount</code> 会相应更新。</li>
+            <li>与常规销毁(动作 <code class="doc-code--inline">70</code>)不同，动作 <code class="doc-code--inline">563</code> <strong>不会导致由小队创建的标签被销毁时弹框崩溃</strong>，因此可安全用于标签的批量清理。</li>
+            <li>动作 <code class="doc-code--inline">570</code> 的原理：该动作会强制创建一个<strong>全新</strong>的标签实例，然后将当前所有已经绑定了该标签类型(TagType)的科技对象<strong>全部重新指向</strong>这个新标签，最后销毁原有的所有标签实例。</li>
+            <li><strong>布尔值参数(强制新建)</strong>：
+                <ul class="doc-list--content">
+                    <li>若为 <code class="doc-code--inline">1</code> (真)，则无论当前是否存在相同标签类型的实例，都会创建一个<strong>全新的标签实例</strong>，可用于统一实例。(新实例与同类型其他实例独立存在，引擎允许多实例)</li>
+                    <li>若为 <code class="doc-code--inline">0</code> (假)，则优先寻找游戏内已存在的该标签类型实例，找到则直接使用，找不到才会创建新标签。</li>
+                    <li>注意：当使用 <code class="doc-code--inline">0</code> 时，若存在多个同类型标签实例，实际绑定到哪一个<strong>不确定</strong>(取决于遍历顺序)，建议在需要明确控制实例时使用 <code class="doc-code--inline">1</code>。</li>
+                </ul>
+            </li>
+        </ol>
+
+        <!-- 3. 金钱操作功能 -->
+        <h3 id="money-op" class="doc-heading--tertiary">3. 金钱操作功能</h3>
+        <p>允许动态调整指定所属方的资金数额。所有操作均以所属方国家索引作为目标标识，金额单位为游戏内货币单位(即“钱”)。</p>
+        <ul class="doc-list--content">
+            <li><code class="doc-code--inline">557</code> - 为指定所属方添加金钱数额...(参数：所属方国家索引，金额数额)</li>
+            <li><code class="doc-code--inline">558</code> - 为指定所属方扣除金钱数额...(参数：所属方国家索引，金额数额)</li>
+            <li><code class="doc-code--inline">559</code> - 设置指定所属方的金钱数额...(参数：所属方国家索引，金额数额)</li>
+        </ul>
+
+        <!-- 4. 基地节点操作 -->
+        <h3 id="base-node" class="doc-heading--tertiary">4. 基地节点操作功能</h3>
+        <p>允许动态添加或移除指定所属方的AI基地节点。</p>
+        <ul class="doc-list--content">
+            <li><code class="doc-code--inline">560</code> - 在指定路径点添加基地节点...(参数：所属方国家索引，路径点编号，建筑类型索引)</li>
+            <li><code class="doc-code--inline">561</code> - 移除指定路径点上的所有基地节点...(参数：所属方国家索引，路径点编号)</li>
+            <li><code class="doc-code--inline">562</code> - 移除特定所属方所有指定建筑类型的基地节点...(参数：所属方国家索引，建筑类型索引)</li>
+        </ul>
+        <p class="doc-paragraph--wrapped"><strong>注意事项：</strong> 对于动作 <code class="doc-code--inline">561</code>,<code class="doc-code--inline">562</code>, 会重置 ai 的建造序列, 如果基地正在建造需要移除的基地节点, 则会强制中断建造。</p>
+
+        <!-- 5. 科技类型坐标检测 -->
+        <h3 id="coord-check" class="doc-heading--tertiary">5. 科技类型坐标检测</h3>
+        <p>在指定路径点上或附近距离，检测是否存在触发所属方的科技类型。</p>
+        <ul class="doc-list--content">
+            <li><code class="doc-code--inline">550</code> – 路径点附近存在所属方的科技类型... (参数：距离，路径点索引)</li>
+            <li><code class="doc-code--inline">551</code> – 路径点附近不存在所属方的科技类型... (参数：距离，路径点索引)</li>
+            <li><code class="doc-code--inline">552</code> – 路径点上存在所属方的指定科技类型... (参数：路径点索引，科技类型)</li>
+            <li><code class="doc-code--inline">553</code> – 路径点上不存在所属方的指定科技类型... (参数：路径点索引，科技类型)</li>
+        </ul>
+        <p class="doc-paragraph--wrapped"><strong>注意事项：</strong> 对于事件 <code class="doc-code--inline">552</code>,<code class="doc-code--inline">553</code>, 若科技类型为建筑，则每一格都会检测 (矩形地基)，不支持ares的自定义Foundation。</p>
+
+        <!-- 6. 单位可招募属性设置 -->
+        <h3 id="recruitable" class="doc-heading--tertiary">6. 单位可招募属性设置</h3>
+        <ul class="doc-list--content">
+            <li><code class="doc-code--inline">571</code> – 设置关联单位的可招募属性... (参数：布尔值，布尔值)</li>
+        </ul>
+        <p class="doc-paragraph--wrapped"><strong>注意事项：</strong> 只会修改 <code class="doc-code--inline">FootClass</code> 的实例。两个布尔值，分别对应 <code class="doc-code--inline">RecruitableA</code> 和 <code class="doc-code--inline">RecruitableB</code>。</p>
+
+        <!-- 7. 超时空武器互斥锁定 -->
+        <h3 id="temporal-exclusive" class="doc-heading--tertiary">7. 超时空武器互斥锁定</h3>
+        <p>为 <code class="doc-code--inline">Temporal=yes</code> 的弹头增加互斥锁定机制。</p>
+        <pre class="doc-code--block"><code>[WarheadType]
+TemporalExclusive=              ; boolean(布尔值)，默认 false</code></pre>
+        <p>当弹头同时设置 <code class="doc-code--inline">Temporal=yes</code> 和 <code class="doc-code--inline">TemporalExclusive=yes</code> 时，该武器无法瞄准已被其他 <code class="doc-code--inline">TemporalClass</code> 实例锁定的单位(即正在遭受超时空冻结的单位)。</p>
+        <p class="doc-paragraph--only-vertical">普通的超时空武器(<code class="doc-code--inline">Temporal=yes</code> 但未设置 <code class="doc-code--inline">TemporalExclusive</code>)仍可以攻击已被互斥武器锁定的目标。<br>
+        互斥武器不能攻击被普通超时空武器冻结的目标。</p>
+
+        <!-- 8. 自动游猎 -->
+        <h3 id="auto-hunt" class="doc-heading--tertiary">8. 自动游猎</h3>
+        <pre class="doc-code--block"><code>[TechnoType]
+AutoHunt=                       ; boolean(布尔值)，默认 false</code></pre>
+        <p>当科技类型设置 <code class="doc-code--inline">AutoHunt=yes</code> 时，该类型的所有单位(仅限 AI 控制)会自动强制进入 <code class="doc-code--inline">Hunt</code> 状态，主动搜索并攻击敌方目标。</p>
+        <ul class="doc-list--content">
+            <li><strong>仅限 AI：</strong>人类玩家控制的单位不会受此影响。</li>
+            <li><strong>帧间隔：</strong>每个 <code class="doc-code--inline">AutoHunt=yes</code> 的单位每 <code class="doc-code--inline">15</code> 帧执行一次逻辑检查，避免性能浪费。</li>
+            <li><strong>载具内无效：</strong>如果单位位于载具内，AutoHunt 逻辑不会生效(离开载具后自动生效)。</li>
+            <li><strong>自动解除部署：</strong>如果单位当前处于部署状态，会先尝试解除部署，然后进入 <code class="doc-code--inline">Hunt</code> 状态。</li>
+            <li><strong>目标可达性检查：</strong>当单位有攻击目标时，会检查目标单元格是否可达。如果不可达，则跳过本次逻辑。</li>
+            <li><strong>禁止招募：</strong>单位的 <code class="doc-code--inline">RecruitableA</code> 和 <code class="doc-code--inline">RecruitableB</code> 会强制被设置为 <code class="doc-code--inline">false</code>，并从所属队伍中释放。</li>
+            <li><strong>攻击地面修正：</strong>如果单位当前攻击目标是单元格(强制攻击地面)，会自动清除该目标，转为 <code class="doc-code--inline">Hunt</code> 索敌。</li>
+        </ul>
+
+        <!-- 9. AI 所属单位目标判定 -->
+        <h3 id="legal-target" class="doc-heading--tertiary">9. AI 所属单位目标判定</h3>
+        <pre class="doc-code--block"><code>[TechnoType]
+LegalTargetWhenAIOwner=                       ; boolean(布尔值)，默认 true</code></pre>
+        <p>当 <code class="doc-code--inline">LegalTargetWhenAIOwner=no</code> 时，该单位不会被其他单位选为普通武器攻击对象。<br>
+        (但仍可被 C4 爆破、受到伤害反馈等)</p>
+
+        <!-- 触发编辑器配置 -->
+        <h2 id="fa2-config" class="doc-heading--secondary">触发编辑器配置</h2>
+        <p>为了在触发编辑器(FinalAlert 2)中使用新的触发动作，需要修改 <code class="doc-code--inline">FAData.ini</code> 或对应版本的配置文件。</p>
+        <h4>标准 FinalAlert 2</h4>
+        <p>需在 <code class="doc-code--inline">FAData.ini</code> 的 <code class="doc-code--inline">[EventsRA2]</code> 和 <code class="doc-code--inline">[ActionsRA2]</code> 小节中添加内容, 可以参考 <code class="doc-code--inline">FA2SP_HDM_Edition</code> 版本。</p>
+        <br>
+        <a href="https://github.com/handama/FA2sp" 
+            target="_blank"
+            class="doc-link-unnormal"
+            style="border-bottom:none; 
+            display:inline;"><strong>FA2SP_HDM_Edition</strong></a>（韩大妈版本）
+        <p>需同时编辑 <code class="doc-code--inline">FAData_TriggerAndScript.ini</code> 中的<br>
+        <code class="doc-code--inline">[English-EventsRA2]</code>, <code class="doc-code--inline">[Chinese-EventsRA2]</code>, <code class="doc-code--inline">[English-ActionsRA2]</code>, <code class="doc-code--inline">[Chinese-ActionsRA2]</code> 小节。</p>
+        <br>
+        <p>在 <code class="doc-code--inline">[Chinese-EventsRA2]</code> 和 <code class="doc-code--inline">[English-ActionsRA2]</code> 中添加以下内容:</p>
+        <pre class="doc-code--block"><code>[Chinese-EventsRA2]/[English-ActionsRA2]
+...
+550=路径点附近存在所属方的任意科技类型... (PhobosExt),48,30,0,0,当指定路径点的指定距离内存在触发所属方任意科技类型时，此事件被满足。,0,1,550,1
+551=路径点附近不存在所属方的任意科技类型... (PhobosExt),48,30,0,0,当指定路径点的指定距离内不存在触发所属方任意科技类型时，此事件被满足。,0,1,551,1
+552=路径点上存在所属方的指定科技类型... (PhobosExt),49,46,0,0,当路径点上存在触发所属方的指定科技类型时，此事件被满足。(若科技类型为建筑，则每一格都会检测，不支持ares的自定义Foundation),0,1,552,1
+553=路径点上不存在所属方的指定科技类型... (PhobosExt),49,46,0,0,当路径点上不再存在触发所属方的指定科技类型时，此事件被满足。(若科技类型为建筑，则每一格都会检测，不支持ares的自定义Foundation),0,1,553,1
+...
+</code></pre>
+
+        <p>在 <code class="doc-code--inline">[Chinese-ActionsRA2]</code> 和 <code class="doc-code--inline">[English-ActionsRA2]</code> 中添加以下内容:</p>
+        <pre class="doc-code--block"><code>[Chinese-ActionsRA2]/[English-ActionsRA2]
+...
+550=在指定路径点绘制文本... (PhobosExt),-4,13,30,6,6,6,0,0,0,在指定路径点绘制文本。\n第三个数值是宽度(像素，1~1000，默认250)。\n第四个数值是背景不透明度(百分比，0~100)。\n第五个数值是颜色(金=0，白=1，红=2，蓝=3，绿=4，黄=5，紫=6，粉=7，淡蓝=8),0,1,902,1
+551=清除指定路径点的文本... (PhobosExt),0,0,30,0,0,0,0,0,0,清除指定路径点的文本。,0,1,903,1
+552=清除所有路径点文本... (PhobosExt),0,0,0,0,0,0,0,0,0,清除屏幕上所有已设置的路径点文本。,0,1,904,1
+553=将指定小队全部成员关联到指定标签... (PhobosExt),0,0,7,38,15,0,0,0,0,将指定小队内所有成员关联到指定标签。布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见readme里的相关介绍),0,1,553,1
+554=将指定所属方的指定小队全部成员关联到指定标签... (PhobosExt),0,0,7,38,2,15,0,0,0,将指定所属方下的指定小队所有成员关联到指定标签。布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见readme里的相关介绍)。,0,1,554,1
+555=将特定科技类型全部关联到指定标签... (PhobosExt),-4,46,38,15,0,0,0,0,0,将指定科技类型的所有实例关联到指定标签。(即使正在建造中)\n布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见readme里的相关介绍),0,1,555,1
+556=将指定所属方的特定科技类型全部关联到指定标签... (PhobosExt),-4,46,38,2,15,0,0,0,0,将指定所属方下指定科技类型的所有实例关联到指定标签。(即使正在建造中)\n布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见readme里的相关介绍),0,1,556,1
+557=为所属方添加金钱数额... (PhobosExt),0,0,2,6,0,0,0,0,0,为指定所属方添加指定的金钱数额。,0,1,557,1
+558=为所属方扣除金钱数额... (PhobosExt),0,0,2,6,0,0,0,0,0,为指定所属方扣除指定的金钱数额。,0,1,558,1
+559=设置所属方的金钱数额... (PhobosExt),0,0,2,6,0,0,0,0,0,设置指定所属方的金钱数额。,0,1,559,1
+560=在指定路径点添加基地节点... (PhobosExt),0,0,2,30,8,0,0,0,0,在指定路径点添加指定所属方的基地节点。,0,1,560,1
+561=移除指定路径点上的所有基地节点... (PhobosExt),0,0,2,30,0,0,0,0,0,移除指定路径点上指定所属方的所有基地节点。(会重置ai的建造序列),0,1,561,1
+562=移除特定所属方所有指定建筑类型的基地节点... (PhobosExt),0,0,2,8,0,0,0,0,0,移除特定所属方所有指定建筑类型的基地节点。(会重置ai的建造序列),0,1,562,1
+563=安全地销毁指定标签类型的所有实例... (PhobosExt),0,0,38,0,0,0,0,0,0,销毁指定标签类型的所有实例，不会阻止未来可能的实例。 既会销毁一开始就存在的实例，也会销毁由触发/小队创建的实例，不会导致由小队创建的标签实例被销毁时弹框崩溃。(详细细节请见readme里的相关介绍),0,1,563,1
+564=将路径点上的指定科技类型关联到指定标签... (PhobosExt),-4,46,38,30,15,0,0,0,0,将指定路径点上的指定科技类型关联到指定指定标签。布尔值用来指定是否优先创建一个新的标签实例(TagClass)。(若科技类型为建筑，则每一格都会检测，不支持ares的自定义Foundation，详细细节请见readme里的相关介绍),0,1,564,1
+565=将路径点上指定所属方的指定科技类型关联到指定标签... (PhobosExt),-4,46,38,30,2,15,0,0,0,将指定路径点上指定所属方的指定科技类型关联到指定指定标签。布尔值用来指定是否优先创建一个新的标签实例(TagClass)。(若科技类型为建筑，则每一格都会检测，不支持ares的自定义Foundation，详细细节请见readme里的相关介绍),0,1,565,1
+566=将路径点范围内的指定科技类型关联到指定标签... (PhobosExt),-4,46,38,30,6,15,0,0,0,将指定路径点指定范围内的所有指定科技类型关联到指定标签。(圆形范围)\n布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见readme里的相关介绍),0,1,566,1
+567=将路径点范围内触发所属方的指定科技类型关联到指定标签... (PhobosExt),-4,46,38,30,6,15,0,0,0,将指定路径点指定范围内触发所属方的所有指定科技类型关联到指定标签。(圆形范围)\n布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见readme里的相关介绍),0,1,567,1
+568=将路径点范围内的所有科技类型关联到指定标签... (PhobosExt),0,0,38,30,6,15,0,0,0,将指定路径点指定范围内的所有科技类型关联到指定标签。(圆形范围)\n布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见readme里的相关介绍),0,1,568,1
+569=将路径点范围内指定所属方的所有科技类型关联到指定标签... (PhobosExt),0,2,38,30,6,15,0,0,0,将指定路径点指定范围内指定所属方的所有科技类型关联到指定标签。(圆形范围)\n布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见readme里的相关介绍),0,1,569,1
+570=统一指定标签类型的所有实例... (PhobosExt),0,0,38,0,0,0,0,0,0,统一所有同一标签类型(TagType)的实例。(详细细节请见readme里的相关介绍),0,1,570,1
+571=设置关联单位的可招募属性... (PhobosExt),0,0,15,15,0,0,0,0,0,置关联单位的可招募属性，第一个数值对应RecruitableA，第二个数值对应RecruitableB。仅修改可移动的科技类型(FootClass)。,0,1,571,1
+...
+</code></pre>
+
+        <!-- 页脚 -->
+        <footer class="doc-footer">
+            <p>PhobosExt — 基于 Phobos 开发的 YR 扩展插件 · <a href="https://github.com/Chang-zhi/PhobosExt_Changzhi" target="_blank" class="doc-link">GitHub 仓库</a></p>
+            <p>《红色警戒2：尤里的复仇》及其相关素材归 Electronic Arts 所有。</p>
+        </footer>
+    </div>
+</body>
+</html>
