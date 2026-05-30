@@ -6,7 +6,7 @@
 **尽管叫 PhobosExt , 但不依赖 Ares 或 Phobos，可独立运行。推荐和其一同使用。**
 
 说是基于 Phobos，其实只是删了删代码 (  
-<span style="color: gray;">低创作品，大佬轻喷。</span>
+<span style="color: gray;">低创作品，大佬轻喷</span>
 
 ---
 
