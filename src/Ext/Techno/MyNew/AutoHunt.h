@@ -2,4 +2,6 @@
 
 class FootClass;
 
-void UpdateAutoHunt(FootClass* pThis);
+constexpr static const size_t AUTOHUNT_CHECK_FRAME = 15;
+
+void ProcessAutoHuntForAllFoots();
