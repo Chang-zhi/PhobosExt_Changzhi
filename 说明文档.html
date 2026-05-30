@@ -521,11 +521,12 @@ AutoHunt=                       ; boolean（布尔值），默认 false</code></
         <p><strong>行为细节：</strong></p>
         <ul class="doc-list--content">
             <li><strong>仅限 AI：</strong>人类玩家控制的单位不会受此影响。</li>
+            <li><strong>小队优先：</strong>如果单位在某个小队里，则不会启用逻辑。</li>
             <li><strong>帧间隔：</strong>每个 <code class="doc-code--inline">AutoHunt=yes</code> 的单位每 <code class="doc-code--inline">15</code> 帧执行一次逻辑检查，避免性能浪费。</li>
             <li><strong>载具内无效：</strong>如果单位位于载具内，AutoHunt 逻辑不会生效（离开载具后自动生效）。</li>
             <li><strong>自动解除部署：</strong>如果单位当前处于部署状态，会先尝试解除部署，然后进入 <code class="doc-code--inline">Hunt</code> 状态。</li>
             <li><strong>目标可达性检查：</strong>当单位有攻击目标时，会检查目标单元格是否可达。如果不可达，则跳过本次逻辑。</li>
-            <li><strong>禁止招募：</strong>单位的 <code class="doc-code--inline">RecruitableA</code> 和 <code class="doc-code--inline">RecruitableB</code> 会强制被设置为<code class="doc-code--inline">false</code>，并从所属队伍中释放。</li>
+            <li><strong>禁止招募：</strong>单位的 <code class="doc-code--inline">RecruitableA</code> 和 <code class="doc-code--inline">RecruitableB</code> 会强制被设置为<code class="doc-code--inline">false</code>。</li>
             <li><strong>攻击地面修正：</strong>如果单位当前攻击目标是单元格（强制攻击地面），会自动清除该目标，转为 <code class="doc-code--inline">Hunt</code> 索敌。</li>
         </ul>
 
