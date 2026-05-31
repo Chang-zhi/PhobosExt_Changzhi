@@ -43,7 +43,7 @@ public:
 
 	// ===== 持久化数据（需要存档/读档）=====
 	int WaypointIndex { -1 };               // 路径点索引
-	std::string CurrentLabel;               // 文本内容（CSF 键名或原始字符串）
+	std::string CurrentLabel;               // 文本内容（CSF 键名）
 	int MaxLineWidth { 250 };               // 最大行宽（像素）
 	int BackgroundOpacity { 75 };           // 背景不透明度（0~100）
 	WaypointLabel::Color Color { WaypointLabel::Color::gold }; // 文字/边框颜色
@@ -66,18 +66,18 @@ public:
 	static void ClearLabel(int wpIndex);    // 清除指定路径点标签
 	static void ClearAll();                 // 清除所有标签
 
-	// 序列化接口（供 Phobos 调用）
+	// 序列化接口（供 Phobos.Ext.cpp 调用）
 	bool Load(PhobosStreamReader& Stm, bool RegisterForChange);
 	bool Save(PhobosStreamWriter& Stm) const;
 	static bool SaveGlobals(PhobosStreamWriter& Stm);
 	static bool LoadGlobals(PhobosStreamReader& Stm);
 
 private:
-	// 内部缓存结构体（定义在 .cpp 中，不暴露给外部）
+	// 内部缓存结构体
 	struct Cache;
 	std::unique_ptr<Cache> m_cache;   // 缓存数据，不参与序列化
 
-	// 序列化核心（只处理持久化成员）
+	// 序列化
 	template <typename T>
 	bool Serialize(T& Stm);
 };

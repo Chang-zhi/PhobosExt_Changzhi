@@ -43,7 +43,7 @@ struct WaypointLabelClass::Cache
 	std::vector<std::wstring> CachedLines;       // 分行后的文本（宽字符）
 	int CachedBgWidth { 0 };                     // 背景宽度（像素）
 	int CachedBgHeight { 0 };                    // 背景高度（像素）
-	const wchar_t* CachedTextPtr { nullptr };    // 从 CSF 获取的文本指针（不拥有）
+	const wchar_t* CachedTextPtr { nullptr };    // 从 CSF 获取的文本指针（不拥有文本, 只是保存指针）
 };
 
 // ===== 辅助函数 =====
@@ -317,7 +317,7 @@ void WaypointLabelClass::Draw()
 	int colorInt = Drawing::RGB_To_Int(GetColorStructByEnum(this->Color));
 	Point2D p1, p2;
 
-	// 上边框
+	// 上边框（不裁剪）
 	p1 = { topLeft.X, topLeft.Y };
 	p2 = { topLeft.X + bgWidth - 1, topLeft.Y };
 	DSurface::Composite->DrawLine(&p1, &p2, colorInt);
@@ -372,7 +372,7 @@ void WaypointLabelClass::DrawAll()
 		{
 			CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(pLabel->WaypointIndex);
 			char isShrouded = TacticalClass::Instance->GetOcclusion(cell, false);
-			if (static_cast<int>(isShrouded) == -2)
+			if (static_cast<int>(isShrouded) == -2)  // -1是可见, -2是遮挡
 			{
 				Debug::Log("[WaypointLabelClass]: Index \"%d\", isShrouded is \"%d\".\n", pLabel->WaypointIndex, isShrouded);
 				continue;
