@@ -227,7 +227,7 @@ void WaypointLabelClass::UpdateLayout()
 
 	// 计算最大行宽和总高度
 	int maxLineW = 0;
-	for (const auto& line : m_cache->CachedLines)
+	for (const std::wstring& line : m_cache->CachedLines)
 	{
 		RectangleStruct dims = Drawing::GetTextDimensions(line.c_str(), { 0,0 }, 0, 2, 0);
 		if (dims.Width > maxLineW)
