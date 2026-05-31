@@ -40,8 +40,12 @@
 ---
 
 ### 已知问题  
-当单位当前正在使用带有 `Temporal=yes` 和 `TemporalExclusive=yes` 弹头的武器时, 会强制改变单位的索敌逻辑, 可能会产生bug。  
-当科技类型的 `LegalTargetWhenAIOwner=no` 且不由人类玩家控制时, 会强制改变其他单位的索敌逻辑, 可能会产生bug。  
+1.当单位当前正在使用带有 `Temporal=yes` 和 `TemporalExclusive=yes` 弹头的武器时, 会强制改变单位的索敌逻辑, 可能会产生bug。  
+2.当科技类型的 `LegalTargetWhenAIOwner=no` 且不由人类玩家控制时, 会强制改变其他单位的索敌逻辑, 可能会产生bug。
+  
+**如果遇到bug或兼容性问题可以我发私信, 我会尽量解决。**  
+我的 [*@B站主页*](https://space.bilibili.com/423792550)  
+我的 @QQ邮箱: 3071564490@qq.com
 
 ---
 
