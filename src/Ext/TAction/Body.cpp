@@ -102,6 +102,10 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 		return TActionExt::UnifyAllInstancesOfSameTagType(pThis, pHouse, pObject, pTrigger, location);
 	case PhobosTriggerAction::SetRecruitableForFoot:
 		return TActionExt::SetRecruitableForFoot(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::BindTagsToAllTechTypesInWaypointRangeExceptSpecified:
+		return TActionExt::BindTagsToAllTechTypesInWaypointRangeExceptSpecified(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::BindTagsToAllTechTypesOfTriggerOwnerInWaypointRangeExceptSpecified:
+		return TActionExt::BindTagsToAllTechTypesOfTriggerOwnerInWaypointRangeExceptSpecified(pThis, pHouse, pObject, pTrigger, location);
 
 
 	//case PhobosTriggerAction::RemoveBaseNodesExceedingAttemptCountForHouse:
@@ -193,7 +197,6 @@ bool TActionExt::BindAllTeamMemberToTag(TActionClass* pThis, HouseClass* pHouse,
 		}
 	}
 
-	if (pTagClass->InstanceCount == 0) pTagClass->Destroy();
 	return true;
 }
 
@@ -235,8 +238,6 @@ bool TActionExt::BindOwnerTeamMemberToTag(TActionClass* pThis, HouseClass* pHous
 			}
 		}
 	}
-
-	if (pTagClass->InstanceCount == 0) pTagClass->Destroy();
 	return true;
 }
 
@@ -259,7 +260,6 @@ bool TActionExt::BindAllTechnoTypeToTag(TActionClass* pThis, HouseClass* pHouse,
 		}
 	}
 
-	if (pTagClass->InstanceCount == 0) pTagClass->Destroy();
 	return true;
 }
 
@@ -289,7 +289,6 @@ bool TActionExt::BindOwnerTechnoTypeToTag(TActionClass* pThis, HouseClass* pHous
 		}
 	}
 
-	if (pTagClass->InstanceCount == 0) pTagClass->Destroy();
 	return true;
 }
 
@@ -552,7 +551,6 @@ bool TActionExt::BindTagToTechnoTypeAtWaypoint(TActionClass* pThis, HouseClass* 
 			}
 		}
 	}
-	if (pTagClass->InstanceCount == 0) pTagClass->Destroy();
 	return true;
 }
 
@@ -599,7 +597,6 @@ bool TActionExt::BindTagToTechnoTypeOfHouseAtWaypoint(TActionClass* pThis, House
 			}
 		}
 	}
-	if (pTagClass->InstanceCount == 0) pTagClass->Destroy();
 	return true;
 }
 
@@ -655,7 +652,6 @@ bool TActionExt::BindTagToSpecificTechnoTypeWithinWaypointRange(TActionClass* pT
 			}
 		}
 	}
-	if (pTagClass->InstanceCount == 0) pTagClass->Destroy();
 	return true;
 }
 
@@ -689,7 +685,6 @@ bool TActionExt::BindTagToSpecificTechnoTypeOfSpecificOwnerWithinWaypointRange(T
 			}
 		}
 	}
-	if (pTagClass->InstanceCount == 0) pTagClass->Destroy();
 	return true;
 }
 
@@ -720,7 +715,6 @@ bool TActionExt::BindTagToAllTechnoTypesWithinWaypointRange(TActionClass* pThis,
 			else pTechno->AttachTrigger(pTagClass);
 		}
 	}
-	if (pTagClass->InstanceCount == 0) pTagClass->Destroy();
 	return true;
 }
 
@@ -802,6 +796,86 @@ bool TActionExt::SetRecruitableForFoot(TActionClass* pThis, HouseClass* pHouse, 
 		}
 	}
 
+	return true;
+}
+
+bool TActionExt::BindTagsToAllTechTypesInWaypointRangeExceptSpecified
+(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	const char* techno = pThis->Text;
+	int tagIndex = pThis->Param3;
+	int waypointIndex = pThis->Param4;
+	int range = pThis->Param5;
+	int forceNew = pThis->Param6;
+
+	// ======== 参数设置 ========
+
+	TagClass* pTagClass = GetTagClassByIndex(tagIndex, forceNew);
+	if (!pTagClass) return false;
+
+	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
+	if (cell.X < 0 || cell.Y < 0) return false;
+
+	// 遍历 TechnoClass, 尝试把 TagClass 绑定到 TechnoClass 上
+	for (TechnoClass* pTechno : TechnoClass::Array)
+	{
+		if (!pTechno)
+			continue;
+
+		if (pTechno->get_ID() == std::string(techno))
+			continue;
+
+		if (IsTechnoNearCell(pTechno, cell, range))
+		{
+			if (pTechno->AttachedTag) pTechno->ReplaceTag(pTagClass);
+			else pTechno->AttachTrigger(pTagClass);
+		}
+
+	}
+	return true;
+}
+
+bool TActionExt::BindTagsToAllTechTypesOfTriggerOwnerInWaypointRangeExceptSpecified
+(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	const char* techno = pThis->Text;
+	int tagIndex = pThis->Param3;
+	int waypointIndex = pThis->Param4;
+	int range = pThis->Param5;
+	int forceNew = pThis->Param6;
+
+	// ======== 参数设置 ========
+
+	TagClass* pTagClass = GetTagClassByIndex(tagIndex, forceNew);
+	if (!pTagClass) return false;
+
+	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
+	if (cell.X < 0 || cell.Y < 0) return false;
+
+	// 遍历 TechnoClass, 尝试把 TagClass 绑定到 TechnoClass 上
+	for (TechnoClass* pTechno : TechnoClass::Array)
+	{
+		if (pTechno && pHouse == pTechno->Owner)
+		{
+			if (!pTechno)
+				continue;
+
+			Debug::Log("Techno id is \"%s\".\n", pTechno->get_ID());
+
+			if (pTechno->get_ID() == std::string(techno))
+			{
+				Debug::Log("Techno 冲突, continue.\"%s\"\n", pTechno->get_ID());
+				continue;
+			}
+
+			if (IsTechnoNearCell(pTechno, cell, range))
+			{
+				Debug::Log("AttachedTag, techno is \"%s\"\n", pTechno->get_ID());
+				if (pTechno->AttachedTag) pTechno->ReplaceTag(pTagClass);
+				else pTechno->AttachTrigger(pTagClass);
+			}
+		}
+	}
 	return true;
 }
 

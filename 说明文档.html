@@ -425,7 +425,7 @@ ShowWaypointLabelInShroud=                  ; boolean（布尔值），默认 tr
                     <tr>
                         <td class="doc-table__td">566</td>
                         <td class="doc-table__td">为路径点范围内的指定科技类型绑定标签...</td>
-                        <td class="doc-table__td">路径点索引，科技类型ID，标签索引，范围（单元格），布尔值</td>
+                        <td class="doc-table__td">路径点索引，科技类型ID，标签索引，范围，布尔值</td>
                     </tr>
                     <tr>
                         <td class="doc-table__td">567</td>
@@ -446,6 +446,16 @@ ShowWaypointLabelInShroud=                  ; boolean（布尔值），默认 tr
                         <td class="doc-table__td">570</td>
                         <td class="doc-table__td">统一指定标签类型的所有实例...</td>
                         <td class="doc-table__td">标签索引</td>
+                    </tr>
+                     <tr>
+                        <td class="doc-table__td">572</td>
+                        <td class="doc-table__td">将路径点范围内除指定类型外的所有科技类型关联到指定标签...</td>
+                        <td class="doc-table__td">路径点索引，科技类型ID，标签索引，范围，布尔值</td>
+                    </tr>
+                    <tr>
+                        <td class="doc-table__td">573</td>
+                        <td class="doc-table__td">将路径点范围内触发所属方的除指定类型外的所有科技类型关联到指定标签...</td>
+                        <td class="doc-table__td">路径点索引，科技类型ID，标签索引，范围，布尔值</td>
                     </tr>
                 </tbody>
             </table>
@@ -597,6 +607,8 @@ LegalTargetWhenAIOwner=                     ; boolean（布尔值），默认 tr
 569=将路径点范围内指定所属方的所有科技类型关联到指定标签... (PhobosExt),0,2,38,30,6,15,0,0,0,将指定路径点指定范围内指定所属方的所有科技类型关联到指定标签。(圆形范围)\n布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见"说明文档.html"里的相关介绍),0,1,569,1
 570=统一指定标签类型的所有实例... (PhobosExt),0,0,38,0,0,0,0,0,0,统一所有同一标签类型(TagType)的实例。(详细细节请见"说明文档.html"里的相关介绍),0,1,570,1
 571=设置关联单位的可招募属性... (PhobosExt),0,0,15,15,0,0,0,0,0,置关联单位的可招募属性，第一个数值对应RecruitableA，第二个数值对应RecruitableB。仅修改可移动的科技类型(FootClass)。,0,1,571,1
+572=将路径点范围内除指定类型外的所有科技类型关联到指定标签... (PhobosExt),-4,46,38,30,6,15,0,0,0,将指定路径点指定范围内除指定类型外的所有科技类型关联到指定标签。(圆形范围)\n布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见"说明文档.html"里的相关介绍),0,1,572,1
+573=将路径点范围内触发所属方的除指定类型外的所有科技类型关联到指定标签... (PhobosExt),-4,46,38,30,6,15,0,0,0,将指定路径点指定范围内触发所属方的除指定类型外的所有科技类型关联到指定标签。(圆形范围)\n布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见"说明文档.html"里的相关介绍),0,1,573,1
 ...
 </code></pre>
 
