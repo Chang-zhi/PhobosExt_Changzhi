@@ -452,7 +452,7 @@ ShowWaypointLabelInShroud=                  ; boolean（布尔值），默认 tr
             <li>由本组触发创建的标签可以被原版动作 <code class="doc-code--inline">70</code>（摧毁标签... ）安全销毁而不会弹框。</li>
             <li>即使想要绑定的科技类型<strong>正在建造中</strong>，也会被关联到指定标签，但是建筑造出来之前触发不起作用。</li>
             <li>通过本组触发给小队成员关联的标签，在小队解散后标签不会自动消失。</li>
-            <li>对于动作 <code class="doc-code--inline">564</code>、<code class="doc-code--inline">565</code>，若科技类型为建筑，则<strong>每一格都会检测，支持 Ares 自定义建筑地基</strong>。</li>
+            <li>对于动作 <code class="doc-code--inline">564</code>、<code class="doc-code--inline">565</code>，若科技类型为建筑，则<strong>每一格都会检测，支持 Ares 自定义建筑地基。</strong></li>
             <li>当指定对象已经拥有标签时，新标签会<strong>覆盖</strong>原有标签，并且原有标签的 <code class="doc-code--inline">InstanceCount</code> 会相应更新。</li>
             <li>与常规销毁（动作 <code class="doc-code--inline">70</code>）不同，动作 <code class="doc-code--inline">563</code> <strong>不会导致由小队创建的标签被销毁时弹框崩溃</strong>，因此可安全用于标签的批量清理。</li>
             <li>动作 <code class="doc-code--inline">570</code> 的原理：该动作会强制创建一个<strong>全新</strong>的标签实例，然后将当前所有已经绑定了该标签类型（TagType）的科技对象<strong>全部重新指向</strong>这个新标签，最后销毁原有的所有标签实例。</li>
