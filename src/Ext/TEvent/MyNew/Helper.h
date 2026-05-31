@@ -6,4 +6,4 @@
 
 bool IsTechnoNearCell(const TechnoClass* pTechno, const CellStruct& targetCell, int distanceCells);
 
-bool IsCellInBuildingFoundation(BuildingClass* pBuilding, const CellStruct& cell);
+bool IsCellInBuildingFoundation(const BuildingClass* const pBuilding, const CellStruct& cell);

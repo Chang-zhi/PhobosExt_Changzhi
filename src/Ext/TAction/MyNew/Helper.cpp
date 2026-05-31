@@ -7,7 +7,10 @@
 
 #include <Utilities/Debug.h>
 
+#include <vector>
 #include <string>
+
+
 
 TagClass* GetTagClassByIndex(int Index, bool forceNew)
 {
