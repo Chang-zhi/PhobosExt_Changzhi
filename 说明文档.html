@@ -354,7 +354,7 @@
         </ul>
         <p>在 <code class="doc-code--inline">[General]</code> 的增加新变量，用来控制当路径点在黑幕里时是否绘制。</p>
         <pre class="doc-code--block"><code>[General]
-ShowWaypointLabelInShroud=              ; boolean（布尔值），默认 true</code></pre>
+ShowWaypointLabelInShroud=                  ; boolean（布尔值），默认 true</code></pre>
         <p><strong>注:</strong> 仅判断路径点本身是否被黑幕遮挡, 不检测整个标签。</p>
 
         <!-- 2. 动态标签绑定功能 -->
@@ -452,13 +452,13 @@ ShowWaypointLabelInShroud=              ; boolean（布尔值），默认 true</
             <li>由本组触发创建的标签可以被原版动作 <code class="doc-code--inline">70</code>（摧毁标签... ）安全销毁而不会弹框。</li>
             <li>即使想要绑定的科技类型<strong>正在建造中</strong>，也会被关联到指定标签，但是建筑造出来之前触发不起作用。</li>
             <li>通过本组触发给小队成员关联的标签，在小队解散后标签不会自动消失。</li>
-            <li>对于动作 <code class="doc-code--inline">564</code>、<code class="doc-code--inline">565</code>，若科技类型为建筑，则<strong>每一格都会检测</strong> (矩形地基)，当前<strong>不支持 Ares 自定义建筑地基</strong>。</li>
+            <li>对于动作 <code class="doc-code--inline">564</code>、<code class="doc-code--inline">565</code>，若科技类型为建筑，则<strong>每一格都会检测，支持 Ares 自定义建筑地基</strong>。</li>
             <li>当指定对象已经拥有标签时，新标签会<strong>覆盖</strong>原有标签，并且原有标签的 <code class="doc-code--inline">InstanceCount</code> 会相应更新。</li>
             <li>与常规销毁（动作 <code class="doc-code--inline">70</code>）不同，动作 <code class="doc-code--inline">563</code> <strong>不会导致由小队创建的标签被销毁时弹框崩溃</strong>，因此可安全用于标签的批量清理。</li>
             <li>动作 <code class="doc-code--inline">570</code> 的原理：该动作会强制创建一个<strong>全新</strong>的标签实例，然后将当前所有已经绑定了该标签类型（TagType）的科技对象<strong>全部重新指向</strong>这个新标签，最后销毁原有的所有标签实例。</li>
             <li><strong>布尔值参数（强制新建）</strong>：
                 <ul class="doc-list--content">
-                    <li>若为 <code class="doc-code--inline">1</code>（真），则无论当前是否存在相同标签类型的实例，都会创建一个<strong>全新的标签实例</strong>，可用于统一实例。（新实例与同类型其他实例独立存在，引擎允许多实例）</li>
+                    <li>若为 <code class="doc-code--inline">1</code>（真），则无论当前是否存在相同标签类型的实例，都会创建一个<strong>全新的标签实例</strong>。（新实例与同类型其他实例独立存在，引擎允许多实例）</li>
                     <li>若为 <code class="doc-code--inline">0</code>（假），则优先寻找游戏内已存在的该标签类型实例，找到则直接使用，找不到才会创建新标签。</li>
                     <li>注意：当使用 <code class="doc-code--inline">0</code> 时，若存在多个同类型标签实例，实际绑定到哪一个<strong>不确定</strong>（取决于遍历顺序），建议在需要明确控制实例时使用 <code class="doc-code--inline">1</code>。</li>
                 </ul>
@@ -494,7 +494,7 @@ ShowWaypointLabelInShroud=              ; boolean（布尔值），默认 true</
             <li><code class="doc-code--inline">552</code> – 路径点上存在所属方的指定科技类型... （参数：路径点索引，科技类型）</li>
             <li><code class="doc-code--inline">553</code> – 路径点上不存在所属方的指定科技类型... （参数：路径点索引，科技类型）</li>
         </ul>
-        <p class="doc-paragraph--wrapped"><strong>注意事项：</strong> 对于事件 <code class="doc-code--inline">552</code>,<code class="doc-code--inline">553</code>, 若科技类型为建筑，则每一格都会检测 (矩形地基)，不支持ares的自定义Foundation。</p>
+        <p class="doc-paragraph--wrapped"><strong>注意事项：</strong> 对于事件 <code class="doc-code--inline">552</code>,<code class="doc-code--inline">553</code>, 若科技类型为建筑，则<strong>每一格都会检测，支持ares的自定义Foundation。</strong></p>
 
         <!-- 6. 单位可招募属性设置 -->
         <h3 id="recruitable" class="doc-heading--tertiary">6. 单位可招募属性设置</h3>
@@ -533,7 +533,7 @@ AutoHunt=                       ; boolean（布尔值），默认 false</code></
         <!-- 9. AI 所属单位目标判定 -->
         <h3 id="legal-target" class="doc-heading--tertiary">9. AI 所属单位目标判定</h3>
         <pre class="doc-code--block"><code>[TechnoType]
-LegalTargetWhenAIOwner=                       ; boolean（布尔值），默认 true</code></pre>
+LegalTargetWhenAIOwner=                     ; boolean（布尔值），默认 true</code></pre>
         <p>当科技类型的 <code class="doc-code--inline">LegalTargetWhenAIOwner=no</code> 且不由人类玩家控制时，该科技类型不会被其他单位选为普通武器攻击对象。<br>
         （但仍可被 C4 爆破、受到伤害反馈等）</p>
 
