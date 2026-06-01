@@ -54,7 +54,6 @@ void RulesExt::ExtData::LoadBeforeTypeData(RulesClass* pThis, CCINIClass* pINI)
 	INI_EX exINI(pINI);
 
 	this->ShowWaypointLabelInShroud.Read(exINI, GameStrings::General, "ShowWaypointLabelInShroud");
-
 }
 
 // this should load everything that TypeData is not dependant on
