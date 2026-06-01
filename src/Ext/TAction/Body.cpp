@@ -118,8 +118,8 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 	//	return TActionExt::RemoveBaseNodesExceedingAttemptCountForHouse(pThis, pHouse, pObject, pTrigger, location);
 	//case PhobosTriggerAction::SetObjectRecruitable:
 	//	return TActionExt::SetObjectRecruitable(pThis, pHouse, pObject, pTrigger, location);
-	 case PhobosTriggerAction::testAction:
-	 	return TActionExt::testAction(pThis, pHouse, pObject, pTrigger, location);
+	// case PhobosTriggerAction::testAction:
+	// 	return TActionExt::testAction(pThis, pHouse, pObject, pTrigger, location);
 
 	default:
 		bHandled = false;
@@ -474,8 +474,8 @@ bool TActionExt::RemoveAllBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseC
 		pOwner->Base.BaseNodes.RemoveItem(*it);
 	}
 
-	// Debug::Log("[End]: Removed %zu base nodes at waypoint %d (cell %d,%d). New node count: %d\n"
-	// indicesToRemove.size(), waypointIndex, cell.X, cell.Y, pOwner->Base.BaseNodes.Count);
+	Debug::Log("[End]: Removed %zu base nodes at waypoint %d (cell %d,%d). New node count: %d\n",
+		indicesToRemove.size(), waypointIndex, cell.X, cell.Y, pOwner->Base.BaseNodes.Count);
 	return true;
 }
 
@@ -495,7 +495,7 @@ bool TActionExt::RemoveBaseNodesOfBuildingTypeForHouse(TActionClass* pThis, Hous
 	}
 
 	const char* buildTypeID = BuildingTypeClass::Array[buildTypeIndex]->get_ID();
-	// Debug::Log("[Start]: Removing base nodes for building type \"%s\".\n", buildTypeID);
+	Debug::Log("[Start]: Removing base nodes for building type \"%s\".\n", buildTypeID);
 
 	// 1. 收集需要删除的节点索引
 	std::vector<int> indicesToRemove;
@@ -507,7 +507,7 @@ bool TActionExt::RemoveBaseNodesOfBuildingTypeForHouse(TActionClass* pThis, Hous
 
 	if (indicesToRemove.empty())
 	{
-		// Debug::Log("[End]: No base nodes found for type \"%s\".\n", buildTypeID);
+		Debug::Log("[End]: No base nodes found for type \"%s\".\n", buildTypeID);
 		return true;
 	}
 
@@ -534,8 +534,8 @@ bool TActionExt::RemoveBaseNodesOfBuildingTypeForHouse(TActionClass* pThis, Hous
 		pOwner->Base.BaseNodes.RemoveItem(*it);
 	}
 
-	// Debug::Log("[End]: Removed %zu base nodes for type \"%s\". New node count: %d\n",
-	// 	indicesToRemove.size(), buildTypeID, pOwner->Base.BaseNodes.Count);
+	Debug::Log("[End]: Removed %zu base nodes for type \"%s\". New node count: %d\n",
+		indicesToRemove.size(), buildTypeID, pOwner->Base.BaseNodes.Count);
 	return true;
 }
 
@@ -886,17 +886,17 @@ bool TActionExt::BindTagsToAllTechTypesOfTriggerOwnerInWaypointRangeExceptSpecif
 			if (!pTechno)
 				continue;
 
-			// Debug::Log("Techno id is \"%s\".\n", pTechno->get_ID());
+			Debug::Log("Techno id is \"%s\".\n", pTechno->get_ID());
 
 			if (pTechno->get_ID() == std::string(techno))
 			{
-				// Debug::Log("Techno 冲突, continue.\"%s\"\n", pTechno->get_ID());
+				Debug::Log("Techno 冲突, continue.\"%s\"\n", pTechno->get_ID());
 				continue;
 			}
 
 			if (IsTechnoNearCell(pTechno, cell, range))
 			{
-				// Debug::Log("AttachedTag, techno is \"%s\"\n", pTechno->get_ID());
+				Debug::Log("AttachedTag, techno is \"%s\"\n", pTechno->get_ID());
 				if (pTechno->AttachedTag) pTechno->ReplaceTag(pTagClass);
 				else pTechno->AttachTrigger(pTagClass);
 			}
@@ -955,28 +955,6 @@ bool TActionExt::UpdateOwnerBuildingsAnimations(TActionClass* pThis, HouseClass*
 	return true;
 }
 
-bool TActionExt::testAction(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
-{
-	Debug::Log("[TestAction]: testAction active\n");
-	int houseIndex = pThis->Param3;
-
-	HouseClass* pOwner = HouseClass::FindByCountryIndex(houseIndex);
-	if (!pOwner) return false;
-
-	for (TeamClass* pTeam : TeamClass::Array)
-	{
-		if (!pTeam || !pTeam->Type) continue;
-		if (pTeam->Owner != pOwner) continue;
-
-		Debug::Log("Team: %s, Owner: %s, Members: %d, Type: %s\n",
-				   pTeam->Type->ID,
-				   pTeam->Owner ? pTeam->Owner->get_ID() : "null",
-				   pTeam->TotalObjects,
-				   pTeam->Type->get_ID());
-	}
-
-	return true;
-}
 
 // =============================
 // container

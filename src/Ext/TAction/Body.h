@@ -101,7 +101,7 @@ enum class PhobosTriggerAction : unsigned int
 	// SetObjectRecruitable = 566,
 
 	// 测试用
-	testAction = 1150,
+	// testAction = 1150,
 };
 
 class TActionExt
@@ -168,7 +168,7 @@ public:
 
 	// ACTION_FUNC(RemoveBaseNodesExceedingAttemptCountForHouse);
 	// ACTION_FUNC(SetObjectRecruitable);
-	ACTION_FUNC(testAction);
+	// ACTION_FUNC(testAction);
 
 
 #undef ACTION_FUNC
