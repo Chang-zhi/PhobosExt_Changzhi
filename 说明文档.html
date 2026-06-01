@@ -33,8 +33,8 @@
 
         /* 响应式小屏 */
         @media (max-width: 700px) {
-            .doc-container { 
-                padding: 1.2rem; 
+            .doc-container {
+                padding: 1.2rem;
             }
         }
 
@@ -264,9 +264,9 @@
     <div class="doc-container">
         <!-- 文档主标题 -->
         <h1 class="doc-title">
-            <a href="https://github.com/Chang-zhi/PhobosExt_Changzhi" 
-               target="_blank" 
-               class="doc-link" 
+            <a href="https://github.com/Chang-zhi/PhobosExt_Changzhi"
+               target="_blank"
+               class="doc-link"
                style="border-bottom: none;">PhobosExt</a>
             <span class="doc-title__sub">扩展 DLL</span>
         </h1>
@@ -316,10 +316,10 @@
         <p>当单位当前正在使用带有 <code class="doc-code--inline">Temporal=yes</code> 和 <code class="doc-code--inline">TemporalExclusive=yes</code> 弹头的武器时, 会强制改变单位的索敌逻辑, 可能会产生bug。</p>
         <p>当科技类型的 <code class="doc-code--inline">LegalTargetWhenAIOwner=no</code> 且不由人类玩家控制时, 会强制改变其他单位的索敌逻辑, 可能会产生bug。</p>
         <br>
-        <p><strong>如果遇到bug或兼容性问题可以我发私信, 我会尽量解决。</strong></p> 
-        <p>我的 <a href="https://space.bilibili.com/423792550" 
-               target="_blank" 
-               class="doc-link" 
+        <p><strong>如果遇到bug或兼容性问题可以我发私信, 我会尽量解决。</strong></p>
+        <p>我的 <a href="https://space.bilibili.com/423792550"
+               target="_blank"
+               class="doc-link"
                style="border-bottom: none;">@B站主页</a></p>
         <p>我的 QQ邮箱: 3071564490@qq.com</p>
 
@@ -530,14 +530,15 @@ ShowWaypointLabelInShroud=                  ; boolean（布尔值），默认 tr
         </ul>
         <p class="doc-paragraph--wrapped"><strong>注意事项：</strong> 只会修改 <code class="doc-code--inline">FootClass</code> 的实例。两个布尔值，分别对应 <code class="doc-code--inline">RecruitableA</code> 和 <code class="doc-code--inline">RecruitableB</code>。</p>
 
-        <!-- 7. AI 所属单位目标判定 -->
+        <!-- 7. AI 更新建筑动画功能 -->
         <h3 id="update-buildingAnim" class="doc-heading--tertiary">7. AI 更新建筑动画功能</h3>
-        <p>更新建筑的动画，用于处理建筑改变所属后动画会停止播放的问题。(但遥控坦克的状态仍然不会更新)</p>
+        <p>更新建筑的动画，用于处理建筑改变所属后动画会停止播放的问题。</p>
+        <p>(但遥控坦克的状态仍然不会更新)</p>
         <p><strong>触发动作说明：</strong></p>
         <ul class="doc-list--content">
-            <li><code class="doc-code--inline">557</code> – 为指定所属方添加金钱数额...（参数：所属方国家索引，金额数额）</li>
-            <li><code class="doc-code--inline">558</code> – 为指定所属方扣除金钱数额...（参数：所属方国家索引，金额数额）</li>
-            <li><code class="doc-code--inline">559</code> – 设置指定所属方的金钱数额...（参数：所属方国家索引，金额数额）</li>
+            <li><code class="doc-code--inline">574</code> – 更新所有建筑的动画...</li>
+            <li><code class="doc-code--inline">575</code> – 更新关联建筑的动画...</li>
+            <li><code class="doc-code--inline">576</code> – 更新指定所属方所有建筑的动画... （参数：所属方国家索引）</li>
         </ul>
 
         <!-- 8. 超时空武器互斥锁定 -->
@@ -577,10 +578,10 @@ AutoHunt=                       ; boolean（布尔值），默认 false</code></
         <h4>标准 FinalAlert 2</h4>
         <p>需在 <code class="doc-code--inline">FAData.ini</code> 的 <code class="doc-code--inline">[EventsRA2]</code> 和 <code class="doc-code--inline">[ActionsRA2]</code> 小节中添加内容, 可以参考 <code class="doc-code--inline">FA2SP_HDM_Edition</code> 版本。</p>
         <br>
-        <a href="https://github.com/handama/FA2sp" 
+        <a href="https://github.com/handama/FA2sp"
             target="_blank"
             class="doc-link-unnormal"
-            style="border-bottom:none; 
+            style="border-bottom:none;
             display:inline;"><strong>FA2SP_HDM_Edition</strong></a>（韩大妈版本）
         <p>可以直接复制压缩包里面的 <code class="doc-code--inline">FAData_TriggerAndScript.ini</code> 到地编的根目录下。<br>
         否则需手动同时编辑 <code class="doc-code--inline">FAData_TriggerAndScript.ini</code> 中的<br>
