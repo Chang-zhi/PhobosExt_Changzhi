@@ -26,8 +26,8 @@ BEGIN
    VALUE "FileDescription", FILE_DESCRIPTION "\0"
    VALUE "FileVersion", FILE_VERSION_STR "\0"
    VALUE "ProductVersion", PRODUCT_VERSION "\0"
-   VALUE "InternalName", "Phobos.dll\0"
-   VALUE "OriginalFilename", "Phobos.dll\0"
+   VALUE "InternalName", "PhobosExt.dll\0"
+   VALUE "OriginalFilename", "PhobosExt.dll\0"
 
 #ifndef IS_RELEASE_VER
    VALUE "SpecialBuild", "Testing version. Use at your own risk.\0"

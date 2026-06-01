@@ -111,21 +111,21 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
-    <CharacterSet>NotSet</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
     <XPDeprecationWarning>false</XPDeprecationWarning>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DevBuild|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
-    <CharacterSet>NotSet</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
     <XPDeprecationWarning>false</XPDeprecationWarning>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
     <XPDeprecationWarning>false</XPDeprecationWarning>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -176,7 +176,7 @@
       <ConformanceMode>true</ConformanceMode>
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <OmitFramePointers>true</OmitFramePointers>
-      <PreprocessorDefinitions>IS_RELEASE_VER;SYR_VER=2;HAS_EXCEPTIONS=0;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0601;NTDDI_VERSION=0x06010000;%(PreprocessorDefinitions);%(AdditionalDefinitions);PHOBOS_DLL="$(ProjectName).dll"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>IS_RELEASE_VER;SYR_VER=2;HAS_EXCEPTIONS=0;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0601;NTDDI_VERSION=0x06010000;%(PreprocessorDefinitions);%(AdditionalDefinitions);PHOBOS_DLL="PhobosExt.dll"</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>false</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -221,7 +221,7 @@
       <ConformanceMode>true</ConformanceMode>
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <OmitFramePointers>true</OmitFramePointers>
-      <PreprocessorDefinitions>SYR_VER=2;HAS_EXCEPTIONS=0;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0601;NTDDI_VERSION=0x06010000;%(PreprocessorDefinitions);%(AdditionalDefinitions);PHOBOS_DLL="$(ProjectName).dll"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>SYR_VER=2;HAS_EXCEPTIONS=0;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0601;NTDDI_VERSION=0x06010000;%(PreprocessorDefinitions);%(AdditionalDefinitions);PHOBOS_DLL="PhobosExt.dll"</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>false</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -264,7 +264,7 @@
       <ConformanceMode>true</ConformanceMode>
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
       <OmitFramePointers>false</OmitFramePointers>
-      <PreprocessorDefinitions>DEBUG;SYR_VER=2;HAS_EXCEPTIONS=0;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0601;NTDDI_VERSION=0x06010000;%(PreprocessorDefinitions);%(AdditionalDefinitions);PHOBOS_DLL="$(ProjectName).dll"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DEBUG;SYR_VER=2;HAS_EXCEPTIONS=0;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0601;NTDDI_VERSION=0x06010000;%(PreprocessorDefinitions);%(AdditionalDefinitions);PHOBOS_DLL="PhobosExt.dll"</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>false</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -278,6 +278,7 @@
       <AssemblerListingLocation>$(IntDir)\%(RelativeDir)</AssemblerListingLocation>
       <ObjectFileName>$(IntDir)\%(RelativeDir)</ObjectFileName>
       <CallingConvention>StdCall</CallingConvention>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4100;4201;4530;4731;4740;4458;4819;5103;5105;26495</DisableSpecificWarnings>
       <EnableModules>true</EnableModules>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>

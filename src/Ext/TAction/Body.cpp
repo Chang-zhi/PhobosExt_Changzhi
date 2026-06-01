@@ -359,7 +359,7 @@ bool TActionExt::AddBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseClass* 
 	const int buildTypeIndex = pThis->Param5;
 	const int forceAtFront = pThis->Param6;
 
-	// ===== 基础信息 ===== 
+	// ===== 基础信息 =====
 	HouseClass* pOwner = HouseClass::FindByCountryIndex(houseIndex);
 	if (!pOwner) return false;
 
@@ -370,7 +370,7 @@ bool TActionExt::AddBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseClass* 
 
 	BaseNodeClass newNode = { buildTypeIndex, cell, false, 0 };
 
-	// ===== 强制放到最前面 ===== 
+	// ===== 强制放到最前面 =====
 	if (forceAtFront)
 	{
 	    // 1.清除工厂序列
@@ -380,7 +380,7 @@ bool TActionExt::AddBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseClass* 
 	    	if (!pBuilding->Factory
 	    		|| !pBuilding->Factory->Object
 	    		|| pBuilding->Factory->Object->WhatAmI() != AbstractType::Building) continue;
-	    
+
 	    	TechnoTypeClass* pFactObjType = pBuilding->Factory->Object->GetTechnoType();
 
 	    	pBuilding->Factory->AbandonProduction();
@@ -446,7 +446,7 @@ bool TActionExt::RemoveAllBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseC
 	{
 		if (buildTypeIndex < 0 || buildTypeIndex >= BuildingTypeClass::Array.Count)
 		{
-			Debug::Log("Invalid buildTypeIndex %d at waypoint %d\n", buildTypeIndex, waypointIndex);
+			// Debug::Log("Invalid buildTypeIndex %d at waypoint %d\n", buildTypeIndex, waypointIndex);
 			continue;
 		}
 		const char* buildTypeID = BuildingTypeClass::Array[buildTypeIndex]->get_ID();
@@ -474,8 +474,8 @@ bool TActionExt::RemoveAllBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseC
 		pOwner->Base.BaseNodes.RemoveItem(*it);
 	}
 
-	Debug::Log("[End]: Removed %zu base nodes at waypoint %d (cell %d,%d). New node count: %d\n",
-		indicesToRemove.size(), waypointIndex, cell.X, cell.Y, pOwner->Base.BaseNodes.Count);
+	// Debug::Log("[End]: Removed %zu base nodes at waypoint %d (cell %d,%d). New node count: %d\n",
+		// indicesToRemove.size(), waypointIndex, cell.X, cell.Y, pOwner->Base.BaseNodes.Count);
 	return true;
 }
 
@@ -490,12 +490,12 @@ bool TActionExt::RemoveBaseNodesOfBuildingTypeForHouse(TActionClass* pThis, Hous
 
 	if (buildTypeIndex < 0 || buildTypeIndex >= BuildingTypeClass::Array.Count)
 	{
-		Debug::Log("Invalid buildTypeIndex %d\n", buildTypeIndex);
+		// Debug::Log("Invalid buildTypeIndex %d\n", buildTypeIndex);
 		return false;
 	}
 
 	const char* buildTypeID = BuildingTypeClass::Array[buildTypeIndex]->get_ID();
-	Debug::Log("[Start]: Removing base nodes for building type \"%s\".\n", buildTypeID);
+	// Debug::Log("[Start]: Removing base nodes for building type \"%s\".\n", buildTypeID);
 
 	// 1. 收集需要删除的节点索引
 	std::vector<int> indicesToRemove;
@@ -507,7 +507,7 @@ bool TActionExt::RemoveBaseNodesOfBuildingTypeForHouse(TActionClass* pThis, Hous
 
 	if (indicesToRemove.empty())
 	{
-		Debug::Log("[End]: No base nodes found for type \"%s\".\n", buildTypeID);
+		// Debug::Log("[End]: No base nodes found for type \"%s\".\n", buildTypeID);
 		return true;
 	}
 
@@ -534,8 +534,8 @@ bool TActionExt::RemoveBaseNodesOfBuildingTypeForHouse(TActionClass* pThis, Hous
 		pOwner->Base.BaseNodes.RemoveItem(*it);
 	}
 
-	Debug::Log("[End]: Removed %zu base nodes for type \"%s\". New node count: %d\n",
-		indicesToRemove.size(), buildTypeID, pOwner->Base.BaseNodes.Count);
+	// Debug::Log("[End]: Removed %zu base nodes for type \"%s\". New node count: %d\n",
+		// indicesToRemove.size(), buildTypeID, pOwner->Base.BaseNodes.Count);
 	return true;
 }
 
@@ -589,7 +589,7 @@ bool TActionExt::BindTagToTechnoTypeAtWaypoint(TActionClass* pThis, HouseClass* 
 				{
 					if (pBuilding->AttachedTag) pBuilding->ReplaceTag(pTagClass);
 					else pBuilding->AttachTrigger(pTagClass);
-				}	
+				}
 			}
 			else
 			{
@@ -746,7 +746,7 @@ bool TActionExt::BindTagToAllTechnoTypesWithinWaypointRange(TActionClass* pThis,
 
 bool TActionExt::BindTagToAllTechnoTypesOfSpecificOwnerWithinWaypointRange(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {
-	
+
 	int houseIndex = pThis->Value;
 	int tagIndex = pThis->Param3;
 	int waypointIndex = pThis->Param4;
@@ -785,10 +785,10 @@ bool TActionExt::BindTagToAllTechnoTypesOfSpecificOwnerWithinWaypointRange(TActi
 bool TActionExt::UnifyAllInstancesOfSameTagType(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {
 	int tagIndex = pThis->Param3;
-	
+
 	TagClass* pUnifiedTag = GetTagClassByIndex(tagIndex, true);
 	if (!pUnifiedTag) return false;
-	
+
 	std::set<TagClass*> tagsToUnify;
 
 	for(TechnoClass *pTechno : TechnoClass::Array)
@@ -890,7 +890,7 @@ bool TActionExt::BindTagsToAllTechTypesOfTriggerOwnerInWaypointRangeExceptSpecif
 
 			if (pTechno->get_ID() == std::string(techno))
 			{
-				Debug::Log("Techno 冲突, continue.\"%s\"\n", pTechno->get_ID());
+				Debug::Log(L"Techno 冲突, continue.\"%hs\"\n", pTechno->get_ID());
 				continue;
 			}
 

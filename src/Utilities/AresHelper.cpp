@@ -23,7 +23,7 @@ const AresHelper::AresTimestampMap AresHelper::AresTimestampBytes =
 };
 
 #ifndef PHOBOS_DLL
-#define PHOBOS_DLL "Phobos.dll"
+#define PHOBOS_DLL "PhobosExt.dll"
 #endif
 
 bool module_has_syhks00(HMODULE hModule)
@@ -111,7 +111,7 @@ void AresHelper::Init()
 
 	if (!AresBaseAddress)
 	{
-		Debug::LogDeferred("[Phobos] Failed to detect Ares. Disabling integration.\n");
+		Debug::LogDeferred("[PhobosExt] Failed to detect Ares. Disabling integration.\n");
 		return;
 	}
 	// find offset of PE header
