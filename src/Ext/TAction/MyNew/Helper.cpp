@@ -76,8 +76,12 @@ bool CheckTaskForceZoneConnection(HouseClass* pOwner, HouseClass* pEnemy, TaskFo
 
 		++checkedCount;
 		auto const mz = pType->MovementZone;
+		auto const connected = HasZoneConnection(pOwner, pEnemy, mz);
 
-		if(HasZoneConnection(pOwner, pEnemy, mz))
+		Debug::Log(L"  [TF条目%d] \"%hs\" MovementZone=%d, 区域连通=%d\n",
+			i, pType->get_ID(), static_cast<int>(mz), connected);
+
+		if(connected)
 			++connectedCount;
 	}
 
