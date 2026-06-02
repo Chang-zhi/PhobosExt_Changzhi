@@ -1052,7 +1052,6 @@ bool TActionExt::testAction(TActionClass* pThis, HouseClass* pHouse, ObjectClass
 			pBuilding->Factory->QueuedObjects.Count);
 	}
 
-
 	return true;
 }
 

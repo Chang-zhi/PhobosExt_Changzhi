@@ -357,7 +357,7 @@
         </ul>
         <p><strong>触发动作说明：</strong></p>
         <ul class="doc-list--content">
-            <li><code class="doc-code--inline">550</code> – 在指定路径点绘制文本...（参数：路径点索引，文本内容，宽度，不透明度，颜色）</li>
+            <li><code class="doc-code--inline">550</code> – 在指定路径点绘制文本...（参数：路径点索引，文本内容，像素宽度，不透明度百分比，文本颜色）</li>
             <li><code class="doc-code--inline">551</code> – 清除指定路径点的文本...（参数：路径点索引）</li>
             <li><code class="doc-code--inline">552</code> – 清除所有路径点文本...</li>
         </ul>
@@ -392,22 +392,22 @@ ShowWaypointLabelInShroud=                  ; boolean（布尔值），默认 tr
                     <tr>
                         <td class="doc-table__td">553</td>
                         <td class="doc-table__td">将指定小队全部成员关联到指定标签...</td>
-                        <td class="doc-table__td">小队索引，标签索引，布尔值</td>
+                        <td class="doc-table__td">小队索引，标签索引，强制新建标签</td>
                     </tr>
                     <tr>
                         <td class="doc-table__td">554</td>
                         <td class="doc-table__td">将指定所属方的指定小队全部成员关联到指定标签...</td>
-                        <td class="doc-table__td">小队索引，标签索引，所属方国家索引，布尔值</td>
+                        <td class="doc-table__td">小队索引，标签索引，所属方国家索引，强制新建标签</td>
                     </tr>
                     <tr>
                         <td class="doc-table__td">555</td>
                         <td class="doc-table__td">将特定科技类型全部关联到指定标签...</td>
-                        <td class="doc-table__td">科技类型ID，标签索引，布尔值</td>
+                        <td class="doc-table__td">科技类型ID，标签索引，强制新建标签</td>
                     </tr>
                     <tr>
                         <td class="doc-table__td">556</td>
                         <td class="doc-table__td">将指定所属方的特定科技类型全部关联到指定标签...</td>
-                        <td class="doc-table__td">科技类型ID，标签索引，所属方国家索引，布尔值</td>
+                        <td class="doc-table__td">科技类型ID，标签索引，所属方国家索引，强制新建标签</td>
                     </tr>
                     <tr>
                         <td class="doc-table__td">563</td>
@@ -417,32 +417,32 @@ ShowWaypointLabelInShroud=                  ; boolean（布尔值），默认 tr
                     <tr>
                         <td class="doc-table__td">564</td>
                         <td class="doc-table__td">为路径点上的指定科技类型绑定标签...</td>
-                        <td class="doc-table__td">路径点索引，科技类型ID，标签索引，布尔值</td>
+                        <td class="doc-table__td">路径点索引，科技类型ID，标签索引，强制新建标签</td>
                     </tr>
                     <tr>
                         <td class="doc-table__td">565</td>
                         <td class="doc-table__td">为路径点上指定所属方的指定科技类型绑定标签...</td>
-                        <td class="doc-table__td">路径点索引，科技类型ID，标签索引，所属方国家索引，布尔值</td>
+                        <td class="doc-table__td">路径点索引，科技类型ID，标签索引，所属方国家索引，强制新建标签</td>
                     </tr>
                     <tr>
                         <td class="doc-table__td">566</td>
                         <td class="doc-table__td">为路径点范围内的指定科技类型绑定标签...</td>
-                        <td class="doc-table__td">路径点索引，科技类型ID，标签索引，范围，布尔值</td>
+                        <td class="doc-table__td">路径点索引，科技类型ID，标签索引，范围，强制新建标签</td>
                     </tr>
                     <tr>
                         <td class="doc-table__td">567</td>
                         <td class="doc-table__td">为路径点范围内触发所属方的指定科技类型绑定标签...</td>
-                        <td class="doc-table__td">路径点索引，科技类型ID，标签索引，范围，布尔值</td>
+                        <td class="doc-table__td">路径点索引，科技类型ID，标签索引，范围，强制新建标签</td>
                     </tr>
                     <tr>
                         <td class="doc-table__td">568</td>
                         <td class="doc-table__td">为路径点范围内的所有科技类型绑定标签...</td>
-                        <td class="doc-table__td">路径点索引，标签索引，范围，布尔值</td>
+                        <td class="doc-table__td">路径点索引，标签索引，范围，强制新建标签</td>
                     </tr>
                     <tr>
                         <td class="doc-table__td">569</td>
                         <td class="doc-table__td">为路径点范围内指定所属方的所有科技类型绑定标签...</td>
-                        <td class="doc-table__td">路径点索引，所属方国家索引，标签索引，范围，布尔值</td>
+                        <td class="doc-table__td">路径点索引，所属方国家索引，标签索引，范围，强制新建标签</td>
                     </tr>
                     <tr>
                         <td class="doc-table__td">570</td>
@@ -452,18 +452,18 @@ ShowWaypointLabelInShroud=                  ; boolean（布尔值），默认 tr
                      <tr>
                         <td class="doc-table__td">572</td>
                         <td class="doc-table__td">将路径点范围内除指定类型外的所有科技类型关联到指定标签...</td>
-                        <td class="doc-table__td">路径点索引，科技类型ID，标签索引，范围，布尔值</td>
+                        <td class="doc-table__td">路径点索引，科技类型ID，标签索引，范围，强制新建标签</td>
                     </tr>
                     <tr>
                         <td class="doc-table__td">573</td>
                         <td class="doc-table__td">将路径点范围内触发所属方的除指定类型外的所有科技类型关联到指定标签...</td>
-                        <td class="doc-table__td">路径点索引，科技类型ID，标签索引，范围，布尔值</td>
+                        <td class="doc-table__td">路径点索引，科技类型ID，标签索引，范围，强制新建标签</td>
                     </tr>
                 </tbody>
             </table>
         </div>
         <p><strong>范围</strong>：整数，以单元格为单位的圆形半径 。<br>
-        <strong>布尔值</strong>：<code class="doc-code--inline">0</code> 或 <code class="doc-code--inline">1</code>，控制是否强制创建一个新的标签实例。（见下文注意事项第9条）</p>
+        <strong>强制新建标签</strong>：<code class="doc-code--inline">0</code>=使用已有实例，<code class="doc-code--inline">1</code>=强制创建新实例。见下文注意事项第9条。</p>
 
         <h4>注意事项</h4>
         <ol class="doc-list--content">
@@ -475,7 +475,7 @@ ShowWaypointLabelInShroud=                  ; boolean（布尔值），默认 tr
             <li>当指定对象已经拥有标签时，新标签会<strong>覆盖</strong>原有标签，并且原有标签的 <code class="doc-code--inline">InstanceCount</code> 会相应更新。</li>
             <li>与常规销毁（动作 <code class="doc-code--inline">70</code>）不同，动作 <code class="doc-code--inline">563</code> <strong>不会导致由小队创建的标签被销毁时弹框崩溃</strong>，因此可安全用于标签的批量清理。</li>
             <li>动作 <code class="doc-code--inline">570</code> 的原理：该动作会强制创建一个<strong>全新</strong>的标签实例，然后将当前所有已经绑定了该标签类型（TagType）的科技对象<strong>全部重新指向</strong>这个新标签，最后销毁原有的所有标签实例。</li>
-            <li><strong>布尔值参数（强制新建）</strong>：
+            <li><strong>强制新建标签参数</strong>：
                 <ul class="doc-list--content">
                     <li>若为 <code class="doc-code--inline">1</code>（真），则无论当前是否存在相同标签类型的实例，都会创建一个<strong>全新的标签实例</strong>。（新实例与同类型其他实例独立存在，引擎允许多实例）</li>
                     <li>若为 <code class="doc-code--inline">0</code>（假），则优先寻找游戏内已存在的该标签类型实例，找到则直接使用，找不到才会创建新标签。</li>
@@ -500,14 +500,14 @@ ShowWaypointLabelInShroud=                  ; boolean（布尔值），默认 tr
         <p>允许动态添加或移除指定所属方的AI基地节点。</p>
         <p><strong>触发动作说明：</strong></p>
         <ul class="doc-list--content">
-            <li><code class="doc-code--inline">560</code> – 在指定路径点添加基地节点...（参数：所属方国家索引，路径点编号，建筑类型索引，布尔值）</li>
+            <li><code class="doc-code--inline">560</code> – 在指定路径点添加基地节点...（参数：所属方国家索引，路径点编号，建筑类型索引，立即建造）</li>
             <li><code class="doc-code--inline">561</code> – 移除指定路径点上的所有基地节点...（参数：所属方国家索引，路径点编号）</li>
             <li><code class="doc-code--inline">562</code> – 移除特定所属方所有指定建筑类型的基地节点...（参数：所属方国家索引，建筑类型索引）</li>
         </ul>
 
         <h4>注意事项</h4>
         <ol class="doc-list--content">
-            <li>对于动作 <code class="doc-code--inline">560</code>,布尔值用来指定是否立即开始建造指定建筑, 为真时AI会立即开始建造指定建筑并清空建筑生产序列。</li>
+            <li>对于动作 <code class="doc-code--inline">560</code>，立即建造：<code class="doc-code--inline">0</code>=仅添加到建造队列，<code class="doc-code--inline">1</code>=立即开始建造。为真时AI会立即开始建造指定建筑并清空建筑生产序列。</li>
             <li>对于动作 <code class="doc-code--inline">561</code>,<code class="doc-code--inline">562</code>, 会重置 ai 的建造序列, 如果基地正在建造需要移除的基地节点, 则会强制中断建造。</li>
         </ol>
 
@@ -527,9 +527,9 @@ ShowWaypointLabelInShroud=                  ; boolean（布尔值），默认 tr
         <h3 id="recruitable" class="doc-heading--tertiary">6. 单位可招募属性设置</h3>
         <p><strong>触发动作说明：</strong></p>
         <ul class="doc-list--content">
-            <li><code class="doc-code--inline">571</code> – 设置关联单位的可招募属性... （参数：布尔值，布尔值）</li>
+            <li><code class="doc-code--inline">571</code> – 设置关联单位的可招募属性... （参数：可招募A，可招募B）</li>
         </ul>
-        <p class="doc-paragraph--wrapped"><strong>注意事项：</strong> 只会修改 <code class="doc-code--inline">FootClass</code> 的实例。两个布尔值，分别对应 <code class="doc-code--inline">RecruitableA</code> 和 <code class="doc-code--inline">RecruitableB</code>。</p>
+        <p class="doc-paragraph--wrapped"><strong>注意事项：</strong> 只会修改 <code class="doc-code--inline">FootClass</code> 的实例。可招募A对应 <code class="doc-code--inline">RecruitableA</code>，可招募B对应 <code class="doc-code--inline">RecruitableB</code>。</p>
 
         <!-- 7. AI 更新建筑动画功能 -->
         <h3 id="update-buildingAnim" class="doc-heading--tertiary">7. AI 更新建筑动画功能</h3>
@@ -579,77 +579,25 @@ LegalTargetWhenAIOwner=         ; boolean（布尔值），默认 true</code></p
         <h3 id="create-team" class="doc-heading--tertiary">11. 建立作战小队(考虑限制)</h3>
         <p><strong>触发动作说明：</strong></p>
         <ul class="doc-list--content">
-            <li><code class="doc-code--inline">577</code> – 建立作战小队(考虑限制)... （参数：小队索引，布尔值，布尔值，布尔值）</li>
+            <li><code class="doc-code--inline">577</code> – 建立作战小队(考虑限制)... （参数：小队索引，上限限制开关，区域检查开关，连通模式）</li>
         </ul>
         <p><strong>注意事项: </strong></p>
         <ul class="doc-list--content">
-            <li><strong>上限限制(参数2)：</strong>启用后，若当前实例数已达到"作战小队"里的"最大"值，则不创建。</li>
-            <li><strong>区域检查(参数3)：</strong>启用后，检测所属方与敌对方之间是否存在区域连通路径，无连接则跳过。</li>
+            <li><strong>上限限制(参数2)：</strong><code class="doc-code--inline">0</code>=无限制，<code class="doc-code--inline">1</code>=启用上限。若当前实例数已达到"作战小队"里的"最大"值，则不创建。</li>
+            <li><strong>区域检查(参数3)：</strong><code class="doc-code--inline">0</code>=不检查，<code class="doc-code--inline">1</code>=启用检查。检测所属方与敌对方之间是否存在区域连通路径，无连接则跳过。</li>
             <li><strong>连通模式(参数4)：</strong>仅在区域检查启用时生效。</li>
             <ul class="doc-list--content">
-                    <li>若为 <code class="doc-code--inline">0</code>（假），则小队内任一兵种可以抵达目的地即可。</li>
-                    <li>若为 <code class="doc-code--inline">1</code>（真），则小队内全部兵种都需要可以抵达目的地才行。</li>
+                    <li><code class="doc-code--inline">0</code>：小队内任一兵种可以抵达目的地即可。</li>
+                    <li><code class="doc-code--inline">1</code>：小队内全部兵种都需要可以抵达目的地才行。</li>
             </ul>
         </ul>
 
         <!-- 触发编辑器配置 -->
         <h2 id="fa2-config" class="doc-heading--secondary">触发编辑器配置</h2>
-        <p>为了在触发编辑器（FinalAlert 2）中使用新的触发动作，需要修改 <code class="doc-code--inline">FAData.ini</code> 或对应版本的配置文件。</p>
-        <h4>标准 FinalAlert 2</h4>
-        <p>需在 <code class="doc-code--inline">FAData.ini</code> 的 <code class="doc-code--inline">[EventsRA2]</code> 和 <code class="doc-code--inline">[ActionsRA2]</code> 小节中添加内容, 可以参考 <code class="doc-code--inline">FA2SP_HDM_Edition</code> 版本。</p>
+        <p>为了在触发编辑器中使用新的触发动作，您需要复制压缩包里面的 <code class="doc-code--inline">FAData_TriggerAndScript.ini</code> 到地编的根目录下。</p>
         <br>
-        <a href="https://github.com/handama/FA2sp"
-            target="_blank"
-            class="doc-link-unnormal"
-            style="border-bottom:none;
-            display:inline;"><strong>FA2SP_HDM_Edition</strong></a>（韩大妈版本）
-        <p>可以直接复制压缩包里面的 <code class="doc-code--inline">FAData_TriggerAndScript.ini</code> 到地编的根目录下。<br>
-        否则需手动同时编辑 <code class="doc-code--inline">FAData_TriggerAndScript.ini</code> 中的<br>
-        <code class="doc-code--inline">[Chinese-EventsRA2]</code>, <code class="doc-code--inline">[English-EventsRA2]</code>, <code class="doc-code--inline">[Chinese-ActionsRA2]</code>, <code class="doc-code--inline">[English-ActionsRA2]</code> 小节。</p>
-        <br>
-        <p>在 <code class="doc-code--inline">[Chinese-EventsRA2]</code> 和 <code class="doc-code--inline">[English-EventsRA2]</code> 中添加以下内容:</p>
-        <pre class="doc-code--block"><code>[Chinese-EventsRA2]/[English-EventsRA2]
-...
-550=路径点附近存在所属方的任意科技类型... (PhobosExt),48,30,0,0,当指定路径点的指定距离内存在触发所属方任意科技类型时，此事件被满足。,0,1,550,1
-551=路径点附近不存在所属方的任意科技类型... (PhobosExt),48,30,0,0,当指定路径点的指定距离内不存在触发所属方任意科技类型时，此事件被满足。,0,1,551,1
-552=路径点上存在所属方的指定科技类型... (PhobosExt),49,46,0,0,当路径点上存在触发所属方的指定科技类型时，此事件被满足。(若科技类型为建筑，则每一格都会检测，支持ares的自定义Foundation),0,1,552,1
-553=路径点上不存在所属方的指定科技类型... (PhobosExt),49,46,0,0,当路径点上不再存在触发所属方的指定科技类型时，此事件被满足。(若科技类型为建筑，则每一格都会检测，支持ares的自定义Foundation),0,1,553,1
-...
-</code></pre>
-
-        <p>在 <code class="doc-code--inline">[Chinese-ActionsRA2]</code> 和 <code class="doc-code--inline">[English-ActionsRA2]</code> 中添加以下内容:</p>
-        <pre class="doc-code--block"><code>[Chinese-ActionsRA2]/[English-ActionsRA2]
-...
-550=在指定路径点绘制文本... (PhobosExt),-4,13,30,6,6,6,0,0,0,在指定路径点绘制文本。\n第三个数值是宽度(像素，1~1000，默认250)。\n第四个数值是背景不透明度(百分比，0~100)。\n第五个数值是颜色(金=0，白=1，红=2，蓝=3，绿=4，黄=5，紫=6，粉=7，淡蓝=8),0,1,902,1
-551=清除指定路径点的文本... (PhobosExt),0,0,30,0,0,0,0,0,0,清除指定路径点的文本。,0,1,903,1
-552=清除所有路径点文本... (PhobosExt),0,0,0,0,0,0,0,0,0,清除屏幕上所有已设置的路径点文本。,0,1,904,1
-553=将指定小队全部成员关联到指定标签... (PhobosExt),0,0,7,38,15,0,0,0,0,将指定小队内所有成员关联到指定标签。布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见"说明文档.html"里的相关介绍),0,1,553,1
-554=将指定所属方的指定小队全部成员关联到指定标签... (PhobosExt),0,0,7,38,2,15,0,0,0,将指定所属方下的指定小队所有成员关联到指定标签。布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见"说明文档.html"里的相关介绍)。,0,1,554,1
-555=将特定科技类型全部关联到指定标签... (PhobosExt),-4,46,38,15,0,0,0,0,0,将指定科技类型的所有实例关联到指定标签。(即使正在建造中)\n布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见"说明文档.html"里的相关介绍),0,1,555,1
-556=将指定所属方的特定科技类型全部关联到指定标签... (PhobosExt),-4,46,38,2,15,0,0,0,0,将指定所属方下指定科技类型的所有实例关联到指定标签。(即使正在建造中)\n布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见"说明文档.html"里的相关介绍),0,1,556,1
-557=为所属方添加金钱数额... (PhobosExt),0,0,2,6,0,0,0,0,0,为指定所属方添加指定的金钱数额。,0,1,557,1
-558=为所属方扣除金钱数额... (PhobosExt),0,0,2,6,0,0,0,0,0,为指定所属方扣除指定的金钱数额。,0,1,558,1
-559=设置所属方的金钱数额... (PhobosExt),0,0,2,6,0,0,0,0,0,设置指定所属方的金钱数额。,0,1,559,1
-560=在指定路径点添加基地节点... (PhobosExt),0,0,2,30,8,15,0,0,0,在指定路径点添加指定所属方的基地节点。(布尔值用来指定是否立即开始建造指定建筑),0,1,560,1
-561=移除指定路径点上的所有基地节点... (PhobosExt),0,0,2,30,0,0,0,0,0,移除指定路径点上指定所属方的所有基地节点。(会重置ai的建造序列),0,1,561,1
-562=移除特定所属方所有指定建筑类型的基地节点... (PhobosExt),0,0,2,8,0,0,0,0,0,移除特定所属方所有指定建筑类型的基地节点。(会重置ai的建造序列),0,1,562,1
-563=安全地销毁指定标签类型的所有实例... (PhobosExt),0,0,38,0,0,0,0,0,0,销毁指定标签类型的所有实例，不会阻止未来可能的实例。 既会销毁一开始就存在的实例，也会销毁由触发/小队创建的实例，不会导致由小队创建的标签实例被销毁时弹框崩溃。(详细细节请见"说明文档.html"里的相关介绍),0,1,563,1
-564=将路径点上的指定科技类型关联到指定标签... (PhobosExt),-4,46,38,30,15,0,0,0,0,将指定路径点上的指定科技类型关联到指定指定标签。布尔值用来指定是否优先创建一个新的标签实例(TagClass)。(若科技类型为建筑，则每一格都会检测，支持ares的自定义Foundation，详细细节请见"说明文档.html"里的相关介绍),0,1,564,1
-565=将路径点上指定所属方的指定科技类型关联到指定标签... (PhobosExt),-4,46,38,30,2,15,0,0,0,将指定路径点上指定所属方的指定科技类型关联到指定指定标签。布尔值用来指定是否优先创建一个新的标签实例(TagClass)。(若科技类型为建筑，则每一格都会检测，支持ares的自定义Foundation，详细细节请见"说明文档.html"里的相关介绍),0,1,565,1
-566=将路径点范围内的指定科技类型关联到指定标签... (PhobosExt),-4,46,38,30,6,15,0,0,0,将指定路径点指定范围内的所有指定科技类型关联到指定标签。(圆形范围)\n布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见"说明文档.html"里的相关介绍),0,1,566,1
-567=将路径点范围内触发所属方的指定科技类型关联到指定标签... (PhobosExt),-4,46,38,30,6,15,0,0,0,将指定路径点指定范围内触发所属方的所有指定科技类型关联到指定标签。(圆形范围)\n布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见"说明文档.html"里的相关介绍),0,1,567,1
-568=将路径点范围内的所有科技类型关联到指定标签... (PhobosExt),0,0,38,30,6,15,0,0,0,将指定路径点指定范围内的所有科技类型关联到指定标签。(圆形范围)\n布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见"说明文档.html"里的相关介绍),0,1,568,1
-569=将路径点范围内指定所属方的所有科技类型关联到指定标签... (PhobosExt),0,2,38,30,6,15,0,0,0,将指定路径点指定范围内指定所属方的所有科技类型关联到指定标签。(圆形范围)\n布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见"说明文档.html"里的相关介绍),0,1,569,1
-570=统一指定标签类型的所有实例... (PhobosExt),0,0,38,0,0,0,0,0,0,统一所有同一标签类型(TagType)的实例。(详细细节请见"说明文档.html"里的相关介绍),0,1,570,1
-571=设置关联单位的可招募属性... (PhobosExt),0,0,15,15,0,0,0,0,0,置关联单位的可招募属性，第一个数值对应RecruitableA，第二个数值对应RecruitableB。仅修改可移动的科技类型(FootClass)。,0,1,571,1
-572=将路径点范围内除指定类型外的所有科技类型关联到指定标签... (PhobosExt),-4,46,38,30,6,15,0,0,0,将指定路径点指定范围内除指定类型外的所有科技类型关联到指定标签。(圆形范围)\n布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见"说明文档.html"里的相关介绍),0,1,572,1
-573=将路径点范围内触发所属方的除指定类型外的所有科技类型关联到指定标签... (PhobosExt),-4,46,38,30,6,15,0,0,0,将指定路径点指定范围内触发所属方的除指定类型外的所有科技类型关联到指定标签。(圆形范围)\n布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见"说明文档.html"里的相关介绍),0,1,573,1
-574=更新所有建筑的动画... (PhobosExt),0,0,0,0,0,0,0,0,0,更新所有建筑的动画，用于处理建筑改变所属后动画会停止播放的问题。(但遥控坦克的状态仍然不会更新),0,1,574,1
-575=更新关联建筑的动画... (PhobosExt),0,0,0,0,0,0,0,0,0,更新关联建筑的动画，用于处理建筑改变所属后动画会停止播放的问题。(但遥控坦克的状态仍然不会更新),0,1,575,1
-576=更新指定所属方所有建筑的动画... (PhobosExt),0,0,2,0,0,0,0,0,0,更新指定所属方所有建筑的动画，用于处理建筑改变所属后动画会停止播放的问题。(但遥控坦克的状态仍然不会更新),0,1,576,1
-577=建立作战小队(考虑限制)... (PhobosExt),0,0,7,15,15,15,0,0,0,根据指定索引创建小队，可选启用限制:\n上限限制(参数2):依据"作战小队"中的"Max"值，超出则不创建。\n区域检查(参数3):启用后检测与敌对方的区域连通性。\n连通模式(参数4):0=任一兵种可以抵达目的地即可，1=全部兵种都需要可以抵达目的地(仅在参数3启用时生效),0,1,577,1
-...
-</code></pre>
+        <p>仅支持 <a href="https://github.com/handama/FA2sp" target="_blank" class="doc-link">FA2SP_HDM_Edition</a>（韩大妈版本）<br>
+        其他版本请自行移植。</p>
 
         <!-- 页脚 -->
         <footer class="doc-footer">
