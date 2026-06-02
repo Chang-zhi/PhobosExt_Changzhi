@@ -960,8 +960,12 @@ bool TActionExt::UpdateOwnerBuildingsAnimations(TActionClass* pThis, HouseClass*
 bool TActionExt::CreateTeamConsideringLimits(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {
 	int teamIndex = pThis->Param3;
-	TeamTypeClass* pTeamType = nullptr;
+	bool useMaxLimit     = (pThis->Param4 != 0); // Param4: 是否启用 Max 上限限制
+	bool useZoneCheck    = (pThis->Param5 != 0); // Param5: 是否启用区域连接检查
+	bool requireAllZone  = (pThis->Param6 != 0); // Param6: 区域连通模式(Param5=1时生效), 0=任一兵种连通即可, 1=全部兵种都需要连通
 
+	// ===== 1, 获取队伍类型 =====
+	TeamTypeClass* pTeamType = nullptr;
 	for(TeamTypeClass* pCurrentTeamType : TeamTypeClass::Array)
 	{
 		if(pCurrentTeamType && pCurrentTeamType->get_ID() == ("0" + std::to_string(teamIndex)))
@@ -972,22 +976,67 @@ bool TActionExt::CreateTeamConsideringLimits(TActionClass* pThis, HouseClass* pH
 	}
 	if(!pTeamType) return false;
 
+
+	// ===== 2, 检查实例上限 =====
 	auto const id = pTeamType->get_ID();
 	auto const cnt = pTeamType->cntInstances;
 	auto const max = pTeamType->Max;
 
 	Debug::Log(L"尝试创建小队 \"%hs\", 当前实例数: %d, 最大上限: %d.\n", id, cnt, max);
 
-	if(cnt < max)
-	{
-		Debug::Log(L"创建小队 \"%hs\" 成功, 当前实例数: %d, 最大上限: %d.\n", id, cnt + 1, max);
-		pTeamType->CreateTeam(pTeamType->Owner);
-	}
-	else
+	if(useMaxLimit && cnt >= max && max >= 0)
 	{
 		Debug::Log(L"小队 \"%hs\" 已达上限 (%d/%d), 无法继续创建.\n", id, cnt, max);
+		return true;
 	}
 
+	// ===== 3, 区域连接检查 =====
+	if(useZoneCheck)
+	{
+		HouseClass* pOwner = pTeamType->Owner;
+		HouseClass* pEnemy = nullptr;
+
+		if(pOwner)
+		{
+			// 优先使用 EnemyHouseIndex
+			if(pOwner->EnemyHouseIndex >= 0)
+				pEnemy = HouseClass::FindByIndex(pOwner->EnemyHouseIndex);
+
+			// 备选: 遍历所有 House, 找第一个非盟友
+			if(!pEnemy || pEnemy == pOwner)
+			{
+				for(HouseClass* const pHouse : HouseClass::Array)
+				{
+					if(pHouse && pHouse != pOwner && !pOwner->IsAlliedWith(pHouse))
+					{
+						pEnemy = pHouse;
+						break;
+					}
+				}
+			}
+
+			if(pEnemy && pEnemy != pOwner)
+			{
+				Debug::Log(L"区域检查: 所属方 \"%hs\"(基地%d,%d), 敌人 \"%hs\"(基地%d,%d).\n",
+					pOwner->get_ID(), pOwner->GetBaseCenter().X, pOwner->GetBaseCenter().Y,
+					pEnemy->get_ID(), pEnemy->GetBaseCenter().X, pEnemy->GetBaseCenter().Y);
+
+				if(!CheckTaskForceZoneConnection(pOwner, pEnemy, pTeamType->TaskForce, requireAllZone))
+				{
+					Debug::Log(L"小队 \"%hs\" 的所属方与敌人之间没有区域连接(%s), 跳过创建.\n",
+						id, requireAllZone ? L"全部兵种" : L"任一兵种");
+					return true;
+				}
+			}
+			else
+			{
+				Debug::Log(L"区域检查: 未找到敌方, 跳过区域检查.\n");
+			}
+		}
+	}
+
+	Debug::Log(L"创建小队 \"%hs\" 成功, 当前实例数: %d, 最大上限: %d.\n", id, cnt + 1, max);
+	pTeamType->CreateTeam(pTeamType->Owner);
 	return true;
 }
 
