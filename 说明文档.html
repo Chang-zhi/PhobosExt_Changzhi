@@ -298,6 +298,7 @@
                         <li class="doc-toc__item"><a href="#temporal-exclusive" class="doc-toc__link">8. 超时空武器互斥锁定</a></li>
                         <li class="doc-toc__item"><a href="#auto-hunt" class="doc-toc__link">9. 自动游猎</a></li>
                         <li class="doc-toc__item"><a href="#legal-target" class="doc-toc__link">10. AI 所属单位目标判定</a></li>
+                        <li class="doc-toc__item"><a href="#create-team" class="doc-toc__link">11. 建立作战小队(考虑限制)</a></li>
                     </ul>
                 </li>
                 <li class="doc-toc__item"><a href="#fa2-config" class="doc-toc__link">触发编辑器配置</a></li>
@@ -569,8 +570,20 @@ AutoHunt=                       ; boolean（布尔值），默认 false</code></
 
         <!-- 10. AI 所属单位目标判定 -->
         <h3 id="legal-target" class="doc-heading--tertiary">10. AI 所属单位目标判定</h3>
+        <pre class="doc-code--block"><code>[TechnoType]
+LegalTargetWhenAIOwner=         ; boolean（布尔值），默认 true</code></pre>
         <p>当科技类型的 <code class="doc-code--inline">LegalTargetWhenAIOwner=no</code> 且不由人类玩家控制时，该科技类型不会被其他单位选为普通武器攻击对象。<br>
         （但仍可被 C4 爆破、受到伤害反馈等）</p>
+
+        <!-- 11. 建立作战小队(考虑限制) -->
+        <h3 id="create-team" class="doc-heading--tertiary">11. 建立作战小队(考虑限制)</h3>
+        <p><strong>触发动作说明：</strong></p>
+        <ul class="doc-list--content">
+            <li><code class="doc-code--inline">577</code> – 建立作战小队(考虑限制)... （参数：小队索引）</li>
+        </ul>
+        <p class="doc-paragraph--wrapped"><strong>注意事项：</strong></p>
+        <p class="doc-paragraph--wrapped" style="margin: -1% 2%;">创建一个指定的作战小队(归属于小队所属方)。</p>
+        <p class="doc-paragraph--wrapped" style="margin: 1% 2%;">若当前已存在的作战小队实例数量已达到上限（ <code class="doc-code--inline">作战小队</code> 里的 <code class="doc-code--inline">最大</code> ），则无法继续创建。</p>
 
         <!-- 触发编辑器配置 -->
         <h2 id="fa2-config" class="doc-heading--secondary">触发编辑器配置</h2>
@@ -627,6 +640,7 @@ AutoHunt=                       ; boolean（布尔值），默认 false</code></
 574=更新所有建筑的动画... (PhobosExt),0,0,0,0,0,0,0,0,0,更新所有建筑的动画，用于处理建筑改变所属后动画会停止播放的问题。(但遥控坦克的状态仍然不会更新),0,1,574,1
 575=更新关联建筑的动画... (PhobosExt),0,0,0,0,0,0,0,0,0,更新关联建筑的动画，用于处理建筑改变所属后动画会停止播放的问题。(但遥控坦克的状态仍然不会更新),0,1,575,1
 576=更新指定所属方所有建筑的动画... (PhobosExt),0,0,2,0,0,0,0,0,0,更新指定所属方所有建筑的动画，用于处理建筑改变所属后动画会停止播放的问题。(但遥控坦克的状态仍然不会更新),0,1,576,1
+577=建立作战小队(考虑限制)... (PhobosExt),0,0,7,0,0,0,0,0,0,建立一个指定的作战小队(归属于小队所属方)。通常会直接从已有单位中招募。如果没有足够的单位来组建小队，AI会通过生产补足(自动建造)。当所有成员就位时，小队即自动建立。若当前已存在的作战小队实例数量已达到上限("作战小队"里的"最大")，则无法继续创建。,0,1,577,1
 ...
 </code></pre>
 

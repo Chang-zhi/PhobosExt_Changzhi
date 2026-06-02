@@ -111,15 +111,17 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 	case PhobosTriggerAction::UpdateAssociatedBuildingsAnims:
 		return TActionExt::UpdateAssociatedBuildingsAnims(pThis, pHouse, pObject, pTrigger, location);
 	case PhobosTriggerAction::UpdateOwnerBuildingsAnimations:
-		return TActionExt::UpdateOwnerBuildingsAnimations(pThis, pHouse, pObject, pTrigger, location);
+	return TActionExt::UpdateOwnerBuildingsAnimations(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::CreateTeamConsideringLimits:
+		return TActionExt::CreateTeamConsideringLimits(pThis, pHouse, pObject, pTrigger, location);
 
 
 	//case PhobosTriggerAction::RemoveBaseNodesExceedingAttemptCountForHouse:
 	//	return TActionExt::RemoveBaseNodesExceedingAttemptCountForHouse(pThis, pHouse, pObject, pTrigger, location);
 	//case PhobosTriggerAction::SetObjectRecruitable:
 	//	return TActionExt::SetObjectRecruitable(pThis, pHouse, pObject, pTrigger, location);
-	// case PhobosTriggerAction::testAction:
-	// 	return TActionExt::testAction(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::testAction:
+		return TActionExt::testAction(pThis, pHouse, pObject, pTrigger, location);
 
 	default:
 		bHandled = false;
@@ -886,17 +888,17 @@ bool TActionExt::BindTagsToAllTechTypesOfTriggerOwnerInWaypointRangeExceptSpecif
 			if (!pTechno)
 				continue;
 
-			Debug::Log("Techno id is \"%s\".\n", pTechno->get_ID());
+			// Debug::Log("Techno id is \"%s\".\n", pTechno->get_ID());
 
 			if (pTechno->get_ID() == std::string(techno))
 			{
-				Debug::Log(L"Techno 冲突, continue.\"%hs\"\n", pTechno->get_ID());
+				// Debug::Log(L"Techno 冲突, continue.\"%hs\"\n", pTechno->get_ID());
 				continue;
 			}
 
 			if (IsTechnoNearCell(pTechno, cell, range))
 			{
-				Debug::Log("AttachedTag, techno is \"%s\"\n", pTechno->get_ID());
+				// Debug::Log("AttachedTag, techno is \"%s\"\n", pTechno->get_ID());
 				if (pTechno->AttachedTag) pTechno->ReplaceTag(pTagClass);
 				else pTechno->AttachTrigger(pTagClass);
 			}
@@ -951,6 +953,56 @@ bool TActionExt::UpdateOwnerBuildingsAnimations(TActionClass* pThis, HouseClass*
 			pBuilding->EnableStuff();
 		}
 	}
+
+	return true;
+}
+
+bool TActionExt::CreateTeamConsideringLimits(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	int teamIndex = pThis->Param3;
+	TeamTypeClass* pTeamType = nullptr;
+
+	for(TeamTypeClass* pCurrentTeamType : TeamTypeClass::Array)
+	{
+		if(pCurrentTeamType && pCurrentTeamType->get_ID() == ("0" + std::to_string(teamIndex)))
+		{
+			pTeamType = pCurrentTeamType;
+			break;
+		}
+	}
+	if(!pTeamType) return false;
+
+	auto const id = pTeamType->get_ID();
+	auto const cnt = pTeamType->cntInstances;
+	auto const max = pTeamType->Max;
+
+	Debug::Log(L"尝试创建小队 \"%hs\", 当前实例数: %d, 最大上限: %d.\n", id, cnt, max);
+
+	if(cnt < max)
+	{
+		Debug::Log(L"创建小队 \"%hs\" 成功, 当前实例数: %d, 最大上限: %d.\n", id, cnt + 1, max);
+		pTeamType->CreateTeam(pTeamType->Owner);
+	}
+	else
+	{
+		Debug::Log(L"小队 \"%hs\" 已达上限 (%d/%d), 无法继续创建.\n", id, cnt, max);
+	}
+
+	return true;
+}
+
+bool TActionExt::testAction(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	for (BuildingClass* pBuilding : BuildingClass::Array)
+	{
+		if (!pBuilding) continue;
+		if (!pBuilding->Factory) continue;
+
+		Debug::Log(L"工厂 \"%hs\" 有 %d 个待生产对象.\n",
+			pBuilding->GetTechnoType()->get_ID(),
+			pBuilding->Factory->QueuedObjects.Count);
+	}
+
 
 	return true;
 }

@@ -1,10 +1,11 @@
 #pragma once
 
-#include <Windows.h>
-#include <string>
+#include <Syringe.h>
 
 #include <Phobos.version.h>
-#include <Syringe.h>
+
+#include <Windows.h>
+#include <string>
 
 class CCINIClass;
 class AbstractClass;

@@ -17,7 +17,7 @@ enum class PhobosTriggerAction : unsigned int
 	// 清除指定路径点的文本...
 	ClearWaypointLabel = 551,
 
-	// 清除所有路径点文本... 
+	// 清除所有路径点文本...
 	ClearAllWaypointLabels = 552,
 
 	// 将指定小队全部成员关联到指定标签...
@@ -74,7 +74,7 @@ enum class PhobosTriggerAction : unsigned int
 	// 统一指定标签类型的所有实例
 	UnifyAllInstancesOfSameTagType = 570,
 
-	// 设置关联单位单位的可招募属性... 
+	// 设置关联单位单位的可招募属性...
 	SetRecruitableForFoot = 571,
 
 	// 为路径点范围内除指定类型外的所有科技类型绑定标签...
@@ -92,6 +92,8 @@ enum class PhobosTriggerAction : unsigned int
 	// 更新指定所属方所有建筑的动画
 	UpdateOwnerBuildingsAnimations = 576,
 
+	// 建立作战小队(考虑限制)...
+	CreateTeamConsideringLimits = 577,
 
 
 
@@ -101,7 +103,7 @@ enum class PhobosTriggerAction : unsigned int
 	// SetObjectRecruitable = 566,
 
 	// 测试用
-	// testAction = 1150,
+	testAction = 1150,
 };
 
 class TActionExt
@@ -164,11 +166,14 @@ public:
 	ACTION_FUNC(UpdateAllBuildingAnims);
 	ACTION_FUNC(UpdateAssociatedBuildingsAnims);
 	ACTION_FUNC(UpdateOwnerBuildingsAnimations);
+	ACTION_FUNC(CreateTeamConsideringLimits);
 
 
 	// ACTION_FUNC(RemoveBaseNodesExceedingAttemptCountForHouse);
 	// ACTION_FUNC(SetObjectRecruitable);
-	// ACTION_FUNC(testAction);
+
+	// 测试用
+	ACTION_FUNC(testAction);
 
 
 #undef ACTION_FUNC
