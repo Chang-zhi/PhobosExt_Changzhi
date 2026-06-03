@@ -3,6 +3,7 @@
 #include <LoadOptionsClass.h>
 
 #include <Ext/TAction/Body.h>
+#include <Ext/House/Body.h>
 #include <Ext/Techno/Body.h>
 #include <Ext/TechnoType/Body.h>
 #include <Ext/WarheadType/Body.h>
@@ -172,6 +173,7 @@ private:
 // Add more class names as you like
 using PhobosTypeRegistry = TypeRegistry <
 	// Ext classes
+	HouseExt,
 	TActionExt,
 	TechnoExt,
 	TechnoTypeExt,
