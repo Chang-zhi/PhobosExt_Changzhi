@@ -6,6 +6,7 @@
 #include <TagTypeClass.h>
 #include <TechnoClass.h>
 #include <HouseClass.h>
+#include <Ext/House/Body.h>
 #include <ArrayClasses.h>
 #include <MessageListClass.h>
 
@@ -412,6 +413,9 @@ bool TActionExt::AddBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseClass* 
 	// ===== 直接加就行, 不管他什么时候造 =====
 	else
 		pOwner->Base.BaseNodes.AddItem(newNode);
+
+	// 将此节点加入授权列表，防止被自动清理
+	HouseExt::AuthorizeBaseNode(pOwner, buildTypeIndex, cell.X, cell.Y);
 
 	return true;
 }
@@ -982,11 +986,11 @@ bool TActionExt::CreateTeamConsideringLimits(TActionClass* pThis, HouseClass* pH
 	auto const cnt = pTeamType->cntInstances;
 	auto const max = pTeamType->Max;
 
-	Debug::Log(L"尝试创建小队 \"%hs\", 当前实例数: %d, 最大上限: %d.\n", id, cnt, max);
+	// Debug::Log(L"尝试创建小队 \"%hs\", 当前实例数: %d, 最大上限: %d.\n", id, cnt, max);
 
 	if(useMaxLimit && cnt >= max && max >= 0)
 	{
-		Debug::Log(L"小队 \"%hs\" 已达上限 (%d/%d), 无法继续创建.\n", id, cnt, max);
+		// Debug::Log(L"小队 \"%hs\" 已达上限 (%d/%d), 无法继续创建.\n", id, cnt, max);
 		return true;
 	}
 
@@ -1017,25 +1021,25 @@ bool TActionExt::CreateTeamConsideringLimits(TActionClass* pThis, HouseClass* pH
 
 			if(pEnemy && pEnemy != pOwner)
 			{
-				Debug::Log(L"区域检查: 所属方 \"%hs\"(基地%d,%d), 敌人 \"%hs\"(基地%d,%d).\n",
-					pOwner->get_ID(), pOwner->GetBaseCenter().X, pOwner->GetBaseCenter().Y,
-					pEnemy->get_ID(), pEnemy->GetBaseCenter().X, pEnemy->GetBaseCenter().Y);
+				// Debug::Log(L"区域检查: 所属方 \"%hs\"(基地%d,%d), 敌人 \"%hs\"(基地%d,%d).\n",
+				//	pOwner->get_ID(), pOwner->GetBaseCenter().X, pOwner->GetBaseCenter().Y,
+				//	pEnemy->get_ID(), pEnemy->GetBaseCenter().X, pEnemy->GetBaseCenter().Y);
 
 				if(!CheckTaskForceZoneConnection(pOwner, pEnemy, pTeamType->TaskForce, requireAllZone))
 				{
-					Debug::Log(L"小队 \"%hs\" 的所属方与敌人之间没有区域连接(%s), 跳过创建.\n",
-						id, requireAllZone ? L"全部兵种" : L"任一兵种");
+					// Debug::Log(L"小队 \"%hs\" 的所属方与敌人之间没有区域连接(%s), 跳过创建.\n",
+					//	id, requireAllZone ? L"全部兵种" : L"任一兵种");
 					return true;
 				}
 			}
 			else
 			{
-				Debug::Log(L"区域检查: 未找到敌方, 跳过区域检查.\n");
+				// Debug::Log(L"区域检查: 未找到敌方, 跳过区域检查.\n");
 			}
 		}
 	}
 
-	Debug::Log(L"创建小队 \"%hs\" 成功, 当前实例数: %d, 最大上限: %d.\n", id, cnt + 1, max);
+	// Debug::Log(L"创建小队 \"%hs\" 成功, 当前实例数: %d, 最大上限: %d.\n", id, cnt + 1, max);
 	pTeamType->CreateTeam(pTeamType->Owner);
 	return true;
 }
@@ -1047,9 +1051,9 @@ bool TActionExt::testAction(TActionClass* pThis, HouseClass* pHouse, ObjectClass
 		if (!pBuilding) continue;
 		if (!pBuilding->Factory) continue;
 
-		Debug::Log(L"工厂 \"%hs\" 有 %d 个待生产对象.\n",
-			pBuilding->GetTechnoType()->get_ID(),
-			pBuilding->Factory->QueuedObjects.Count);
+		// Debug::Log(L"工厂 \"%hs\" 有 %d 个待生产对象.\n",
+		//	pBuilding->GetTechnoType()->get_ID(),
+		//	pBuilding->Factory->QueuedObjects.Count);
 	}
 
 	return true;
