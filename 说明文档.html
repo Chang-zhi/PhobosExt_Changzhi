@@ -300,6 +300,7 @@
                         <li class="doc-toc__item"><a href="#legal-target" class="doc-toc__link">10. AI 所属单位目标判定</a></li>
                         <li class="doc-toc__item"><a href="#create-team" class="doc-toc__link">11. 建立作战小队(考虑限制)</a></li>
                         <li class="doc-toc__item"><a href="#base-node-cross-owner" class="doc-toc__link">12. 基地节点跨所属方判定</a></li>
+                        <li class="doc-toc__item"><a href="#elapsed-time" class="doc-toc__link">13. 流逝时间检测</a></li>
                     </ul>
                 </li>
                 <li class="doc-toc__item"><a href="#fa2-config" class="doc-toc__link">触发编辑器配置</a></li>
@@ -627,6 +628,14 @@ ConsiderAllOwnersForBaseNode=                  ; boolean（布尔值），默认
             <li>过滤掉遭遇战模式下 AI 自动生成的多余节点，确保 AI 只建造任务作者指定的建筑。</li>
             <li>记录节点的建造顺序和完成状态，支持存档读档后继续未完成的建造序列。</li>
             <li>当节点被摧毁或占领状态变化时，注册表提供依据来决定是否恢复重建。</li>
+        </ul>
+
+        <!-- 13. 流逝时间检测 -->
+        <h3 id="elapsed-time" class="doc-heading--tertiary">13. 流逝时间检测</h3>
+        <p>从触发器激活时开始计时，当流逝帧数达到指定值时触发。</p>
+        <p><strong>触发事件说明：</strong></p>
+        <ul class="doc-list--content">
+            <li><code class="doc-code--inline">554</code> – 流逝时间(帧)... （参数：等待帧数）</li>
         </ul>
 
         <!-- 触发编辑器配置 -->
