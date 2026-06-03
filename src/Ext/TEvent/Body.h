@@ -16,6 +16,7 @@ enum PhobosTriggerEvent
 	TechnoTypeOfHouseAllLeavesWaypoint = 551,
 	TechnoTypeOfHouseExistsAtWaypoint = 552,
 	TechnoTypeOfHouseNotExistsAtWaypoint = 553,
+	ElapsedTimeFrames = 554,
 
 	_DummyMaximum,
 };
@@ -40,6 +41,7 @@ public:
 		virtual void LoadFromStream(PhobosStreamReader& Stm) override;
 		virtual void SaveToStream(PhobosStreamWriter& Stm) override;
 
+
 	private:
 		template <typename T>
 		void Serialize(T& Stm);
@@ -54,6 +56,7 @@ public:
 	static bool TechnoTypeOfHouseNearWaypoint(TEventClass* pThis, ObjectClass* pObject, HouseClass* pHouse);
 	static bool TechnoTypeOfHouseExistsAtWaypoint(TEventClass* pThis, HouseClass* pHouse);
 	// static bool TechnoDestroyedByHouse(TEventClass* pThis, ObjectClass* pAttached);
+	static bool ElapsedTimeFramesFunc(TEventClass* pThis);
 
 	class ExtContainer final : public Container<TEventExt>
 	{

@@ -9,9 +9,11 @@
 #include <CellClass.h>
 #include <HouseClass.h>
 #include <GeneralStructures.h>
+#include <Fundamentals.h>
 // #include <Ext/Techno/MyNew/DetectKiller.h>
 
 #include <string>
+#include <map>
 
 //Static init
 TEventExt::ExtContainer TEventExt::ExtMap;
@@ -82,6 +84,8 @@ std::optional<bool> TEventExt::Execute(TEventClass* pThis, int iEvent, HouseClas
 		return TEventExt::TechnoTypeOfHouseExistsAtWaypoint(pThis, pHouse);
 	case PhobosTriggerEvent::TechnoTypeOfHouseNotExistsAtWaypoint:
 		return !TEventExt::TechnoTypeOfHouseExistsAtWaypoint(pThis, pHouse);
+	case PhobosTriggerEvent::ElapsedTimeFrames:
+		return TEventExt::ElapsedTimeFramesFunc(pThis);
 
 	default:
 		return std::nullopt;
@@ -168,10 +172,29 @@ bool TEventExt::TechnoTypeOfHouseExistsAtWaypoint(TEventClass* pThis, HouseClass
 // 	int Value = pThis->Value;
 // 	const char* String = pThis->String;
 // 	Debug::Log("[TEventExt] Value is \"%d\" , String is \"%s\", pHouse is \"%s\".\n", Value, String, pHouse->Type->get_ID());
-// 
+//
 // 	return true;
 // }
 
+
+bool TEventExt::ElapsedTimeFramesFunc(TEventClass* pThis)
+{
+	static std::map<const TEventClass*, int> StartFrames;
+
+	int waitFrames = pThis->Value;
+
+	auto it = StartFrames.find(pThis);
+	if (it == StartFrames.end())
+	{
+		StartFrames[pThis] = Unsorted::CurrentFrame;
+	}
+
+	int startFrame = StartFrames[pThis];
+	int elapsed = Unsorted::CurrentFrame - startFrame;
+	bool result = elapsed >= waitFrames;
+
+	return result;
+}
 
 // =============================
 // container
