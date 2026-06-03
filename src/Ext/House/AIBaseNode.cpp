@@ -219,3 +219,57 @@ DEFINE_HOOK(0x4FE3E0, HouseClass_AI_BaseConstructionUpdate_Entry, 0x5)
 
 	return 0;
 }
+
+// 移除指定坐标的所有授权节点
+void HouseExt::RemoveAuthorizedNodeByCoord(HouseClass* pHouse, short x, short y)
+{
+	auto pExt = HouseExt::ExtMap.Find(pHouse);
+	if (!pExt) return;
+
+	auto it = pExt->AuthorizedNodeKeys.begin();
+	while (it != pExt->AuthorizedNodeKeys.end())
+	{
+		if (it->X == x && it->Y == y)
+			it = pExt->AuthorizedNodeKeys.erase(it);
+		else
+			++it;
+	}
+
+	// 如果当前目标就是这个坐标，清除记录
+	if (pExt->LastTargetX == x && pExt->LastTargetY == y)
+	{
+		pExt->LastTargetType = -1;
+		pExt->LastTargetX = -1;
+		pExt->LastTargetY = -1;
+	}
+
+	Debug::Log(L"[PhobosExt] 已移除坐标(%d,%d)的授权节点, AI=%hs\n",
+		x, y, pHouse->get_ID());
+}
+
+// 移除指定类型的所有授权节点
+void HouseExt::RemoveAuthorizedNodeByType(HouseClass* pHouse, int buildingTypeIndex)
+{
+	auto pExt = HouseExt::ExtMap.Find(pHouse);
+	if (!pExt) return;
+
+	auto it = pExt->AuthorizedNodeKeys.begin();
+	while (it != pExt->AuthorizedNodeKeys.end())
+	{
+		if (it->BuildingTypeIndex == buildingTypeIndex)
+			it = pExt->AuthorizedNodeKeys.erase(it);
+		else
+			++it;
+	}
+
+	// 如果当前目标就是这个类型，清除记录
+	if (pExt->LastTargetType == buildingTypeIndex)
+	{
+		pExt->LastTargetType = -1;
+		pExt->LastTargetX = -1;
+		pExt->LastTargetY = -1;
+	}
+
+	Debug::Log(L"[PhobosExt] 已移除类型=%d的授权节点, AI=%hs\n",
+		buildingTypeIndex, pHouse->get_ID());
+}

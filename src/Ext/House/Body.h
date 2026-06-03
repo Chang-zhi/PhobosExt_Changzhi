@@ -104,6 +104,12 @@ public:
 	// 将触发动作添加的基地节点加入授权列表（供 TAction 调用）
 	static void AuthorizeBaseNode(HouseClass* pHouse, int buildingTypeIndex, short x, short y);
 
+	// 移除指定坐标的授权节点
+	static void RemoveAuthorizedNodeByCoord(HouseClass* pHouse, short x, short y);
+
+	// 移除指定类型的授权节点
+	static void RemoveAuthorizedNodeByType(HouseClass* pHouse, int buildingTypeIndex);
+
 	static CellClass* GetEnemyBaseGatherCell(HouseClass* pTargetHouse, HouseClass* pCurrentHouse, CoordStruct defaultCurrentCoords, SpeedType speedTypeZone, int extraDistance = 0);
 
 	static bool IsDisabledFromShell(

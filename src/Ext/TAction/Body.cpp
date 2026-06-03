@@ -480,8 +480,9 @@ bool TActionExt::RemoveAllBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseC
 		pOwner->Base.BaseNodes.RemoveItem(*it);
 	}
 
-	// Debug::Log("[End]: Removed %zu base nodes at waypoint %d (cell %d,%d). New node count: %d\n",
-		// indicesToRemove.size(), waypointIndex, cell.X, cell.Y, pOwner->Base.BaseNodes.Count);
+	// 同步删除授权注册表中的条目
+	HouseExt::RemoveAuthorizedNodeByCoord(pOwner, cell.X, cell.Y);
+
 	return true;
 }
 
@@ -540,8 +541,9 @@ bool TActionExt::RemoveBaseNodesOfBuildingTypeForHouse(TActionClass* pThis, Hous
 		pOwner->Base.BaseNodes.RemoveItem(*it);
 	}
 
-	// Debug::Log("[End]: Removed %zu base nodes for type \"%s\". New node count: %d\n",
-		// indicesToRemove.size(), buildTypeID, pOwner->Base.BaseNodes.Count);
+	// 同步删除授权注册表中的条目
+	HouseExt::RemoveAuthorizedNodeByType(pOwner, buildTypeIndex);
+
 	return true;
 }
 
