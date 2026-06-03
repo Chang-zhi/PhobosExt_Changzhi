@@ -1,11 +1,10 @@
 ======V0.0.13.4(预发布版本)=======
 1,为FAData_TriggerAndScript.ini中的PhobosExt动作添加专用ParamTypes.
 2,翻译FAData_TriggerAndScript.ini英文区段为英文.
-3,更新README.md和说明文档.html同步新内容.
-4,添加新动作
+3,添加新动作
 - 577=建立作战小队(考虑限制)...
-5,新增 [Country House] → BaseNodeCrossOwners=      ;boolean 默认false
-6,添加新事件
+4,新增 [Country House] → BaseNodeCrossOwners=      ;boolean 默认false
+5,添加新事件
 - 554=流逝时间(帧)...
 (具体细节请见说明文档.html)
 
