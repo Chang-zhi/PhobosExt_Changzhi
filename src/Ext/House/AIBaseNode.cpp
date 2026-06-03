@@ -129,11 +129,19 @@ DEFINE_HOOK(0x4FE3E0, HouseClass_AI_BaseConstructionUpdate_Entry, 0x5)
 	{
 		// 已经建造成功（AI有自己的建筑在此位置）→ 跳过
 		if (IsNodeBuiltByAI(key.BuildingTypeIndex, key.X, key.Y, pThis))
+		{
+			Debug::Log(L"[PhobosExt]   节点 类型=%d,(%d,%d): 已建造,跳过\n",
+				key.BuildingTypeIndex, key.X, key.Y);
 			continue;
+		}
 
 		// 被占领（其他所属方有建筑在此位置）→ 跳过，等待后续恢复
 		if (IsNodeOccupiedByOther(key.BuildingTypeIndex, key.X, key.Y, pThis))
+		{
+			Debug::Log(L"[PhobosExt]   节点 类型=%d,(%d,%d): 被占领,跳过\n",
+				key.BuildingTypeIndex, key.X, key.Y);
 			continue;
+		}
 
 		// 这个需要建造
 		targetType = key.BuildingTypeIndex;
@@ -148,73 +156,192 @@ DEFINE_HOOK(0x4FE3E0, HouseClass_AI_BaseConstructionUpdate_Entry, 0x5)
 		pThis->Base.BaseNodes[i].BuildingTypeIndex = -1;
 	}
 
+	Debug::Log(L"[PhobosExt] 注册表共%d个节点, 选中 target=类型%d,(%d,%d)\n",
+		(int)pExt->AuthorizedNodeKeys.size(), targetType, targetX, targetY);
+
 	// 如果有需要建造的节点，设为唯一的有效节点
 	if (targetType >= 0)
 	{
-		// 使用第一个 BaseNode 槽位
 		auto& node = pThis->Base.BaseNodes[0];
 		node.BuildingTypeIndex = targetType;
 		node.MapCoords.X = targetX;
 		node.MapCoords.Y = targetY;
 
-		// 检测目标是否变化
 		bool targetChanged = (pExt->LastTargetType != targetType
 			|| pExt->LastTargetX != targetX
 			|| pExt->LastTargetY != targetY);
 
-		// 更新记录
 		pExt->LastTargetType = targetType;
 		pExt->LastTargetX = targetX;
 		pExt->LastTargetY = targetY;
 
 		if (targetChanged)
 		{
-			Debug::Log(L"[PhobosExt] 单节点模式: "
-				L"类型=%d, 坐标=(%d,%d), AI=%hs\n",
+			Debug::Log(L"[PhobosExt] 目标变化为 类型=%d,(%d,%d), AI=%hs\n",
 				targetType, targetX, targetY, pThis->get_ID());
+		}
 
-			// 目标变化了！检查工厂是否需要重定向
-			for (auto* pFact : FactoryClass::Array)
+		// ===== 每帧检查工厂: 是否在生产正确的东西? =====
+		for (auto* pFact : FactoryClass::Array)
+		{
+			if (pFact->Owner != pThis)
+				continue;
+			if (pFact->IsSuspended)
 			{
-				if (pFact->Owner != pThis)
-					continue;
-				if (pFact->IsSuspended)
-					continue;
-
-				auto* pObj = pFact->Object;
-				if (!pObj)
-					continue;
-
-				auto* pProdType = pObj->GetTechnoType();
-				if (!pProdType)
-					continue;
-
-				int prodTypeIdx = static_cast<BuildingTypeClass*>(pProdType)->ArrayIndex;
-				if (prodTypeIdx == targetType)
-					continue;
-
-				// 正在生产错误的东西 → 中断，切换到正确目标
-				Debug::Log(L"[PhobosExt] 中断生产(目标变化): "
-					L"旧类型=%d → 新类型=%d, AI=%hs\n",
-					prodTypeIdx, targetType, pThis->get_ID());
-
-				pFact->AbandonProduction();
-				pFact->QueuedObjects.Clear();
-
-				BuildingTypeClass* pTargetType = BuildingTypeClass::Array[targetType];
-				if (pTargetType)
-					pFact->DemandProduction(pTargetType, pThis, false);
-
+				if (!targetChanged)
+					Debug::Log(L"[PhobosExt]   工厂暂停(等待放置): 类型=%d\n", targetType);
 				break;
 			}
+			auto* pObj = pFact->Object;
+			if (!pObj)
+			{
+				if (!targetChanged)
+					Debug::Log(L"[PhobosExt]   工厂空闲,目标=%d\n", targetType);
+				break;
+			}
+			auto* pProdType = pObj->GetTechnoType();
+			if (!pProdType) break;
+			int prodTypeIdx = static_cast<BuildingTypeClass*>(pProdType)->ArrayIndex;
+			if (prodTypeIdx == targetType)
+			{
+				if (!targetChanged)
+					Debug::Log(L"[PhobosExt]   工厂生产中: 类型=%d ✓\n", targetType);
+				break;
+			}
+			Debug::Log(L"[PhobosExt] 中断生产: 旧类型=%d → 新类型=%d\n",
+				prodTypeIdx, targetType);
+			pFact->AbandonProduction();
+			pFact->QueuedObjects.Clear();
+			BuildingTypeClass* pTargetType = BuildingTypeClass::Array[targetType];
+			if (pTargetType)
+				pFact->DemandProduction(pTargetType, pThis, false);
+			break;
 		}
 	}
 	else
 	{
-		// 没有需要建造的节点 → 清空记录
+		Debug::Log(L"[PhobosExt] 没有需要建造的节点, AI=%hs\n", pThis->get_ID());
 		pExt->LastTargetType = -1;
 		pExt->LastTargetX = -1;
 		pExt->LastTargetY = -1;
+	}
+
+	return 0;
+}
+
+// ============================================================
+// Hook 2: auto-gen 完成后替换节点
+// 地址 0x4FE4A6 是 auto-gen 结束、主循环开始的会合点
+// 此时 auto-gen 已经加完节点，我们把它们换成注册表中的目标
+// ============================================================
+DEFINE_HOOK(0x4FE4A6, HouseClass_AI_BaseConstructionUpdate_AfterAutoGen, 0x8)
+{
+	GET(HouseClass*, pThis, EBP);
+
+	auto pExt = HouseExt::ExtMap.Find(pThis);
+	if (!pExt || !pExt->BaseNodeCrossOwners)
+		return 0;
+
+	int targetType = -1;
+	short targetX = -1, targetY = -1;
+	for (auto& key : pExt->AuthorizedNodeKeys)
+	{
+		if (IsNodeBuiltByAI((short)key.BuildingTypeIndex, key.X, key.Y, pThis))
+			continue;
+		if (IsNodeOccupiedByOther((short)key.BuildingTypeIndex, key.X, key.Y, pThis))
+			continue;
+		targetType = key.BuildingTypeIndex;
+		targetX = key.X;
+		targetY = key.Y;
+		break;
+	}
+
+	// 读 ecx 寄存器（var_30）
+	int* pVar30 = nullptr;
+	__asm mov pVar30, ecx;
+
+	Debug::Log(L"[PhobosExt][Hook2] var_30=%p, [var_30]=%d, targetType=%d, BaseNodes[0].type=%d\n",
+		pVar30, pVar30 ? *pVar30 : -999, targetType,
+		pThis->Base.BaseNodes.Count > 0 ? pThis->Base.BaseNodes[0].BuildingTypeIndex : -999);
+
+	// 清空所有 BaseNodes
+	for (int i = 0; i < pThis->Base.BaseNodes.Count; ++i)
+		pThis->Base.BaseNodes[i].BuildingTypeIndex = -1;
+
+	if (targetType >= 0)
+	{
+		// 设唯一目标
+		auto& node = pThis->Base.BaseNodes[0];
+		node.BuildingTypeIndex = targetType;
+		node.MapCoords.X = targetX;
+		node.MapCoords.Y = targetY;
+
+		// var_30 (ecx) 是 auto-gen 返回的节点数据
+		// 把它改成 -1 强制走 BaseNodes 路径
+		if (pVar30 && *pVar30 >= 0 && *pVar30 != targetType)
+		{
+			Debug::Log(L"[PhobosExt][Hook2] 覆盖 var_30: %d → -1\n", *pVar30);
+			*pVar30 = -1;
+		}
+	}
+
+	// 再次检查注册后的状态
+	Debug::Log(L"[PhobosExt][Hook2] 完成后: BaseNodes.Count=%d, [0].type=%d, [0].pos=(%d,%d)\n",
+		pThis->Base.BaseNodes.Count,
+		pThis->Base.BaseNodes.Count > 0 ? pThis->Base.BaseNodes[0].BuildingTypeIndex : -999,
+		pThis->Base.BaseNodes.Count > 0 ? pThis->Base.BaseNodes[0].MapCoords.X : -999,
+		pThis->Base.BaseNodes.Count > 0 ? pThis->Base.BaseNodes[0].MapCoords.Y : -999);
+
+	return 0;
+}
+
+// ============================================================
+// Hook 3: 拦截 FactoryClass::DemandProduction
+// 阻止未授权的建筑类型（如墙头 359）进入工厂
+// 地址 0x4C9C70
+// ============================================================
+DEFINE_HOOK(0x4C9C70, FactoryClass_DemandProduction_Intercept, 0x9)
+{
+	GET_STACK(TechnoTypeClass const*, pType, 0x4);
+	GET_STACK(HouseClass*, pOwner, 0x8);
+
+	if (!pOwner || !pType)
+		return 0;
+
+	auto pExt = HouseExt::ExtMap.Find(pOwner);
+	if (!pExt || !pExt->BaseNodeCrossOwners)
+		return 0;
+
+	// 只拦截建筑类型
+	if (pType->WhatAmI() != AbstractType::BuildingType)
+		return 0;
+
+	int reqTypeIdx = static_cast<BuildingTypeClass const*>(pType)->ArrayIndex;
+
+	// 检查请求的类型是否在授权列表中
+	for (auto& key : pExt->AuthorizedNodeKeys)
+	{
+		if (key.BuildingTypeIndex == reqTypeIdx)
+			return 0; // 已授权 → 放行
+	}
+
+	// 未授权 → 把 pType 换成第一个需要建造的授权类型
+	for (auto& key : pExt->AuthorizedNodeKeys)
+	{
+		if (IsNodeBuiltByAI((short)key.BuildingTypeIndex, key.X, key.Y, pOwner))
+			continue;
+		if (IsNodeOccupiedByOther((short)key.BuildingTypeIndex, key.X, key.Y, pOwner))
+			continue;
+
+		// 找到需要建造的，替换 pType
+		BuildingTypeClass* pTargetType = BuildingTypeClass::Array[key.BuildingTypeIndex];
+		if (pTargetType)
+		{
+			Debug::Log(L"[PhobosExt][DemandProduction] 重定向: %d → %d, AI=%hs\n",
+				reqTypeIdx, key.BuildingTypeIndex, pOwner->get_ID());
+			R->Stack<TechnoTypeClass*>(0x4, pTargetType);
+		}
+		break;
 	}
 
 	return 0;
