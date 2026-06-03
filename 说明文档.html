@@ -629,6 +629,13 @@ BaseNodeCrossOwners=                  ; boolean（布尔值），默认 false</c
             <li>记录节点的建造顺序和完成状态，支持存档读档后继续未完成的建造序列。</li>
             <li>当节点被摧毁或占领状态变化时，注册表提供依据来决定是否恢复重建。</li>
         </ul>
+        <div class="doc-notice--warning">
+            <strong>已知不兼容与限制：</strong>
+            <ol style="margin: 4px 0 0 18px; line-height: 1.8;">
+                <li><strong>与触发动作 30（自动建设基地）不兼容：</strong>本功能接管了 AI 的基地节点建造逻辑，会强制严格按注册表顺序依次建造。即使同时开启自动建设基地模式，建筑也不会自动更换位置建造，推荐不要同时开启。</li>
+                <li><strong>开启时不要让 AI 造围墙：</strong>围墙会会扰乱本功能的单节点控制，导致节点队列卡死。请确保 AI 的基地节点中不包含围墙类型。</li>
+            </ol>
+        </div>
 
         <!-- 13. 流逝时间检测 -->
         <h3 id="elapsed-time" class="doc-heading--tertiary">13. 流逝时间检测</h3>
