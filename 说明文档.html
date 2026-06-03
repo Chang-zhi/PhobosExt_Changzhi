@@ -597,8 +597,8 @@ LegalTargetWhenAIOwner=         ; boolean（布尔值），默认 true</code></p
         <!-- 12. 基地节点跨所属方判定 -->
         <h3 id="base-node-cross-owner" class="doc-heading--tertiary">12. 基地节点跨所属方判定</h3>
         <pre class="doc-code--block"><code>[Country House]
-ConsiderAllOwnersForBaseNode=                  ; boolean（布尔值），默认 false</code></pre>
-        <p>当 AI 作战方设置 <code class="doc-code--inline">ConsiderAllOwnersForBaseNode=yes</code> 时，AI 在判定基地节点是否已建立成功时，会<strong>将所有所属方的建筑</strong>纳入考虑。</p>
+BaseNodeCrossOwners=                  ; boolean（布尔值），默认 false</code></pre>
+        <p>当 AI 作战方设置 <code class="doc-code--inline">BaseNodeCrossOwners=yes</code> 时，AI 在判定基地节点是否已建立成功时，会<strong>将所有所属方的建筑</strong>纳入考虑。</p>
         <p><strong>用途：</strong></p>
         <ul class="doc-list--content">
             <li>让 AI 给玩家造建筑。(就是为了这个目的做的这个功能)</li>
@@ -615,7 +615,7 @@ ConsiderAllOwnersForBaseNode=                  ; boolean（布尔值），默认
         <br>
         <p><strong>捕获时机：</strong></p>
         <ul class="doc-list--content">
-            <li><code class="doc-code--inline">ConsiderAllOwnersForBaseNode=yes</code> 的 AI 作战方第一次进入本逻辑时，会自动将当前基地节点中所有有效节点捕获到内部注册表中。此捕获仅执行一次，后续通过<strong>本dll的触发动作</strong>添加/移除的节点会同步更新注册表。</li>
+            <li><code class="doc-code--inline">BaseNodeCrossOwners=yes</code> 的 AI 作战方第一次进入本逻辑时，会自动将当前基地节点中所有有效节点捕获到内部注册表中。此捕获仅执行一次，后续通过<strong>本dll的触发动作</strong>添加/移除的节点会同步更新注册表。</li>
         </ul>
         <p><strong>与触发动作的联动：</strong></p>
         <ul class="doc-list--content">

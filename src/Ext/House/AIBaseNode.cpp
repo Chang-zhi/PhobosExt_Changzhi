@@ -115,7 +115,7 @@ DEFINE_HOOK(0x4FE3E0, HouseClass_AI_BaseConstructionUpdate_Entry, 0x5)
 	GET(HouseClass*, pThis, ECX);
 
 	auto pExt = HouseExt::ExtMap.Find(pThis);
-	if (!pExt || !pExt->ConsiderAllOwnersForBaseNode)
+	if (!pExt || !pExt->BaseNodeCrossOwners)
 		return 0;
 
 	CaptureAuthorizedNodes(pExt, pThis);

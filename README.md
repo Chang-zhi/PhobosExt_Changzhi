@@ -280,10 +280,10 @@ LegalTargetWhenAIOwner=                       ; boolean（布尔值），默认 
 
 ```ini
 [Country House]
-ConsiderAllOwnersForBaseNode=                  ; boolean（布尔值），默认 false
+BaseNodeCrossOwners=                          ; boolean（布尔值），默认 false
 ```
 
-当 AI 作战方设置 `ConsiderAllOwnersForBaseNode=yes` 时，AI 在判定基地节点是否已建立成功时，会**将所有所属方的建筑**纳入考虑。
+当 AI 作战方设置 `BaseNodeCrossOwners=yes` 时，AI 在判定基地节点是否已建立成功时，会**将所有所属方的建筑**纳入考虑。
 
 **用途：**
 - 让 AI 给玩家造建筑。(就是为了这个目的做的这个功能)
@@ -299,7 +299,7 @@ ConsiderAllOwnersForBaseNode=                  ; boolean（布尔值），默认
 本功能维护了一个独立于游戏引擎的**内部节点注册表**，用于追踪哪些基地节点是"合法"的。
 
 **捕获时机：**
-- 当 `ConsiderAllOwnersForBaseNode=yes` 的 AI 作战方第一次进入本逻辑时，会自动将当前基地节点中所有有效节点捕获到内部注册表中。
+- 当 `BaseNodeCrossOwners=yes` 的 AI 作战方第一次进入本逻辑时，会自动将当前基地节点中所有有效节点捕获到内部注册表中。
 - 此捕获仅执行一次，后续通过**本dll的触发动作**添加/移除的节点会同步更新注册表。
 
 **与触发动作的联动：**
