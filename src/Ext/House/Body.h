@@ -45,10 +45,10 @@ public:
 		// 授权节点坐标列表（持久化，随存档保存/加载）
 		std::vector<AuthorizedNodeKey> AuthorizedNodeKeys;
 
-		// 上一次的目标节点（用于检测目标变化）
-		int LastTargetType;
-		short LastTargetX;
-		short LastTargetY;
+		// 上一帧的目标节点信息（用于检测目标变化）
+		int LastFrameTargetType;
+		short LastFrameTargetX;
+		short LastFrameTargetY;
 
 		// 被暂缓的节点列表（持久化，随存档保存/加载）
 		std::vector<DeferredNodeInfo> DeferredNodeList;
@@ -56,9 +56,9 @@ public:
 		ExtData(HouseClass* OwnerObject) : Extension<HouseClass>(OwnerObject)
 			, BaseNodeCrossOwners { false }
 			, AuthorizedNodesCaptured { false }
-			, LastTargetType { -1 }
-			, LastTargetX { -1 }
-			, LastTargetY { -1 }
+			, LastFrameTargetType { -1 }
+			, LastFrameTargetX { -1 }
+			, LastFrameTargetY { -1 }
 		{ }
 
 		virtual ~ExtData() = default;
