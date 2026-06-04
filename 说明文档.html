@@ -316,8 +316,9 @@
 
         <!-- 已知问题 -->
         <h2 id="known-issues" class="doc-heading--secondary">已知问题</h2>
-        <p>当单位当前正在使用带有 <code class="doc-code--inline">Temporal=yes</code> 和 <code class="doc-code--inline">TemporalExclusive=yes</code> 弹头的武器时, 会强制改变单位的索敌逻辑, 可能会产生bug。</p>
-        <p>当科技类型的 <code class="doc-code--inline">LegalTargetWhenAIOwner=no</code> 且不由人类玩家控制时, 会强制改变其他单位的索敌逻辑, 可能会产生bug。</p>
+        <p>1. 当单位当前正在使用带有 <code class="doc-code--inline">Temporal=yes</code> 和 <code class="doc-code--inline">TemporalExclusive=yes</code> 弹头的武器时, 会强制改变单位的索敌逻辑, 可能会产生bug。</p>
+        <p>2. 当科技类型的 <code class="doc-code--inline">LegalTargetWhenAIOwner=no</code> 且不由人类玩家控制时, 会强制改变其他单位的索敌逻辑, 可能会产生bug。</p>
+        <p>3. 基地节点跨所属方判定：开启后不要让 AI 造围墙，与触发动作 30 不兼容。详见<a href="#base-node-cross-owner-compatibility" class="doc-link">对应章节</a>。</p>
         <br>
         <p><strong>如果遇到bug或兼容性问题可以我发私信, 我会尽量解决。</strong></p>
         <p>我的 <a href="https://space.bilibili.com/423792550"
@@ -627,7 +628,7 @@ BaseNodeCrossOwners=                  ; boolean(布尔值)，默认 false</code>
             <li><code class="doc-code--inline">562</code>(移除指定类型的节点)：从游戏中删除的同时从注册表删除。</li>
             <li>所有通过触发动作添加的节点都会被注册表追踪，不会被 AI 自动生成逻辑覆盖。</li>
         </ul>
-        <div class="doc-notice--warning">
+        <div id="base-node-cross-owner-compatibility" class="doc-notice--warning">
             <strong>兼容性说明：</strong>
             <ol style="margin: 4px 0 0 18px; line-height: 1.8;">
                 <li><strong>与触发动作 <code class="doc-code--inline--deepColor">30(自动建设基地)</code>不兼容：</strong></li>
