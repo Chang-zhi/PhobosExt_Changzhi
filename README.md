@@ -37,15 +37,15 @@
 
 ### 兼容性说明
 
-需保证游戏版本为 YR 1.001。
-**不依赖 Ares 或 Phobos，可单独使用。**
+需保证游戏版本为 YR 1.001。  
+**不依赖 Ares 或 Phobos，可单独使用。**   
 本 DLL 已避免使用 `ExtPointerOffset` ，改用独立 `unordered_map` 存储扩展数据，不会与 Ares 或 Phobos 的原生扩展数据冲突。（严格来说可能变慢, 但对现代cpu的影响应该可以忽略不计）
 
 ---
 
 ### 已知问题
-1.当单位当前正在使用带有 `Temporal=yes` 和 `TemporalExclusive=yes` 弹头的武器时, 会强制改变单位的索敌逻辑, 可能会产生bug。
-2.当科技类型的 `LegalTargetWhenAIOwner=no` 且不由人类玩家控制时, 会强制改变其他单位的索敌逻辑, 可能会产生bug。
+1.当单位当前正在使用带有 `Temporal=yes` 和 `TemporalExclusive=yes` 弹头的武器时, 会强制改变单位的索敌逻辑, 可能会产生bug。  
+2.当科技类型的 `LegalTargetWhenAIOwner=no` 且不由人类玩家控制时, 会强制改变其他单位的索敌逻辑, 可能会产生bug。  
 
 **如果遇到bug或兼容性问题可以我发私信, 我会尽量解决。**
 我的 [*@B站主页*](https://space.bilibili.com/423792550)
@@ -54,22 +54,22 @@
 ---
 
 ### 致谢
-[*Ares*](https://github.com/Ares-Developers/Ares) 项目组
-[*Phobos*](https://github.com/Phobos-developers/Phobos) 项目组
-[*YRpp*](https://github.com/Phobos-developers/YRpp) 项目组
-韩大妈 [*@B站主页*](https://space.bilibili.com/2229647)
-九千天华 [*@B站主页*](https://space.bilibili.com/362533219)
-偏微whyffu [*@B站主页*](https://space.bilibili.com/41073096)
-妖妖酱 [*@GitHub*](https://github.com/yaoyaojiang)
+[*Ares*](https://github.com/Ares-Developers/Ares) 项目组   
+[*Phobos*](https://github.com/Phobos-developers/Phobos) 项目组   
+[*YRpp*](https://github.com/Phobos-developers/YRpp) 项目组  
+韩大妈 [*@B站主页*](https://space.bilibili.com/2229647)   
+九千天华 [*@B站主页*](https://space.bilibili.com/362533219)   
+偏微whyffu [*@B站主页*](https://space.bilibili.com/41073096)    
+妖妖酱 [*@GitHub*](https://github.com/yaoyaojiang)   
 
 <span style="color: gray;">排名不分先后</span>
 
 ---
 
 ### 许可
-Github 仓库: [**PhobosExt_Changzhi**](https://github.com/Chang-zhi/PhobosExt_Changzhi)
-本项目代码采用与 Phobos 相同的 `GPL-3.0 license` 许可证。
-《红色警戒2：尤里的复仇》及其相关素材归 Electronic Arts 所有。
+Github 仓库: [**PhobosExt_Changzhi**](https://github.com/Chang-zhi/PhobosExt_Changzhi)   
+本项目代码采用与 Phobos 相同的 `GPL-3.0 license` 许可证。   
+《红色警戒2：尤里的复仇》及其相关素材归 Electronic Arts 所有。  
 
 ---
 
@@ -80,9 +80,9 @@ Github 仓库: [**PhobosExt_Changzhi**](https://github.com/Chang-zhi/PhobosExt_C
 在地图路径点上绘制自定义文本。
 
 **特性**：
-- 可自定义文本内容、显示宽度（像素）、背景不透明度。
-- 可分别设置文本颜色和边框颜色（预定义 9 种颜色）。
-- 鼠标移动到文本框上时，文本会暂时停止绘制（避免遮挡操作）。
+- 可自定义文本内容、显示宽度（像素）、背景不透明度。  
+- 可分别设置文本颜色和边框颜色（预定义 9 种颜色）。  
+- 鼠标移动到文本框上时，文本会暂时停止绘制（避免遮挡操作）。   
 
 **触发动作说明**：
 - `550` – 在指定路径点绘制文本...（参数：路径点索引，文本内容，像素宽度，不透明度百分比，文本颜色）
@@ -103,15 +103,15 @@ ShowWaypointLabelInShroud=              ; boolean（布尔值），默认 true
 ### 2. 动态标签绑定功能
 
 <span style="color: red;">**注意!**
-触发系统事实上很复杂，需读者了解其组成和运行机制。
-这里默认读者已经具备了相关知识，可以阅读 `Handama` 的 `触发系统.docx` 以了解相关知识。
+触发系统事实上很复杂，需读者了解其组成和运行机制。   
+这里默认读者已经具备了相关知识，可以阅读 `Handama` 的 `触发系统.docx` 以了解相关知识。   
 </span>
 
-允许将游戏中的科技类型实例与标签（Tag）动态关联，便于后续通过触发器执行逻辑。
-若标签不存在/已销毁，则会根据标签类型（TagType）创建一个新标签，确保目标会与标签关联。
-
-<span style="color: gray;">事实上，触发也会在小队创建时实例化，因此动作 `553` 和 `554` 实际上可能并没有必要，
-只需要在 `作战小队` 的 `挂载标签` 上挂载所需标签即可以实现与该动作类似的效果，但仍保留以备不时之需。
+允许将游戏中的科技类型实例与标签（Tag）动态关联，便于后续通过触发器执行逻辑。   
+若标签不存在/已销毁，则会根据标签类型（TagType）创建一个新标签，确保目标会与标签关联。   
+  
+<span style="color: gray;">事实上，触发也会在小队创建时实例化，因此动作 `553` 和 `554` 实际上可能并没有必要，   
+只需要在 `作战小队` 的 `挂载标签` 上挂载所需标签即可以实现与该动作类似的效果，但仍保留以备不时之需。   
 （写都写了.jpg，不过确实有所不同）
 </span>
 
@@ -156,8 +156,8 @@ ShowWaypointLabelInShroud=              ; boolean（布尔值），默认 true
 ---
 
 ### 3. 金钱操作功能
-允许动态调整指定所属方的资金数额。
-所有操作均以所属方国家索引作为目标标识，金额单位为游戏内货币单位（即“钱”）。
+允许动态调整指定所属方的资金数额。    
+所有操作均以所属方国家索引作为目标标识，金额单位为游戏内货币单位（即“钱”）。    
 
 **触发动作说明：**
 - `557` – 为指定所属方添加金钱数额...（参数：所属方国家索引，金额数额）
@@ -207,7 +207,7 @@ ShowWaypointLabelInShroud=              ; boolean（布尔值），默认 true
 ---
 
 ### 7. 更新建筑动画功能
-更新建筑的动画，用于处理建筑改变所属后动画会停止播放的问题。(但遥控坦克的状态仍然不会更新)
+更新建筑的动画，用于处理建筑改变所属后动画会停止播放的问题。(但遥控坦克的状态仍然不会更新)    
 
 **触发事件说明：**
 - `574` – 更新所有建筑的动画...
@@ -224,8 +224,8 @@ ShowWaypointLabelInShroud=              ; boolean（布尔值），默认 true
 [WarheadType]
 TemporalExclusive=              ; boolean（布尔值），默认 false
 ```
-当弹头同时设置 `Temporal=yes` 和 `TemporalExclusive=yes` 时，
-该武器无法瞄准已被其他 `TemporalClass` 实例锁定的单位（即正在遭受超时空冻结的单位）。
+当弹头同时设置 `Temporal=yes` 和 `TemporalExclusive=yes` 时，   
+该武器无法瞄准已被其他 `TemporalClass` 实例锁定的单位（即正在遭受超时空冻结的单位）。   
 
 普通的超时空武器（ `Temporal=yes` 但未设置 `TemporalExclusive` ）仍可以攻击已被互斥武器锁定的单位。
 
@@ -258,7 +258,7 @@ AutoHunt=                       ; boolean（布尔值），默认 false
 [TechnoType]
 LegalTargetWhenAIOwner=                       ; boolean（布尔值），默认 true
 ```
-当科技类型的 `LegalTargetWhenAIOwner=no` 且不由人类玩家控制时，该科技类型不会被其他单位选为普通武器攻击对象。
+当科技类型的 `LegalTargetWhenAIOwner=no` 且不由人类玩家控制时，该科技类型不会被其他单位选为普通武器攻击对象。    
 （但仍可被 C4 爆破、受到伤害反馈等）
 
 ---
