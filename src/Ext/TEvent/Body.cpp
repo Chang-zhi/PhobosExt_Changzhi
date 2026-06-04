@@ -187,15 +187,15 @@ bool TEventExt::ElapsedTimeFramesFunc(TEventClass* pThis)
 	if (it == StartFrames.end())
 	{
 		StartFrames[pThis] = Unsorted::CurrentFrame;
-		Debug::Log("[TEventExt] ElapsedTimeFrames: New trigger registered, start frame set to %d, waiting %d frames.\n", Unsorted::CurrentFrame, waitFrames);
+		// Debug::Log("[TEventExt] ElapsedTimeFrames: New trigger registered, start frame set to %d, waiting %d frames.\n", Unsorted::CurrentFrame, waitFrames);
 	}
 
 	int startFrame = StartFrames[pThis];
 	int elapsed = Unsorted::CurrentFrame - startFrame;
 	bool result = elapsed >= waitFrames;
 
-	Debug::Log("[TEventExt] ElapsedTimeFrames: startFrame=%d, currentFrame=%d, elapsed=%d, waitFrames=%d, result=%s.\n",
-		startFrame, Unsorted::CurrentFrame, elapsed, waitFrames, result ? "true" : "false");
+	// Debug::Log("[TEventExt] ElapsedTimeFrames: startFrame=%d, currentFrame=%d, elapsed=%d, waitFrames=%d, result=%s.\n",
+		// startFrame, Unsorted::CurrentFrame, elapsed, waitFrames, result ? "true" : "false");
 
 	return result;
 }
