@@ -43,9 +43,25 @@ void TEventExt::ExtData::SaveToStream(PhobosStreamWriter& Stm)
 int TEventExt::GetFlags(int iEvent)
 {
 	// 0x0 : If it has to have an AttachedObject in order to use it, then let it return 0.
+	// 0x0 : 这个事件需要有"附加对象"才能使用，所以返回0。
+    // 		 这意味着事件必须挂在一个对象（单位/建筑）上才能工作。
+    // 		 比如"被摧毁"事件，只有挂载在某个单位上才有意义。
+
 	// 0x4 : In MapClass, ZoneEntryBy uses it. borrowed from 0x684D61.
+	// 0x4 : 在地图类(MapClass)中使用，ZoneEntryBy(进入区域)事件用这个。
+	//       0x684D61 是原版游戏中这个逻辑的参考地址
+
 	// 0x8 : In HouseClass, It will be added to the RelatedTags of the specified house. Ares' TriggerEvent 75/77 uses it. borrowed from 0x684E34.
+	// 0x8 : 在所属方类(HouseClass)中使用。
+	//       这个事件会被添加到指定所属方的 RelatedTags 列表中。
+	//       Ares平台的 TriggerEvent 75/77 用了这个。
+	//       0x684E34 是原版游戏中这个逻辑的参考地址。
+
 	// 0x10 : In LogicClass. borrowed from 0x684DCA.
+	// 0x10: 在逻辑类(LogicClass)中使用。
+	//       这类事件每帧都在逻辑更新循环中被检查。
+	//       0x684DCA 是原版游戏中这个逻辑的参考地址。
+
 	switch (static_cast<PhobosTriggerEvent>(iEvent))
 	{
 	//case PhobosTriggerEvent::TechnoDestroyedByHouse:
@@ -75,9 +91,9 @@ std::optional<bool> TEventExt::Execute(TEventClass* pThis, int iEvent, HouseClas
 		struct and_with { bool operator()(int a, int b) { return a & b; } };
 
 	case PhobosTriggerEvent::TechnoTypeOfHouseNearWaypoint:
-		return TEventExt::TechnoTypeOfHouseNearWaypoint(pThis, pObject, pHouse);
+		return TEventExt::TechnoTypeOfHouseNearWaypoint(pThis, pHouse);
 	case PhobosTriggerEvent::TechnoTypeOfHouseAllLeavesWaypoint:
-		return !TEventExt::TechnoTypeOfHouseNearWaypoint(pThis, pObject, pHouse);
+		return !TEventExt::TechnoTypeOfHouseNearWaypoint(pThis, pHouse);
 	// case PhobosTriggerEvent::TechnoDestroyedByHouse:
 	// 	return TEventExt::TechnoDestroyedByHouse(pThis, pObject);
 	case PhobosTriggerEvent::TechnoTypeOfHouseExistsAtWaypoint:
@@ -92,7 +108,7 @@ std::optional<bool> TEventExt::Execute(TEventClass* pThis, int iEvent, HouseClas
 	};
 }
 
-bool TEventExt::TechnoTypeOfHouseNearWaypoint(TEventClass* pThis, ObjectClass* pObject, HouseClass* pHouse)
+bool TEventExt::TechnoTypeOfHouseNearWaypoint(TEventClass* pThis, HouseClass* pHouse)
 {
 	int range = pThis->Value;
 	int wayPointIndex = std::stoi(pThis->String);
@@ -112,12 +128,6 @@ bool TEventExt::TechnoTypeOfHouseNearWaypoint(TEventClass* pThis, ObjectClass* p
 
 	return false;
 }
-
-//bool TEventExt::TechnoDestroyedByHouse(TEventClass* pThis, ObjectClass* pAttached)
-//{
-//	// 大败而归
-//	return false;
-//}
 
 bool TEventExt::TechnoTypeOfHouseExistsAtWaypoint(TEventClass* pThis, HouseClass* pHouse)
 {
@@ -164,18 +174,6 @@ bool TEventExt::TechnoTypeOfHouseExistsAtWaypoint(TEventClass* pThis, HouseClass
 
 	return false;
 }
-
-
-// test code for parameters
-// bool TechnoTypeOfHouseExistsAtWaypoint(TEventClass* pThis, HouseClass* pHouse)
-// {
-// 	int Value = pThis->Value;
-// 	const char* String = pThis->String;
-// 	Debug::Log("[TEventExt] Value is \"%d\" , String is \"%s\", pHouse is \"%s\".\n", Value, String, pHouse->Type->get_ID());
-//
-// 	return true;
-// }
-
 
 bool TEventExt::ElapsedTimeFramesFunc(TEventClass* pThis)
 {

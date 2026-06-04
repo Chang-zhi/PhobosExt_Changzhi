@@ -12,10 +12,19 @@ class HouseClass;
 
 enum PhobosTriggerEvent
 {
+	// 路径点附近存在所属方的任意科技类型...
 	TechnoTypeOfHouseNearWaypoint = 550,
+
+	// 路径点附近不存在所属方的任意科技类型...
 	TechnoTypeOfHouseAllLeavesWaypoint = 551,
+
+	// 路径点上存在所属方的指定科技类型...
 	TechnoTypeOfHouseExistsAtWaypoint = 552,
+
+	// 路径点上不存在所属方的指定科技类型...
 	TechnoTypeOfHouseNotExistsAtWaypoint = 553,
+
+	// 流逝时间(帧)...
 	ElapsedTimeFrames = 554,
 
 	_DummyMaximum,
@@ -53,7 +62,7 @@ public:
 		ObjectClass* pObject, CDTimerClass* pTimer, bool* isPersitant, TechnoClass* pSource);
 
 
-	static bool TechnoTypeOfHouseNearWaypoint(TEventClass* pThis, ObjectClass* pObject, HouseClass* pHouse);
+	static bool TechnoTypeOfHouseNearWaypoint(TEventClass* pThis, HouseClass* pHouse);
 	static bool TechnoTypeOfHouseExistsAtWaypoint(TEventClass* pThis, HouseClass* pHouse);
 	// static bool TechnoDestroyedByHouse(TEventClass* pThis, ObjectClass* pAttached);
 	static bool ElapsedTimeFramesFunc(TEventClass* pThis);
