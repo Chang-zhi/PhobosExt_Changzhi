@@ -4,14 +4,13 @@
 #include <FactoryClass.h>
 #include <TechnoClass.h>
 
-
 // 检查节点位置是否有其他所属方的同类型建筑
 static bool IsNodeOccupiedByOther(short nodeType, short nodeX, short nodeY, HouseClass* pAI)
 {
 	if (nodeType < 0)
 		return false;
 
-	for (auto* pBld : BuildingClass::Array)
+	for (BuildingClass* pBld : BuildingClass::Array)
 	{
 		if (!pBld || !pBld->Type)
 			continue;
@@ -36,7 +35,7 @@ static bool IsNodeBuiltByAI(short nodeType, short nodeX, short nodeY, HouseClass
 	if (nodeType < 0)
 		return false;
 
-	for (auto* pBld : BuildingClass::Array)
+	for (BuildingClass* pBld : BuildingClass::Array)
 	{
 		if (!pBld || !pBld->Type)
 			continue;
@@ -56,6 +55,7 @@ static bool IsNodeBuiltByAI(short nodeType, short nodeX, short nodeY, HouseClass
 // 将当前 BaseNodes 捕获为授权节点列表（仅首次调用时执行）
 static void CaptureAuthorizedNodes(HouseExt::ExtData* pExt, HouseClass* pThis)
 {
+	// 已经捕获过了就不再捕获了
 	if (pExt->AuthorizedNodesCaptured)
 		return;
 
@@ -64,7 +64,7 @@ static void CaptureAuthorizedNodes(HouseExt::ExtData* pExt, HouseClass* pThis)
 
 	for (int i = 0; i < pThis->Base.BaseNodes.Count; ++i)
 	{
-		auto& node = pThis->Base.BaseNodes[i];
+		BaseNodeClass& node = pThis->Base.BaseNodes[i];
 		if (node.BuildingTypeIndex < 0)
 			continue;
 
@@ -75,8 +75,6 @@ static void CaptureAuthorizedNodes(HouseExt::ExtData* pExt, HouseClass* pThis)
 		pExt->AuthorizedNodeKeys.push_back(key);
 	}
 
-	Debug::Log(L"[PhobosExt] 已捕获 %d 个授权基地节点, AI=%hs\n",
-		pExt->AuthorizedNodeKeys.size(), pThis->get_ID());
 }
 
 // 供 TAction 调用：将触发动作添加的节点加入授权列表
@@ -89,7 +87,7 @@ void HouseExt::AuthorizeBaseNode(HouseClass* pHouse, int buildingTypeIndex, shor
 	CaptureAuthorizedNodes(pExt, pHouse);
 
 	// 检查是否已存在
-	for (auto& key : pExt->AuthorizedNodeKeys)
+	for (AuthorizedNodeKey& key : pExt->AuthorizedNodeKeys)
 	{
 		if (key.X == x && key.Y == y && key.BuildingTypeIndex == buildingTypeIndex)
 			return;
@@ -101,24 +99,22 @@ void HouseExt::AuthorizeBaseNode(HouseClass* pHouse, int buildingTypeIndex, shor
 	key.Y = y;
 	pExt->AuthorizedNodeKeys.push_back(key);
 
-	// Debug::Log(L"[PhobosExt] 授权基地节点: 类型=%d, 坐标=(%d,%d), AI=%hs\n",
-	// 	buildingTypeIndex, x, y, pHouse->get_ID());
 }
 
 
 // ============================================================
 // 用于跨越 sub_506EF0 入口/出口保存/恢复建筑列表
 // ============================================================
-static DWORD s_SavedBldgBase = 0;
-static int s_SavedBldgCount = 0;
-static HouseClass* s_SavedHouse = nullptr;
-static int s_SavedOriginalNodeCount = 0;
+static DWORD s_SavedBldgBase = 0;          // Hook A 保存的原 [house+6Ch] 建筑列表指针
+static int s_SavedBldgCount = 0;           // Hook A 保存的原 [house+78h] 建筑数量
+static HouseClass* s_SavedHouse = nullptr; // Hook A 保存的 HouseClass*（Hook B 用，因为出口处 EBP 已变）
+
+static int s_SavedOriginalNodeCount = 0;   // Hook B 保存的原 BaseNodes.Count（全部完成时清零，下帧恢复）
 
 // ============================================================
-// Hook A: sub_506EF0 入口
+// Hook A.start: sub_506EF0 入口
 // 将 AI 自己的建筑列表替换为全局建筑列表，
 // 使该函数能识别跨所属方建筑
-// 地址 0x506EF0 (sub esp, 154h, 6字节)
 // ============================================================
 DEFINE_HOOK(0x506EF0, HouseClass_BaseNode_SatisfactionCheck_Entry, 0x6)
 {
@@ -128,20 +124,20 @@ DEFINE_HOOK(0x506EF0, HouseClass_BaseNode_SatisfactionCheck_Entry, 0x6)
 	if (!pExt || !pExt->BaseNodeCrossOwners)
 		return 0;
 
-	s_SavedHouse = pThis;
-	s_SavedBldgBase = *(DWORD*)((DWORD)pThis + 0x6C);
-	s_SavedBldgCount = *(int*)((DWORD)pThis + 0x78);
+	s_SavedHouse = pThis;                      		     // 保存 House 指针，供 Hook B 出口恢复用
+	s_SavedBldgBase = *(DWORD*)((DWORD)pThis + 0x6C);    // 保存原 [house+6Ch]（AI 自有建筑列表）
+	s_SavedBldgCount = *(int*)((DWORD)pThis + 0x78);     // 保存原 [house+78h]（AI 自有建筑数量）
 
-	*(DWORD*)((DWORD)pThis + 0x6C) = (DWORD)BuildingClass::Array.Items;
-	*(int*)((DWORD)pThis + 0x78) = BuildingClass::Array.Count;
+	// 替换为全阵营建筑列表，让 sub_506EF0 能看到玩家的建筑
+	*(DWORD*)((DWORD)pThis + 0x6C) = (DWORD)BuildingClass::Array.Items;   // [house+6Ch] = 全局建筑列表
+	*(int*)((DWORD)pThis + 0x78) = BuildingClass::Array.Count;            // [house+78h] = 全局建筑数量
 
 	return 0;
 }
 
 // ============================================================
-// Hook B: sub_506EF0 出口
+// Hook A.end: sub_506EF0 出口
 // 恢复被 Hook A 替换的建筑列表
-// 地址 0x50766E (pop edi~retn 8, 13字节)
 // ============================================================
 DEFINE_HOOK(0x50766E, HouseClass_BaseNode_SatisfactionCheck_Exit, 0xD)
 {
@@ -151,18 +147,24 @@ DEFINE_HOOK(0x50766E, HouseClass_BaseNode_SatisfactionCheck_Exit, 0xD)
 	if (!s_SavedHouse)
 		return 0;
 
+	// 检查 [house+6Ch] 是否仍是全局列表（防止中间被其他代码改过）
 	if (*(DWORD*)((DWORD)s_SavedHouse + 0x6C) == (DWORD)BuildingClass::Array.Items)
 	{
-		*(DWORD*)((DWORD)s_SavedHouse + 0x6C) = s_SavedBldgBase;
-		*(int*)((DWORD)s_SavedHouse + 0x78) = s_SavedBldgCount;
+		// 恢复 AI 自己的建筑列表
+		*(DWORD*)((DWORD)s_SavedHouse + 0x6C) = s_SavedBldgBase;   // [house+6Ch] = 原 AI 建筑列表
+		*(int*)((DWORD)s_SavedHouse + 0x78) = s_SavedBldgCount;    // [house+78h] = 原 AI 建筑数量
 	}
 
 	return 0;
 }
 
 // ============================================================
-// Hook 1: AI_BaseConstructionUpdate 入口
-// 功能：一次只让 AI 拥有一个基地节点
+// Hook B: AI_BaseConstructionUpdate (0x4FE3E0) 入口
+//
+// 原版每帧遍历 HouseClass::Base.BaseNodes，调用 sub_506EF0 评估各节点
+// 根据基地节点指南, auto-gen (sub_42EB20) 会动态补充新节点（如围墙、防御等）
+//
+// 我们每帧只保留一个授权节点，其余清空，让 AI 按顺序逐个建造。
 // ============================================================
 DEFINE_HOOK(0x4FE3E0, HouseClass_AI_BaseConstructionUpdate_Entry, 0x5)
 {
@@ -179,6 +181,7 @@ DEFINE_HOOK(0x4FE3E0, HouseClass_AI_BaseConstructionUpdate_Entry, 0x5)
 		s_SavedOriginalNodeCount = 0;
 	}
 
+	// 捕获, 仅首次调用时执行
 	CaptureAuthorizedNodes(pExt, pThis);
 
 	int totalNodes = pExt->AuthorizedNodeKeys.size();
@@ -189,7 +192,8 @@ DEFINE_HOOK(0x4FE3E0, HouseClass_AI_BaseConstructionUpdate_Entry, 0x5)
 	short targetX = -1;
 	short targetY = -1;
 
-	for (auto& key : pExt->AuthorizedNodeKeys)
+	// ========= 1, 每帧检查授权节点状态: 已建/被占/空置 ========
+	for (AuthorizedNodeKey& key : pExt->AuthorizedNodeKeys)
 	{
 		if (IsNodeBuiltByAI(key.BuildingTypeIndex, key.X, key.Y, pThis))
 		{
@@ -203,7 +207,8 @@ DEFINE_HOOK(0x4FE3E0, HouseClass_AI_BaseConstructionUpdate_Entry, 0x5)
 			continue;
 		}
 
-		// 这个需要建造
+		// 这个需要建造, 到这里的节点都是未完成的了
+		// 获取第一个需要建造的节点坐标和类型
 		++emptyCount;
 		if (targetType < 0)
 		{
@@ -214,80 +219,62 @@ DEFINE_HOOK(0x4FE3E0, HouseClass_AI_BaseConstructionUpdate_Entry, 0x5)
 		break;
 	}
 
-	Debug::Log(L"[PhobosExt][Hook1] AI=%hs Nodes=%d (built=%d occ=%d empty=%d) target=类型%d,(%d,%d)\n",
-		pThis->get_ID(), totalNodes, builtCount, occupiedCount, emptyCount,
-		targetType, targetX, targetY);
 
+	// ========= 2, 根据状态设置 BaseNodes ========
 	// 所有节点已完成（AI已建或玩家占领）→ Count=0 让 sub_506EF0 跳过处理
 	if (emptyCount == 0 && builtCount + occupiedCount == totalNodes)
 	{
-		Debug::Log(L"[PhobosExt][Hook1] 所有 %d 个节点已完成 (built=%d occ=%d), Count=0 跳过后续, AI=%hs\n",
-			totalNodes, builtCount, occupiedCount, pThis->get_ID());
-		pExt->LastTargetType = -1;
-		pExt->LastTargetX = -1;
-		pExt->LastTargetY = -1;
+		pExt->LastFrameTargetType = -1;
+		pExt->LastFrameTargetX = -1;
+		pExt->LastFrameTargetY = -1;
 		s_SavedOriginalNodeCount = pThis->Base.BaseNodes.Count;
 		pThis->Base.BaseNodes.Count = 0;
 		return 0;
 	}
 
 	// 把所有节点设为 -1，一个不留
-	for (int i = 0; i < pThis->Base.BaseNodes.Count; ++i)
+	// 确保单节点模式
+	for (BaseNodeClass& node : pThis->Base.BaseNodes)
 	{
-		pThis->Base.BaseNodes[i].BuildingTypeIndex = -1;
+		node.BuildingTypeIndex = -1;
 	}
 
 	// 设 BaseNodes[0] = 需要建造的目标
 	if (targetType >= 0)
 	{
-		auto& node = pThis->Base.BaseNodes[0];
+		BaseNodeClass& node = pThis->Base.BaseNodes[0];
 		node.BuildingTypeIndex = targetType;
 		node.MapCoords.X = targetX;
 		node.MapCoords.Y = targetY;
 
-		bool targetChanged = (pExt->LastTargetType != targetType
-			|| pExt->LastTargetX != targetX
-			|| pExt->LastTargetY != targetY);
-
-		pExt->LastTargetType = targetType;
-		pExt->LastTargetX = targetX;
-		pExt->LastTargetY = targetY;
-
-		if (targetChanged)
-		{
-			Debug::Log(L"[PhobosExt][Hook1] 目标变化 -> 类型%d,(%d,%d), AI=%hs\n",
-				targetType, targetX, targetY, pThis->get_ID());
-		}
+		pExt->LastFrameTargetType = targetType;
+		pExt->LastFrameTargetX = targetX;
+		pExt->LastFrameTargetY = targetY;
 
 		// ===== 每帧检查工厂: 是否在生产正确的东西? =====
-		for (auto* pFact : FactoryClass::Array)
+		for (FactoryClass* pFact : FactoryClass::Array)
 		{
 			if (pFact->Owner != pThis)
 				continue;
+
+			// 获取工厂的生产对象, 不是建筑就继续遍历
+			TechnoClass* pObj = pFact->Object;
+			if (!pObj || pObj->What_Am_I() != AbstractType::Building)
+				continue;
+
+			// 如果工厂暂停, 暂时不检查
 			if (pFact->IsSuspended)
-			{
-				if (!targetChanged)
-					Debug::Log(L"[PhobosExt][Hook1]   工厂暂停(等待放置): 类型=%d\n", targetType);
 				break;
-			}
-			auto* pObj = pFact->Object;
-			if (!pObj)
-			{
-				if (!targetChanged)
-					Debug::Log(L"[PhobosExt][Hook1]   工厂空闲,目标=%d\n", targetType);
-				break;
-			}
-			auto* pProdType = pObj->GetTechnoType();
+
+			// Production TechnoType
+			TechnoTypeClass* pProdType = pObj->GetTechnoType();
 			if (!pProdType) break;
+
 			int prodTypeIdx = static_cast<BuildingTypeClass*>(pProdType)->ArrayIndex;
+			// 如果当前生成的类型和目标一样, 不处理, 让他继续生产
 			if (prodTypeIdx == targetType)
-			{
-				if (!targetChanged)
-					Debug::Log(L"[PhobosExt][Hook1]   工厂生产中: 类型=%d ✓\n", targetType);
 				break;
-			}
-			Debug::Log(L"[PhobosExt][Hook1] 中断生产: 旧类型=%d → 新类型=%d\n",
-				prodTypeIdx, targetType);
+
 			pFact->AbandonProduction();
 			BuildingTypeClass* pTargetType = BuildingTypeClass::Array[targetType];
 			if (pTargetType)
@@ -300,9 +287,8 @@ DEFINE_HOOK(0x4FE3E0, HouseClass_AI_BaseConstructionUpdate_Entry, 0x5)
 }
 
 // ============================================================
-// Hook 3: 拦截 FactoryClass::DemandProduction
-// 阻止未授权的建筑类型（如墙头 359）进入工厂
-// 地址 0x4C9C70
+// Hook C: 拦截 FactoryClass::DemandProduction
+// 阻止未授权的建筑类型进入工厂生产队列
 // ============================================================
 DEFINE_HOOK(0x4C9C70, FactoryClass_DemandProduction_Intercept, 0x9)
 {
@@ -326,30 +312,21 @@ DEFINE_HOOK(0x4C9C70, FactoryClass_DemandProduction_Intercept, 0x9)
 	if (pReqType)
 		reqId = pReqType->get_ID();
 
-	Debug::Log(L"[PhobosExt][Hook3] AI=%hs 请求建造 类型=%d(%hs)\n",
-		pOwner->get_ID(), reqTypeIdx, reqId ? reqId : "?");
-
-	// 检查请求的类型是否在授权列表中
-	for (auto& key : pExt->AuthorizedNodeKeys)
+	// 检查请求的类型是否在授权列表中, 在就不用管, 让它造
+	for (AuthorizedNodeKey& key : pExt->AuthorizedNodeKeys)
 	{
 		if (key.BuildingTypeIndex == reqTypeIdx)
-		{
-			Debug::Log(L"[PhobosExt][Hook3]   已授权, 放行\n");
 			return 0;
-		}
 	}
 
-	Debug::Log(L"[PhobosExt][Hook3]   未授权, 尝试重定向\n");
-
-	// 未授权 → 寻找需要建造的空位，如果全部建成则重定向到第一个已建类型
+	// 未授权 -> 寻找需要建造的空位，如果全部建成则重定向到第一个已建类型
 	int fallbackType = -1;
 	int nBuilt = 0, nOccupied = 0;
-	for (auto& key : pExt->AuthorizedNodeKeys)
+	for (AuthorizedNodeKey& key : pExt->AuthorizedNodeKeys)
 	{
 		if (IsNodeBuiltByAI((short)key.BuildingTypeIndex, key.X, key.Y, pOwner))
 		{
-			Debug::Log(L"[PhobosExt][Hook3]   节点 类型=%d,(%d,%d): 已建成\n",
-				key.BuildingTypeIndex, key.X, key.Y);
+			// 获取第一个已建的类型作为 fallback
 			if (fallbackType < 0)
 				fallbackType = key.BuildingTypeIndex;
 			++nBuilt;
@@ -357,96 +334,31 @@ DEFINE_HOOK(0x4C9C70, FactoryClass_DemandProduction_Intercept, 0x9)
 		}
 		if (IsNodeOccupiedByOther((short)key.BuildingTypeIndex, key.X, key.Y, pOwner))
 		{
-			Debug::Log(L"[PhobosExt][Hook3]   节点 类型=%d,(%d,%d): 被占领\n",
-				key.BuildingTypeIndex, key.X, key.Y);
 			++nOccupied;
 			continue;
 		}
 
-		// 找到空位 → 正常重定向
-		Debug::Log(L"[PhobosExt][Hook3]   节点 类型=%d,(%d,%d): 空位, 重定向至此\n",
-			key.BuildingTypeIndex, key.X, key.Y);
+		// 经过多次continue过滤, 找到空位 -> 正常重定向
 		BuildingTypeClass* pTargetType = BuildingTypeClass::Array[key.BuildingTypeIndex];
 		if (pTargetType)
 		{
-			Debug::Log(L"[PhobosExt][Hook3]   重定向: %d(%hs) → %d(%hs)\n",
-				reqTypeIdx, reqId ? reqId : "?",
-				key.BuildingTypeIndex, pTargetType->get_ID());
+			// 偷改参数, 让工厂去造AuthorizedNodeKeys里面的的东西
 			R->Stack<TechnoTypeClass*>(0x4, pTargetType);
 		}
 		return 0;
 	}
 
+	// 经过过滤仍然没有空位了 -> 全部建成或被占领了
 	// 全部建成/被占领 → 使用 fallback
-	Debug::Log(L"[PhobosExt][Hook3]   总计: built=%d occ=%d total=%d, fallbackType=%d\n",
-		nBuilt, nOccupied, (int)pExt->AuthorizedNodeKeys.size(), fallbackType);
 
 	if (fallbackType >= 0)
 	{
-		Debug::Log(L"[PhobosExt][Hook3]   使用 fallback 重定向: %d(%hs) → %d\n",
-			reqTypeIdx, reqId ? reqId : "?", fallbackType);
 		BuildingTypeClass* pTargetType = BuildingTypeClass::Array[fallbackType];
 		if (pTargetType)
 			R->Stack<TechnoTypeClass*>(0x4, pTargetType);
-	}
-	else
-	{
-		Debug::Log(L"[PhobosExt][Hook3]   无 fallback, 未拦截! 请求将原样通过!\n");
 	}
 
 	return 0;
 }
 
-// 移除指定坐标的所有授权节点
-void HouseExt::RemoveAuthorizedNodeByCoord(HouseClass* pHouse, short x, short y)
-{
-	auto pExt = HouseExt::ExtMap.Find(pHouse);
-	if (!pExt) return;
 
-	auto it = pExt->AuthorizedNodeKeys.begin();
-	while (it != pExt->AuthorizedNodeKeys.end())
-	{
-		if (it->X == x && it->Y == y)
-			it = pExt->AuthorizedNodeKeys.erase(it);
-		else
-			++it;
-	}
-
-	// 如果当前目标就是这个坐标，清除记录
-	if (pExt->LastTargetX == x && pExt->LastTargetY == y)
-	{
-		pExt->LastTargetType = -1;
-		pExt->LastTargetX = -1;
-		pExt->LastTargetY = -1;
-	}
-
-	// Debug::Log(L"[PhobosExt] 已移除坐标(%d,%d)的授权节点, AI=%hs\n",
-	// 	x, y, pHouse->get_ID());
-}
-
-// 移除指定类型的所有授权节点
-void HouseExt::RemoveAuthorizedNodeByType(HouseClass* pHouse, int buildingTypeIndex)
-{
-	auto pExt = HouseExt::ExtMap.Find(pHouse);
-	if (!pExt) return;
-
-	auto it = pExt->AuthorizedNodeKeys.begin();
-	while (it != pExt->AuthorizedNodeKeys.end())
-	{
-		if (it->BuildingTypeIndex == buildingTypeIndex)
-			it = pExt->AuthorizedNodeKeys.erase(it);
-		else
-			++it;
-	}
-
-	// 如果当前目标就是这个类型，清除记录
-	if (pExt->LastTargetType == buildingTypeIndex)
-	{
-		pExt->LastTargetType = -1;
-		pExt->LastTargetX = -1;
-		pExt->LastTargetY = -1;
-	}
-
-	// Debug::Log(L"[PhobosExt] 已移除类型=%d的授权节点, AI=%hs\n",
-	// 	buildingTypeIndex, pHouse->get_ID());
-}
