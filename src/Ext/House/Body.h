@@ -102,7 +102,8 @@ public:
 	static bool SaveGlobals(PhobosStreamWriter& Stm);
 
 	// 将触发动作添加的基地节点加入授权列表（供 TAction 调用）
-	static void AuthorizeBaseNode(HouseClass* pHouse, int buildingTypeIndex, short x, short y);
+	// insertAtFront = true 时插入到列表头部，用于 forceAtFront 优先建造
+	static void AuthorizeBaseNode(HouseClass* pHouse, int buildingTypeIndex, short x, short y, bool insertAtFront = false);
 
 	// 移除指定坐标的授权节点
 	static void RemoveAuthorizedNodeByCoord(HouseClass* pHouse, short x, short y);

@@ -78,10 +78,11 @@ static void CaptureAuthorizedNodes(HouseExt::ExtData* pExt, HouseClass* pThis)
 }
 
 // 供 TAction 调用：将触发动作添加的节点加入授权列表
-void HouseExt::AuthorizeBaseNode(HouseClass* pHouse, int buildingTypeIndex, short x, short y)
+void HouseExt::AuthorizeBaseNode(HouseClass* pHouse, int buildingTypeIndex, short x, short y, bool insertAtFront)
 {
 	auto pExt = HouseExt::ExtMap.Find(pHouse);
-	if (!pExt)
+	// 仅当 BaseNodeCrossOwners 启用时，授权列表才生效
+	if (!pExt || !pExt->BaseNodeCrossOwners)
 		return;
 
 	CaptureAuthorizedNodes(pExt, pHouse);
@@ -97,7 +98,11 @@ void HouseExt::AuthorizeBaseNode(HouseClass* pHouse, int buildingTypeIndex, shor
 	key.BuildingTypeIndex = buildingTypeIndex;
 	key.X = x;
 	key.Y = y;
-	pExt->AuthorizedNodeKeys.push_back(key);
+
+	if (insertAtFront)
+		pExt->AuthorizedNodeKeys.insert(pExt->AuthorizedNodeKeys.begin(), key);
+	else
+		pExt->AuthorizedNodeKeys.push_back(key);
 
 }
 
