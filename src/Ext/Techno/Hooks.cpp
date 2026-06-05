@@ -4,6 +4,7 @@
 #include <Ext/Techno/MyNew/AutoHunt.h>
 #include <Ext/Techno/MyNew/LegalTargetAI.h>
 #include <Ext/Techno/MyNew/TemporalExclusive.h>
+#include <Ext/Techno/MyNew/TemporalAOE.h>
 
 // AutoHunt 相关
 size_t s_AutoHuntFrameCounter = 0;
@@ -22,6 +23,23 @@ DEFINE_HOOK(0x6F9E50, TechnoClass_AI, 0x5)
 	// Temporal exclusive
 	HandleLegalTargetAITargeting(pThis);
 	HandleTemporalExclusiveTargeting(pThis);
+
+	// Temporal AOE
+	auto const pExt = TechnoExt::ExtMap.Find(pThis);
+	if (pExt)
+	{
+		pExt->UpdateTemporalAOE();
+	}
+
+	// 全局副目标合法性检测（每帧仅执行一次）
+	{
+		static DWORD lastFrame = 0;
+		if ((DWORD)Unsorted::CurrentFrame != lastFrame)
+		{
+			lastFrame = Unsorted::CurrentFrame;
+			ValidateGlobalSecondaryClaims();
+		}
+	}
 
 	return 0;
 }

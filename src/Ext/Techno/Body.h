@@ -11,6 +11,9 @@
 
 #include <Ext\TechnoType\Body.h>
 
+#include <vector>
+#include <set>
+
 class TechnoExt
 {
 public:
@@ -25,6 +28,24 @@ public:
 	public:
 		TechnoTypeExt::ExtData* TypeExtData;
 
+		// Temporal AOE state
+		struct TemporalAOEState
+		{
+			bool Active = false;
+			double CellSpread = 3.0;
+			double SecondaryWeight = 1.0;    // 副目标HP权重
+			int WeaponDamage = 100;
+			int ExtraWarpAdded = 0;           // 已加到主Temporal上的额外Warp值
+			TechnoClass* MainTarget = nullptr;  // 记录主目标，用于死亡检测
+			bool WarpingOut = false;            // 正在抹除中，防止递归
+			int ScanInterval = 5;
+			int ScanCounter = 0;
+
+			std::vector<TechnoClass*> TargetsInRange;
+			std::set<TechnoClass*> BuildingsDisabled;
+		};
+		TemporalAOEState AOEState;
+
 		ExtData(TechnoClass* OwnerObject) : Extension<TechnoClass>(OwnerObject)
 			, TypeExtData { nullptr }
 		{ }
@@ -33,6 +54,8 @@ public:
 		virtual void InvalidatePointer(void* ptr, bool bRemoved) override;
 		virtual void LoadFromStream(PhobosStreamReader& Stm) override;
 		virtual void SaveToStream(PhobosStreamWriter& Stm) override;
+
+		void UpdateTemporalAOE();
 
 	private:
 		template <typename T>

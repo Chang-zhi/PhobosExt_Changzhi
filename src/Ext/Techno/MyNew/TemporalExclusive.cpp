@@ -4,8 +4,12 @@
 
 #include <Ext/Techno/body.h>
 #include <Ext/WarheadType/body.h>
+#include <Utilities/Debug.h>
 
 #include <map>
+
+// 定义独占映射
+std::map<TechnoClass*, TechnoClass*> TemporalExclusiveTargetsMap;
 
 // Check if a unit has an exclusive temporal weapon
 bool IsCurrentUseExclusiveTemporalWeapon(TechnoClass* pTechno)
@@ -20,7 +24,7 @@ bool IsCurrentUseExclusiveTemporalWeapon(TechnoClass* pTechno)
         if (pWeapon->Warhead->Temporal)
         {
             auto pWHExt = WarheadTypeExt::ExtMap.Find(pWeapon->Warhead);
-            if (pWHExt && pWHExt->TemporalExclusive)
+            if (pWHExt && pWHExt->Temporal_Exclusive)
             {
                 return true;
             }
@@ -127,10 +131,13 @@ void HandleTemporalExclusiveTargeting(TechnoClass* pThis)
         if (pOccupier != pThis)
         {
             // 双重检查：确保占用者真的还在攻击这个目标（防止竞态条件）
-            if (abstract_cast<TechnoClass*>(pOccupier->Target) == pCurrentTarget && 
+            if (abstract_cast<TechnoClass*>(pOccupier->Target) == pCurrentTarget &&
                 IsCurrentUseExclusiveTemporalWeapon(pOccupier))
             {
                 // 确实发生冲突，强制当前单位放弃
+                Debug::Log("[TemporalExclusive] CONFLICT: %s forced to abandon %s (locked by %s)\n",
+                    pThis->GetTechnoType()->ID, pCurrentTarget->GetTechnoType()->ID,
+                    pOccupier->GetTechnoType()->ID);
                 pThis->SetTarget(nullptr);
             }
             else
@@ -186,6 +193,9 @@ void UpdateTemporalExclusive()
 	{
 		if (pInst)
 		{
+			Debug::Log("[TemporalExclusive] Releasing duplicate temporal: %s -> %s\n",
+				pInst->Owner->GetTechnoType()->ID,
+				pInst->Target->GetTechnoType()->ID);
 			pInst->JustLetGo();
 		}
 	}

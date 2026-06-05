@@ -88,6 +88,7 @@ void HouseExt::AuthorizeBaseNode(HouseClass* pHouse, int buildingTypeIndex, shor
 	CaptureAuthorizedNodes(pExt, pHouse);
 
 	// 检查是否已存在
+	// 存在就不加入了, 毕竟这个功能不能实现 AI 自己换节点位置, 防止卡死
 	for (AuthorizedNodeKey& key : pExt->AuthorizedNodeKeys)
 	{
 		if (key.X == x && key.Y == y && key.BuildingTypeIndex == buildingTypeIndex)
@@ -109,6 +110,7 @@ void HouseExt::AuthorizeBaseNode(HouseClass* pHouse, int buildingTypeIndex, shor
 
 // ============================================================
 // 用于跨越 sub_506EF0 入口/出口保存/恢复建筑列表
+// 不太懂逆向工程, 可能有更好的办法, 我这个比较繁琐
 // ============================================================
 static DWORD s_SavedBldgBase = 0;          // Hook A 保存的原 [house+6Ch] 建筑列表指针
 static int s_SavedBldgCount = 0;           // Hook A 保存的原 [house+78h] 建筑数量

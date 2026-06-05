@@ -32,6 +32,7 @@
     <ClCompile Include="src\Ext\Techno\MyNew\AutoHunt.cpp" />
     <ClCompile Include="src\Ext\Techno\MyNew\LegalTargetAI.cpp" />
     <ClCompile Include="src\Ext\Techno\MyNew\TemporalExclusive.cpp" />
+    <ClCompile Include="src\Ext\Techno\MyNew\TemporalAOE.cpp" />
     <ClCompile Include="src\Ext\Techno\WeaponHelpers.cpp" />
     <ClCompile Include="src\Ext\TEvent\Body.cpp" />
     <ClCompile Include="src\Ext\TEvent\Hooks.cpp" />
@@ -64,6 +65,7 @@
     <ClInclude Include="src\Ext\Techno\MyNew\AutoHunt.h" />
     <ClInclude Include="src\Ext\Techno\MyNew\LegalTargetAI.h" />
     <ClInclude Include="src\Ext\Techno\MyNew\TemporalExclusive.h" />
+    <ClInclude Include="src\Ext\Techno\MyNew\TemporalAOE.h" />
     <ClInclude Include="src\Ext\TEvent\Body.h" />
     <ClInclude Include="src\Ext\TEvent\MyNew\Helper.h" />
     <ClInclude Include="src\MyNew\WaypointLabelClass.h" />

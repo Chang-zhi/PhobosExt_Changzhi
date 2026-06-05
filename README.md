@@ -25,7 +25,9 @@
   - [5. 科技类型坐标检测](#5-科技类型坐标检测)
   - [6. 单位可招募属性设置](#6-单位可招募属性设置)
   - [7. 更新建筑动画功能](#7-更新建筑动画功能)
-  - [8. 超时空武器互斥锁定](#8-超时空武器互斥锁定)
+  - [8. 超时空武器扩展](#8-超时空武器扩展)
+    - [8.1 互斥锁定](#81-互斥锁定-temporalexclusive)
+    - [8.2 范围冻结](#82-范围冻结-temporalaoeenable)
   - [9. 自动游猎](#9-自动游猎)
   - [10. AI 所属单位目标判定](#10-ai-所属单位目标判定)
   - [11. 建立作战小队(考虑限制)](#11-建立作战小队考虑限制)
@@ -44,9 +46,10 @@
 ---
 
 ### 已知问题
-1.当单位当前正在使用带有 `Temporal=yes` 和 `TemporalExclusive=yes` 弹头的武器时, 会强制改变单位的索敌逻辑, 可能会产生bug。  
+1.当单位当前正在使用带有 `Temporal=yes` 和 `Temporal.Exclusive=yes` 弹头的武器时, 会强制改变单位的索敌逻辑, 可能会产生bug。  
 2.当科技类型的 `LegalTargetWhenAIOwner=no` 且不由人类玩家控制时, 会强制改变其他单位的索敌逻辑, 可能会产生bug。  
 3.基地节点跨所属方判定：开启后不要让 AI 造围墙，与触发动作 30 不兼容。详见[对应章节](#兼容性说明-1)。
+4.当单位当前正在使用带有 `Temporal=yes` 弹头的武器反复攻击同一个目标时, 可能会出现中间的目标没有进入冻结状态但其他目标进入的情况(不过时间到了仍会被一同抹除)。
 
 **如果遇到bug或兼容性问题可以我发私信, 我会尽量解决。**   
 我的 [*@B站主页*](https://space.bilibili.com/423792550)   
@@ -217,20 +220,39 @@ ShowWaypointLabelInShroud=              ; boolean(布尔值)，默认 true
 
 ---
 
-### 8. 超时空武器互斥锁定
+### 8. 超时空武器扩展
 
-为 `Temporal=yes` 的弹头增加互斥锁定机制。
+为 `Temporal=yes` 的弹头增加互斥锁定和范围冻结（AOE）机制。
 
 ```ini
 [WarheadType]
-TemporalExclusive=              ; boolean(布尔值)，默认 false
+Temporal.Exclusive=                        ; boolean，默认 false — 启用后无法攻击已被其他超时空锁定的单位
+TemporalAOE.Enable=                        ; boolean，默认 false — 启用范围冻结
+TemporalAOE.CellSpread=                    ; double，默认 3.0 — AOE 半径
+TemporalAOE.SecondaryWeight=               ; double，默认 1.0 — 副目标扭曲时间贡献权重
+TemporalAOE.AffectsAllies=                 ; boolean，默认 false — 是否影响友军
 ```
-当弹头同时设置 `Temporal=yes` 和 `TemporalExclusive=yes` 时，   
-该武器无法瞄准已被其他 `TemporalClass` 实例锁定的单位(即正在遭受超时空冻结的单位)。   
 
-普通的超时空武器( `Temporal=yes` 但未设置 `TemporalExclusive` )仍可以攻击已被互斥武器锁定的单位。
+#### 8.1 互斥锁定 (`Temporal.Exclusive`)
 
-互斥武器不能攻击被普通超时空武器冻结的目标。
+当弹头同时设置 `Temporal=yes` 和 `Temporal.Exclusive=yes` 时，该武器无法瞄准已被其他 `TemporalClass` 实例锁定的单位（即正在遭受超时空冻结的单位）。
+
+- 普通的超时空武器（`Temporal=yes` 但未设置 `Temporal.Exclusive`）仍可以攻击已被互斥武器锁定的单位。
+- 互斥武器不能攻击被普通超时空武器冻结的目标。
+
+#### 8.2 范围冻结 (`TemporalAOE.Enable`)
+
+当弹头同时设置 `Temporal=yes` 和 `TemporalAOE.Enable=yes` 时，超时空武器攻击主目标的同时，会冻结主目标周围一定范围内的所有敌方单位，并与主目标同时被抹除。
+
+**行为细节：**
+
+- **时间计算公式**：`额外扭曲帧数 = (10 × 副目标HP × SecondaryWeight) ÷ 武器Damage`。每个副目标的贡献独立累加。
+  - 例如：副目标 HP=200，`SecondaryWeight=1.0`，武器伤害=100，则每个副目标增加 `10×200×1.0÷100 = 20` 帧。
+- **进出范围**：单位进入或离开范围时，扭曲所需总时间会自动重新计算，已消耗的进度不会丢失。
+- **要塞兼容**：超时空兵在 OpenTopped 要塞内作为乘员开火时，AOE 正常生效，且要塞本身不会受到冻结影响。
+- **攻击者免冻**：正在使用超时空武器的单位不会被选为副目标，防止多个 AOE 攻击者之间互相冻结。
+- **副目标独占**：已被某个 AOE 标记为副目标的单位，其他设置了 `Temporal.Exclusive=yes` 的武器无法再次将其选为副目标。未设置 Exclusive 的武器则可以覆盖接管。
+- **自动清理**：系统每帧检测所有被冻结的单位，自动解除以下情况的冻结：攻击者已死亡/被冻结/停止攻击、副目标已死亡/离场。额外每 15 帧进行一次全图扫描，清除任何异常残留的孤立冻结状态(被逼无奈才做全局处理, 一直有残留问题)。
 
 ---
 
