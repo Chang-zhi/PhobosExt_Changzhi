@@ -115,7 +115,8 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 	return TActionExt::UpdateOwnerBuildingsAnimations(pThis, pHouse, pObject, pTrigger, location);
 	case PhobosTriggerAction::CreateTeamConsideringLimits:
 		return TActionExt::CreateTeamConsideringLimits(pThis, pHouse, pObject, pTrigger, location);
-
+	case PhobosTriggerAction::RecruitNearbyFootToTeam:
+		return TActionExt::RecruitNearbyFootToTeam(pThis, pHouse, pObject, pTrigger, location);
 
 	//case PhobosTriggerAction::RemoveBaseNodesExceedingAttemptCountForHouse:
 	//	return TActionExt::RemoveBaseNodesExceedingAttemptCountForHouse(pThis, pHouse, pObject, pTrigger, location);
@@ -1044,6 +1045,52 @@ bool TActionExt::CreateTeamConsideringLimits(TActionClass* pThis, HouseClass* pH
 
 	// Debug::Log(L"创建小队 \"%hs\" 成功, 当前实例数: %d, 最大上限: %d.\n", id, cnt + 1, max);
 	pTeamType->CreateTeam(pTeamType->Owner);
+	return true;
+}
+
+bool TActionExt::RecruitNearbyFootToTeam(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	int teamIndex = pThis->Param3;
+	int waypointIndex = pThis->Param4;
+	int range = pThis->Param5;
+	int houseIndex = pThis->Param6;
+
+	// ===== 1. 获取作战小队类型 =====
+	TeamTypeClass* pTeamType = nullptr;
+	for (TeamTypeClass* pCurrentTeamType : TeamTypeClass::Array)
+	{
+		if (pCurrentTeamType && pCurrentTeamType->get_ID() == ("0" + std::to_string(teamIndex)))
+		{
+			pTeamType = pCurrentTeamType;
+			break;
+		}
+	}
+	if (!pTeamType) return false;
+
+	// ===== 2. 查找已存在的作战小队实例 =====
+	TeamClass* pTeam = pTeamType->FindFirstInstance();
+	if (!pTeam) return true; // 没有实例就不做动作
+
+	// ===== 3. 获取路径点坐标 =====
+	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
+	if (cell.X < 0 || cell.Y < 0) return false;
+
+	// ===== 4. 获取所属方 =====
+	HouseClass* pOwner = HouseClass::FindByCountryIndex(houseIndex);
+	if (!pOwner) return false;
+
+	// ===== 5. 遍历所有 FootClass，招募符合条件的单位 =====
+	for (FootClass* pFoot : FootClass::Array)
+	{
+		if (!pFoot) continue;
+		if (pFoot->Owner != pOwner) continue;
+		if (pFoot->Team) continue; // 已经在其他小队中
+		if (!pFoot->CanBeRecruited(pOwner)) continue;
+		if (!IsTechnoNearCell(pFoot, cell, range)) continue;
+
+		pTeam->AddMember(pFoot, true);
+	}
+
 	return true;
 }
 
