@@ -36,7 +36,8 @@ public:
 			double SecondaryWeight = 1.0;    // 副目标HP权重
 			int WeaponDamage = 100;
 			int ExtraWarpAdded = 0;           // 已加到主Temporal上的额外Warp值
-			TechnoClass* MainTarget = nullptr;  // 记录主目标，用于死亡检测
+			TechnoClass* CachedMain = nullptr;   // 缓存的主目标（独立于 InvalidatePointer，自行管理）
+			bool CachedMainDead = false;         // 缓存的主目标已被游戏销毁（InvalidatePointer 标记）
 			bool WarpingOut = false;            // 正在抹除中，防止递归
 			int ScanInterval = 5;
 			int ScanCounter = 0;

@@ -14,6 +14,9 @@ extern std::map<TechnoClass*, TechnoClass*> TemporalAOESecondaryClaims;
 // 正在被 AOE 抹除中的目标集合，防止多个 AOE 同时抹除同一目标导致野指针崩溃
 extern std::set<TechnoClass*> TemporalAOEWarpingOutTargets;
 
+// 缓存主目标 → AOE 攻击者映射（RegisterDestruction 钩子用于精确检测主目标销毁）
+extern std::map<TechnoClass*, TechnoClass*> TemporalAOECachedMainOwners;
+
 // 初始化攻击者的 AOE 状态（从弹头配置中读取参数）
 void InitTemporalAOEState(TechnoClass* pAttacker);
 

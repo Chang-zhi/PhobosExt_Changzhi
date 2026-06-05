@@ -26,7 +26,8 @@ void TechnoExt::ExtData::Serialize(T& Stm)
 		.Process(this->AOEState.SecondaryWeight)
 		.Process(this->AOEState.WeaponDamage)
 		.Process(this->AOEState.ExtraWarpAdded)
-		.Process(this->AOEState.MainTarget)
+		.Process(this->AOEState.CachedMain)
+		.Process(this->AOEState.CachedMainDead)
 		.Process(this->AOEState.WarpingOut)
 		.Process(this->AOEState.ScanInterval)
 		.Process(this->AOEState.ScanCounter)
@@ -47,6 +48,12 @@ void TechnoExt::ExtData::Serialize(T& Stm)
 		Stm.Process(bldVec);
 		this->AOEState.BuildingsDisabled.clear();
 		this->AOEState.BuildingsDisabled.insert(bldVec.begin(), bldVec.end());
+
+		// 读档后重建 TemporalAOECachedMainOwners 全局映射（防止其他 CLEG 抢夺目标）
+		if (this->AOEState.CachedMain && this->OwnerObject())
+		{
+			TemporalAOECachedMainOwners[this->AOEState.CachedMain] = this->OwnerObject();
+		}
 	}
 }
 
@@ -55,9 +62,13 @@ void TechnoExt::ExtData::InvalidatePointer(void* ptr, bool bRemoved)
 	if (!ptr) return;
 	auto& state = this->AOEState;
 
-	// 主目标指针失效
-	if (state.MainTarget == ptr)
-		state.MainTarget = nullptr;
+	// 缓存的主目标被销毁 → 标记但不置空指针（后续逻辑判断用 CachedMainDead）
+	if (state.CachedMain == ptr)
+	{
+		state.CachedMainDead = true;
+		Debug::Log("[TemporalAOE] InvalidatePointer: CachedMain %08X destroyed, setting CachedMainDead\n",
+			(DWORD)ptr);
+	}
 
 	// 副目标列表（遍历删除，不用 static_cast）
 	for (auto it = state.TargetsInRange.begin(); it != state.TargetsInRange.end(); )
