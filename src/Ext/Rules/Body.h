@@ -2,6 +2,7 @@
 
 #include <CCINIClass.h>
 #include <RulesClass.h>
+#include <MissionClass.h>
 #include <Utilities/Container.h>
 #include <Utilities/Constructs.h>
 #include <Utilities/Template.h>
@@ -30,9 +31,11 @@ public:
 	{
 	public:
 		Valueable<bool> ShowWaypointLabelInShroud;
+		Valueable<bool> BerzerkRestoreClearTarget;
 
 		ExtData(RulesClass* OwnerObject) : Extension<RulesClass>(OwnerObject)
 			, ShowWaypointLabelInShroud { true }
+			, BerzerkRestoreClearTarget { false }
 		{ }
 
 		virtual ~ExtData() = default;

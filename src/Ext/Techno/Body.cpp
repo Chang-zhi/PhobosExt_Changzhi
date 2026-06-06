@@ -7,6 +7,7 @@
 
 #include <Utilities/AresFunctions.h>
 #include <Ext/Techno/MyNew/TemporalAOE.h>
+#include <Ext/Techno/MyNew/BerzerkRestore.h>
 TechnoExt::ExtContainer TechnoExt::ExtMap;
 
 TechnoExt::ExtData::~ExtData()
@@ -152,6 +153,7 @@ DEFINE_HOOK(0x6F4500, TechnoClass_DTOR, 0x5)
 	GET(TechnoClass*, pItem, ECX);
 
 	InvalidateAOESecondaryClaims(pItem);
+	BerzerkRestorePointerInvalidate(pItem);
 	TechnoExt::ExtMap.Remove(pItem);
 
 	return 0;

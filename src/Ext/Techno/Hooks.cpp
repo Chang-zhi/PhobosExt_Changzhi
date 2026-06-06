@@ -5,6 +5,7 @@
 #include <Ext/Techno/MyNew/LegalTargetAI.h>
 #include <Ext/Techno/MyNew/TemporalExclusive.h>
 #include <Ext/Techno/MyNew/TemporalAOE.h>
+#include <Ext/Techno/MyNew/BerzerkRestore.h>
 
 // AutoHunt 相关
 size_t s_AutoHuntFrameCounter = 0;
@@ -19,6 +20,9 @@ DEFINE_JUMP(VTABLE, 0x7F5CF4, 0x741490) // UnitClass_GetTechnoType -> UnitClass_
 DEFINE_HOOK(0x6F9E50, TechnoClass_AI, 0x5)
 {
 	GET(TechnoClass*, pThis, ECX);
+
+	// Berzerk restore check
+	BerzerkRestoreCheck(pThis);
 
 	// Temporal exclusive
 	HandleLegalTargetAITargeting(pThis);

@@ -30,6 +30,7 @@
     <ClCompile Include="src\Ext\Techno\Hooks.cpp" />
     <ClCompile Include="src\Ext\Techno\Hooks.Firing.cpp" />
     <ClCompile Include="src\Ext\Techno\MyNew\AutoHunt.cpp" />
+    <ClCompile Include="src\Ext\Techno\MyNew\BerzerkRestore.cpp" />
     <ClCompile Include="src\Ext\Techno\MyNew\LegalTargetAI.cpp" />
     <ClCompile Include="src\Ext\Techno\MyNew\TemporalExclusive.cpp" />
     <ClCompile Include="src\Ext\Techno\MyNew\TemporalAOE.cpp" />
@@ -63,6 +64,7 @@
     <ClInclude Include="src\Ext\TAction\MyNew\Helper.h" />
     <ClInclude Include="src\Ext\TechnoType\Body.h" />
     <ClInclude Include="src\Ext\Techno\MyNew\AutoHunt.h" />
+    <ClInclude Include="src\Ext\Techno\MyNew\BerzerkRestore.h" />
     <ClInclude Include="src\Ext\Techno\MyNew\LegalTargetAI.h" />
     <ClInclude Include="src\Ext\Techno\MyNew\TemporalExclusive.h" />
     <ClInclude Include="src\Ext\Techno\MyNew\TemporalAOE.h" />
