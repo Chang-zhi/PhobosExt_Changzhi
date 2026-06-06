@@ -1,4 +1,4 @@
-======V0.0.13.5=======
+======V0.0.13.5(预发布版本)=======
 1,新增弹头标签 TemporalAOE 范围冻结机制.
 2,更名 Temporal.Exclusive (加了个".")
 3,新增 [General] -> BerzerkRestoreClearTarget=     ;boolean 默认false 混乱恢复后清除目标防止乱跑.
