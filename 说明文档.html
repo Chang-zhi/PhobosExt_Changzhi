@@ -695,7 +695,7 @@ BaseNodeCrossOwners=                  ; boolean(布尔值)，默认 false</code>
         <h4 style="margin-top:1.2em;">14.1 混乱恢复设置</h4>
         <pre class="doc-code--block"><code>[General]
 BerzerkRestoreClearTarget=               ; boolean(布尔值)，默认 false</code></pre>
-        <p>启用时，当单位从混乱状态恢复会自动清除当前攻击目标，停止移动，切换至Guard状态，用于防止单位乱跑。</p>
+        <p>启用时，当单位从混乱状态恢复会自动清除当前攻击目标，停止移动，切换至 <code class="doc-code--inline">Guard</code> 状态，用于防止单位乱跑。</p>
 
         <h4 style="margin-top:1.2em;">14.2 弹头混乱缩减</h4>
         <pre class="doc-code--block"><code>[WarheadType]
@@ -704,7 +704,7 @@ BerserkReduce=               ; integer(整数)，默认 0</code></pre>
         <ul class="doc-list--content">
             <li><strong>正值</strong>：减少对应帧数的混乱时间（加速清醒）。</li>
             <li><strong>负值</strong>：延长对应帧数的混乱时间。</li>
-            <li>如果减少后的剩余时间 ≤ 0，则<strong>立即清除混乱状态</strong>，单位强制停止移动、进入警戒模式并清除攻击目标，防止乱跑。</li>
+            <li>如果减少后的剩余时间 ≤ 0，则<strong>立即清除混乱状态</strong>，单位强制停止移动、进入 <code class="doc-code--inline">Guard</code> 模式并清除攻击目标，防止乱跑。</li>
         </ul>
 
         <!-- 触发编辑器配置 -->
