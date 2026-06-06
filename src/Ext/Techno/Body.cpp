@@ -108,22 +108,13 @@ void TechnoExt::ExtData::InvalidatePointer(void* ptr, bool bRemoved)
 		}
 	}
 
-	// 建筑禁用列表（遍历删除，避免对非 TechnoClass 指针做 static_cast）
+	// 建筑禁用列表（遍历删除）
 	for (auto it = state.BuildingsDisabled.begin(); it != state.BuildingsDisabled.end(); )
 	{
 		if (*it == ptr)
-		{
-			if (auto pBld = abstract_cast<BuildingClass*>(*it))
-			{
-				if (pBld->Health > 0 && !pBld->InLimbo)
-					pBld->EnableTemporal();
-			}
 			it = state.BuildingsDisabled.erase(it);
-		}
 		else
-		{
 			++it;
-		}
 	}
 }
 

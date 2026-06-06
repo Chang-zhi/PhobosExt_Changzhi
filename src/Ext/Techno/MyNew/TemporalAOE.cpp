@@ -11,6 +11,7 @@
 #include <HouseClass.h>
 #include <RulesClass.h>
 #include <CellClass.h>
+#include <MapClass.h>
 #include <set>
 #include <cmath>
 
@@ -189,7 +190,46 @@ void ValidateGlobalSecondaryClaims()
 // 辅助函数
 // ============================================================
 
-// 播放 WarpAway 动画
+// 强制建筑物重绘（遍历地基所有 Cell 触发 MarkForRedraw）
+static void ForceBuildingRedraw(TechnoClass* pTechno)
+{
+	auto pBld = abstract_cast<BuildingClass*>(pTechno);
+	if (!pBld || !pBld->Type) return;
+	auto pCell = pBld->GetCell();
+	if (!pCell) return;
+	CellStruct baseCell = pCell->MapCoords;
+	CellStruct const* pFoundation = pBld->GetFoundationData(false);
+	if (!pFoundation) return;
+	int occupyHeight = pBld->Type->OccupyHeight;
+	if (occupyHeight <= 0) occupyHeight = 1;
+	CellStruct end = { 0x7FFF, 0x7FFF };
+	while (*pFoundation != end)
+	{
+		auto actualCell = baseCell + *pFoundation;
+		for (int i = occupyHeight; i > 0; --i)
+		{
+			if (auto pRedraw = MapClass::Instance.TryGetCellAt(actualCell))
+				pRedraw->MarkForRedraw();
+			--actualCell.X; --actualCell.Y;
+		}
+		++pFoundation;
+	}
+}
+
+// 安全清除建筑禁用列表（逐个 EnableTemporal 后清空）
+static void ClearBuildingsDisabled(std::set<TechnoClass*>& set)
+{
+	for (auto pTech : set)
+	{
+		if (!pTech) continue;
+		if (auto pBld = abstract_cast<BuildingClass*>(pTech))
+		{
+			if (pBld->Health > 0 && !pBld->InLimbo)
+				pBld->EnableTemporal();
+		}
+	}
+	set.clear();
+}
 static void PlayWarpAwayAnim(TechnoClass* pTarget)
 {
 	if (!pTarget) return;
@@ -211,6 +251,7 @@ static void WarpOutTarget(TechnoClass* pTarget, TechnoClass* pKiller, TechnoExt:
 		return;
 	}
 
+	// 多层防护：确保目标可被安全销毁
 	if (pTarget->Health <= 0)
 	{
 		Debug::Log("[TemporalAOE] WarpOutTarget: %s Health<=0, skipping\n",
@@ -225,12 +266,21 @@ static void WarpOutTarget(TechnoClass* pTarget, TechnoClass* pKiller, TechnoExt:
 		return;
 	}
 
-	if (pKiller && pTarget == pKiller)
+	// 检查 TechnoType 是否仍然有效（防止野指针）
+	if (!pTarget->GetTechnoType())
 	{
-		Debug::Log("[TemporalAOE] WarpOutTarget: %s is killer, skipping\n",
-			pTarget->GetTechnoType()->ID);
+		Debug::Log("[TemporalAOE] WarpOutTarget: null TechnoType, skipping\n");
 		return;
 	}
+
+	// 不能抹除攻击者自己
+	if (pKiller && pTarget == pKiller)
+		return;
+
+	// killer 可能已被销毁，多层校验
+	TechnoClass* pSource = pTarget;
+	if (pKiller && pKiller->Health > 0 && !pKiller->InLimbo && pKiller->GetTechnoType())
+		pSource = pKiller;
 
 	Debug::Log("[TemporalAOE] WarpOutTarget: eliminating %s (HP=%d)\n",
 		pTarget->GetTechnoType()->ID, pTarget->Health);
@@ -241,9 +291,7 @@ static void WarpOutTarget(TechnoClass* pTarget, TechnoClass* pKiller, TechnoExt:
 	if (auto pBld = abstract_cast<BuildingClass*>(pTarget))
 		state.BuildingsDisabled.erase(pBld);
 
-	auto pSource = (pKiller && pKiller->Health > 0) ? pKiller : pTarget;
-
-	// 逐步骤抹除，每一步都确认目标仍然有效
+	// 逐步骤抹除，每次都重新确认目标仍然有效
 	if (pTarget->Health > 0 && !pTarget->InLimbo)
 		pTarget->KillPassengers(pSource);
 
@@ -339,7 +387,7 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 	{
 		ReleaseAOEAttackerLocks(pThis);
 		state.TargetsInRange.clear();
-		state.BuildingsDisabled.clear();
+		ClearBuildingsDisabled(state.BuildingsDisabled);
 		state.ExtraWarpAdded = 0;
 		TemporalAOECachedMainOwners.erase(state.CachedMain);
 		state.CachedMain = nullptr;
@@ -355,17 +403,7 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 	// ──────────────────────────────────────────────────────────────
 	if (!pThis || pThis->Health <= 0 || pThis->InLimbo)
 	{
-		for (auto pTech : state.BuildingsDisabled)
-		{
-			if (!pTech) continue;
-			if (auto pBld = abstract_cast<BuildingClass*>(pTech))
-			{
-				if (pBld->Health > 0 && !pBld->InLimbo)
-					pBld->EnableTemporal();
-			}
-		}
-		state.BuildingsDisabled.clear();
-		// 清除所有副目标的 BeingWarpedOut
+		ClearBuildingsDisabled(state.BuildingsDisabled);
 		ReleaseAOEAttackerLocks(pThis);
 		for (auto pT : state.TargetsInRange) { if (pT) pT->BeingWarpedOut = false; }
 		state.TargetsInRange.clear();
@@ -382,16 +420,7 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 
 	if (!HasTemporalAOEWeapon(pThis))
 	{
-		for (auto pTech : state.BuildingsDisabled)
-		{
-			if (!pTech) continue;
-			if (auto pBld = abstract_cast<BuildingClass*>(pTech))
-			{
-				if (pBld->Health > 0 && !pBld->InLimbo)
-					pBld->EnableTemporal();
-			}
-		}
-		state.BuildingsDisabled.clear();
+		ClearBuildingsDisabled(state.BuildingsDisabled);
 		ReleaseAOEAttackerLocks(pThis);
 		for (auto pT : state.TargetsInRange) { if (pT) pT->BeingWarpedOut = false; }
 		state.TargetsInRange.clear();
@@ -442,14 +471,6 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 			Debug::Log("[TemporalAOE] %s cached main eliminated, eliminating %d secondaries\n",
 				pThis->GetTechnoType()->ID, state.TargetsInRange.size());
 
-			for (auto pTech : state.BuildingsDisabled)
-			{
-				if (!pTech) continue;
-				if (auto pBld = abstract_cast<BuildingClass*>(pTech))
-				{
-					if (pBld->Health > 0 && !pBld->InLimbo) pBld->EnableTemporal();
-				}
-			}
 			state.BuildingsDisabled.clear();
 
 			if (state.ExtraWarpAdded > 0 && pTemporal)
@@ -510,15 +531,7 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 				// 目标未被冻结 → CLEG 主动停止攻击 → 释放副目标
 				Debug::Log("[TemporalAOE] %s stopped attacking (target alive), releasing %d secondaries\n",
 					pThis->GetTechnoType()->ID, state.TargetsInRange.size());
-				for (auto pTech : state.BuildingsDisabled)
-				{
-					if (!pTech) continue;
-					if (auto pBld = abstract_cast<BuildingClass*>(pTech))
-					{
-						if (pBld->Health > 0 && !pBld->InLimbo) pBld->EnableTemporal();
-					}
-				}
-				state.BuildingsDisabled.clear();
+				ClearBuildingsDisabled(state.BuildingsDisabled);
 				ReleaseAOEAttackerLocks(pThis);
 				for (auto pT : state.TargetsInRange) { if (pT) pT->BeingWarpedOut = false; }
 				state.TargetsInRange.clear();
@@ -536,15 +549,7 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 			{
 				Debug::Log("[TemporalAOE] %s no main target, releasing %d orphan secondaries\n",
 					pThis->GetTechnoType()->ID, state.TargetsInRange.size());
-				for (auto pTech : state.BuildingsDisabled)
-				{
-					if (!pTech) continue;
-					if (auto pBld = abstract_cast<BuildingClass*>(pTech))
-					{
-						if (pBld->Health > 0 && !pBld->InLimbo) pBld->EnableTemporal();
-					}
-				}
-				state.BuildingsDisabled.clear();
+				ClearBuildingsDisabled(state.BuildingsDisabled);
 				ReleaseAOEAttackerLocks(pThis);
 				for (auto pT : state.TargetsInRange) { if (pT) pT->BeingWarpedOut = false; }
 				state.TargetsInRange.clear();
@@ -707,22 +712,47 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 					continue;
 				}
 
-				CellStruct candCell = CellClass::Coord2Cell(pCandidate->GetCoords());
-				int dx = candCell.X - targetCell.X;
-				int dy = candCell.Y - targetCell.Y;
-				int distSq = dx * dx + dy * dy;
-
-				if (distSq > cellSpreadSq)
+				// 建筑用 foundation 多格检测，其他用中心格
+				bool inRange = false;
+				if (auto pBld = abstract_cast<BuildingClass*>(pCandidate))
 				{
-					Debug::Log("  [%d] %s too far (cellDist=%.1f > %d)\n",
-						i, pType->ID, std::sqrt(static_cast<double>(distSq)), cellSpreadInt);
+					auto pCell = pBld->GetCell();
+					if (pCell)
+					{
+						CellStruct baseCell = pCell->MapCoords;
+						CellStruct const* pFoundation = pBld->GetFoundationData(false);
+						if (pFoundation)
+						{
+							CellStruct end = { 0x7FFF, 0x7FFF };
+							while (*pFoundation != end)
+							{
+								int dx = (baseCell.X + pFoundation->X) - targetCell.X;
+								int dy = (baseCell.Y + pFoundation->Y) - targetCell.Y;
+								if (dx * dx + dy * dy <= cellSpreadSq) { inRange = true; break; }
+								++pFoundation;
+							}
+						}
+					}
+				}
+				else
+				{
+					CellStruct candCell = CellClass::Coord2Cell(pCandidate->GetCoords());
+					int dx = candCell.X - targetCell.X;
+					int dy = candCell.Y - targetCell.Y;
+					inRange = (dx * dx + dy * dy <= cellSpreadSq);
+				}
+
+				if (!inRange)
+				{
+					Debug::Log("  [%d] %s too far (cellSpread=%d)\n",
+						i, pType->ID, cellSpreadInt);
 					continue;
 				}
 
 				if (!affectsAllies && (!pThis->Owner || pThis->Owner->IsAlliedWith(pCandidate)))
 				{
-					Debug::Log("  [%d] %s allied (cellDist=%.1f)\n",
-						i, pType->ID, std::sqrt(static_cast<double>(distSq)));
+					Debug::Log("  [%d] %s allied (in range but friendly)\n",
+						i, pType->ID);
 					continue;
 				}
 
@@ -746,8 +776,8 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 					}
 				}
 
-				Debug::Log("  [%d] %s ACCEPTED (HP=%d, cellDist=%.1f)\n",
-					i, pType->ID, pType->Strength, std::sqrt(static_cast<double>(distSq)));
+				Debug::Log("  [%d] %s ACCEPTED (HP=%d)\n",
+					i, pType->ID, pType->Strength);
 				newTargets.push_back(pCandidate);
 			}
 
@@ -774,12 +804,9 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 					targetsChanged = true;
 					if (auto pBld = abstract_cast<BuildingClass*>(pOld))
 					{
-						auto it = state.BuildingsDisabled.find(pBld);
-						if (it != state.BuildingsDisabled.end())
-						{
+						if (pBld->Health > 0 && !pBld->InLimbo)
 							pBld->EnableTemporal();
-							state.BuildingsDisabled.erase(it);
-						}
+						state.BuildingsDisabled.erase(pBld);
 					}
 				}
 			}
@@ -800,7 +827,8 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 
 				if (auto pBld = abstract_cast<BuildingClass*>(pNew))
 				{
-					pBld->DisableTemporal();
+					if (pBld->Health > 0 && !pBld->InLimbo)
+						pBld->DisableTemporal();
 					state.BuildingsDisabled.insert(pBld);
 				}
 			}
@@ -824,7 +852,10 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 				{
 					TemporalAOESecondaryClaims.erase(pOld);
 					if (pOld->Health > 0 && !pOld->InLimbo)
+					{
 						pOld->BeingWarpedOut = false;
+						ForceBuildingRedraw(pOld);
+					}
 				}
 			}
 
@@ -848,6 +879,7 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 				// 断言独占锁 + 冻结效果
 				TemporalAOESecondaryClaims[pNew] = pThis;
 				pNew->BeingWarpedOut = true;
+				ForceBuildingRedraw(pNew);
 			}
 
 			// ---------------------------------------------------------------
