@@ -306,7 +306,7 @@
                         <li class="doc-toc__item"><a href="#team-ops" class="doc-toc__link">11. 作战小队操作</a></li>
                         <li class="doc-toc__item"><a href="#base-node-cross-owner" class="doc-toc__link">12. 基地节点跨所属方判定</a></li>
                         <li class="doc-toc__item"><a href="#elapsed-time" class="doc-toc__link">13. 流逝时间检测</a></li>
-                        <li class="doc-toc__item"><a href="#berzerk-restore" class="doc-toc__link">14. 混乱恢复设置</a></li>
+                        <li class="doc-toc__item"><a href="#berserk" class="doc-toc__link">14. 混乱机制</a></li>
                     </ul>
                 </li>
                 <li class="doc-toc__item"><a href="#fa2-config" class="doc-toc__link">触发编辑器配置</a></li>
@@ -689,11 +689,23 @@ BaseNodeCrossOwners=                  ; boolean(布尔值)，默认 false</code>
             <li><code class="doc-code--inline">554</code> – 流逝时间(帧)... (参数：等待帧数)</li>
         </ul>
 
-        <!-- 14. 混乱恢复设置 -->
-        <h3 id="berzerk-restore" class="doc-heading--tertiary">14. 混乱恢复设置</h3>
+        <!-- 14. 混乱机制 -->
+        <h3 id="berserk" class="doc-heading--tertiary">14. 混乱机制</h3>
+
+        <h4 style="margin-top:1.2em;">14.1 混乱恢复设置</h4>
         <pre class="doc-code--block"><code>[General]
 BerzerkRestoreClearTarget=               ; boolean(布尔值)，默认 false</code></pre>
-        <p>当单位从混乱状态恢复时，是否自动清除当前攻击目标，防止单位无目标乱跑。</p>
+        <p>启用时，当单位从混乱状态恢复会自动清除当前攻击目标，停止移动，切换至Guard状态，用于防止单位乱跑。</p>
+
+        <h4 style="margin-top:1.2em;">14.2 弹头混乱缩减</h4>
+        <pre class="doc-code--block"><code>[WarheadType]
+BerserkReduce=               ; integer(整数)，默认 0</code></pre>
+        <p>当单位受到带有此标签的弹头攻击时（无论是否造成伤害），减少目标的混乱持续时间。</p>
+        <ul class="doc-list--content">
+            <li><strong>正值</strong>：减少对应帧数的混乱时间（加速清醒）。</li>
+            <li><strong>负值</strong>：延长对应帧数的混乱时间。</li>
+            <li>如果减少后的剩余时间 ≤ 0，则<strong>立即清除混乱状态</strong>，单位强制停止移动、进入警戒模式并清除攻击目标，防止乱跑。</li>
+        </ul>
 
         <!-- 触发编辑器配置 -->
         <h2 id="fa2-config" class="doc-heading--secondary">触发编辑器配置</h2>

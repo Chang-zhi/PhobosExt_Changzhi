@@ -8,10 +8,33 @@
 #include <Utilities/AresFunctions.h>
 #include <Ext/Techno/MyNew/TemporalAOE.h>
 #include <Ext/Techno/MyNew/BerzerkRestore.h>
+
 TechnoExt::ExtContainer TechnoExt::ExtMap;
 
 TechnoExt::ExtData::~ExtData()
 {
+}
+
+// =============================
+// effects
+
+void TechnoExt::ExtData::UpdateEffects()
+{
+	// 更新所有效果
+	for (auto& pEffect : this->Effects)
+	{
+		if (pEffect)
+			pEffect->OnUpdate();
+	}
+
+	// 清理已死亡的效果
+	for (auto it = this->Effects.begin(); it != this->Effects.end(); )
+	{
+		if (!(*it) || !(*it)->IsAlive())
+			it = this->Effects.erase(it);
+		else
+			++it;
+	}
 }
 
 // =============================
