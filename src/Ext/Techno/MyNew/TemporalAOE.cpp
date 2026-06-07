@@ -34,6 +34,9 @@ std::unordered_set<TechnoClass* /*正在被抹除的目标*/> TemporalAOEWarping
 /* 3. 主目标→攻击者映射 */
 std::unordered_map<TechnoClass* /*主目标*/, TechnoClass* /*攻击者*/> TemporalAOECachedMainOwners;
 
+/* 4. 读档后第一帧深度清理标记 */
+bool s_PostLoadCleanupNeeded = false;
+
 // 前向声明
 static void ForceTechnoRedraw(TechnoClass* pTechno);
 static void ClearBuildingsDisabled(std::unordered_set<TechnoClass*>& set);
@@ -109,10 +112,78 @@ void InvalidateAOESecondaryClaims(void* ptr)
 }
 
 // 全局检测所有副目标独占锁的合法性，释放无效记录并解冻对应单位
+// 读档后第一帧深度清理（此时引擎指针修复已完成）
+static void PostLoadCleanup()
+{
+	Debug::Log("[TemporalAOE] Post-load cleanup: fixing orphaned state\n");
+
+	// 1. 扫描 TemporalClass::Array 中残存的假 Temporal 实例
+	//    此时指针已修复，可安全访问 pTemp->Target
+	{
+		std::vector<TemporalClass*> fakes;
+		for (int i = 0; i < TemporalClass::Array.Count; ++i)
+		{
+			auto pTemp = TemporalClass::Array.Items[i];
+			if (!pTemp) continue;
+			if (pTemp->WarpPerStep == 0 && pTemp->WarpRemaining == 0x7FFFFFFF)
+				fakes.push_back(pTemp);
+		}
+		for (auto pTemp : fakes)
+		{
+			Debug::Log("[TemporalAOE]   removing fake temporal %08X (target %08X)\n",
+				(DWORD)pTemp, (DWORD)pTemp->Target);
+			if (pTemp->Target)
+			{
+				pTemp->Target->TemporalTargetingMe = nullptr;
+				pTemp->Target->BeingWarpedOut = false;
+			}
+			pTemp->Owner = nullptr;
+			pTemp->Target = nullptr;
+			GameDelete(pTemp);
+		}
+	}
+
+	// 2. 扫描 TechnoClass::Array 清理孤儿 BeingWarpedOut
+	for (int i = 0; i < TechnoClass::Array.Count; ++i)
+	{
+		auto pTech = TechnoClass::Array.Items[i];
+		if (!pTech) continue;
+		if (pTech->BeingWarpedOut && !pTech->TemporalTargetingMe)
+		{
+			pTech->BeingWarpedOut = false;
+			Debug::Log("[TemporalAOE]   cleaned orphan BeingWarpedOut on %08X\n",
+				(DWORD)pTech);
+		}
+	}
+
+	// 3. 恢复被禁用的建筑 + 刷新所属方感知
+	for (int i = 0; i < TechnoClass::Array.Count; ++i)
+	{
+		auto pTech = TechnoClass::Array.Items[i];
+		if (!pTech) continue;
+		if (auto pBld = abstract_cast<BuildingClass*>(pTech))
+		{
+			pBld->EnableTemporal();
+			if (pBld->Owner)
+			{
+				pBld->Owner->RecheckPower = true;
+				pBld->Owner->RecheckRadar = true;
+			}
+		}
+	}
+}
+
 // 每帧由全局 hook 调用，不依赖具体攻击者的 AI 是否运行
 // 没招了, 游戏中一直存在没有被攻击但是还在冻结状态的单位, 只能全局检查了.
 void ValidateGlobalSecondaryClaims()
 {
+	// 读档后第一帧深度清理（引擎指针修复完成后）
+	if (s_PostLoadCleanupNeeded)
+	{
+		s_PostLoadCleanupNeeded = false;
+		PostLoadCleanup();
+	}
+
 	// 递归防护：防止级联回调，每帧重置
 	static int s_RecursionGuard = 0;
 	static DWORD s_lastRecFrame = 0;
@@ -327,7 +398,15 @@ static void ClearBuildingsDisabled(std::unordered_set<TechnoClass*>& set)
 		if (auto pBld = abstract_cast<BuildingClass*>(pTech))
 		{
 			if (pBld->Health > 0 && !pBld->InLimbo)
+			{
 				pBld->EnableTemporal();
+				ForceTechnoRedraw(pBld);
+				if (pBld->Owner)
+				{
+					pBld->Owner->RecheckPower = true;
+					pBld->Owner->RecheckRadar = true;
+				}
+			}
 		}
 	}
 	set.clear();
@@ -462,6 +541,17 @@ void DestroyFakeTemporalsByTargetList(const std::vector<TechnoClass*>& targets)
 		DestroyFakeTemporal(pTarget);
 }
 
+// 销毁所有假 Temporal（用于存档前清理）
+void DestroyAllFakeTemporals()
+{
+	// 拷贝键列表，防迭代失效
+	std::vector<TechnoClass*> toRemove;
+	for (auto& pair : FakeTemporals)
+		toRemove.push_back(pair.first);
+	for (auto pTarget : toRemove)
+		DestroyFakeTemporal(pTarget);
+}
+
 static void WarpOutTarget(TechnoClass* pTarget, TechnoClass* pKiller, TechnoExt::TemporalAOEState& state)
 {
 	if (!pTarget)
@@ -587,7 +677,7 @@ void InitTemporalAOEState(TechnoClass* pAttacker)
 	state.CachedMain = nullptr;
 	state.CachedMainDead = false;
 	state.ScanInterval = 5;
-	state.ScanCounter = 0;
+	state.ScanCounter = state.ScanInterval; // 初始化后第一次 ++ 即触发扫描，避免读档后延迟
 	state.TargetsInRange.clear();
 	state.BuildingsDisabled.clear();
 }
@@ -1073,7 +1163,15 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 					if (auto pBld = abstract_cast<BuildingClass*>(pOld))
 					{
 						if (pBld->Health > 0 && !pBld->InLimbo)
+						{
 							pBld->EnableTemporal();
+							ForceTechnoRedraw(pBld);
+							if (pBld->Owner)
+							{
+								pBld->Owner->RecheckPower = true;
+								pBld->Owner->RecheckRadar = true;
+							}
+						}
 						state.BuildingsDisabled.erase(pBld);
 					}
 				}
@@ -1099,7 +1197,15 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 				if (auto pBld = abstract_cast<BuildingClass*>(pNew))
 				{
 					if (pBld->Health > 0 && !pBld->InLimbo)
+					{
 						pBld->DisableTemporal();
+						ForceTechnoRedraw(pBld);
+						if (pBld->Owner)
+						{
+							pBld->Owner->RecheckPower = true;
+							pBld->Owner->RecheckRadar = true;
+						}
+					}
 					state.BuildingsDisabled.insert(pBld);
 				}
 			}

@@ -8,6 +8,8 @@
 #include <Utilities/AresFunctions.h>
 #include <Ext/Techno/MyNew/TemporalAOE.h>
 #include <Ext/Techno/MyNew/BerzerkRestore.h>
+#include <Ext/Techno/MyNew/TemporalExclusive.h>
+#include <TemporalClass.h>
 
 TechnoExt::ExtContainer TechnoExt::ExtMap;
 
@@ -56,12 +58,18 @@ void TechnoExt::ExtData::Serialize(T& Stm)
 		.Process(this->AOEState.ScanCounter)
 		;
 
-	// 读档时：重置指针状态（不序列化指针，下次更新自动重建）
+	// 读档时：完全重置 AOEState（存档中的标记位不可信，下次更新自动重建）
 	if constexpr (std::is_same_v<T, PhobosStreamReader>)
 	{
+		// 全部重置为默认值，消除状态不一致风险
+		this->AOEState.Active = false;
 		this->AOEState.CachedMain = nullptr;
 		this->AOEState.TargetsInRange.clear();
 		this->AOEState.BuildingsDisabled.clear();
+		this->AOEState.CachedMainDead = false;
+		this->AOEState.WarpingOut = false;
+		this->AOEState.ExtraWarpAdded = 0;
+		this->AOEState.ScanCounter = 0;
 	}
 }
 
@@ -113,11 +121,18 @@ void TechnoExt::ExtData::SaveToStream(PhobosStreamWriter& Stm)
 
 bool TechnoExt::LoadGlobals(PhobosStreamReader& Stm)
 {
-	// 读档时清理全局 maps（旧会话的指针在新会话中无效）
+	// ⚠ 此时引擎指针修复尚未完成，不能访问任何游戏对象指针
+
+	// 清理全局 maps（旧会话的指针在新会话中无效）
 	FakeTemporals.clear();
 	TemporalAOESecondaryClaims.clear();
 	TemporalAOEWarpingOutTargets.clear();
 	TemporalAOECachedMainOwners.clear();
+	TemporalExclusiveTargetsMap.clear();
+	BerzerkRestoreClearCache();
+
+	// 标记：指针修复完成后在第一帧执行深度清理
+	s_PostLoadCleanupNeeded = true;
 
 	return Stm
 		.Success();

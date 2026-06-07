@@ -32,6 +32,7 @@ void CreateFakeTemporal(TechnoClass* pAttacker, TechnoClass* pTarget);
 void DestroyFakeTemporal(TechnoClass* pTarget);
 void DestroyFakeTemporalsByAttacker(TechnoClass* pAttacker);
 void DestroyFakeTemporalsByTargetList(const std::vector<TechnoClass*>& targets);
+void DestroyAllFakeTemporals();
 
 // 初始化攻击者的 AOE 状态（从弹头配置中读取参数）
 void InitTemporalAOEState(TechnoClass* pAttacker);
@@ -47,3 +48,6 @@ void InvalidateAOESecondaryClaims(void* ptr);
 
 // 全局检测所有副目标独占锁的合法性，释放无效记录并解冻对应单位
 void ValidateGlobalSecondaryClaims();
+
+// 读档后第一帧深度清理标记（引擎指针修复完成后执行）
+extern bool s_PostLoadCleanupNeeded;

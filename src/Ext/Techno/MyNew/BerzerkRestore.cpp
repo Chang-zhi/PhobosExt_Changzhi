@@ -23,6 +23,11 @@ void BerzerkRestorePointerInvalidate(void* ptr)
 	}
 }
 
+void BerzerkRestoreClearCache()
+{
+	BerzerkStateCache.clear();
+}
+
 // ============================================================
 // 检测 Berzerk 从 true → false 的转变（混乱恢复）
 // 如果规则允许，清除目标防止乱跑
