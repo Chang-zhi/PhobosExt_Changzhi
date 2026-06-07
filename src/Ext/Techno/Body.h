@@ -14,6 +14,7 @@
 
 #include <vector>
 #include <set>
+#include <unordered_set>
 #include <memory>
 
 class TechnoExt
@@ -42,7 +43,7 @@ public:
 		int ScanCounter = 0;                    // 扫描计数器
 
 		std::vector<TechnoClass*> TargetsInRange;      // 范围内的副目标列表
-		std::set<TechnoClass*> BuildingsDisabled;      // 已被 DisableTemporal 的建筑
+		std::unordered_set<TechnoClass*> BuildingsDisabled;      // 已被 DisableTemporal 的建筑
 	};
 
 	class ExtData final : public Extension<TechnoClass>

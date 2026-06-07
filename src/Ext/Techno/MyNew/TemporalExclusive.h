@@ -1,11 +1,11 @@
 #pragma once
 
-#include <map>
+#include <unordered_map>
 
 class TechnoClass;
 
 // Key: 目标 (TechnoClass*), Value: 攻击者 (TechnoClass*)
-extern std::map<TechnoClass*, TechnoClass*> TemporalExclusiveTargetsMap;
+extern std::unordered_map<TechnoClass*, TechnoClass*> TemporalExclusiveTargetsMap;
 
 // Helper: Check if a unit has an exclusive temporal weapon
 bool IsCurrentUseExclusiveTemporalWeapon(TechnoClass* pTechno);

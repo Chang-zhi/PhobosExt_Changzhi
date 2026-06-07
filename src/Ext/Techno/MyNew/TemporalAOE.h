@@ -1,27 +1,37 @@
 #pragma once
 
-#include <map>
-#include <set>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 class TechnoClass;
 class TemporalClass;
 
-// ── 1. 副目标独占锁 ─────────────────────────────────────────────
-// 映射: secondary target → AOE attacker
-// 写入：UpdateTemporalAOE() 扫描循环；读取：CanFire 钩子拦截
-// 删除：范围离开/攻击者死亡/目标销毁时
-// 兜底：ValidateGlobalSecondaryClaims() 每帧清理
-extern std::map<TechnoClass* /*目标*/, TechnoClass* /*攻击者*/> TemporalAOESecondaryClaims;
+// ── 副目标假 Temporal 条目 ──────────────────────────────────────
+// 每个副目标对应一个假 TemporalClass 实例，驱动 BeingWarpedOut 效果
+struct FakeTemporalEntry
+{
+	TemporalClass* FakeTemporal;
+	TechnoClass*   Attacker;
+};
+
+// 映射: 副目标 → 假 Temporal 条目
+extern std::unordered_map<TechnoClass* /*副目标*/, FakeTemporalEntry> FakeTemporals;
+
+// ── 1. 副目标独占锁（已废弃，保留为冗余） ──────────────────────
+extern std::unordered_map<TechnoClass* /*目标*/, TechnoClass* /*攻击者*/> TemporalAOESecondaryClaims;
 
 // ── 2. 抹除中锁定集合 ───────────────────────────────────────────
-// 防止批量 WarpOutTarget 时重复销毁同一目标
-extern std::set<TechnoClass* /*正在被抹除的目标*/> TemporalAOEWarpingOutTargets;
+extern std::unordered_set<TechnoClass* /*正在被抹除的目标*/> TemporalAOEWarpingOutTargets;
 
 // ── 3. 主目标→攻击者映射 ───────────────────────────────────────
-// 解决时序竞态：RegisterDestruction 钩子(0x702E4E)精确检测主目标死亡
-// 读档后由 Body.cpp 反序列化从 CachedMain + OwnerObject() 重建
-extern std::map<TechnoClass* /*主目标*/, TechnoClass* /*攻击者*/> TemporalAOECachedMainOwners;
+extern std::unordered_map<TechnoClass* /*主目标*/, TechnoClass* /*攻击者*/> TemporalAOECachedMainOwners;
+
+// ── 假 Temporal 管理 ────────────────────────────────────────────
+void CreateFakeTemporal(TechnoClass* pAttacker, TechnoClass* pTarget);
+void DestroyFakeTemporal(TechnoClass* pTarget);
+void DestroyFakeTemporalsByAttacker(TechnoClass* pAttacker);
+void DestroyFakeTemporalsByTargetList(const std::vector<TechnoClass*>& targets);
 
 // 初始化攻击者的 AOE 状态（从弹头配置中读取参数）
 void InitTemporalAOEState(TechnoClass* pAttacker);
@@ -36,6 +46,4 @@ void ReleaseAOEAttackerLocks(TechnoClass* pAttacker);
 void InvalidateAOESecondaryClaims(void* ptr);
 
 // 全局检测所有副目标独占锁的合法性，释放无效记录并解冻对应单位
-// 在每帧的全局 hook 中调用，不依赖具体攻击者的 AI 状态
 void ValidateGlobalSecondaryClaims();
-void ReleaseAOEAttackerLocks(TechnoClass* pAttacker);

@@ -15,30 +15,27 @@
 #include <set>
 #include <cmath>
 
+#include <TemporalClass.h>
 #include <Ext/Techno/Body.h>
 #include <Ext/WarheadType/Body.h>
 #include <Utilities/Debug.h>
 
-/* 1. 副目标独占锁 (副目标->攻击者)
-* 映射: secondary target → AOE attacker
-* 防止多个 AOE 攻击者同时锁定/冻结同一个副目标。
-* 每个副目标只能被一个攻击者冻结，其他攻击者即使自己的 AOE 扫描到它，也会因这个锁而跳过。
-* (不这样可能有崩溃的风险)
-*/
-std::map<TechnoClass* /*目标*/, TechnoClass* /*攻击者*/> TemporalAOESecondaryClaims;
+// ── 副目标假 Temporal 映射 ──────────────────────────────────────
+// 每个副目标对应一个从游戏 Array/链表拆除的 TemporalClass 实例，
+// 驱动 TemporalTargetingMe + BeingWarpedOut，游戏不更新它。
+std::unordered_map<TechnoClass* /*副目标*/, FakeTemporalEntry> FakeTemporals;
 
-/* 2. 抹除中锁定集合
-* 标记正被批量抹除（WarpOutTarget）的副目标集合。
-* 防止同一目标在批量抹除过程中被多个攻击者重复调用，避免二次销毁崩溃。
-*/
-std::set<TechnoClass* /*正在被抹除的目标*/> TemporalAOEWarpingOutTargets;
+/* 1. 副目标独占锁 (已废弃，保留为冗余) */
+std::unordered_map<TechnoClass* /*目标*/, TechnoClass* /*攻击者*/> TemporalAOESecondaryClaims;
 
-/* 3. 主目标→攻击者映射
-* 映射: cached main target → AOE attacker
-* 用途：解决时序竞态问题, 通过钩子精确检测主目标死亡，避免误释放副目标。
-* 读档后在 Body.cpp 反序列化中从 CachedMain + OwnerObject() 重建
-*/
-std::map<TechnoClass* /*主目标*/, TechnoClass* /*攻击者*/> TemporalAOECachedMainOwners;
+/* 2. 抹除中锁定集合 */
+std::unordered_set<TechnoClass* /*正在被抹除的目标*/> TemporalAOEWarpingOutTargets;
+
+/* 3. 主目标→攻击者映射 */
+std::unordered_map<TechnoClass* /*主目标*/, TechnoClass* /*攻击者*/> TemporalAOECachedMainOwners;
+
+// 前向声明
+static void ForceTechnoRedraw(TechnoClass* pTechno);
 
 // ============================================================
 // RegisterDestruction 钩子：精确检测主目标被游戏抹除
@@ -81,6 +78,17 @@ void ReleaseAOEAttackerLocks(TechnoClass* pAttacker)
 void InvalidateAOESecondaryClaims(void* ptr)
 {
 	if (!ptr) return;
+	// FakeTemporals (副目标→假 Temporal)：先收集再清理，防迭代失效
+	{
+		std::vector<TechnoClass*> toRemove;
+		for (auto& ft : FakeTemporals)
+		{
+			if (ft.first == ptr || ft.second.Attacker == ptr)
+				toRemove.push_back(ft.first);
+		}
+		for (auto pTarget : toRemove)
+			DestroyFakeTemporal(pTarget);
+	}
 	// TemporalAOESecondaryClaims (副目标->攻击者)
 	for (auto it = TemporalAOESecondaryClaims.begin(); it != TemporalAOESecondaryClaims.end(); )
 	{
@@ -104,10 +112,16 @@ void InvalidateAOESecondaryClaims(void* ptr)
 // 没招了, 游戏中一直存在没有被攻击但是还在冻结状态的单位, 只能全局检查了.
 void ValidateGlobalSecondaryClaims()
 {
-	// 递归防护, 崩过几次了, 强行限制每帧最多递归3层
+	// 递归防护：防止级联回调，每帧重置
 	static int s_RecursionGuard = 0;
+	static DWORD s_lastRecFrame = 0;
+	if (Unsorted::CurrentFrame != s_lastRecFrame)
+	{
+		s_lastRecFrame = Unsorted::CurrentFrame;
+		s_RecursionGuard = 0;
+	}
 	struct RecursionCounter { ~RecursionCounter() { --s_RecursionGuard; } };
-	if (++s_RecursionGuard > 3) return;
+	if (++s_RecursionGuard > 10) return;
 	RecursionCounter guard;
 
 	// 清理上一帧积累的 TemporalAOEWarpingOutTargets（墓碑条目）
@@ -124,8 +138,10 @@ void ValidateGlobalSecondaryClaims()
 		// 目标无效
 		if (!pTarget || pTarget->InLimbo)
 			invalid = true;
-		// 攻击者无效
-		else if (!pAttacker || pAttacker->Health <= 0 || pAttacker->InLimbo)
+		// 攻击者无效（OpenTopped 乘员虽然 InLimbo 但仍然活跃）
+		else if (!pAttacker || pAttacker->Health <= 0
+			|| (pAttacker->InLimbo
+				&& !(pAttacker->Transporter && pAttacker->Transporter->GetTechnoType()->OpenTopped)))
 			invalid = true;
 		// 攻击者被冻住
 		else if (pAttacker->BeingWarpedOut)
@@ -136,9 +152,15 @@ void ValidateGlobalSecondaryClaims()
 			if (!pExt->AOEState.Active)
 				invalid = true;
 			// 攻击者的时间束目标已死或不存在
+			// OpenTopped 乘员 TemporalImUsing->Target 可能临时丢失，检查 CachedMain 兜底
 			else if (!pAttacker->TemporalImUsing || !pAttacker->TemporalImUsing->Target
 				|| pAttacker->TemporalImUsing->Target->Health <= 0)
-				invalid = true;
+			{
+				if (!(pExt->AOEState.CachedMain
+					&& pExt->AOEState.CachedMain->Health > 0
+					&& !pExt->AOEState.CachedMain->InLimbo))
+					invalid = true;
+			}
 		}
 		else
 		{
@@ -147,8 +169,7 @@ void ValidateGlobalSecondaryClaims()
 
 		if (invalid)
 		{
-			if (pTarget && pTarget->Health > 0)
-				pTarget->BeingWarpedOut = false;
+			DestroyFakeTemporal(pTarget);
 			it = TemporalAOESecondaryClaims.erase(it);
 		}
 		else
@@ -162,8 +183,10 @@ void ValidateGlobalSecondaryClaims()
 	{
 		auto pTarget = it->first;
 		auto pOwner = it->second;
+		bool pOwnerInLimbo = pOwner && pOwner->InLimbo
+			&& !(pOwner->Transporter && pOwner->Transporter->GetTechnoType()->OpenTopped);
 		bool invalid = !pTarget || pTarget->Health <= 0 || pTarget->InLimbo
-			|| !pOwner || pOwner->Health <= 0 || pOwner->InLimbo
+			|| !pOwner || pOwner->Health <= 0 || pOwnerInLimbo
 			|| pOwner->BeingWarpedOut;
 		if (!invalid)
 		{
@@ -183,17 +206,46 @@ void ValidateGlobalSecondaryClaims()
 			++it;
 	}
 
-	// 兜底（每 15 帧）：遍历所有 TechnoClass，清除 BeingWarpedOut=true 但不在全局锁中
-	// 且不是任何时间束主目标的孤立冻结（防止各种边缘情况残留）
+	// 兜底（每 15 帧）：清理 FakeTemporals 中失效的条目 + 孤立 BeingWarpedOut
 	{
 		static int cleanupCounter = 0;
 		if (++cleanupCounter >= 15)
 		{
 			cleanupCounter = 0;
+
+			// 清理 FakeTemporals 中目标已死的条目
+			for (auto it = FakeTemporals.begin(); it != FakeTemporals.end(); )
+			{
+				auto pTarget = it->first;
+				if (!pTarget || pTarget->Health <= 0 || pTarget->InLimbo)
+				{
+					// 手动清理（不用 DestroyFakeTemporal 避免递归）
+					auto pTemp = it->second.FakeTemporal;
+					if (pTemp)
+					{
+						pTarget->TemporalTargetingMe = nullptr;
+						pTarget->BeingWarpedOut = false;
+						ForceTechnoRedraw(pTarget);
+						pTemp->Target = nullptr;
+						pTemp->Owner = nullptr;
+						TemporalClass::Array.AddItem(pTemp);
+						GameDelete(pTemp);
+					}
+					it = FakeTemporals.erase(it);
+				}
+				else
+				{
+					++it;
+				}
+			}
+
+			// 清理孤立 BeingWarpedOut（没有 FakeTemporal 也没有 TemporalTargetingMe）
 			for (int i = 0; i < TechnoClass::Array.Count; ++i)
 			{
 				auto pTech = TechnoClass::Array.Items[i];
 				if (!pTech || pTech->Health <= 0 || pTech->InLimbo || !pTech->BeingWarpedOut)
+					continue;
+				if (FakeTemporals.count(pTech))
 					continue;
 				if (TemporalAOESecondaryClaims.find(pTech) != TemporalAOESecondaryClaims.end())
 					continue;
@@ -209,34 +261,46 @@ void ValidateGlobalSecondaryClaims()
 // 辅助函数
 // ============================================================
 
-// 强制建筑物重绘（遍历地基所有 Cell 触发 MarkForRedraw）
-static void ForceBuildingRedraw(TechnoClass* pTechno)
+// 强制单位重绘（刷新 BeingWarpedOut 视觉状态）
+static void ForceTechnoRedraw(TechnoClass* pTechno)
 {
-	auto pBld = abstract_cast<BuildingClass*>(pTechno);
-	if (!pBld || !pBld->Type) return;
-	auto pCell = pBld->GetCell();
-	if (!pCell) return;
-	CellStruct baseCell = pCell->MapCoords;
-	CellStruct const* pFoundation = pBld->GetFoundationData(false);
-	if (!pFoundation) return;
-	int occupyHeight = pBld->Type->OccupyHeight;
-	if (occupyHeight <= 0) occupyHeight = 1;
-	CellStruct end = { 0x7FFF, 0x7FFF };
-	while (*pFoundation != end)
+	if (!pTechno) return;
+
+	// 建筑物：遍历地基所有 Cell
+	if (auto pBld = abstract_cast<BuildingClass*>(pTechno))
 	{
-		auto actualCell = baseCell + *pFoundation;
-		for (int i = occupyHeight; i > 0; --i)
+		if (!pBld->Type) return;
+		auto pCell = pBld->GetCell();
+		if (!pCell) return;
+		CellStruct baseCell = pCell->MapCoords;
+		CellStruct const* pFoundation = pBld->GetFoundationData(false);
+		if (!pFoundation) return;
+		int occupyHeight = pBld->Type->OccupyHeight;
+		if (occupyHeight <= 0) occupyHeight = 1;
+		CellStruct end = { 0x7FFF, 0x7FFF };
+		while (*pFoundation != end)
 		{
-			if (auto pRedraw = MapClass::Instance.TryGetCellAt(actualCell))
-				pRedraw->MarkForRedraw();
-			--actualCell.X; --actualCell.Y;
+			auto actualCell = baseCell + *pFoundation;
+			for (int i = occupyHeight; i > 0; --i)
+			{
+				if (auto pRedraw = MapClass::Instance.TryGetCellAt(actualCell))
+					pRedraw->MarkForRedraw();
+				--actualCell.X; --actualCell.Y;
+			}
+			++pFoundation;
 		}
-		++pFoundation;
+	}
+	// 其他单位：重绘所在格
+	else
+	{
+		auto pCell = MapClass::Instance.TryGetCellAt(pTechno->GetCoords());
+		if (pCell)
+			pCell->MarkForRedraw();
 	}
 }
 
 // 安全清除建筑禁用列表（逐个 EnableTemporal 后清空）
-static void ClearBuildingsDisabled(std::set<TechnoClass*>& set)
+static void ClearBuildingsDisabled(std::unordered_set<TechnoClass*>& set)
 {
 	for (auto pTech : set)
 	{
@@ -260,6 +324,112 @@ static void PlayWarpAwayAnim(TechnoClass* pTarget)
 		if (pAnim && pTarget->Owner)
 			pAnim->Owner = pTarget->Owner;
 	}
+}
+
+// ============================================================
+// 假 Temporal 管理
+// ============================================================
+
+// 为副目标创建假 TemporalClass（从游戏 Array/链表拆除，游戏不更新它）
+void CreateFakeTemporal(TechnoClass* pAttacker, TechnoClass* pTarget)
+{
+	if (!pAttacker || !pTarget)
+		return;
+
+	// 已有假 Temporal → 跳过
+	if (FakeTemporals.count(pTarget))
+		return;
+
+	// 创建 TemporalClass（构造会自动加入 Array 和 linked list）
+	auto pTemp = GameCreate<TemporalClass>(pAttacker);
+	if (!pTemp)
+		return;
+
+	// 从游戏 Array 拆除（不让游戏每帧更新它）
+	TemporalClass::Array.Remove(pTemp);
+
+	// 从 linked list 拆除
+	if (pTemp->PrevTemporal)
+		pTemp->PrevTemporal->NextTemporal = pTemp->NextTemporal;
+	if (pTemp->NextTemporal)
+		pTemp->NextTemporal->PrevTemporal = pTemp->PrevTemporal;
+	pTemp->NextTemporal = nullptr;
+	pTemp->PrevTemporal = nullptr;
+
+	// 配置假 Temporal
+	pTemp->Target = pTarget;
+	pTemp->WarpRemaining = 0x7FFFFFFF; // 永不归零
+	pTemp->WarpPerStep = 0;            // 每帧不扣减
+
+	// 设目标关联，驱动游戏渲染
+	pTarget->TemporalTargetingMe = pTemp;
+	pTarget->BeingWarpedOut = true;
+
+	// 强制重绘，立即呈现冻结效果
+	ForceTechnoRedraw(pTarget);
+
+	// 登记到映射
+	FakeTemporals[pTarget] = { pTemp, pAttacker };
+}
+
+// 销毁副目标的假 Temporal
+void DestroyFakeTemporal(TechnoClass* pTarget)
+{
+	if (!pTarget)
+		return;
+
+	auto it = FakeTemporals.find(pTarget);
+	if (it == FakeTemporals.end())
+		return;
+
+	auto pTemp = it->second.FakeTemporal;
+	if (pTemp)
+	{
+		// 清除目标关联
+		if (pTemp->Target == pTarget)
+		{
+			pTarget->TemporalTargetingMe = nullptr;
+			pTarget->BeingWarpedOut = false;
+			pTemp->Target = nullptr;
+		}
+
+		// 清除 Owner 防止析构时访问
+		pTemp->Owner = nullptr;
+
+		// 强制重绘，刷新视觉状态
+		ForceTechnoRedraw(pTarget);
+
+		// 插回 Array（让析构函数安全地移除自己）
+		TemporalClass::Array.AddItem(pTemp);
+
+		// 销毁
+		GameDelete(pTemp);
+	}
+
+	FakeTemporals.erase(it);
+}
+
+// 销毁某个攻击者的所有假 Temporal
+void DestroyFakeTemporalsByAttacker(TechnoClass* pAttacker)
+{
+	if (!pAttacker) return;
+
+	// 拷贝键列表，防迭代失效
+	std::vector<TechnoClass*> toRemove;
+	for (auto& pair : FakeTemporals)
+	{
+		if (pair.second.Attacker == pAttacker)
+			toRemove.push_back(pair.first);
+	}
+	for (auto pTarget : toRemove)
+		DestroyFakeTemporal(pTarget);
+}
+
+// 批量销毁列表中目标的假 Temporal
+void DestroyFakeTemporalsByTargetList(const std::vector<TechnoClass*>& targets)
+{
+	for (auto pTarget : targets)
+		DestroyFakeTemporal(pTarget);
 }
 
 static void WarpOutTarget(TechnoClass* pTarget, TechnoClass* pKiller, TechnoExt::TemporalAOEState& state)
@@ -315,10 +485,20 @@ static void WarpOutTarget(TechnoClass* pTarget, TechnoClass* pKiller, TechnoExt:
 		return;
 	}
 
-	// killer 可能已被销毁，多层校验
+	// 确定击杀者（经验归属）：优先用 killer，OpenTopped 乘客经验归载具
 	TechnoClass* pSource = pTarget;
-	if (pKiller && pKiller->Health > 0 && !pKiller->InLimbo && pKiller->GetTechnoType())
-		pSource = pKiller;
+	if (pKiller && pKiller->Health > 0 && pKiller->GetTechnoType())
+	{
+		if (!pKiller->InLimbo)
+		{
+			pSource = pKiller;
+		}
+		else if (pKiller->Transporter && pKiller->Transporter->GetTechnoType()->OpenTopped
+			&& pKiller->Transporter->Health > 0 && !pKiller->Transporter->InLimbo)
+		{
+			pSource = pKiller->Transporter;
+		}
+	}
 
 	Debug::Log("[TemporalAOE] WarpOutTarget: eliminating %s (HP=%d)\n",
 		pTarget->GetTechnoType()->ID, pTarget->Health);
@@ -407,27 +587,59 @@ bool HasTemporalAOEWeapon(TechnoClass* pAttacker)
 // ============================================================
 void TechnoExt::ExtData::UpdateTemporalAOE()
 {
-	// 递归防护：大量单位同时入 AOE 范围可能触发级联回调
+	// 递归防护：防止级联回调导致无限递归
+	// 每帧重置的全局计数器，确保一帧内不会无限递归
 	static int s_RecursionGuard = 0;
+	static DWORD s_lastGuardFrame = 0;
+	if (Unsorted::CurrentFrame != s_lastGuardFrame)
+	{
+		s_lastGuardFrame = Unsorted::CurrentFrame;
+		s_RecursionGuard = 0;
+	}
 	struct RecursionCounter { ~RecursionCounter() { --s_RecursionGuard; } };
-	if (++s_RecursionGuard > 3) return;
+	if (++s_RecursionGuard > 10)
+	{
+		Debug::Log("[TemporalAOE] RecursionGuard triggered! s_RecursionGuard=%d\n", s_RecursionGuard);
+		return;
+	}
 	RecursionCounter guard;
 
 	auto pThis = this->OwnerObject();
 	auto& state = this->AOEState;
 
-	// 防止重入：正在抹除副目标时不做任何操作
-	if (state.WarpingOut)
-		return;
-
-	// OpenTopped 乘员禁用 AOE（要塞内开火存在指针异常和状态机误判，直接禁止）
+	// Debug: OpenTopped 乘员 AOE 诊断
 	if (pThis && pThis->Transporter && pThis->Transporter->GetTechnoType()->OpenTopped)
-		return;
-
-	// 防护：攻击者自己被冻住了 → 仅关闭自身 AOE，不触碰副目标状态（防级联回调）
-	if (pThis && pThis->BeingWarpedOut)
 	{
+		Debug::Log("[TemporalAOE-DBG] %s is OpenTopped passenger, transporter=%s\n",
+			pThis->GetTechnoType()->ID,
+			pThis->Transporter->GetTechnoType()->ID);
+		Debug::Log("[TemporalAOE-DBG]   TemporalImUsing=%08X, Target=%08X, Active=%d\n",
+			(DWORD)pThis->TemporalImUsing,
+			pThis->TemporalImUsing ? (DWORD)pThis->TemporalImUsing->Target : 0,
+			state.Active);
+		auto pW = TechnoExt::GetCurrentWeapon(pThis);
+		Debug::Log("[TemporalAOE-DBG]   GetCurrentWeapon=%08X, Warhead=%08X, Temporal=%d\n",
+			(DWORD)pW, pW ? (DWORD)pW->Warhead : 0,
+			pW && pW->Warhead ? pW->Warhead->Temporal : -1);
+		if (pW && pW->Warhead)
+		{
+			auto pWHExt = WarheadTypeExt::ExtMap.Find(pW->Warhead);
+			Debug::Log("[TemporalAOE-DBG]   WarheadExt=%08X, TemporalAOE_Enable=%d\n",
+				(DWORD)pWHExt, pWHExt ? pWHExt->TemporalAOE_Enable.Get() : -1);
+		}
+	}
+
+	// Debug: 路径跟踪
+	bool isOT = pThis && pThis->Transporter && pThis->Transporter->GetTechnoType()->OpenTopped;
+
+	if (state.WarpingOut) { if (isOT) Debug::Log("[TemporalAOE-DBG]   EXIT: WarpingOut\n"); return; }
+
+	if (pThis && (pThis->BeingWarpedOut
+		|| (pThis->Transporter && pThis->Transporter->BeingWarpedOut)))
+	{
+		if (isOT) Debug::Log("[TemporalAOE-DBG]   EXIT: BeingWarpedOut\n");
 		ReleaseAOEAttackerLocks(pThis);
+		DestroyFakeTemporalsByAttacker(pThis);
 		state.TargetsInRange.clear();
 		ClearBuildingsDisabled(state.BuildingsDisabled);
 		state.ExtraWarpAdded = 0;
@@ -440,14 +652,13 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 
 	auto pTemporal = pThis ? pThis->TemporalImUsing : nullptr;
 
-	// ──────────────────────────────────────────────────────────────
-	// 守卫检查：CLEG 状态过滤（OpenTopped 乘员已在入口拦截）
-	// ──────────────────────────────────────────────────────────────
-	if (!pThis || pThis->Health <= 0 || pThis->InLimbo)
+	if (!pThis || pThis->Health <= 0
+		|| (pThis->InLimbo && !(pThis->Transporter && pThis->Transporter->GetTechnoType()->OpenTopped)))
 	{
+		if (isOT) Debug::Log("[TemporalAOE-DBG]   EXIT: Dead/InLimbo\n");
 		ClearBuildingsDisabled(state.BuildingsDisabled);
 		ReleaseAOEAttackerLocks(pThis);
-		for (auto pT : state.TargetsInRange) { if (pT) pT->BeingWarpedOut = false; }
+		DestroyFakeTemporalsByAttacker(pThis);
 		state.TargetsInRange.clear();
 		return;
 	}
@@ -455,19 +666,28 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 	if (!state.Active)
 	{
 		if (HasTemporalAOEWeapon(pThis))
+		{
+			if (isOT) Debug::Log("[TemporalAOE-DBG]   InitTemporalAOEState\n");
 			InitTemporalAOEState(pThis);
+		}
 		else
+		{
+			if (isOT) Debug::Log("[TemporalAOE-DBG]   EXIT: No AOE weapon\n");
 			return;
+		}
 	}
 
 	if (!HasTemporalAOEWeapon(pThis))
 	{
+		if (isOT) Debug::Log("[TemporalAOE-DBG]   EXIT: No AOE weapon (2nd check)\n");
 		ClearBuildingsDisabled(state.BuildingsDisabled);
 		ReleaseAOEAttackerLocks(pThis);
-		for (auto pT : state.TargetsInRange) { if (pT) pT->BeingWarpedOut = false; }
+		DestroyFakeTemporalsByAttacker(pThis);
 		state.TargetsInRange.clear();
 		return;
 	}
+
+	if (isOT) Debug::Log("[TemporalAOE-DBG]   PASSED guards, entering state machine\n");
 
 	// ═══════════════════════════════════════════════════════════════
 	// 缓存主目标状态机（CachedMain + CachedMainDead）
@@ -492,6 +712,13 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 	TechnoClass* curMain = (pThis->TemporalImUsing && pThis->TemporalImUsing->Target
 		&& pThis->TemporalImUsing->Target->Health > 0)
 		? pThis->TemporalImUsing->Target : nullptr;
+
+	// Debug: OpenTopped 乘员 curMain 诊断
+	if (pThis && pThis->Transporter && pThis->Transporter->GetTechnoType()->OpenTopped)
+	{
+		Debug::Log("[TemporalAOE-DBG]   curMain=%08X, CachedMain=%08X, hasSecondaries=%d\n",
+			(DWORD)curMain, (DWORD)state.CachedMain, !state.TargetsInRange.empty());
+	}
 
 	// 每次进入状态机前修复可能丢失的全局映射（读档/反序列化后 OwnerObject 可能为空）
 	if (state.CachedMain && state.CachedMain->Health > 0 && !state.CachedMain->InLimbo)
@@ -528,6 +755,9 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 			Debug::Log("[TemporalAOE] %s eliminating %d secondaries in one batch\n",
 				pThis->GetTechnoType()->ID, targetsToWarp.size());
 
+			// 先销毁所有假 Temporal，再真抹除
+			DestroyFakeTemporalsByTargetList(targetsToWarp);
+
 			int idx = 0;
 			for (auto pSec : targetsToWarp)
 			{
@@ -550,16 +780,24 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 
 	if (!curMain)
 	{
-		// 无当前时间束目标
+		// 无当前 TemporalImUsing->Target
 		if (state.CachedMain && !state.CachedMainDead)
 		{
-			// 有缓存但 TemporalImUsing 消失了
-			// 用 BeingWarpedOut 判断目标是否正在被游戏抹除（超时空武器不减HP）
-			if (state.CachedMain->BeingWarpedOut)
+			// 有缓存但 TemporalImUsing->Target 暂时丢失（常见于 OpenTopped 乘员）
+			// 用 CachedMain 继续扫描，保持副目标冻结状态
+			if (state.CachedMain->BeingWarpedOut
+				&& state.CachedMain->Health > 0 && !state.CachedMain->InLimbo)
+			{
+				curMain = state.CachedMain;
+				Debug::Log("[TemporalAOE] %s using cached main target (TemporalImUsing->Target lost)\n",
+					pThis->GetTechnoType()->ID);
+			}
+			else if (state.CachedMain->BeingWarpedOut)
 			{
 				// 目标正在被抹除 → 等待 InvalidatePointer
 				Debug::Log("[TemporalAOE] %s waiting for InvalidatePointer (target BeingWarpedOut)\n",
 					pThis->GetTechnoType()->ID);
+				return;
 			}
 			else
 			{
@@ -568,16 +806,17 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 					pThis->GetTechnoType()->ID, state.TargetsInRange.size());
 				ClearBuildingsDisabled(state.BuildingsDisabled);
 				ReleaseAOEAttackerLocks(pThis);
-				for (auto pT : state.TargetsInRange) { if (pT) pT->BeingWarpedOut = false; }
+				DestroyFakeTemporalsByAttacker(pThis);
 				state.TargetsInRange.clear();
 				state.ExtraWarpAdded = 0;
 				TemporalAOECachedMainOwners.erase(state.CachedMain);
 				state.CachedMain = nullptr;
 				state.CachedMainDead = false;
 				state.Active = false;
+				return;
 			}
 		}
-		else if (!state.CachedMain)
+		else if (!state.CachedMain && !state.CachedMainDead)
 		{
 			// 没有缓存 → 异常或闲置
 			if (hasSecondaries)
@@ -586,16 +825,19 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 					pThis->GetTechnoType()->ID, state.TargetsInRange.size());
 				ClearBuildingsDisabled(state.BuildingsDisabled);
 				ReleaseAOEAttackerLocks(pThis);
-				for (auto pT : state.TargetsInRange) { if (pT) pT->BeingWarpedOut = false; }
+				DestroyFakeTemporalsByAttacker(pThis);
 				state.TargetsInRange.clear();
 			}
 			state.ExtraWarpAdded = 0;
 			state.CachedMain = nullptr;
 			state.CachedMainDead = false;
 			state.Active = false;
+			return;
 		}
-		// CachedMainDead 已为 true 的情况由上面的 if(state.CachedMainDead) 处理
-		return;
+		else
+		{
+			return;
+		}
 	}
 
 	// curMain 有效
@@ -610,7 +852,7 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 			pTemporal->WarpRemaining -= state.ExtraWarpAdded;
 			if (pTemporal->WarpRemaining < 1) pTemporal->WarpRemaining = 1;
 		}
-		for (auto pT : state.TargetsInRange) { if (pT) pT->BeingWarpedOut = false; }
+		DestroyFakeTemporalsByAttacker(pThis);
 		state.TargetsInRange.clear();
 		state.ExtraWarpAdded = 0;
 		TemporalAOECachedMainOwners.erase(state.CachedMain);
@@ -652,15 +894,26 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 		// 条件：目标已死 / 攻击者已死 / 攻击者自己被冻 / 攻击者已停止攻击
 		for (auto it = TemporalAOESecondaryClaims.begin(); it != TemporalAOESecondaryClaims.end(); )
 		{
+			// 检查攻击者是否有 CachedMain 兜底（OpenTopped 乘员 TemporalImUsing->Target 可能临时丢失）
+			bool hasCachedFallback = false;
+			if (it->second)
+			{
+				auto pAtkExt = TechnoExt::ExtMap.Find(it->second);
+				if (pAtkExt && pAtkExt->AOEState.CachedMain
+					&& pAtkExt->AOEState.CachedMain->Health > 0
+					&& !pAtkExt->AOEState.CachedMain->InLimbo)
+					hasCachedFallback = true;
+			}
 			bool invalid = !it->first || it->first->Health <= 0
 				|| !it->second || it->second->Health <= 0
-				|| it->second->BeingWarpedOut
-				|| !it->second->TemporalImUsing
-				|| !it->second->TemporalImUsing->Target;
+				|| it->second->BeingWarpedOut;
+			if (!invalid && !hasCachedFallback)
+			{
+				invalid = !it->second->TemporalImUsing || !it->second->TemporalImUsing->Target;
+			}
 			if (invalid)
 			{
-				if (it->first && it->first->Health > 0)
-					it->first->BeingWarpedOut = false;
+				DestroyFakeTemporal(it->first);
 				it = TemporalAOESecondaryClaims.erase(it);
 			}
 			else
@@ -669,8 +922,11 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 			}
 		}
 
-		// 获取当前被时间束攻击的目标
-		auto pTarget = (pThis->TemporalImUsing && pThis->TemporalImUsing->Target) ? pThis->TemporalImUsing->Target : nullptr;
+		// 获取当前被时间束攻击的目标（TemporalImUsing->Target 丢失时用 curMain/CachedMain 兜底）
+		auto pTarget = (pThis->TemporalImUsing && pThis->TemporalImUsing->Target)
+			? pThis->TemporalImUsing->Target
+			: ((state.CachedMain && state.CachedMain->Health > 0 && !state.CachedMain->InLimbo)
+				? state.CachedMain : nullptr);
 
 		// ──────────────────────────────────────────────────────────────
 		// 情况①：目标指针存在（CLEG 正在攻击某个目标）
@@ -733,6 +989,13 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 				{
 					continue;
 				}
+				// 互斥：已被其他时间束影响 → 跳过（自己的假 Temporal 除外）
+				if (pCandidate->TemporalTargetingMe)
+				{
+					auto ftIt = FakeTemporals.find(pCandidate);
+					if (ftIt == FakeTemporals.end() || ftIt->second.Attacker != pThis)
+						continue;
+				}
 				if (pCandidate->Health <= 0 || pCandidate->InLimbo)
 				{
 					continue;
@@ -775,6 +1038,9 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 
 				if (!affectsAllies && (!pThis->Owner || pThis->Owner->IsAlliedWith(pCandidate)))
 				{
+					if (isOT && pThis->Owner)
+						Debug::Log("[TemporalAOE-DBG]   skip allied: %s\n",
+							pCandidate->GetTechnoType()->ID);
 					continue;
 				}
 
@@ -875,11 +1141,11 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 				if (!stillExists)
 				{
 					TemporalAOESecondaryClaims.erase(pOld);
-					// ★ 如果目标正在被其他攻击者抹除，跳过剩余的访问
+					// 如果目标正在被其他攻击者抹除，跳过剩余的访问
 					if (!TemporalAOEWarpingOutTargets.count(pOld) && pOld->Health > 0 && !pOld->InLimbo)
 					{
-						pOld->BeingWarpedOut = false;
-						ForceBuildingRedraw(pOld);
+						DestroyFakeTemporal(pOld);
+						ForceTechnoRedraw(pOld);
 					}
 				}
 			}
@@ -906,8 +1172,8 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 				}
 				// 断言独占锁 + 冻结效果
 				TemporalAOESecondaryClaims[pNew] = pThis;
-				pNew->BeingWarpedOut = true;
-				ForceBuildingRedraw(pNew);
+				CreateFakeTemporal(pThis, pNew);
+				ForceTechnoRedraw(pNew);
 			}
 
 			// ---------------------------------------------------------------
@@ -928,18 +1194,11 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 						10.0 * pTgt->GetTechnoType()->Strength * state.SecondaryWeight / state.WeaponDamage);
 				}
 
+				// 副目标进入时增加时间，离开/死亡时不减少（防止 WarpRemaining 骤降秒杀主目标）
 				int diff = newExtraWarp - state.ExtraWarpAdded;
-
-				// 限制单次扣减不超过 ExtraWarpAdded 的 1/4，防止野指针/死亡目标导致骤降
-				int maxDecrease = -std::max(1, state.ExtraWarpAdded / 4);
-				if (diff < maxDecrease)
-					diff = maxDecrease;
-
-				if (diff != 0 && pThis->TemporalImUsing)
+				if (diff > 0 && pThis->TemporalImUsing)
 				{
 					pThis->TemporalImUsing->WarpRemaining += diff;
-					if (pThis->TemporalImUsing->WarpRemaining < 1)
-						pThis->TemporalImUsing->WarpRemaining = 1;
 				}
 
 				state.ExtraWarpAdded = newExtraWarp;
@@ -962,7 +1221,7 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 				Debug::Log("[TemporalAOE] %s scan: no target but %d secondaries, releasing\n",
 					pThis->GetTechnoType()->ID, state.TargetsInRange.size());
 				ReleaseAOEAttackerLocks(pThis);
-				for (auto pT : state.TargetsInRange) { if (pT) pT->BeingWarpedOut = false; }
+				DestroyFakeTemporalsByAttacker(pThis);
 				state.TargetsInRange.clear();
 				state.ExtraWarpAdded = 0;
 			}
@@ -998,7 +1257,7 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 		if (!pT || pT->Health <= 0 || pT->InLimbo)
 		{
 			TemporalAOESecondaryClaims.erase(pT);
-			if (pT) pT->BeingWarpedOut = false;
+			DestroyFakeTemporal(pT);
 			it = state.TargetsInRange.erase(it);
 		}
 		else
@@ -1017,6 +1276,7 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 		auto targetsToWarp = state.TargetsInRange;
 		state.TargetsInRange.clear();
 		state.ExtraWarpAdded = 0;
+		DestroyFakeTemporalsByTargetList(targetsToWarp);
 		for (auto pTarget : targetsToWarp)
 			WarpOutTarget(pTarget, pThis, state);
 		state.WarpingOut = false;
@@ -1028,7 +1288,7 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 	if (!state.CachedMain && !state.CachedMainDead && !state.TargetsInRange.empty())
 	{
 		ReleaseAOEAttackerLocks(pThis);
-		for (auto pT : state.TargetsInRange) { if (pT) pT->BeingWarpedOut = false; }
+		DestroyFakeTemporalsByAttacker(pThis);
 		state.TargetsInRange.clear();
 		state.ExtraWarpAdded = 0;
 	}

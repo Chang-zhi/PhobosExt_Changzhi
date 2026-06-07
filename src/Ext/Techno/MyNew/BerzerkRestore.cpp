@@ -5,10 +5,10 @@
 #include <Ext/Rules/Body.h>
 #include <Utilities/Debug.h>
 
-#include <map>
+#include <unordered_map>
 
 // 缓存每个单位上一帧的 Berzerk 状态，用于检测状态变化
-static std::map<TechnoClass*, bool> BerzerkStateCache;
+static std::unordered_map<TechnoClass*, bool> BerzerkStateCache;
 
 void BerzerkRestorePointerInvalidate(void* ptr)
 {
