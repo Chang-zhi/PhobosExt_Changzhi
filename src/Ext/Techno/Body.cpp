@@ -155,6 +155,14 @@ DEFINE_HOOK(0x6F4500, TechnoClass_DTOR, 0x5)
 
 	InvalidateAOESecondaryClaims(pItem);
 	BerzerkRestorePointerInvalidate(pItem);
+	// 清理 TemporalAOECachedMainOwners 中指向已销毁对象的条目
+	for (auto it = TemporalAOECachedMainOwners.begin(); it != TemporalAOECachedMainOwners.end(); )
+	{
+		if (it->first == pItem || it->second == pItem)
+			it = TemporalAOECachedMainOwners.erase(it);
+		else
+			++it;
+	}
 	TechnoExt::ExtMap.Remove(pItem);
 
 	return 0;
