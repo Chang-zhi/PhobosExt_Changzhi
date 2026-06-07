@@ -50,34 +50,18 @@ void TechnoExt::ExtData::Serialize(T& Stm)
 		.Process(this->AOEState.SecondaryWeight)
 		.Process(this->AOEState.WeaponDamage)
 		.Process(this->AOEState.ExtraWarpAdded)
-		.Process(this->AOEState.CachedMain)
 		.Process(this->AOEState.CachedMainDead)
 		.Process(this->AOEState.WarpingOut)
 		.Process(this->AOEState.ScanInterval)
 		.Process(this->AOEState.ScanCounter)
-		.Process(this->AOEState.TargetsInRange)
 		;
 
-	// 手动序列化 BuildingsDisabled (std::set → 用临时 vector 中转)
-	if constexpr (std::is_same_v<T, PhobosStreamWriter>)
+	// 读档时：重置指针状态（不序列化指针，下次更新自动重建）
+	if constexpr (std::is_same_v<T, PhobosStreamReader>)
 	{
-		std::vector<TechnoClass*> bldVec(
-			this->AOEState.BuildingsDisabled.begin(),
-			this->AOEState.BuildingsDisabled.end());
-		Stm.Process(bldVec);
-	}
-	else
-	{
-		std::vector<TechnoClass*> bldVec;
-		Stm.Process(bldVec);
+		this->AOEState.CachedMain = nullptr;
+		this->AOEState.TargetsInRange.clear();
 		this->AOEState.BuildingsDisabled.clear();
-		this->AOEState.BuildingsDisabled.insert(bldVec.begin(), bldVec.end());
-
-		// 读档后重建 TemporalAOECachedMainOwners 全局映射（防止其他 CLEG 抢夺目标）
-		if (this->AOEState.CachedMain && this->OwnerObject())
-		{
-			TemporalAOECachedMainOwners[this->AOEState.CachedMain] = this->OwnerObject();
-		}
 	}
 }
 
@@ -94,18 +78,13 @@ void TechnoExt::ExtData::InvalidatePointer(void* ptr, bool bRemoved)
 			(DWORD)ptr);
 	}
 
-	// 副目标列表（遍历删除，不用 static_cast）
+	// 副目标列表（由 InvalidateAOESecondaryClaims 统一处理指针失效）
 	for (auto it = state.TargetsInRange.begin(); it != state.TargetsInRange.end(); )
 	{
 		if (*it == ptr)
-		{
-			if (*it) (*it)->BeingWarpedOut = false;
 			it = state.TargetsInRange.erase(it);
-		}
 		else
-		{
 			++it;
-		}
 	}
 
 	// 建筑禁用列表（遍历删除）
@@ -116,6 +95,8 @@ void TechnoExt::ExtData::InvalidatePointer(void* ptr, bool bRemoved)
 		else
 			++it;
 	}
+
+	// 假 Temporal 条目的清理由 InvalidateAOESecondaryClaims 统一处理（见 TemporalAOE.cpp）
 }
 
 void TechnoExt::ExtData::LoadFromStream(PhobosStreamReader& Stm)
@@ -132,6 +113,12 @@ void TechnoExt::ExtData::SaveToStream(PhobosStreamWriter& Stm)
 
 bool TechnoExt::LoadGlobals(PhobosStreamReader& Stm)
 {
+	// 读档时清理全局 maps（旧会话的指针在新会话中无效）
+	FakeTemporals.clear();
+	TemporalAOESecondaryClaims.clear();
+	TemporalAOEWarpingOutTargets.clear();
+	TemporalAOECachedMainOwners.clear();
+
 	return Stm
 		.Success();
 }

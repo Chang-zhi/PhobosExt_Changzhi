@@ -372,7 +372,7 @@ void CreateFakeTemporal(TechnoClass* pAttacker, TechnoClass* pTarget)
 	FakeTemporals[pTarget] = { pTemp, pAttacker };
 }
 
-// 销毁副目标的假 Temporal
+// 销毁副目标的假 Temporal（安全版：目标可能已被其他攻击者销毁）
 void DestroyFakeTemporal(TechnoClass* pTarget)
 {
 	if (!pTarget)
@@ -385,19 +385,29 @@ void DestroyFakeTemporal(TechnoClass* pTarget)
 	auto pTemp = it->second.FakeTemporal;
 	if (pTemp)
 	{
-		// 清除目标关联
-		if (pTemp->Target == pTarget)
+		// 仅当目标未被其他攻击者抹除时才安全地访问它
+		bool targetAlive = !TemporalAOEWarpingOutTargets.count(pTarget)
+			&& pTarget->Health > 0 && !pTarget->InLimbo;
+
+		if (targetAlive)
 		{
-			pTarget->TemporalTargetingMe = nullptr;
-			pTarget->BeingWarpedOut = false;
+			if (pTemp->Target == pTarget)
+			{
+				pTarget->TemporalTargetingMe = nullptr;
+				pTarget->BeingWarpedOut = false;
+				pTemp->Target = nullptr;
+			}
+			// 强制重绘，刷新视觉状态
+			ForceTechnoRedraw(pTarget);
+		}
+		// 目标已死/正在被抹除：跳过所有对 pTarget 的访问（悬垂指针）
+		else if (pTemp->Target == pTarget)
+		{
 			pTemp->Target = nullptr;
 		}
 
 		// 清除 Owner 防止析构时访问
 		pTemp->Owner = nullptr;
-
-		// 强制重绘，刷新视觉状态
-		ForceTechnoRedraw(pTarget);
 
 		// 插回 Array（让析构函数安全地移除自己）
 		TemporalClass::Array.AddItem(pTemp);
@@ -440,7 +450,7 @@ static void WarpOutTarget(TechnoClass* pTarget, TechnoClass* pKiller, TechnoExt:
 		return;
 	}
 
-	// 核心防护：目标已在抹除集合中 → 跳过，确保每个对象只销毁一次
+	// ★ 核心防护：目标已在抹除集合中 → 跳过，确保每个对象只销毁一次
 	// 必须放在最前面，连 GetTechnoType() 都不能调用（悬垂指针上调用虚函数=崩溃）
 	if (TemporalAOEWarpingOutTargets.count(pTarget))
 	{
@@ -448,11 +458,20 @@ static void WarpOutTarget(TechnoClass* pTarget, TechnoClass* pKiller, TechnoExt:
 		return;
 	}
 
-	// 加入抹除集合：阻止其他 AOE 攻击者同时对同一个目标调用本函数
+	// ★ 加入抹除集合：标记此目标正在被销毁，阻止其他攻击者再次进入
 	TemporalAOEWarpingOutTargets.insert(pTarget);
-	// 注意：早期返回（非销毁路径）必须 erase；成功销毁后不 erase（墓碑保护）
+	// 注意：早期返回（非销毁路径）必须 erase(pTarget)；成功销毁后不 erase（墓碑保护）
 
-	// 多层防护：确保目标可被安全地销毁
+	// 不能抹除攻击者自己
+	if (pKiller && pTarget == pKiller)
+	{
+		Debug::Log("[TemporalAOE] WarpOutTarget: target == killer, skipping\n");
+		TemporalAOEWarpingOutTargets.erase(pTarget);
+		return;
+	}
+
+	// 多层防护：确保目标可被安全地销毁（Health/InLimbo/GetTechnoType 检查）
+	// 注意：走到这里 pTarget 已被 WarpingOutTargets 标记保护，即使后续检查失败也不会被二次销毁
 	if (pTarget->Health <= 0)
 	{
 		Debug::Log("[TemporalAOE] WarpOutTarget: %s Health<=0, skipping\n",
@@ -473,14 +492,6 @@ static void WarpOutTarget(TechnoClass* pTarget, TechnoClass* pKiller, TechnoExt:
 	if (!pTarget->GetTechnoType())
 	{
 		Debug::Log("[TemporalAOE] WarpOutTarget: null TechnoType, skipping\n");
-		TemporalAOEWarpingOutTargets.erase(pTarget);
-		return;
-	}
-
-	// 不能抹除攻击者自己
-	if (pKiller && pTarget == pKiller)
-	{
-		Debug::Log("[TemporalAOE] WarpOutTarget: target == killer, skipping\n");
 		TemporalAOEWarpingOutTargets.erase(pTarget);
 		return;
 	}
@@ -699,7 +710,8 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 	// curMain | 副目标 | CachedMain | CachedMainDead → 动作
 	// ───────┼───────┼───────────┼───────────────┼──────
 	//   null  |   有   |   任意     |     true       → 抹除副目标（主目标被游戏抹除）
-	//   null  |   有   |   非空     |     false      → 释放副目标（攻击者主动停止）
+	//   null  |   有   |   非空(BWO) |     false      → 用 CachedMain 继续（OpenTopped 目标临时丢失）
+	//   null  |   有   |   非空(!BWO)|     false      → 释放副目标（攻击者主动停止）
 	//   null  |   有   |   空       |     false      → 释放副目标（异常状态）
 	//   null  |   空   |   空       |     false      → 闲置
 	//   null  |   空   |   非空     |     false      → 闲置，释放缓存
@@ -1178,8 +1190,7 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 
 			// ---------------------------------------------------------------
 			// 副目标有变化 → 重算额外扭曲值
-			// 采用差值法，但限制最大单次扣减量（不超过当前 ExtraWarpAdded 的 1/4）
-			// 防止因访问已销毁目标的野指针崩溃，也防止 WarpRemaining 骤降秒杀主目标
+			// 进入时增加时间，离开/死亡时不减少（防止 WarpRemaining 骤降秒杀主目标）
 			// ---------------------------------------------------------------
 			if (targetsChanged)
 			{
