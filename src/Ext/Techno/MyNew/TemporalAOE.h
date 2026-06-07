@@ -7,15 +7,21 @@
 class TechnoClass;
 class TemporalClass;
 
-// 全局副目标独占锁: secondary target → AOE attacker
-// 防止多个 AOE 超时空兵重复冻结同一个副目标
-extern std::map<TechnoClass*, TechnoClass*> TemporalAOESecondaryClaims;
+// ── 1. 副目标独占锁 ─────────────────────────────────────────────
+// 映射: secondary target → AOE attacker
+// 写入：UpdateTemporalAOE() 扫描循环；读取：CanFire 钩子拦截
+// 删除：范围离开/攻击者死亡/目标销毁时
+// 兜底：ValidateGlobalSecondaryClaims() 每帧清理
+extern std::map<TechnoClass* /*目标*/, TechnoClass* /*攻击者*/> TemporalAOESecondaryClaims;
 
-// 正在被 AOE 抹除中的目标集合，防止多个 AOE 同时抹除同一目标导致野指针崩溃
-extern std::set<TechnoClass*> TemporalAOEWarpingOutTargets;
+// ── 2. 抹除中锁定集合 ───────────────────────────────────────────
+// 防止批量 WarpOutTarget 时重复销毁同一目标
+extern std::set<TechnoClass* /*正在被抹除的目标*/> TemporalAOEWarpingOutTargets;
 
-// 缓存主目标 → AOE 攻击者映射（RegisterDestruction 钩子用于精确检测主目标销毁）
-extern std::map<TechnoClass*, TechnoClass*> TemporalAOECachedMainOwners;
+// ── 3. 主目标→攻击者映射 ───────────────────────────────────────
+// 解决时序竞态：RegisterDestruction 钩子(0x702E4E)精确检测主目标死亡
+// 读档后由 Body.cpp 反序列化从 CachedMain + OwnerObject() 重建
+extern std::map<TechnoClass* /*主目标*/, TechnoClass* /*攻击者*/> TemporalAOECachedMainOwners;
 
 // 初始化攻击者的 AOE 状态（从弹头配置中读取参数）
 void InitTemporalAOEState(TechnoClass* pAttacker);
