@@ -34,7 +34,7 @@ public:
 		ExtData(WarheadTypeClass* OwnerObject) : Extension<WarheadTypeClass>(OwnerObject)
 			, Temporal_Exclusive { false }
 			, TemporalAOE_Enable { false }
-			, TemporalAOE_CellSpread { 3.0 }
+			, TemporalAOE_CellSpread { 2.0 }
 			, TemporalAOE_SecondaryWeight { 1.0 }
 			, TemporalAOE_AffectsAllies { false }
 			, BerserkReduce { 0 }

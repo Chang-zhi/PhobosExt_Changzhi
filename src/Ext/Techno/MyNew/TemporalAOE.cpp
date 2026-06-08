@@ -1024,8 +1024,7 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 			}
 
 			CellStruct targetCell = CellClass::Coord2Cell(pTarget->GetCoords());
-			int cellSpreadInt = static_cast<int>(state.CellSpread);
-			int cellSpreadSq = cellSpreadInt * cellSpreadInt;
+			double cellSpreadSq = state.CellSpread * state.CellSpread;
 
 	// ──────────────────────────────────────────────────────────────
 	// 扫描过滤：遍历全场所有 TechnoClass，筛选副目标
@@ -1270,6 +1269,8 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 			if (targetsChanged)
 			{
 				int newExtraWarp = 0;
+				// 避免除零崩溃
+				int weaponDmg = state.WeaponDamage > 0 ? state.WeaponDamage : 1;
 				for (auto pTgt : newTargets)
 				{
 					if (!pTgt) continue;
@@ -1277,14 +1278,27 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 					if (TemporalAOEWarpingOutTargets.count(pTgt))
 						continue;
 					newExtraWarp += static_cast<int>(
-						10.0 * pTgt->GetTechnoType()->Strength * state.SecondaryWeight / state.WeaponDamage);
+						10.0 * pTgt->GetTechnoType()->Strength * state.SecondaryWeight / weaponDmg);
 				}
 
 				// 副目标进入时增加时间，离开/死亡时不减少（防止 WarpRemaining 骤降秒杀主目标）
+				// SecondaryWeight >= 0: 只增不减（累计模式）
+				// SecondaryWeight <  0: 正负都生效（冻得越多消耗越快）
 				int diff = newExtraWarp - state.ExtraWarpAdded;
-				if (diff > 0 && pThis->TemporalImUsing)
+				if (pThis->TemporalImUsing)
 				{
-					pThis->TemporalImUsing->WarpRemaining += diff;
+					if (state.SecondaryWeight >= 0.0)
+					{
+						if (diff > 0)
+							pThis->TemporalImUsing->WarpRemaining += diff;
+					}
+					else
+					{
+						pThis->TemporalImUsing->WarpRemaining += diff;
+						// 防止主目标因过度消耗而负值崩溃
+						if (pThis->TemporalImUsing->WarpRemaining < 0)
+							pThis->TemporalImUsing->WarpRemaining = 0;
+					}
 				}
 
 				state.ExtraWarpAdded = newExtraWarp;
