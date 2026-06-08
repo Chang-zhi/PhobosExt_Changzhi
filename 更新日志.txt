@@ -1,11 +1,11 @@
-======V0.0.13.5(预发布版本)=======
+======V0.0.13.5=======
 1,新增弹头标签 TemporalAOE 范围冻结机制.
 2,更名 Temporal.Exclusive (加了个".")
 3,新增 [General] -> BerzerkRestoreClearTarget=     ;boolean 默认false 混乱恢复后清除目标防止乱跑.
 4,新增 [WarheadType] -> BerserkReduce=             ;integer 默认0 减少目标的混乱时间, 减到0以下时立即清除混乱.
 (具体细节请见说明文档.html)
 
-2026.6.6
+2026.6.8
 ======V0.0.13.4=======
 1,为FAData_TriggerAndScript.ini中的PhobosExt动作添加专用ParamTypes.
 2,翻译FAData_TriggerAndScript.ini英文区段为英文.
