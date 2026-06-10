@@ -15,16 +15,13 @@ struct FakeTemporalEntry
 	TechnoClass*   Attacker;
 };
 
-// 映射: 副目标 → 假 Temporal 条目
+// 映射: 副目标 -> 假 Temporal 条目
 extern std::unordered_map<TechnoClass* /*副目标*/, FakeTemporalEntry> FakeTemporals;
 
-// ── 1. 副目标独占锁（已废弃，保留为冗余） ──────────────────────
-extern std::unordered_map<TechnoClass* /*目标*/, TechnoClass* /*攻击者*/> TemporalAOESecondaryClaims;
+// 墓碑集合: 正在被 WarpOutTarget 销毁的目标指针，同帧内阻止重入
+extern std::unordered_set<TechnoClass* /*正在被销毁的目标（墓碑）*/> TemporalAOEWarpingOutTargets;
 
-// ── 2. 抹除中锁定集合 ───────────────────────────────────────────
-extern std::unordered_set<TechnoClass* /*正在被抹除的目标*/> TemporalAOEWarpingOutTargets;
-
-// ── 3. 主目标→攻击者映射 ───────────────────────────────────────
+// 映射: 主目标 -> 攻击者映射
 extern std::unordered_map<TechnoClass* /*主目标*/, TechnoClass* /*攻击者*/> TemporalAOECachedMainOwners;
 
 // ── 假 Temporal 管理 ────────────────────────────────────────────
@@ -40,13 +37,10 @@ void InitTemporalAOEState(TechnoClass* pAttacker);
 // 检查攻击者当前武器是否有 TemporalAOE
 bool HasTemporalAOEWeapon(TechnoClass* pAttacker);
 
-// 清理某个攻击者的所有副目标独占锁
-void ReleaseAOEAttackerLocks(TechnoClass* pAttacker);
-
-// 清理全局副目标锁中涉及指定指针的所有记录（指针失效时调用）
+// 清理 FakeTemporals + WarpingOutTargets 中涉及指定指针的记录（指针失效时调用）
 void InvalidateAOESecondaryClaims(void* ptr);
 
-// 全局检测所有副目标独占锁的合法性，释放无效记录并解冻对应单位
+// 全局兜底：清理 FakeTemporals 中已死的条目 + 孤立 BeingWarpedOut
 void ValidateGlobalSecondaryClaims();
 
 // 读档后第一帧深度清理标记（引擎指针修复完成后执行）
