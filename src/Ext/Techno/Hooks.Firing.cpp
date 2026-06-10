@@ -29,8 +29,8 @@ DEFINE_HOOK(0x6FC339, TechnoClass_CanFire, 0x6)
 	if (pWeapon->Warhead && pWeapon->Warhead->Temporal)
 	{
 		// AOE 副目标拦截
-		auto ftIt = FakeTemporals.find(pTargetTechno);
-		if (ftIt != FakeTemporals.end() && ftIt->second.Attacker != pThis)
+		auto claimIt = TemporalAOESecondaryClaims.find(pTargetTechno);
+		if (claimIt != TemporalAOESecondaryClaims.end() && claimIt->second != pThis)
 			return CannotFire;
 
 		// AOE 主目标拦截

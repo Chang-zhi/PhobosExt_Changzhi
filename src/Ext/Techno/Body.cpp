@@ -125,6 +125,7 @@ bool TechnoExt::LoadGlobals(PhobosStreamReader& Stm)
 
 	// 清理全局 maps（旧会话的指针在新会话中无效）
 	FakeTemporals.clear();
+	TemporalAOESecondaryClaims.clear();
 	TemporalAOEWarpingOutTargets.clear();
 	TemporalAOECachedMainOwners.clear();
 	TemporalExclusiveTargetsMap.clear();
