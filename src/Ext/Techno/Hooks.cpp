@@ -42,7 +42,7 @@ DEFINE_HOOK(0x6F9E50, TechnoClass_AI, 0x5)
 		if ((DWORD)Unsorted::CurrentFrame != lastFrame)
 		{
 			lastFrame = Unsorted::CurrentFrame;
-			ValidateGlobalSecondaryClaims();
+			TemporalAOE::ValidateGlobals();
 		}
 	}
 

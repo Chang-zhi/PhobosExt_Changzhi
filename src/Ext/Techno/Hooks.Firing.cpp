@@ -29,13 +29,13 @@ DEFINE_HOOK(0x6FC339, TechnoClass_CanFire, 0x6)
 	if (pWeapon->Warhead && pWeapon->Warhead->Temporal)
 	{
 		// AOE 副目标拦截
-		auto ftIt = FakeTemporals.find(pTargetTechno);
-		if (ftIt != FakeTemporals.end() && ftIt->second.Attacker != pThis)
+		auto ftIt = TemporalAOE::FakeTemporals.find(pTargetTechno);
+		if (ftIt != TemporalAOE::FakeTemporals.end() && ftIt->second.Attacker != pThis)
 			return CannotFire;
 
 		// AOE 主目标拦截
-		auto mainIt = TemporalAOECachedMainOwners.find(pTargetTechno);
-		if (mainIt != TemporalAOECachedMainOwners.end() && mainIt->second != pThis)
+		auto mainIt = TemporalAOE::CachedMainOwners.find(pTargetTechno);
+		if (mainIt != TemporalAOE::CachedMainOwners.end() && mainIt->second != pThis)
 			return CannotFire;
 
 		// Temporal.Exclusive 拦截
@@ -53,29 +53,6 @@ DEFINE_HOOK(0x6FC339, TechnoClass_CanFire, 0x6)
 			}
 		}
 	}
-
-	// 要塞乘员开火：其武器系统由载具管理，跳过所有检测防止指针异常
-	if (pThis->Transporter && pThis->Transporter->GetTechnoType()->OpenTopped)
-		return 0;
-
-	// 类型安全检查：防止非 TechnoClass 对象（如 Anim）被误传
-	{
-		AbstractType atThis = ((AbstractClass*)pThis)->WhatAmI();
-		AbstractType atTarget = ((AbstractClass*)pTargetTechno)->WhatAmI();
-		if (atThis == AbstractType::Anim || atTarget == AbstractType::Anim)
-			return 0;
-		// pThis 必须是 Techno 类型（不是 Terrain/Bullet/Overlay 等）
-		if (atThis != AbstractType::Aircraft && atThis != AbstractType::Building
-			&& atThis != AbstractType::Infantry && atThis != AbstractType::Unit)
-			return 0;
-		if (atTarget != AbstractType::Aircraft && atTarget != AbstractType::Building
-			&& atTarget != AbstractType::Infantry && atTarget != AbstractType::Unit)
-			return CannotFire;
-	}
-
-	// 目标已死或不在场 → 不允许开火
-	if (pTargetTechno->Health <= 0 || pTargetTechno->InLimbo)
-		return CannotFire;
 
 	// Temporal 相关检查已全部上移至函数最前面
 	// （AOE 主/副目标拦截 + Temporal.Exclusive）
