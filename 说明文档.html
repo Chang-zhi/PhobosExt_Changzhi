@@ -453,10 +453,20 @@ function scrollToFeature(id)
     setTimeout(function()
     {
       var o=document.createElement('div');
-      o.id='hl_'+id;o.style.cssText='position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(255,235,150,0.18);border-radius:20px;pointer-events:none;z-index:1;opacity:0;transition:opacity .5s ease';
+      o.id='hl_'+id;o.style.cssText='position:absolute;\
+      top:0;\
+      left:0;\
+      right:0;\
+      bottom:0;\
+      background:rgba(255,235,150,0.25);\
+      border-radius:20px;\
+      pointer-events:none;\
+      z-index:1;\
+      opacity:0;\
+      transition:opacity .5s ease';
       el.style.position='relative';
       el.appendChild(o);
-      requestAnimationFrame(function(){o.style.opacity='1';setTimeout(function(){o.style.opacity='0';setTimeout(function(){if(o.parentNode)o.parentNode.removeChild(o)},500)},1200)})
+      requestAnimationFrame(function(){o.style.opacity='1';setTimeout(function(){o.style.opacity='0';setTimeout(function(){o.style.opacity='1';setTimeout(function(){o.style.opacity='0';setTimeout(function(){if(o.parentNode)o.parentNode.removeChild(o)},300)},300)},300)},300)})
     }
     ,500)
   }
@@ -467,4 +477,5 @@ document.addEventListener('DOMContentLoaded',function(){var n=document.querySele
 function toggleNav(){document.body.classList.toggle('nav-collapsed')}
 function toggleLock(){document.body.classList.toggle('nav-locked')}
 document.addEventListener('DOMContentLoaded',function(){if(window.innerWidth<=640)document.body.classList.add('nav-collapsed');document.body.classList.add('nav-locked');switchPage('home');document.addEventListener('click',function(e){if(document.body.classList.contains('nav-collapsed')||document.body.classList.contains('nav-locked'))return;var n=document.getElementById('mainNav'),t=document.getElementById('navToggle');if(!n.contains(e.target)&&e.target!==t&&!t.contains(e.target))document.body.classList.add('nav-collapsed')})})</script>
-</body></html>
+</body>
+</html>
