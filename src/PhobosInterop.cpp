@@ -176,7 +176,7 @@ bool PhobosInterop::CheckVersion()
 	// 次版本/修订号不匹配 → 向后兼容，警告但继续使用
 	if (loaded.minor != INTEROP_VERSION_CURRENT.minor || loaded.patch != INTEROP_VERSION_CURRENT.patch)
 	{
-Debug::Log(L"[PhobosInterop] [Warning]: 版本不匹配（次版本/修订号差异），可能存在兼容性问题。\n");
+		Debug::Log(L"[PhobosInterop] [Warning]: 版本不匹配（次版本/修订号差异），可能存在兼容性问题。\n");
 		Debug::Log(L"[PhobosInterop] [Warning]: 当前 DLL 支持 Phobos API 版本: v%u.%u.%u\n",
 			INTEROP_VERSION_CURRENT.major, INTEROP_VERSION_CURRENT.minor, INTEROP_VERSION_CURRENT.patch);
 		Debug::Log(L"[PhobosInterop] [Warning]: 加载的 Phobos API 版本: v%u.%u.%u\n",
