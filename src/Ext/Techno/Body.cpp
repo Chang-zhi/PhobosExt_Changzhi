@@ -54,7 +54,6 @@ void TechnoExt::ExtData::Serialize(T& Stm)
 		.Process(this->AOEState.ExtraWarpAdded)
 		.Process(this->AOEState.CachedMainDead)
 		.Process(this->AOEState.WarpingOut)
-		.Process(this->AOEState.ScanInterval)
 		.Process(this->AOEState.ScanCounter)
 		;
 
@@ -65,7 +64,6 @@ void TechnoExt::ExtData::Serialize(T& Stm)
 		this->AOEState.Active = false;
 		this->AOEState.CachedMain = nullptr;
 		this->AOEState.TargetsInRange.clear();
-		this->AOEState.BuildingsDisabled.clear();
 		this->AOEState.CachedMainDead = false;
 		this->AOEState.WarpingOut = false;
 		this->AOEState.ExtraWarpAdded = 0;
@@ -95,15 +93,6 @@ void TechnoExt::ExtData::InvalidatePointer(void* ptr, bool bRemoved)
 			++it;
 	}
 
-	// 建筑禁用列表（遍历删除）
-	for (auto it = state.BuildingsDisabled.begin(); it != state.BuildingsDisabled.end(); )
-	{
-		if (*it == ptr)
-			it = state.BuildingsDisabled.erase(it);
-		else
-			++it;
-	}
-
 	// 假 Temporal 条目的清理由 TemporalAOE::InvalidateRecords 统一处理（见 TemporalAOE.cpp）
 }
 
@@ -125,7 +114,6 @@ bool TechnoExt::LoadGlobals(PhobosStreamReader& Stm)
 
 	// 清理全局 maps（旧会话的指针在新会话中无效）
 	TemporalAOE::FakeTemporals.clear();
-	TemporalAOE::SecondariesByAttacker.clear();
 	TemporalAOE::WarpingOutTargets.clear();
 	TemporalAOE::CachedMainOwners.clear();
 	TemporalExclusiveTargetsMap.clear();

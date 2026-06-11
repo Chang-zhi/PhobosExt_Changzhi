@@ -74,4 +74,53 @@ DEFINE_HOOK(0x4DA54E, FootClass_AI, 0x6)
 	return 0;
 }
 
+// ============================================================
+// RegisterDestruction 钩子：区分主目标被谁击杀
+// ============================================================
+DEFINE_HOOK(0x702E4E, TechnoClass_RegisterDestruction_TemporalAOE, 0x6)
+{
+	GET(TechnoClass*, pVictim, ECX);
+	GET(TechnoClass*, pKiller, EDI);
 
+	auto it = TemporalAOE::CachedMainOwners.find(pVictim);
+	if (it != TemporalAOE::CachedMainOwners.end())
+	{
+		auto pAttacker = it->second;
+		TemporalAOE::CachedMainOwners.erase(it);
+
+		if (pKiller == pAttacker)
+		{
+			// 被 AOE 武器自身抹除 → 标记，让 UpdateTemporalAOE 抹除副目标
+			if (auto pExt = TechnoExt::ExtMap.Find(pAttacker))
+			{
+				pExt->AOEState.CachedMainDead = true;
+				Debug::Log("[TemporalAOE] RegisterDestruction: main %s killed by AOE weapon, CachedMainDead=true\n",
+					pVictim->GetTechnoType()->ID);
+			}
+		}
+		else
+		{
+			// 被第三方击杀 → 释放所有副目标（不解冻）
+			Debug::Log("[TemporalAOE] RegisterDestruction: main %s killed by other, releasing secondaries\n",
+				pVictim->GetTechnoType()->ID);
+
+			if (auto pExt = TechnoExt::ExtMap.Find(pAttacker))
+			{
+				// 用新 map 直接释放该攻击者的所有副目标
+				TemporalAOE::DestroyByAttacker(pAttacker);
+
+				// 恢复被禁用的建筑
+				TemporalAOE::ClearDisabledBuildings(pExt->AOEState.TargetsInRange);
+
+				// 重置 AOE 状态
+				pExt->AOEState.TargetsInRange.clear();
+				pExt->AOEState.ExtraWarpAdded = 0;
+				pExt->AOEState.CachedMain = nullptr;
+				pExt->AOEState.CachedMainDead = false;
+				pExt->AOEState.Active = false;
+			}
+		}
+	}
+
+	return 0;
+}
