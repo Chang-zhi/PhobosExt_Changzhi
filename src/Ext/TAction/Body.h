@@ -11,14 +11,17 @@ class HouseClass;
 
 enum class PhobosTriggerAction : unsigned int
 {
+	// 指定类型设置路径点标签(新式)
+	SetWaypointTextBoxByType = 549,
+
 	// 在指定路径点绘制文本...
-	SetWaypointLabel = 550,
+	SetWaypointTextBoxByData = 550,
 
 	// 清除指定路径点的文本...
-	ClearWaypointLabel = 551,
+	ClearWaypointTextBox = 551,
 
 	// 清除所有路径点文本...
-	ClearAllWaypointLabels = 552,
+	ClearAllWaypointTextBoxs = 552,
 
 	// 将指定小队全部成员关联到指定标签...
 	BindAllTeamMemberToTag = 553,
@@ -98,13 +101,41 @@ enum class PhobosTriggerAction : unsigned int
 	// 将路径点范围内指定所属方的所有可招募单位加入已存在的作战小队...
 	RecruitNearbyFootToTeam = 578,
 
-	// 清除指定所属方尝试次数超过指定数值的基地节点...
-	//RemoveBaseNodesExceedingAttemptCountForHouse = 570,
-	// 设置关联单位单位的可招募属性...
-	// SetObjectRecruitable = 566,
+	// 在关联单位上绘制文本(根据类型)...
+	SetUnitTextBoxByTriggerType = 579,
+
+	// 在关联单位上绘制文本(根据数据)...
+	SetUnitTextBoxByTriggerData = 580,
+
+	// 在指定小队所有单位上绘制文本(根据类型)...
+	SetUnitTextBoxByTeamType = 581,
+
+	// 在指定小队所有单位上绘制文本(根据数据)...
+	SetUnitTextBoxByTeamData = 582,
+
+	// 移除指定类型的所有文本...
+	ClearUnitTextBoxByType = 583,
+
+	// 移除关联单位上的文本...
+	ClearUnitTextBoxByTag = 584,
+
+	// 移除指定科技类型上的文本...
+	ClearUnitTextBoxByTechType = 585,
+
+	// 移除指定所属方的指定科技类型上的文本...
+	ClearUnitTextBoxByHouseAndType = 586,
+
+	// 移除指定小队类型的所有单位上的文本...
+	ClearUnitTextBoxByTeam = 587,
+
+	// 移除所有单位上的文本...
+	ClearAllUnitTextBoxs = 588,
+
+	// 移除所有文本(含路径点)...
+	ClearAllTextBoxs = 589,
 
 	// 测试用
-	testAction = 1150,
+	// testAction = 1150,
 };
 
 class TActionExt
@@ -137,12 +168,13 @@ public:
 
 #pragma push_macro("ACTION_FUNC")
 #define ACTION_FUNC(name) \
-	static bool name(TActionClass* pThis, HouseClass* pHouse, \
-		ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+static bool name(TActionClass* pThis, HouseClass* pHouse, \
+	ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 
-	ACTION_FUNC(SetWaypointLabel);
-	ACTION_FUNC(ClearWaypointLabel);
-	ACTION_FUNC(ClearAllWaypointLabels);
+	ACTION_FUNC(SetWaypointTextBoxByType);
+	ACTION_FUNC(SetWaypointTextBoxByData);
+	ACTION_FUNC(ClearWaypointTextBox);
+	ACTION_FUNC(ClearAllWaypointTextBoxs);
 	ACTION_FUNC(BindAllTeamMemberToTag);
 	ACTION_FUNC(BindOwnerTeamMemberToTag);
 	ACTION_FUNC(BindAllTechnoTypeToTag);
@@ -169,12 +201,20 @@ public:
 	ACTION_FUNC(UpdateOwnerBuildingsAnimations);
 	ACTION_FUNC(CreateTeamConsideringLimits);
 	ACTION_FUNC(RecruitNearbyFootToTeam);
-
-	// ACTION_FUNC(RemoveBaseNodesExceedingAttemptCountForHouse);
-	// ACTION_FUNC(SetObjectRecruitable);
+	ACTION_FUNC(SetUnitTextBoxByTriggerType);
+	ACTION_FUNC(SetUnitTextBoxByTriggerData);
+	ACTION_FUNC(SetUnitTextBoxByTeamType);
+	ACTION_FUNC(SetUnitTextBoxByTeamData);
+	ACTION_FUNC(ClearUnitTextBoxByType);
+	ACTION_FUNC(ClearUnitTextBoxByTag);
+	ACTION_FUNC(ClearUnitTextBoxByTechType);
+	ACTION_FUNC(ClearUnitTextBoxByHouseAndType);
+	ACTION_FUNC(ClearUnitTextBoxByTeam);
+	ACTION_FUNC(ClearAllUnitTextBoxs);
+	ACTION_FUNC(ClearAllTextBoxs);
 
 	// 测试用
-	ACTION_FUNC(testAction);
+	// ACTION_FUNC(testAction);
 
 
 #undef ACTION_FUNC

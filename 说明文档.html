@@ -74,7 +74,7 @@
 <div class="sec-toc">
 <p class="sec-toc__title">目录：</p>
 <ul class="sec-toc__list">
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_1')" class="sec-toc__link">1. 路径点文本显示</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_1')" class="sec-toc__link">1. 文本框系统</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_2')" class="sec-toc__link">2. 动态标签绑定功能</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_3')" class="sec-toc__link">3. 金钱操作功能</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_4')" class="sec-toc__link">4. 基地节点操作功能</a></li>
@@ -87,24 +87,64 @@
 <hr class="sec-divider">
 
 <div id="actions_1">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">1. 路径点文本显示</h3>
-<p>在地图路径点上绘制自定义文本。</p>
+<h3 class="doc-heading--tertiary" style="margin-top:2em">1. 文本框系统</h3>
+<p>在地图路径点或科技类型上绘制自定义文本框，支持预定义样式(TextBoxType)或直接指定参数。</p>
 <p class="doc-paragraph--only-vertical"><strong>特性：</strong></p>
 <ul class="doc-list--content">
-<li>可自定义文本内容、显示宽度(像素)、背景不透明度。</li>
-<li>可分别设置文本颜色和边框颜色(预定义 9 种颜色)。</li>
+<li>可自定义文本内容、最大显示宽度(像素)、背景不透明度。</li>
+<li>支持预定义样式(TextBoxType)，包括文本颜色和边框颜色(RGB)。</li>
 <li>鼠标移动到文本框上时，文本会暂时停止绘制(避免遮挡操作)。</li>
+<li>单位进入载具(limbo状态)时，文本框会暂时停止绘制，离开载具后自动恢复。</li>
+<li>单位标签支持所有科技类型(TechnoClass，含建筑)。小队相关动作限制为FootClass。</li>
 </ul>
+
+<h4>文本框类型</h4>
+<p>在 <code class="doc-code--inline">rulesmd.ini</code> 的 <code class="doc-code--inline">[TextBoxTypes]</code> 段中定义文本框样式，可按需添加任意多个。</p>
+<pre class="doc-code--block"><code>[TextBoxTypes]
+0=FirstBoxType
+1=YourBoxType
+
+[YourBoxType]
+MaxWidth=300                ;integer - 最大像素宽度(1-1000)，文本超出自动换行，默认250
+BackgroundOpacity=55        ;integer - 背景不透明度百分比(0-100)。默认75
+Color=255,215,0             ;integer,integer,integer - 文本和边框颜色，RGB格式。默认255,215,0(金色)
+</code></pre>
+
+<h4>路径点文本框</h4>
 <p><strong>触发动作说明：</strong></p>
 <ul class="doc-list--content">
-<li><code class="doc-code--inline">550</code> – 在指定路径点绘制文本...(参数：路径点索引，文本内容，像素宽度，不透明度百分比，文本颜色)</li>
-<li><code class="doc-code--inline">551</code> – 清除指定路径点的文本...(参数：路径点索引)</li>
-<li><code class="doc-code--inline">552</code> – 清除所有路径点文本...</li>
+<li><code class="doc-code--inline">549</code> – 在指定路径点绘制文本框(根据类型)...(参数：路径点，TextBoxType)</li>
+<li><code class="doc-code--inline">550</code> – 在指定路径点绘制文本框(根据数据)...(参数：路径点，文本内容，像素宽度，不透明度百分比，文本颜色)</li>
+<li><code class="doc-code--inline">551</code> – 清除指定路径点的文本框...(参数：路径点索引)</li>
+<li><code class="doc-code--inline">552</code> – 清除所有路径点文本框...</li>
 </ul>
-<p>在 <code class="doc-code--inline">[General]</code> 的增加新变量，用来控制当路径点在黑幕里时是否绘制。</p>
+
+<h4>单位文本框</h4>
+<p><strong>触发动作说明：</strong></p>
+<div class="doc-table--action">
+<table class="doc-table">
+<thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
+<tbody>
+<tr><td class="doc-table__td">579</td><td class="doc-table__td">在关联单位上绘制文本框(根据类型)...</td><td class="doc-table__td">CSF标签，文本框类型</td></tr>
+<tr><td class="doc-table__td">580</td><td class="doc-table__td">在关联单位上绘制文本框(根据数据)...</td><td class="doc-table__td">CSF标签，宽度，不透明度，颜色</td></tr>
+<tr><td class="doc-table__td">581</td><td class="doc-table__td">在作战小队成员上绘制文本框(根据类型)...</td><td class="doc-table__td">CSF标签，小队索引，文本框类型</td></tr>
+<tr><td class="doc-table__td">582</td><td class="doc-table__td">在作战小队成员上绘制文本框(根据数据)...</td><td class="doc-table__td">CSF标签，小队索引，宽度，不透明度，颜色</td></tr>
+<tr><td class="doc-table__td">583</td><td class="doc-table__td">清除单位文本框(根据类型)...</td><td class="doc-table__td">文本框类型</td></tr>
+<tr><td class="doc-table__td">584</td><td class="doc-table__td">清除关联单位文本框...</td><td class="doc-table__td">无参数</td></tr>
+<tr><td class="doc-table__td">585</td><td class="doc-table__td">清除单位文本框(根据科技类型)...</td><td class="doc-table__td">科技类型ID</td></tr>
+<tr><td class="doc-table__td">586</td><td class="doc-table__td">清除单位文本框(根据所属方和科技类型)...</td><td class="doc-table__td">科技类型ID，国家索引</td></tr>
+<tr><td class="doc-table__td">587</td><td class="doc-table__td">清除单位文本框(根据作战小队)...</td><td class="doc-table__td">小队索引</td></tr>
+<tr><td class="doc-table__td">588</td><td class="doc-table__td">清除所有单位文本框...</td><td class="doc-table__td">无参数</td></tr>
+<tr><td class="doc-table__td">589</td><td class="doc-table__td">清除所有文本框...</td><td class="doc-table__td">无参数(含路径点)</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>在 <code class="doc-code--inline">[General]</code> 中增加新变量，用来控制文本框在黑幕中是否绘制。</p>
 <pre class="doc-code--block"><code>[General]
-ShowWaypointLabelInShroud=                  ; boolean(布尔值)，默认 true</code></pre>
-<p><strong>注:</strong> 仅判断路径点本身是否被黑幕遮挡, 不检测整个标签。</p>
+ShowTextBoxInShroud.Waypoint=           ; boolean，默认 true — 路径点文本框在黑幕中是否显示
+ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本框在黑幕中是否显示</code></pre>
+<p><strong>注:</strong> 仅检测路径点格子或单位所在单元格是否被黑幕遮挡, 不检测整个文本框区域。</p>
 </div>
 
 <hr class="sec-divider--double">

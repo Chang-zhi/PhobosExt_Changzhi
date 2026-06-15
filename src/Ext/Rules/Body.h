@@ -30,11 +30,15 @@ public:
 	class ExtData final : public Extension<RulesClass>
 	{
 	public:
-		Valueable<bool> ShowWaypointLabelInShroud;
+		// Text Box
+		Valueable<bool> ShowTextBoxInShroud_Waypoint;
+		Valueable<bool> ShowTextBoxInShroud_Techno;
+
 		Valueable<bool> BerzerkRestoreClearTarget;
 
 		ExtData(RulesClass* OwnerObject) : Extension<RulesClass>(OwnerObject)
-			, ShowWaypointLabelInShroud { true }
+			, ShowTextBoxInShroud_Waypoint { true }
+			, ShowTextBoxInShroud_Techno { true }
 			, BerzerkRestoreClearTarget { false }
 		{ }
 
