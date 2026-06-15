@@ -5,6 +5,7 @@
 
 #include <Ext/TechnoType/Body.h>
 #include <MyNew/TextBox/Types/TextBoxTypeClass.h>
+#include <Ext/TAction/MyNew/ScriptManipulator.h>
 #include <Utilities/Patch.h>
 
 std::unique_ptr<RulesExt::ExtData> RulesExt::Data = nullptr;
@@ -33,6 +34,7 @@ void RulesExt::LoadBeforeTypeData(RulesClass* pThis, CCINIClass* pINI)
 
 void RulesExt::LoadAfterTypeData(RulesClass* pThis, CCINIClass* pINI)
 {
+	ScriptManipulator::CaptureFromINI(pINI);
 
 	if (pINI == CCINIClass::INI_Rules)
 		Data->InitializeAfterTypeData(pThis);

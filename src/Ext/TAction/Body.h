@@ -134,6 +134,38 @@ enum class PhobosTriggerAction : unsigned int
 	// 移除所有文本(含路径点)...
 	ClearAllTextBoxs = 589,
 
+	// ---- Script Manipulation Actions (650-659) ----
+
+	// 清空指定脚本的内容
+	ClearScript = 650,
+
+	// 复制源脚本的内容到目标脚本
+	CopyScript = 651,
+
+	// 以直接参数修改指定脚本的指定行
+	ModifyScriptByParam = 652,
+
+	// 以局部变量修改指定脚本的指定行
+	ModifyScriptByLocalVar = 653,
+
+	// 以全局变量修改指定脚本的指定行
+	ModifyScriptByGlobalVar = 654,
+
+	// 重新指定作战小队类型绑定的脚本
+	RebindTeamTypeScript = 655,
+
+	// 恢复作战小队类型绑定的脚本索引到初始状态
+	ResetTeamTypeScript = 656,
+
+	// 恢复所有作战小队类型绑定的脚本索引到初始状态
+	ResetAllTeamTypeScripts = 657,
+
+	// 恢复指定脚本的内容到初始状态
+	RestoreScriptContent = 658,
+
+	// 恢复所有脚本的内容到初始状态
+	RestoreAllScriptContents = 659,
+
 	// 测试用
 	// testAction = 1150,
 };
@@ -212,6 +244,18 @@ static bool name(TActionClass* pThis, HouseClass* pHouse, \
 	ACTION_FUNC(ClearUnitTextBoxByTeam);
 	ACTION_FUNC(ClearAllUnitTextBoxs);
 	ACTION_FUNC(ClearAllTextBoxs);
+
+	// ---- Script Manipulation Actions ----
+	ACTION_FUNC(ClearScript);
+	ACTION_FUNC(CopyScript);
+	ACTION_FUNC(ModifyScriptByParam);
+	ACTION_FUNC(ModifyScriptByLocalVar);
+	ACTION_FUNC(ModifyScriptByGlobalVar);
+	ACTION_FUNC(RebindTeamTypeScript);
+	ACTION_FUNC(ResetTeamTypeScript);
+	ACTION_FUNC(ResetAllTeamTypeScripts);
+	ACTION_FUNC(RestoreScriptContent);
+	ACTION_FUNC(RestoreAllScriptContents);
 
 	// 测试用
 	// ACTION_FUNC(testAction);

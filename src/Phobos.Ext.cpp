@@ -7,6 +7,8 @@
 #include <Ext/Techno/Body.h>
 #include <Ext/TechnoType/Body.h>
 #include <Ext/WarheadType/Body.h>
+#include <Ext/ScriptType/Body.h>
+#include <Ext/TeamType/Body.h>
 
 #include <MyNew/TextBox/Entities/Base/MapTextBoxClass.h>
 #include <MyNew/TextBox/Entities/Derived/TechnoTextBoxClass.h>
@@ -181,6 +183,8 @@ using PhobosTypeRegistry = TypeRegistry <
 	TechnoExt,
 	TechnoTypeExt,
 	WarheadTypeExt,
+	ScriptTypeExt,
+	TeamTypeExt,
 	MapTextBoxClass,
 	TechnoTextBoxClass,
 	WaypointTextBoxClass,

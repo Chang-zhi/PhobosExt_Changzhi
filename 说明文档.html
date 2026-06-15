@@ -25,13 +25,15 @@
 
 <p>一个扩展《红色警戒2：尤里的复仇》游戏功能的 DLL，基于 Phobos 开发，作者<a href="https://space.bilibili.com/423792550" target="_blank" class="doc-link"><strong>Chang_zhi</strong></a>。</p>
 <p>主要面向 任务/地图 作者，可以自由的将其用于任务包或模组制作。</p>
-<p><strong>尽管叫 PhobosExt , 但不依赖 Ares 或 Phobos，可独立运行。推荐和其一同使用。</strong></p>
+<p><strong>尽管叫 PhobosExt , 但不依赖 Ares 或 Phobos，可独立运行。推荐和其一同使用。</strong><br>
+<p>仅部分功能需要依赖 Phobos 才能使用，详见对应章节。</p>
 <p>说是基于 Phobos，其实只是删了删代码 ( <span class="doc-title--gray;">低创作品，大佬轻喷</span> )</p>
 <p style="margin-top:1.5rem">← 左侧导航栏点击查看各功能详情</p>
 
 <h2 class="doc-heading--secondary">兼容性说明</h2>
 <p>需保证游戏版本为 YR 1.001。</p>
-<p><strong>不依赖 Ares 或 Phobos，可单独使用。</strong></p>
+<p><strong>不依赖 Ares 或 Phobos，可单独使用。</strong> </p>
+<p>部分功能（如触发动作 653、654）依赖 Phobos ，详见对应章节。</p>
 <p>本 DLL 已避免使用 <code class="doc-code--inline">ExtPointerOffset</code> ，改用独立 <code class="doc-code--inline">unordered_map</code> 存储扩展数据，不会与 Ares 或 Phobos 的原生扩展数据冲突。(严格来说可能变慢, 但对现代cpu的影响应该可以忽略不计)</p>
 
 <h2 class="doc-heading--secondary">已知问题</h2>
@@ -81,6 +83,7 @@
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_6')" class="sec-toc__link">5. 单位可招募属性设置</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_7')" class="sec-toc__link">6. 更新建筑动画功能</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_11')" class="sec-toc__link">7. 作战小队操作</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_12')" class="sec-toc__link">8. 脚本操作</a></li>
 </ul>
 </div>
 
@@ -287,6 +290,54 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本
 <li>将指定路径点指定范围内、指定所属方的所有可招募地面单位(FootClass)加入一个已存在的作战小队实例。</li>
 <li>如果没有该类型的已有实例，则无动作。</li>
 <li>只会招募满足以下条件的单位：属于指定所属方、未加入其他小队、可被招募(<code class="doc-code--inline">CanBeRecruited</code>)、在路径点指定范围内。</li>
+</ul>
+</div>
+
+<hr class="sec-divider--double">
+
+<div id="actions_12">
+<h3 class="doc-heading--tertiary" style="margin-top:2em">8. 脚本操作</h3>
+<p><strong>触发动作说明：</strong></p>
+<ul class="doc-list--content">
+<li><code class="doc-code--inline">650</code> – 清空指定脚本内容... (参数：脚本类型索引)</li>
+<li><code class="doc-code--inline">651</code> – 复制脚本内容... (参数：源脚本类型索引，目标脚本类型索引)</li>
+<li><code class="doc-code--inline">652</code> – 以参数修改脚本行... (参数：脚本ID(Text)，行号，动作类型，动作参数高位，动作参数低位)</li>
+<li><code class="doc-code--inline">653</code> – 以局部变量修改脚本行... (参数：脚本ID(Text)，行号，动作类型变量索引，参数1变量索引，参数2变量索引) <em>(暂不可用,需等Phobos PR#2256通过,且需与Phobos配合使用)</em></li>
+<li><code class="doc-code--inline">654</code> – 以全局变量修改脚本行... (参数：脚本ID(Text)，行号，动作类型变量索引，参数1变量索引，参数2变量索引) <em>(暂不可用,需等Phobos PR#2256通过,且需与Phobos配合使用)</em></li>
+</ul>
+<p class="doc-paragraph--only-vertical"><strong>动作 650-654 (脚本内容修改)：</strong></p>
+<ul class="doc-list--content">
+<li>这些动作允许在游戏运行时动态修改脚本类型(ScriptType)的动作内容。</li>
+<li>每个脚本类型最多 50 个动作行，动作参数编码为 <code>param2 &lt;&lt; 16 | param1 &amp; 0xFFFF</code>。</li>
+<li><strong>注意：动作 653、654 暂不可用</strong>，需等待 Phobos PR#2256 通过后方可使用，且必须与 Phobos 配合使用。</li>
+<li>修改后会自动备份原始内容，可通过动作 658/659 恢复。</li>
+<li>修改后使用该脚本的作战小队会立即重置到第 0 行执行。</li>
+</ul>
+<br>
+<p><strong>触发动作说明：</strong></p>
+<ul class="doc-list--content">
+<li><code class="doc-code--inline">655</code> – 重新指定小队脚本索引... (参数：作战小队类型索引，目标脚本类型索引)</li>
+<li><code class="doc-code--inline">656</code> – 恢复小队脚本索引... (参数：作战小队类型索引)</li>
+<li><code class="doc-code--inline">657</code> – 恢复所有小队脚本索引... (无参数)</li>
+</ul>
+<p class="doc-paragraph--only-vertical"><strong>动作 655-657 (小队脚本绑定)：</strong></p>
+<ul class="doc-list--content">
+<li>这些动作改变作战小队类型(TeamType)引用的脚本类型。</li>
+<li>动作 655 将指定 TeamType 切换到新脚本，已存在的作战小队实例也会同步切换。</li>
+<li>动作 656 恢复指定 TeamType 的脚本绑定到 INI 定义的原始值。</li>
+<li>动作 657 恢复所有 TeamType 的脚本绑定到 INI 定义的原始值。</li>
+<li>首次修改时会自动记录原始绑定，可多次安全切换。</li>
+</ul>
+<br>
+<p><strong>触发动作说明：</strong></p>
+<ul class="doc-list--content">
+<li><code class="doc-code--inline">658</code> – 恢复脚本内容... (参数：脚本类型索引)</li>
+<li><code class="doc-code--inline">659</code> – 恢复所有脚本内容... (无参数)</li>
+</ul>
+<p class="doc-paragraph--only-vertical"><strong>动作 658-659 (脚本内容恢复)：</strong></p>
+<ul class="doc-list--content">
+<li>将之前通过动作 650-654 修改过的脚本内容恢复到 INI 定义的原始状态。</li>
+<li>动作 658 恢复指定脚本类型，659 恢复所有被修改过的脚本类型。</li>
 </ul>
 </div>
 

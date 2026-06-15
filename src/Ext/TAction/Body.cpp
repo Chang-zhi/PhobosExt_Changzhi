@@ -1,5 +1,6 @@
-#include "Body.h"
+﻿#include "Body.h"
 #include "MyNew/Helper.h"
+#include "MyNew/ScriptManipulator.h"
 
 #include <YRpp.h>
 #include <TagClass.h>
@@ -146,6 +147,28 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 	case PhobosTriggerAction::ClearAllTextBoxs:
 		return TActionExt::ClearAllTextBoxs(pThis, pHouse, pObject, pTrigger, location);
 
+	// ---- Script Manipulation Actions ----
+	case PhobosTriggerAction::ClearScript:
+		return TActionExt::ClearScript(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::CopyScript:
+		return TActionExt::CopyScript(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::ModifyScriptByParam:
+		return TActionExt::ModifyScriptByParam(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::ModifyScriptByLocalVar:
+		return TActionExt::ModifyScriptByLocalVar(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::ModifyScriptByGlobalVar:
+		return TActionExt::ModifyScriptByGlobalVar(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::RebindTeamTypeScript:
+		return TActionExt::RebindTeamTypeScript(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::ResetTeamTypeScript:
+		return TActionExt::ResetTeamTypeScript(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::ResetAllTeamTypeScripts:
+		return TActionExt::ResetAllTeamTypeScripts(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::RestoreScriptContent:
+		return TActionExt::RestoreScriptContent(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::RestoreAllScriptContents:
+		return TActionExt::RestoreAllScriptContents(pThis, pHouse, pObject, pTrigger, location);
+
 	//case PhobosTriggerAction::RemoveBaseNodesExceedingAttemptCountForHouse:
 	//	return TActionExt::RemoveBaseNodesExceedingAttemptCountForHouse(pThis, pHouse, pObject, pTrigger, location);
 	//case PhobosTriggerAction::SetObjectRecruitable:
@@ -194,7 +217,7 @@ bool TActionExt::SetWaypointTextBoxByData(TActionClass* pThis, HouseClass* pHous
 
 	if (wpIndex >= 0 && csfLabel && csfLabel[0])
 	{
-		// 动态生成一个类型名（保证每个路径点独立，后续触发可更新�?
+		// 动态生成一个类型名(保证每个路径点独立,后续触发可更新)
 		char typeName[64];
 		sprintf_s(typeName, "__AutoWPLabel_%d", wpIndex);
 
@@ -309,7 +332,7 @@ bool TActionExt::BindAllTechnoTypeToTag(TActionClass* pThis, HouseClass* pHouse,
 	TagClass* pTagClass = GetTagClassByIndex(tagIndex, forceNew);
 	if (!pTagClass) return false;
 
-	// 遍历 TechnoClass, 尝试�?TagClass 绑定�?TechnoClass �?
+	// 遍历 TechnoClass, 尝试将 TagClass 绑定到 TechnoClass 上
 	for (auto const pTechno : TechnoClass::Array)
 	{
 		if (pTechno->get_ID() == std::string(techno))
@@ -335,7 +358,7 @@ bool TActionExt::BindOwnerTechnoTypeToTag(TActionClass* pThis, HouseClass* pHous
 	HouseClass* pOwner = HouseClass::FindByCountryIndex(houseIndex);
 	if (!pOwner) return false;
 
-	// 遍历 TechnoClass, 尝试�?TagClass 绑定�?TechnoClass �?
+	// 遍历 TechnoClass, 尝试将 TagClass 绑定到 TechnoClass 上
 	for (auto const pTechno : TechnoClass::Array)
 	{
 		if (pTechno->Owner == pOwner)
@@ -449,7 +472,7 @@ bool TActionExt::AddBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseClass* 
 				return false;
 		}
 
-		// 直接拷贝赋值后�?
+		// 直接拷贝赋值后
 		for (int i = nodes.Count; i > 0; --i)
 		{
 			nodes.Items[i] = nodes.Items[i - 1];
@@ -458,12 +481,12 @@ bool TActionExt::AddBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseClass* 
 		nodes.Items[0] = newNode;
 		++nodes.Count;
 	}
-	// ===== 直接加就�? 不管他什么时候�?=====
+	// ===== 直接加就行, 不管他什么时候=====
 	else
 		pOwner->Base.BaseNodes.AddItem(newNode);
 
 	// 将此节点加入授权列表，防止被自动清理
-	// forceAtFront 时插入到授权列表头部，确保优先建�?
+	// forceAtFront 时插入到授权列表头部, 确保优先建
 	HouseExt::AuthorizeBaseNode(pOwner, buildTypeIndex, cell.X, cell.Y, forceAtFront);
 
 	return true;
@@ -494,9 +517,9 @@ bool TActionExt::RemoveAllBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseC
 	}
 
 	if (indicesToRemove.empty())
-		return true; // 无节点需要删�?
+		return true; // 无节点需要删除
 
-	// 2. 清理工厂生产队列（仅影响被删除节点相关的建筑类型�?
+	// 2. 清理工厂生产队列(仅影响被删除节点相关的建筑类型)
 	for (int buildTypeIndex : uniqueBuildingTypes)
 	{
 		if (buildTypeIndex < 0 || buildTypeIndex >= BuildingTypeClass::Array.Count)
@@ -529,7 +552,7 @@ bool TActionExt::RemoveAllBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseC
 		pOwner->Base.BaseNodes.RemoveItem(*it);
 	}
 
-	// 同步删除授权注册表中的条�?
+	// 同步删除授权注册表中的条目
 	HouseExt::RemoveAuthorizedNodeByCoord(pOwner, cell.X, cell.Y);
 
 	return true;
@@ -537,7 +560,7 @@ bool TActionExt::RemoveAllBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseC
 
 bool TActionExt::RemoveBaseNodesOfBuildingTypeForHouse(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {
-	// AI 真好�?
+	// AI 真好用
 	const int houseIndex = pThis->Param3;
 	const int buildTypeIndex = pThis->Param4;
 
@@ -590,7 +613,7 @@ bool TActionExt::RemoveBaseNodesOfBuildingTypeForHouse(TActionClass* pThis, Hous
 		pOwner->Base.BaseNodes.RemoveItem(*it);
 	}
 
-	// 同步删除授权注册表中的条�?
+	// 同步删除授权注册表中的条目
 	HouseExt::RemoveAuthorizedNodeByType(pOwner, buildTypeIndex);
 
 	return true;
@@ -634,7 +657,7 @@ bool TActionExt::BindTagToTechnoTypeAtWaypoint(TActionClass* pThis, HouseClass* 
 	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
 	if (cell.X < 0 || cell.Y < 0) return false;
 
-	// 遍历 TechnoClass, 尝试�?TagClass 绑定�?TechnoClass �?
+	// 遍历 TechnoClass, 尝试将 TagClass 绑定到 TechnoClass 上
 	for (TechnoClass* const pTechno : TechnoClass::Array)
 	{
 		if (pTechno && pTechno->get_ID() == std::string(techno))
@@ -678,7 +701,7 @@ bool TActionExt::BindTagToTechnoTypeOfHouseAtWaypoint(TActionClass* pThis, House
 	HouseClass* pOwner = HouseClass::FindByCountryIndex(houseIndex);
 	if (!pOwner) return false;
 
-	// 遍历 TechnoClass, 尝试�?TagClass 绑定�?TechnoClass �?
+	// 遍历 TechnoClass, 尝试将 TagClass 绑定到 TechnoClass 上
 	for (auto const pTechno : TechnoClass::Array)
 	{
 		if (pTechno
@@ -723,7 +746,7 @@ bool TActionExt::BindTagToSpecificTechnoTypeWithinWaypointRange(TActionClass* pT
 	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
 	if (cell.X < 0 || cell.Y < 0) return false;
 
-	// 遍历 TechnoClass, 尝试�?TagClass 绑定�?TechnoClass �?
+	// 遍历 TechnoClass, 尝试将 TagClass 绑定到 TechnoClass 上
 	for (TechnoClass* pTechno : TechnoClass::Array)
 	{
 		if (pTechno && pTechno->get_ID() == std::string(techno))
@@ -754,7 +777,7 @@ bool TActionExt::BindTagToSpecificTechnoTypeOfSpecificOwnerWithinWaypointRange(T
 	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
 	if (cell.X < 0 || cell.Y < 0) return false;
 
-	// 遍历 TechnoClass, 尝试�?TagClass 绑定�?TechnoClass �?
+	// 遍历 TechnoClass, 尝试将 TagClass 绑定到 TechnoClass 上
 	for (TechnoClass* pTechno : TechnoClass::Array)
 	{
 		if (pTechno
@@ -789,7 +812,7 @@ bool TActionExt::BindTagToAllTechnoTypesWithinWaypointRange(TActionClass* pThis,
 	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
 	if (cell.X < 0 || cell.Y < 0) return false;
 
-	// 遍历 TechnoClass, 尝试�?TagClass 绑定�?TechnoClass �?
+	// 遍历 TechnoClass, 尝试将 TagClass 绑定到 TechnoClass 上
 	for (TechnoClass* pTechno : TechnoClass::Array)
 	{
 		if (IsTechnoNearCell(pTechno, cell, range))
@@ -823,7 +846,7 @@ bool TActionExt::BindTagToAllTechnoTypesOfSpecificOwnerWithinWaypointRange(TActi
 	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
 	if (cell.X < 0 || cell.Y < 0) return false;
 
-	// 遍历 TechnoClass, 尝试�?TagClass 绑定�?TechnoClass �?
+	// 遍历 TechnoClass, 尝试将 TagClass 绑定到 TechnoClass 上
 	for (TechnoClass *pTechno : TechnoClass::Array)
 	{
 		if(pOwner == pTechno->Owner)
@@ -899,7 +922,7 @@ bool TActionExt::BindTagsToAllTechTypesInWaypointRangeExceptSpecified
 	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
 	if (cell.X < 0 || cell.Y < 0) return false;
 
-	// 遍历 TechnoClass, 尝试�?TagClass 绑定�?TechnoClass �?
+	// 遍历 TechnoClass, 尝试将 TagClass 绑定到 TechnoClass 上
 	for (TechnoClass* pTechno : TechnoClass::Array)
 	{
 		if (!pTechno)
@@ -935,7 +958,7 @@ bool TActionExt::BindTagsToAllTechTypesOfTriggerOwnerInWaypointRangeExceptSpecif
 	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
 	if (cell.X < 0 || cell.Y < 0) return false;
 
-	// 遍历 TechnoClass, 尝试�?TagClass 绑定�?TechnoClass �?
+	// 遍历 TechnoClass, 尝试将 TagClass 绑定到 TechnoClass 上
 	for (TechnoClass* pTechno : TechnoClass::Array)
 	{
 		if (pTechno && pHouse == pTechno->Owner)
@@ -1369,6 +1392,71 @@ bool TActionExt::ClearAllTextBoxs(TActionClass* pThis, HouseClass* pHouse, Objec
 {
 	TechnoTextBoxClass::ClearAll();
 	WaypointTextBoxClass::ClearAll();
+	return true;
+}
+
+// =============================
+// Script Manipulation Actions (650-659)
+
+bool TActionExt::ClearScript(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	ScriptManipulator::ClearScript(pThis);
+	return true;
+}
+
+bool TActionExt::CopyScript(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	ScriptManipulator::CopyScript(pThis);
+	return true;
+}
+
+bool TActionExt::ModifyScriptByParam(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	ScriptManipulator::ModifyScriptByParam(pThis);
+	return true;
+}
+
+// 暂时不可用, 需要等我的pr通过
+bool TActionExt::ModifyScriptByLocalVar(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	ScriptManipulator::ModifyScriptByLocalVar(pThis);
+	return true;
+}
+
+// 暂时不可用, 需要等我的pr通过
+bool TActionExt::ModifyScriptByGlobalVar(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	ScriptManipulator::ModifyScriptByGlobalVar(pThis);
+	return true;
+}
+
+bool TActionExt::RebindTeamTypeScript(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	ScriptManipulator::RebindTeamTypeScript(pThis);
+	return true;
+}
+
+bool TActionExt::ResetTeamTypeScript(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	ScriptManipulator::ResetTeamTypeScript(pThis);
+	return true;
+}
+
+bool TActionExt::ResetAllTeamTypeScripts(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	ScriptManipulator::ResetAllTeamTypeScripts();
+	return true;
+}
+
+bool TActionExt::RestoreScriptContent(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	ScriptManipulator::RestoreScriptContent(pThis);
+	return true;
+}
+
+bool TActionExt::RestoreAllScriptContents(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	ScriptManipulator::RestoreAllScriptContents();
 	return true;
 }
 
