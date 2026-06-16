@@ -20,7 +20,7 @@
 #include <algorithm>
 #include <memory>
 
-// 此类独有的实例数组定�?
+// 此类独有的实例数组定义
 std::vector<std::shared_ptr<WaypointTextBoxClass>> WaypointTextBoxClass::Array;
 
 WaypointTextBoxClass::WaypointTextBoxClass(int wpIndex, const char* csfLabel,
@@ -43,8 +43,6 @@ WaypointTextBoxClass::WaypointTextBoxClass(int wpIndex, const char* csfLabel,
 	this->ColorB = pType->ColorB;
 	this->Type = pType;
 }
-
-
 
 bool WaypointTextBoxClass::CanDraw() const
 {
@@ -78,8 +76,6 @@ bool WaypointTextBoxClass::GetDrawPosition(Point2D& outPos) const
 	CoordStruct coords = CellClass::Cell2Coord(cell);
 	return TacticalClass::Instance->CoordsToClient(&coords, &outPos);
 }
-
-
 
 WaypointTextBoxClass* WaypointTextBoxClass::FindOrCreate(int wpIndex,
 	const char* csfLabel, const char* typeName)
@@ -118,7 +114,7 @@ WaypointTextBoxClass* WaypointTextBoxClass::FindOrCreate(int wpIndex,
 		auto newLabel = std::make_shared<WaypointTextBoxClass>(
 			wpIndex, csfLabel, typeName);
 		newLabel->UpdateLayout();
-		Array.push_back(newLabel);                          // 派生类数�?
+		Array.push_back(newLabel);                          // 派生类数数组
 		MapTextBoxClass::Array.push_back(std::move(newLabel)); // 基类数组
 		return static_cast<WaypointTextBoxClass*>(
 			MapTextBoxClass::Array.back().get());
@@ -136,13 +132,13 @@ void WaypointTextBoxClass::Remove(int wpIndex)
 	if (it == Array.end())
 		return;
 
-	// 记录原始指针，用于在基类数组中匹�?
+	// 记录原始指针，用于在基类数组中匹配
 	WaypointTextBoxClass* pTarget = it->get();
 
 	// 从派生类数组移除
 	Array.erase(it);
 
-	// 从基类数组移除（匹配原始指针�?
+	// 从基类数组移除(匹配原始指针)
 	auto& baseArray = MapTextBoxClass::Array;
 	auto baseIt = std::find_if(baseArray.begin(), baseArray.end(),
 		[pTarget](const std::shared_ptr<MapTextBoxClass>& pLabel) {
@@ -155,7 +151,6 @@ void WaypointTextBoxClass::Remove(int wpIndex)
 
 void WaypointTextBoxClass::ClearAll()
 {
-	// 同步从基类数组中移除所有属�?WaypointTextBoxClass 的条�?
 	auto& baseArray = MapTextBoxClass::Array;
 	for (auto it = baseArray.begin(); it != baseArray.end(); )
 	{
