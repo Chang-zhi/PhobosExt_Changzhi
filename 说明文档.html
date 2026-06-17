@@ -403,6 +403,7 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本
 <ul class="sec-toc__list">
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('events_1')" class="sec-toc__link">1. 科技类型坐标检测</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('events_2')" class="sec-toc__link">2. 流逝时间检测</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('events_3')" class="sec-toc__link">3. 任务计时器检测</a></li>
 </ul>
 </div>
 
@@ -429,6 +430,18 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本
 <p><strong>触发事件说明：</strong></p>
 <ul class="doc-list--content">
 <li><code class="doc-code--inline">554</code> – 流逝时间(帧)... (参数：等待帧数)</li>
+</ul>
+</div>
+
+<hr class="sec-divider--double">
+
+<div id="events_3">
+<h3 class="doc-heading--tertiary" style="margin-top:2em">3. 任务计时器检测</h3>
+<p>比较任务计时器(MissionTimer)剩余时间与指定秒数。</p>
+<p><strong>触发事件说明：</strong></p>
+<ul class="doc-list--content">
+<li><code class="doc-code--inline">555</code> – 任务计时器大于... (参数：秒数)</li>
+<li><code class="doc-code--inline">556</code> – 任务计时器小于... (参数：秒数)</li>
 </ul>
 </div>
 

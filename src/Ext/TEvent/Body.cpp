@@ -2,6 +2,8 @@
 #include "MyNew/Helper.h"
 
 #include <Utilities/SavegameDef.h>
+#include <Utilities/Debug.h>
+#include <ScenarioClass.h>
 #include <BuildingClass.h>
 #include <InfantryClass.h>
 #include <UnitClass.h>
@@ -94,14 +96,17 @@ std::optional<bool> TEventExt::Execute(TEventClass* pThis, int iEvent, HouseClas
 		return TEventExt::TechnoTypeOfHouseNearWaypoint(pThis, pHouse);
 	case PhobosTriggerEvent::TechnoTypeOfHouseAllLeavesWaypoint:
 		return !TEventExt::TechnoTypeOfHouseNearWaypoint(pThis, pHouse);
-	// case PhobosTriggerEvent::TechnoDestroyedByHouse:
-	// 	return TEventExt::TechnoDestroyedByHouse(pThis, pObject);
 	case PhobosTriggerEvent::TechnoTypeOfHouseExistsAtWaypoint:
 		return TEventExt::TechnoTypeOfHouseExistsAtWaypoint(pThis, pHouse);
 	case PhobosTriggerEvent::TechnoTypeOfHouseNotExistsAtWaypoint:
 		return !TEventExt::TechnoTypeOfHouseExistsAtWaypoint(pThis, pHouse);
 	case PhobosTriggerEvent::ElapsedTimeFrames:
 		return TEventExt::ElapsedTimeFramesFunc(pThis);
+
+	case PhobosTriggerEvent::MissionTimerGreater:
+		return TEventExt::MissionTimerGreaterFunc(pThis);
+	case PhobosTriggerEvent::MissionTimerLess:
+		return TEventExt::MissionTimerLessFunc(pThis);
 
 	default:
 		return std::nullopt;
@@ -196,6 +201,38 @@ bool TEventExt::ElapsedTimeFramesFunc(TEventClass* pThis)
 		// startFrame, Unsorted::CurrentFrame, elapsed, waitFrames, result ? "true" : "false");
 
 	return result;
+}
+
+// ============================================================================
+// 555: MissionTimer > N seconds
+// ============================================================================
+bool TEventExt::MissionTimerGreaterFunc(TEventClass* pThis)
+{
+	auto const pTimer = &ScenarioClass::Instance->MissionTimer;
+	int thresholdFrames = pThis->Value * 15;
+	int remainingSec = pTimer->GetTimeLeft() / 15;
+
+	Debug::Log("[TEvent] MissionTimerGreater: threshold=%ds(%df) remaining=%ds(%df) result=%s\n",
+		pThis->Value, thresholdFrames, remainingSec, pTimer->GetTimeLeft(),
+		(pTimer->GetTimeLeft() > thresholdFrames) ? "true" : "false");
+
+	return pTimer->GetTimeLeft() > thresholdFrames;
+}
+
+// ============================================================================
+// 556: MissionTimer < N seconds
+// ============================================================================
+bool TEventExt::MissionTimerLessFunc(TEventClass* pThis)
+{
+	auto const pTimer = &ScenarioClass::Instance->MissionTimer;
+	int thresholdFrames = pThis->Value * 15;
+	int remainingSec = pTimer->GetTimeLeft() / 15;
+
+	Debug::Log("[TEvent] MissionTimerLess: threshold=%ds(%df) remaining=%ds(%df) result=%s\n",
+		pThis->Value, thresholdFrames, remainingSec, pTimer->GetTimeLeft(),
+		(pTimer->GetTimeLeft() < thresholdFrames) ? "true" : "false");
+
+	return pTimer->GetTimeLeft() < thresholdFrames;
 }
 
 // =============================
