@@ -1,4 +1,4 @@
-﻿======V0.0.13.6(pre-release)=======
+﻿======V0.0.13.6=======
 1,新增/更名 文本框系统(TextBox):可在路径点或科技类型(TechnoClass)上绘制自定义文本框.
 2,新增 [TextBoxTypes] 规则段 - 预定义文本框样式(宽度,不透明度,颜色).
 3,新增 [General] -> ShowTextBoxInShroud.Waypoint=    ;boolean 默认true 路径点文本框在黑幕中是否显示
