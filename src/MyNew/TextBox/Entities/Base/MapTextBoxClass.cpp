@@ -310,7 +310,7 @@ void MapTextBoxClass::DrawAll()
 		pLabel->DrawAt(pos);
 	}
 
-	// ÿ֡������������λ�ı�ǩ
+	// 每帧清理已摧毁单位/已移除的标签
 	TechnoTextBoxClass::CleanupDeadLabels();
 }
 
@@ -334,7 +334,7 @@ bool MapTextBoxClass::SaveGlobals(PhobosStreamWriter& Stm)
 
 bool MapTextBoxClass::LoadGlobals(PhobosStreamReader& Stm)
 {
-	// ����ǰ���������ʵ������
+	// 清除当前所有已存在的实例
 	Clear();
 
 	size_t Count = 0;
@@ -358,7 +358,7 @@ bool MapTextBoxClass::LoadGlobals(PhobosStreamReader& Stm)
 			WaypointTextBoxClass::Array.push_back(newObj);
 			Array.push_back(std::move(newObj));
 		}
-		// TechnoTextBoxClass �������л���������ָ�
+		// TechnoTextBoxClass 反序列化后重建指针
 		else if (std::strcmp(typeMarker.data(), "TechnoTextBoxClass") == 0)
 		{
 			auto newObj = std::make_shared<TechnoTextBoxClass>();

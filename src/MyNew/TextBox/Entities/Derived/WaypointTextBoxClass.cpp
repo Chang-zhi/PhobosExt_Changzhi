@@ -118,7 +118,7 @@ WaypointTextBoxClass* WaypointTextBoxClass::FindOrCreate(int wpIndex,
 		auto newLabel = std::make_shared<WaypointTextBoxClass>(
 			wpIndex, csfLabel, typeName);
 		newLabel->UpdateLayout();
-		Array.push_back(newLabel);                          // 派生类数数组
+		Array.push_back(newLabel);                          // 派生类数组
 		MapTextBoxClass::Array.push_back(std::move(newLabel)); // 基类数组
 		return static_cast<WaypointTextBoxClass*>(
 			MapTextBoxClass::Array.back().get());

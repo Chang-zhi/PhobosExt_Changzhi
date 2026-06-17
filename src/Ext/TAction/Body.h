@@ -169,7 +169,7 @@ enum class PhobosTriggerAction : unsigned int
 	// 将指定作战小队类型的所有实例的脚本执行行号调整至
 	SeekTeamTypeScript = 660,
 
-	// ---- TaskForce Editing Actions (670-675) ----
+	// ---- TaskForce Editing Actions (670-677) ----
 
 	// 清空指定作战小队类型的所有内容
 	ClearTaskForce = 670,
