@@ -25,9 +25,10 @@ static TeamTypeClass* FindTeam(int param) { return TeamTypeClass::Find(MakeID(pa
 // ============================================================================
 // Helper: read a variable via Interop API with Direct fallback
 // ============================================================================
-static int ReadVar(bool bGlobal, int index, int maxIndex)
+static int ReadVar(bool bGlobal, int index)
 {
 	int value = 0;
+	int maxIndex = PhobosInterop::IsAvailable() ? 0x7FFFFFFF : (bGlobal ? 50 : 100);
 
 	if (index < 0 || index >= maxIndex)
 		return 0;
@@ -297,9 +298,9 @@ void ScriptManipulator::ModifyScriptByLocalVar(TActionClass* pThis)
 
 	auto const pExt = CaptureOriginalScriptContent(pScript);
 
-	int actionType = ReadVar(false, pThis->Param4, 100);
-	int param1 = ReadVar(false, pThis->Param5, 100);
-	int param2Val = ReadVar(false, pThis->Param6, 100);
+	int actionType = ReadVar(false, pThis->Param4);
+	int param1 = ReadVar(false, pThis->Param5);
+	int param2Val = ReadVar(false, pThis->Param6);
 
 	int encodedArg = (param2Val << 16) | (param1 & 0xFFFF);
 
@@ -330,9 +331,9 @@ void ScriptManipulator::ModifyScriptByGlobalVar(TActionClass* pThis)
 
 	auto const pExt = CaptureOriginalScriptContent(pScript);
 
-	int actionType = ReadVar(true, pThis->Param4, 50);
-	int param1 = ReadVar(true, pThis->Param5, 50);
-	int param2Val = ReadVar(true, pThis->Param6, 50);
+	int actionType = ReadVar(true, pThis->Param4);
+	int param1 = ReadVar(true, pThis->Param5);
+	int param2Val = ReadVar(true, pThis->Param6);
 
 	int encodedArg = (param2Val << 16) | (param1 & 0xFFFF);
 

@@ -1,6 +1,8 @@
-﻿#include "Body.h"
+#include "Body.h"
 #include "MyNew/Helper.h"
 #include "MyNew/ScriptManipulator.h"
+
+#include <PhobosInterop.h>
 
 #include <YRpp.h>
 #include <TagClass.h>
@@ -173,8 +175,8 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 	//	return TActionExt::RemoveBaseNodesExceedingAttemptCountForHouse(pThis, pHouse, pObject, pTrigger, location);
 	//case PhobosTriggerAction::SetObjectRecruitable:
 	//	return TActionExt::SetObjectRecruitable(pThis, pHouse, pObject, pTrigger, location);
-	//case PhobosTriggerAction::testAction:
-	//	return TActionExt::testAction(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::testAction:
+		return TActionExt::testAction(pThis, pHouse, pObject, pTrigger, location);
 
 	default:
 		bHandled = false;
@@ -1457,6 +1459,97 @@ bool TActionExt::RestoreScriptContent(TActionClass* pThis, HouseClass* pHouse, O
 bool TActionExt::RestoreAllScriptContents(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {
 	ScriptManipulator::RestoreAllScriptContents();
+	return true;
+}
+
+// test helper
+static int testReadVar(bool bGlobal, int index)
+{
+	int value = 0;
+	int maxIndex = PhobosInterop::IsAvailable() ? 0x7FFFFFFF : (bGlobal ? 50 : 100);
+
+	if (index < 0 || index >= maxIndex)
+		return 0;
+
+	if (PhobosInterop::IsAvailable())
+	{
+		if (bGlobal)
+		{
+			PhobosInterop::Variables_GetGlobal(index, &value);
+			Debug::LogAndMessage("[OtherDll] [testReadVar] PhobosInterop Global[%d] = %d\n", index, value);
+		}
+		else
+		{
+			PhobosInterop::Variables_GetLocal(index, &value);
+			Debug::LogAndMessage("[OtherDll] [testReadVar] PhobosInterop Local[%d] = %d\n", index, value);
+		}
+	}
+	else if (ScenarioClass::Instance)
+	{
+		if (bGlobal)
+		{
+			value = ScenarioClass::Instance->GlobalVariables[index].Value;
+			Debug::LogAndMessage("[OtherDll] [testReadVar] ScenarioClass Global[%d] = %d\n", index, value);
+		}
+		else
+		{
+			value = ScenarioClass::Instance->LocalVariables[index].Value;
+			Debug::LogAndMessage("[OtherDll] [testReadVar] ScenarioClass Local[%d] = %d\n", index, value);
+		}
+	}
+
+	return value;
+}
+
+static int testChangeVar(bool bGlobal, int index, int value)
+{
+	int maxIndex = PhobosInterop::IsAvailable() ? 0x7FFFFFFF : (bGlobal ? 50 : 100);
+
+	if (index < 0 || index >= maxIndex)
+		return 0;
+
+	if (PhobosInterop::IsAvailable())
+	{
+		if (bGlobal)
+		{
+			PhobosInterop::Variables_SetGlobal(index, value);
+			Debug::LogAndMessage("[OtherDll] [testChangeVar] PhobosInterop Global[%d] := %d\n", index, value);
+		}
+		else
+		{
+			PhobosInterop::Variables_SetLocal(index, value);
+			Debug::LogAndMessage("[OtherDll] [testChangeVar] PhobosInterop Local[%d] := %d\n", index, value);
+		}
+	}
+	else if (ScenarioClass::Instance)
+	{
+		if (bGlobal)
+		{
+			ScenarioClass::Instance->GlobalVariables[index].Value = value;
+			Debug::LogAndMessage("[OtherDll] [testChangeVar] ScenarioClass Global[%d] := %d\n", index, value);
+		}
+		else
+		{
+			ScenarioClass::Instance->LocalVariables[index].Value = value;
+			Debug::LogAndMessage("[OtherDll] [testChangeVar] ScenarioClass Local[%d] := %d\n", index, value);
+		}
+	}
+
+	return value;
+}
+
+bool TActionExt::testAction(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	int valIndex = pThis->Param3;
+	int targetVal = pThis->Param4;
+	bool isGlobal = (pThis->Param5 != 0);
+	bool isChange = (pThis->Param6 != 0);
+
+	if (isChange)
+		testChangeVar(isGlobal, valIndex, targetVal);
+	else
+		testReadVar(isGlobal, valIndex);
+
 	return true;
 }
 

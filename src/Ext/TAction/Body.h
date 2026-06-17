@@ -167,7 +167,7 @@ enum class PhobosTriggerAction : unsigned int
 	RestoreAllScriptContents = 659,
 
 	// 测试用
-	// testAction = 1150,
+	testAction = 1150,
 };
 
 class TActionExt
@@ -258,7 +258,7 @@ static bool name(TActionClass* pThis, HouseClass* pHouse, \
 	ACTION_FUNC(RestoreAllScriptContents);
 
 	// 测试用
-	// ACTION_FUNC(testAction);
+	ACTION_FUNC(testAction);
 
 
 #undef ACTION_FUNC

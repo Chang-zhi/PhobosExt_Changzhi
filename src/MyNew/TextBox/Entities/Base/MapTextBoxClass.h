@@ -51,6 +51,8 @@ protected:
 				  int maxWidth = 250, int opacityPercent = 75,
 				  int colorR = 255, int colorG = 215, int colorB = 0);
 
+	int VerticalOffset { 0 };
+
 	template <typename T>
 	bool Serialize(T& Stm);
 
@@ -61,7 +63,6 @@ private:
 		std::vector<std::wstring> CachedLines;
 		int CachedBgWidth { 0 };
 		int CachedBgHeight { 0 };
-		const wchar_t* CachedTextPtr { nullptr };
 	};
 	std::unique_ptr<Cache> m_cache;
 };

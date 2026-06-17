@@ -11,6 +11,8 @@
 #include <TacticalClass.h>
 #include <ScenarioClass.h>
 #include <CellClass.h>
+#include <MapClass.h>
+#include <Unsorted.h>
 
 #include <Ext/Rules/Body.h>
 
@@ -73,7 +75,9 @@ bool WaypointTextBoxClass::GetDrawPosition(Point2D& outPos) const
 	if (cell.X < 0 && cell.Y < 0)
 		return false;
 
-	CoordStruct coords = CellClass::Cell2Coord(cell);
+	CellClass* pCellData = MapClass::Instance.GetCellAt(cell);
+	int cellZ = pCellData ? pCellData->GetLevel() * Unsorted::LevelHeight : 0;
+	CoordStruct coords = CellClass::Cell2Coord(cell, cellZ);
 	return TacticalClass::Instance->CoordsToClient(&coords, &outPos);
 }
 
