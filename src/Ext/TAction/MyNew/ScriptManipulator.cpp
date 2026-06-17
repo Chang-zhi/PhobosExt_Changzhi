@@ -28,7 +28,7 @@ static TeamTypeClass* FindTeam(int param) { return TeamTypeClass::Find(MakeID(pa
 static int ReadVar(bool bGlobal, int index)
 {
 	int value = 0;
-	int maxIndex = PhobosInterop::IsAvailable() ? 0x7FFFFFFF : (bGlobal ? 50 : 100);
+	int maxIndex = bGlobal ? 50 : 100;
 
 	if (index < 0 || index >= maxIndex)
 		return 0;

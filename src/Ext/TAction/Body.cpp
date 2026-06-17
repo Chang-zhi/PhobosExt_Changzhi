@@ -1,6 +1,7 @@
 #include "Body.h"
 #include "MyNew/Helper.h"
 #include "MyNew/ScriptManipulator.h"
+#include "MyNew/TaskForceManipulator.h"
 
 #include <PhobosInterop.h>
 
@@ -172,6 +173,24 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 		return TActionExt::RestoreAllScriptContents(pThis, pHouse, pObject, pTrigger, location);
 	case PhobosTriggerAction::SeekTeamTypeScript:
 		return TActionExt::SeekTeamTypeScript(pThis, pHouse, pObject, pTrigger, location);
+
+	// ---- TaskForce Editing Actions ----
+	case PhobosTriggerAction::ClearTaskForce:
+		return TActionExt::ClearTaskForce(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::CopyTaskForce:
+		return TActionExt::CopyTaskForce(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::ModifyTaskForceEntry:
+		return TActionExt::ModifyTaskForceEntry(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::RebindTeamTypeTaskForce:
+		return TActionExt::RebindTeamTypeTaskForce(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::RestoreTaskForce:
+		return TActionExt::RestoreTaskForce(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::RestoreAllTaskForces:
+		return TActionExt::RestoreAllTaskForces(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::ResetTeamTypeTaskForce:
+		return TActionExt::ResetTeamTypeTaskForce(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::ResetAllTeamTypeTaskForces:
+		return TActionExt::ResetAllTeamTypeTaskForces(pThis, pHouse, pObject, pTrigger, location);
 
 	//case PhobosTriggerAction::RemoveBaseNodesExceedingAttemptCountForHouse:
 	//	return TActionExt::RemoveBaseNodesExceedingAttemptCountForHouse(pThis, pHouse, pObject, pTrigger, location);
@@ -1472,11 +1491,62 @@ bool TActionExt::SeekTeamTypeScript(TActionClass* pThis, HouseClass* pHouse, Obj
 	return true;
 }
 
+// =============================
+// TaskForce Editing Actions (670-675)
+
+bool TActionExt::ClearTaskForce(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	TaskForceManipulator::ClearTaskForce(pThis);
+	return true;
+}
+
+bool TActionExt::CopyTaskForce(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	TaskForceManipulator::CopyTaskForce(pThis);
+	return true;
+}
+
+bool TActionExt::ModifyTaskForceEntry(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	TaskForceManipulator::ModifyTaskForceEntry(pThis);
+	return true;
+}
+
+bool TActionExt::RebindTeamTypeTaskForce(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	TaskForceManipulator::RebindTeamTypeTaskForce(pThis);
+	return true;
+}
+
+bool TActionExt::RestoreTaskForce(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	TaskForceManipulator::RestoreTaskForce(pThis);
+	return true;
+}
+
+bool TActionExt::RestoreAllTaskForces(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	TaskForceManipulator::RestoreAllTaskForces();
+	return true;
+}
+
+bool TActionExt::ResetTeamTypeTaskForce(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	TaskForceManipulator::ResetTeamTypeTaskForce(pThis);
+	return true;
+}
+
+bool TActionExt::ResetAllTeamTypeTaskForces(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	TaskForceManipulator::ResetAllTeamTypeTaskForces();
+	return true;
+}
+
 // test helper
 static int testReadVar(bool bGlobal, int index)
 {
 	int value = 0;
-	int maxIndex = PhobosInterop::IsAvailable() ? 0x7FFFFFFF : (bGlobal ? 50 : 100);
+	int maxIndex = bGlobal ? 50 : 100;
 
 	if (index < 0 || index >= maxIndex)
 		return 0;
@@ -1513,7 +1583,7 @@ static int testReadVar(bool bGlobal, int index)
 
 static int testChangeVar(bool bGlobal, int index, int value)
 {
-	int maxIndex = PhobosInterop::IsAvailable() ? 0x7FFFFFFF : (bGlobal ? 50 : 100);
+	int maxIndex = bGlobal ? 50 : 100;
 
 	if (index < 0 || index >= maxIndex)
 		return 0;

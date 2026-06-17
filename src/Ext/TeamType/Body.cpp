@@ -20,6 +20,7 @@ void TeamTypeExt::ExtData::Serialize(T& Stm)
 {
 	Stm
 		.Process(this->OriginalScriptTypeIndex)
+		.Process(this->OriginalTaskForceIndex)
 		;
 }
 

@@ -169,6 +169,32 @@ enum class PhobosTriggerAction : unsigned int
 	// 将指定作战小队类型的所有实例的脚本执行行号调整至
 	SeekTeamTypeScript = 660,
 
+	// ---- TaskForce Editing Actions (670-675) ----
+
+	// 清空指定作战小队类型的所有内容
+	ClearTaskForce = 670,
+
+	// 复制源作战小队类型的内容到目标作战小队类型
+	CopyTaskForce = 671,
+
+	// 修改指定作战小队类型的指定条目
+	ModifyTaskForceEntry = 672,
+
+	// 重新指定作战小队类型绑定的特遣部队
+	RebindTeamTypeTaskForce = 673,
+
+	// 恢复指定作战小队类型的内容到初始状态
+	RestoreTaskForce = 674,
+
+	// 恢复所有作战小队类型的内容到初始状态
+	RestoreAllTaskForces = 675,
+
+	// 恢复指定作战小队类型绑定的特遣部队到初始状态
+	ResetTeamTypeTaskForce = 676,
+
+	// 恢复所有作战小队类型绑定的特遣部队到初始状态
+	ResetAllTeamTypeTaskForces = 677,
+
 	// 测试用
 	testAction = 1150,
 };
@@ -260,6 +286,16 @@ static bool name(TActionClass* pThis, HouseClass* pHouse, \
 	ACTION_FUNC(RestoreScriptContent);
 	ACTION_FUNC(RestoreAllScriptContents);
 	ACTION_FUNC(SeekTeamTypeScript);
+
+	// ---- TaskForce Editing Actions ----
+	ACTION_FUNC(ClearTaskForce);
+	ACTION_FUNC(CopyTaskForce);
+	ACTION_FUNC(ModifyTaskForceEntry);
+	ACTION_FUNC(RebindTeamTypeTaskForce);
+	ACTION_FUNC(RestoreTaskForce);
+	ACTION_FUNC(RestoreAllTaskForces);
+	ACTION_FUNC(ResetTeamTypeTaskForce);
+	ACTION_FUNC(ResetAllTeamTypeTaskForces);
 
 	// 测试用
 	ACTION_FUNC(testAction);

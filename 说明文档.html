@@ -83,6 +83,7 @@
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_7')" class="sec-toc__link">6. 更新建筑动画功能</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_11')" class="sec-toc__link">7. 作战小队操作</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_12')" class="sec-toc__link">8. 脚本操作</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_13')" class="sec-toc__link">9. 特遣部队操作</a></li>
 </ul>
 </div>
 
@@ -325,6 +326,34 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本
 <li>动作 660 将指定作战小队类型的所有实例的脚本执行行号跳转到指定位置(0-based)，不会修改脚本内容或小队绑定。</li>
 <li>以上所有动作执行后，使用该脚本的作战小队会立即重置到第 0 行执行。</li>
 <li><strong>注意：动作 653、654 暂不可用</strong>，需等待 Phobos PR#2256 通过，且必须与 Phobos 配合使用。</li>
+</ul>
+</div>
+
+<hr class="sec-divider--double">
+
+<div id="actions_13">
+<h3 class="doc-heading--tertiary" style="margin-top:2em">9. 特遣部队操作</h3>
+
+<div class="doc-table--action">
+<table class="doc-table">
+<thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
+<tbody>
+<tr><td class="doc-table__td">670</td><td class="doc-table__td">清空特遣部队内容...</td><td class="doc-table__td">特遣部队</td></tr>
+<tr><td class="doc-table__td">671</td><td class="doc-table__td">复制特遣部队内容...</td><td class="doc-table__td">源特遣部队，目标特遣部队</td></tr>
+<tr><td class="doc-table__td">672</td><td class="doc-table__td">修改特遣部队条目...</td><td class="doc-table__td">科技类型，特遣部队，条目索引(0-5)，数量</td></tr>
+<tr><td class="doc-table__td">673</td><td class="doc-table__td">重新指定小队特遣部队...</td><td class="doc-table__td">作战小队类型，目标特遣部队</td></tr>
+<tr><td class="doc-table__td">674</td><td class="doc-table__td">恢复特遣部队内容...</td><td class="doc-table__td">特遣部队</td></tr>
+<tr><td class="doc-table__td">675</td><td class="doc-table__td">恢复所有特遣部队内容...</td><td class="doc-table__td">无参数</td></tr>
+<tr><td class="doc-table__td">676</td><td class="doc-table__td">恢复小队特遣部队索引...</td><td class="doc-table__td">作战小队类型</td></tr>
+<tr><td class="doc-table__td">677</td><td class="doc-table__td">恢复所有小队特遣部队索引...</td><td class="doc-table__td">无参数</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="doc-paragraph--only-vertical"><strong>说明：</strong></p>
+<ul class="doc-list--content">
+<li><strong>内容</strong>指特遣部队的编制条目；<strong>索引</strong>指作战小队类型绑定了哪个特遣部队。</li>
+<li>所有动作执行后自动刷新活跃小队（重新统计成员、释放超额、更新满编/缺编状态）。</li>
 </ul>
 </div>
 
