@@ -198,6 +198,9 @@ enum class PhobosTriggerAction : unsigned int
 	// 将指定分组的指定所属方的所有单位加入指定小队类型
 	RecruitGroupToTeam = 678,
 
+	// 解除指定所属方所有已部署的单位
+	UndeployHouseUnits = 679,
+
 	// 测试用
 	testAction = 1150,
 };
@@ -300,6 +303,7 @@ static bool name(TActionClass* pThis, HouseClass* pHouse, \
 	ACTION_FUNC(ResetTeamTypeTaskForce);
 	ACTION_FUNC(ResetAllTeamTypeTaskForces);
 	ACTION_FUNC(RecruitGroupToTeam);
+	ACTION_FUNC(UndeployHouseUnits);
 
 	// 测试用
 	ACTION_FUNC(testAction);

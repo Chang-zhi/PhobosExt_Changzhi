@@ -9,6 +9,8 @@
 #include <TagClass.h>
 #include <TagTypeClass.h>
 #include <TechnoClass.h>
+#include <UnitClass.h>
+#include <InfantryClass.h>
 #include <HouseClass.h>
 #include <Ext/House/Body.h>
 #include <ArrayClasses.h>
@@ -194,6 +196,8 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 
 	case PhobosTriggerAction::RecruitGroupToTeam:
 		return TActionExt::RecruitGroupToTeam(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::UndeployHouseUnits:
+		return TActionExt::UndeployHouseUnits(pThis, pHouse, pObject, pTrigger, location);
 
 	//case PhobosTriggerAction::RemoveBaseNodesExceedingAttemptCountForHouse:
 	//	return TActionExt::RemoveBaseNodesExceedingAttemptCountForHouse(pThis, pHouse, pObject, pTrigger, location);
@@ -1586,6 +1590,36 @@ bool TActionExt::RecruitGroupToTeam(TActionClass* pThis, HouseClass* pHouse, Obj
 			continue;
 
 		pTeam->AddMember(pFoot, true);
+	}
+
+	return true;
+}
+
+// =============================
+// 679: Undeploy House Units
+
+bool TActionExt::UndeployHouseUnits(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	int houseIdx = pThis->Param3;
+	HouseClass* pOwner = HouseClass::FindByCountryIndex(houseIdx);
+	if (!pOwner)
+		return false;
+
+	for (auto pFoot : FootClass::Array)
+	{
+		if (!pFoot || pFoot->Owner != pOwner)
+			continue;
+
+		if (auto pUnit = abstract_cast<UnitClass*>(pFoot))
+		{
+			if (pUnit->Deployed)
+				pFoot->ForceMission(Mission::Unload);
+		}
+		else if (auto pInf = abstract_cast<InfantryClass*>(pFoot))
+		{
+			if (pInf->IsDeployed())
+				pFoot->ForceMission(Mission::Unload);
+		}
 	}
 
 	return true;
