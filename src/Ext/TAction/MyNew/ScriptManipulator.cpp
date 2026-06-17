@@ -523,3 +523,33 @@ void ScriptManipulator::RestoreAllScriptContents()
 			ResetTeamsUsingScript(pScript);
 	}
 }
+
+// ============================================================================
+// 660: Seek/jump script execution line for all instances of a TeamType
+//   Param3=TeamType index  Param4=target line number (0-based, 0=first action)
+// ============================================================================
+void ScriptManipulator::SeekTeamTypeScript(TActionClass* pThis)
+{
+	auto const pTeamType = FindTeam(pThis->Param3);
+	if (!pTeamType)
+		return;
+
+	int const targetLine = pThis->Param4;
+	int const seekTo = (targetLine <= 0) ? -1 : (targetLine - 1);
+
+	Debug::Log("[Phobos] SeekTeamTypeScript: TeamType [%s] targetLine=%d seekTo=%d\n",
+		pTeamType->ID, targetLine, seekTo);
+
+	for (int i = 0; i < TeamClass::Array.Count; ++i)
+	{
+		auto const pTeam = TeamClass::Array.GetItem(i);
+		if (!pTeam || pTeam->Type != pTeamType)
+			continue;
+
+		if (pTeam->CurrentScript)
+			pTeam->CurrentScript->CurrentMission = seekTo;
+
+		pTeam->StepCompleted = true;
+	}
+}
+

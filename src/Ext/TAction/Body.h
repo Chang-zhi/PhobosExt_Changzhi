@@ -166,6 +166,9 @@ enum class PhobosTriggerAction : unsigned int
 	// 恢复所有脚本的内容到初始状态
 	RestoreAllScriptContents = 659,
 
+	// 将指定作战小队类型的所有实例的脚本执行行号调整至
+	SeekTeamTypeScript = 660,
+
 	// 测试用
 	testAction = 1150,
 };
@@ -256,6 +259,7 @@ static bool name(TActionClass* pThis, HouseClass* pHouse, \
 	ACTION_FUNC(ResetAllTeamTypeScripts);
 	ACTION_FUNC(RestoreScriptContent);
 	ACTION_FUNC(RestoreAllScriptContents);
+	ACTION_FUNC(SeekTeamTypeScript);
 
 	// 测试用
 	ACTION_FUNC(testAction);

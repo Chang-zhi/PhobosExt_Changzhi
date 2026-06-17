@@ -170,6 +170,8 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 		return TActionExt::RestoreScriptContent(pThis, pHouse, pObject, pTrigger, location);
 	case PhobosTriggerAction::RestoreAllScriptContents:
 		return TActionExt::RestoreAllScriptContents(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::SeekTeamTypeScript:
+		return TActionExt::SeekTeamTypeScript(pThis, pHouse, pObject, pTrigger, location);
 
 	//case PhobosTriggerAction::RemoveBaseNodesExceedingAttemptCountForHouse:
 	//	return TActionExt::RemoveBaseNodesExceedingAttemptCountForHouse(pThis, pHouse, pObject, pTrigger, location);
@@ -1114,7 +1116,7 @@ bool TActionExt::RecruitNearbyFootToTeam(TActionClass* pThis, HouseClass* pHouse
 	int teamIndex = pThis->Param3;
 	int waypointIndex = pThis->Param4;
 	int range = pThis->Param5;
-	int houseIndex = pThis->Param6;
+	bool isOnlyRecruitable = pThis->Param6 != 0;
 
 	// ===== 1. 获取作战小队类型 =====
 	TeamTypeClass* pTeamType = nullptr;
@@ -1133,16 +1135,18 @@ bool TActionExt::RecruitNearbyFootToTeam(TActionClass* pThis, HouseClass* pHouse
 
 	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
 	if (cell.X < 0 || cell.Y < 0) return false;
-
-	HouseClass* pOwner = HouseClass::FindByCountryIndex(houseIndex);
-	if (!pOwner) return false;
+\
 
 	for (FootClass* pFoot : FootClass::Array)
 	{
 		if (!pFoot) continue;
-		if (pFoot->Owner != pOwner) continue;
+		if (pFoot->Owner != pTeam->Owner) continue;
 		if (pFoot->Team) continue; // 已经在其他小队中
-		if (!pFoot->CanBeRecruited(pOwner)) continue;
+		if(isOnlyRecruitable)
+		{
+			if (!pFoot->CanBeRecruited(pFoot->Owner))
+				continue;
+		}
 		if (!IsTechnoNearCell(pFoot, cell, range)) continue;
 
 		pTeam->AddMember(pFoot, true);
@@ -1459,6 +1463,12 @@ bool TActionExt::RestoreScriptContent(TActionClass* pThis, HouseClass* pHouse, O
 bool TActionExt::RestoreAllScriptContents(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {
 	ScriptManipulator::RestoreAllScriptContents();
+	return true;
+}
+
+bool TActionExt::SeekTeamTypeScript(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	ScriptManipulator::SeekTeamTypeScript(pThis);
 	return true;
 }
 

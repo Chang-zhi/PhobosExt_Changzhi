@@ -270,7 +270,7 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本
 <p><strong>触发动作说明：</strong></p>
 <ul class="doc-list--content">
 <li><code class="doc-code--inline">577</code> – 建立作战小队(考虑限制)... (参数：小队索引，上限限制开关，区域检查开关，连通模式)</li>
-<li><code class="doc-code--inline">578</code> – 将路径点范围内指定所属方的可招募单位加入已存在的作战小队... (参数：小队索引，路径点，范围，所属方国家索引)</li>
+<li><code class="doc-code--inline">578</code> – 将路径点范围内可招募单位加入已存在的作战小队... (参数：小队索引，路径点，范围，仅招募可招募单位)</li>
 </ul>
 <br>
 <p><strong>动作 577 (建立作战小队)：</strong></p>
@@ -286,9 +286,10 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本
 <br>
 <p><strong>动作 578 (招募单位到已有小队)：</strong></p>
 <ul class="doc-list--content">
-<li>将指定路径点指定范围内、指定所属方的所有可招募地面单位(FootClass)加入一个已存在的作战小队实例。</li>
+<li>将指定路径点指定范围内的所有可招募地面单位(FootClass)加入一个已存在的作战小队实例。</li>
 <li>如果没有该类型的已有实例，则无动作。</li>
-<li>只会招募满足以下条件的单位：属于指定所属方、未加入其他小队、可被招募(<code class="doc-code--inline">CanBeRecruited</code>)、在路径点指定范围内。</li>
+<li>只会招募满足以下条件的单位：属于该小队所属方、未加入其他小队、在路径点指定范围内。</li>
+<li><strong>仅招募可招募单位(参数4)：</strong><code class="doc-code--inline">0</code>=不检查可招募属性，<code class="doc-code--inline">1</code>=仅招募 <code class="doc-code--inline">CanBeRecruited</code> 返回 <code class="doc-code--inline">true</code> 的单位。</li>
 </ul>
 </div>
 
@@ -311,6 +312,7 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本
 <tr><td class="doc-table__td">657</td><td class="doc-table__td">恢复所有小队脚本索引...</td><td class="doc-table__td">无参数</td></tr>
 <tr><td class="doc-table__td">658</td><td class="doc-table__td">恢复脚本内容...</td><td class="doc-table__td">脚本类型</td></tr>
 <tr><td class="doc-table__td">659</td><td class="doc-table__td">恢复所有脚本内容...</td><td class="doc-table__td">无参数</td></tr>
+<tr><td class="doc-table__td">660</td><td class="doc-table__td">将小队脚本执行行号跳转至...</td><td class="doc-table__td">作战小队类型，目标行号(0-based)</td></tr>
 </tbody>
 </table>
 </div>
@@ -320,6 +322,7 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本
 <li>动作 650-654 在游戏运行时动态修改脚本类型(ScriptType)的动作内容（即该脚本的各行具体指令）。</li>
 <li>动作 655-657 改变作战小队类型(TeamType)引用的脚本类型（即该小队执行的脚本是哪个），不对脚本内容本身做任何修改。</li>
 <li>动作 658-659 将之前通过 650-654 修改过的脚本内容恢复到 INI 定义的原始状态，不影响小队绑定索引。</li>
+<li>动作 660 将指定作战小队类型的所有实例的脚本执行行号跳转到指定位置(0-based)，不会修改脚本内容或小队绑定。</li>
 <li>以上所有动作执行后，使用该脚本的作战小队会立即重置到第 0 行执行。</li>
 <li><strong>注意：动作 653、654 暂不可用</strong>，需等待 Phobos PR#2256 通过，且必须与 Phobos 配合使用。</li>
 </ul>
