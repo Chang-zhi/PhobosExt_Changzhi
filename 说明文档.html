@@ -272,6 +272,7 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本
 <ul class="doc-list--content">
 <li><code class="doc-code--inline">577</code> – 建立作战小队(考虑限制)... (参数：小队索引，上限限制开关，区域检查开关，连通模式)</li>
 <li><code class="doc-code--inline">578</code> – 将路径点范围内可招募单位加入已存在的作战小队... (参数：小队索引，路径点，范围，仅招募可招募单位)</li>
+<li><code class="doc-code--inline">678</code> – 将编组单位加入小队... (参数：分组号(0-9,-1=不限)，所属方国家索引，小队索引)</li>
 </ul>
 <br>
 <p><strong>动作 577 (建立作战小队)：</strong></p>
@@ -291,6 +292,14 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本
 <li>如果没有该类型的已有实例，则无动作。</li>
 <li>只会招募满足以下条件的单位：属于该小队所属方、未加入其他小队、在路径点指定范围内。</li>
 <li><strong>仅招募可招募单位(参数4)：</strong><code class="doc-code--inline">0</code>=不检查可招募属性，<code class="doc-code--inline">1</code>=仅招募 <code class="doc-code--inline">CanBeRecruited</code> 返回 <code class="doc-code--inline">true</code> 的单位。</li>
+</ul>
+<br>
+<p><strong>动作 678 (将编组单位加入小队)：</strong></p>
+<ul class="doc-list--content">
+<li>将指定分组(Group)和所属方(House)的所有地面单位(FootClass)加入指定小队类型的首个活跃实例。</li>
+<li>如果没有该类型的已有实例，则什么都不做。</li>
+<li>分组号为 <code class="doc-code--inline">-1</code> 时不限制分组（即招募该所属方的所有可用单位）。</li>
+<li>只会招募满足以下条件的单位：属于指定所属方、未加入其他小队、分组号匹配。</li>
 </ul>
 </div>
 

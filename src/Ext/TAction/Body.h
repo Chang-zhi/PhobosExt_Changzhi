@@ -195,6 +195,9 @@ enum class PhobosTriggerAction : unsigned int
 	// 恢复所有作战小队类型绑定的特遣部队到初始状态
 	ResetAllTeamTypeTaskForces = 677,
 
+	// 将指定分组的指定所属方的所有单位加入指定小队类型
+	RecruitGroupToTeam = 678,
+
 	// 测试用
 	testAction = 1150,
 };
@@ -296,6 +299,7 @@ static bool name(TActionClass* pThis, HouseClass* pHouse, \
 	ACTION_FUNC(RestoreAllTaskForces);
 	ACTION_FUNC(ResetTeamTypeTaskForce);
 	ACTION_FUNC(ResetAllTeamTypeTaskForces);
+	ACTION_FUNC(RecruitGroupToTeam);
 
 	// 测试用
 	ACTION_FUNC(testAction);

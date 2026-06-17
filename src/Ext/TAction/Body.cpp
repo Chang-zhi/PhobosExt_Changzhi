@@ -192,6 +192,9 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 	case PhobosTriggerAction::ResetAllTeamTypeTaskForces:
 		return TActionExt::ResetAllTeamTypeTaskForces(pThis, pHouse, pObject, pTrigger, location);
 
+	case PhobosTriggerAction::RecruitGroupToTeam:
+		return TActionExt::RecruitGroupToTeam(pThis, pHouse, pObject, pTrigger, location);
+
 	//case PhobosTriggerAction::RemoveBaseNodesExceedingAttemptCountForHouse:
 	//	return TActionExt::RemoveBaseNodesExceedingAttemptCountForHouse(pThis, pHouse, pObject, pTrigger, location);
 	//case PhobosTriggerAction::SetObjectRecruitable:
@@ -1539,6 +1542,52 @@ bool TActionExt::ResetTeamTypeTaskForce(TActionClass* pThis, HouseClass* pHouse,
 bool TActionExt::ResetAllTeamTypeTaskForces(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {
 	TaskForceManipulator::ResetAllTeamTypeTaskForces();
+	return true;
+}
+
+// =============================
+// 678: Recruit Group to Team
+
+bool TActionExt::RecruitGroupToTeam(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	int group = pThis->Param3;
+	int houseIdx = pThis->Param4;
+	int teamIdx = pThis->Param5;
+
+	HouseClass* pOwner = HouseClass::FindByCountryIndex(houseIdx);
+	if (!pOwner)
+		return false;
+
+	TeamTypeClass* pTeamType = nullptr;
+	for (auto const pTT : TeamTypeClass::Array)
+	{
+		if (pTT && pTT->get_ID() == ("0" + std::to_string(teamIdx)))
+		{
+			pTeamType = pTT;
+			break;
+		}
+	}
+	if (!pTeamType)
+		return false;
+
+	TeamClass* pTeam = pTeamType->FindFirstInstance();
+	if (!pTeam)
+		return true;
+
+	for (auto pFoot : FootClass::Array)
+	{
+		if (!pFoot)
+			continue;
+		if (pFoot->Owner != pOwner)
+			continue;
+		if (pFoot->Team)
+			continue;
+		if (group >= 0 && pFoot->Group != group)
+			continue;
+
+		pTeam->AddMember(pFoot, true);
+	}
+
 	return true;
 }
 
