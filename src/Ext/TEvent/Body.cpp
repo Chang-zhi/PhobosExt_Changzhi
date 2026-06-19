@@ -210,11 +210,6 @@ bool TEventExt::MissionTimerGreaterFunc(TEventClass* pThis)
 {
 	auto const pTimer = &ScenarioClass::Instance->MissionTimer;
 	int thresholdFrames = pThis->Value * 15;
-	int remainingSec = pTimer->GetTimeLeft() / 15;
-
-	Debug::Log("[TEvent] MissionTimerGreater: threshold=%ds(%df) remaining=%ds(%df) result=%s\n",
-		pThis->Value, thresholdFrames, remainingSec, pTimer->GetTimeLeft(),
-		(pTimer->GetTimeLeft() > thresholdFrames) ? "true" : "false");
 
 	return pTimer->GetTimeLeft() > thresholdFrames;
 }
@@ -226,11 +221,6 @@ bool TEventExt::MissionTimerLessFunc(TEventClass* pThis)
 {
 	auto const pTimer = &ScenarioClass::Instance->MissionTimer;
 	int thresholdFrames = pThis->Value * 15;
-	int remainingSec = pTimer->GetTimeLeft() / 15;
-
-	Debug::Log("[TEvent] MissionTimerLess: threshold=%ds(%df) remaining=%ds(%df) result=%s\n",
-		pThis->Value, thresholdFrames, remainingSec, pTimer->GetTimeLeft(),
-		(pTimer->GetTimeLeft() < thresholdFrames) ? "true" : "false");
 
 	return pTimer->GetTimeLeft() < thresholdFrames;
 }
