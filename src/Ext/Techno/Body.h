@@ -36,6 +36,7 @@ public:
 
 		int WeaponDamage = 100;                 // 武器伤害值
 		int ExtraWarpAdded = 0;                 // 已加到主 Temporal 上的额外时间
+		int WarpTimer = 0;                      // 内部计时器（替代引擎的 WarpRemaining）
 		TechnoClass* CachedMain = nullptr;      // 缓存的主目标指针（不由 InvalidatePointer 清空）
 		bool CachedMainDead = false;            // 缓存的主目标已被游戏抹除
 		bool WarpingOut = false;                // 正在抹除副目标中，防止递归
@@ -44,6 +45,7 @@ public:
 
 		std::vector<TechnoClass*> TargetsInRange;      // 范围内的副目标列表
 		std::unordered_set<TechnoClass*> BuildingsDisabled;      // 已被 DisableTemporal 的建筑
+		std::unordered_set<TechnoClass*> ContributedTargets;    // 已贡献过时间的副目标（仅累加，离开不扣减）
 	};
 
 	class ExtData final : public Extension<TechnoClass>

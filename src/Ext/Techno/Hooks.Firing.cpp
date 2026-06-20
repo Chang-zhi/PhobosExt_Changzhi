@@ -29,13 +29,13 @@ DEFINE_HOOK(0x6FC339, TechnoClass_CanFire, 0x6)
 	if (pWeapon->Warhead && pWeapon->Warhead->Temporal)
 	{
 		// AOE 副目标拦截
-		auto claimIt = TemporalAOESecondaryClaims.find(pTargetTechno);
-		if (claimIt != TemporalAOESecondaryClaims.end() && claimIt->second != pThis)
+		auto claimIt = TemporalAOE::SecondaryClaims.find(pTargetTechno);
+		if (claimIt != TemporalAOE::SecondaryClaims.end() && claimIt->second != pThis)
 			return CannotFire;
 
 		// AOE 主目标拦截
-		auto mainIt = TemporalAOECachedMainOwners.find(pTargetTechno);
-		if (mainIt != TemporalAOECachedMainOwners.end() && mainIt->second != pThis)
+		auto mainIt = TemporalAOE::CachedMainOwners.find(pTargetTechno);
+		if (mainIt != TemporalAOE::CachedMainOwners.end() && mainIt->second != pThis)
 			return CannotFire;
 
 		// Temporal.Exclusive 拦截

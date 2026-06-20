@@ -52,10 +52,12 @@ void TechnoExt::ExtData::Serialize(T& Stm)
 		.Process(this->AOEState.SecondaryWeight)
 		.Process(this->AOEState.WeaponDamage)
 		.Process(this->AOEState.ExtraWarpAdded)
+		.Process(this->AOEState.WarpTimer)
 		.Process(this->AOEState.CachedMainDead)
 		.Process(this->AOEState.WarpingOut)
 		.Process(this->AOEState.ScanInterval)
 		.Process(this->AOEState.ScanCounter)
+		.Process(this->AOEState.ContributedTargets)
 		;
 
 	// 读档时：完全重置 AOEState（存档中的标记位不可信，下次更新自动重建）
@@ -68,7 +70,17 @@ void TechnoExt::ExtData::Serialize(T& Stm)
 		this->AOEState.BuildingsDisabled.clear();
 		this->AOEState.CachedMainDead = false;
 		this->AOEState.WarpingOut = false;
+		// ContributedTargets 指针在存档中无效，全部重置
+		// 下一帧重新扫描时会重新累加 ExtraWarpAdded
+		this->AOEState.Active = false;
+		this->AOEState.CachedMain = nullptr;
+		this->AOEState.TargetsInRange.clear();
+		this->AOEState.BuildingsDisabled.clear();
+		this->AOEState.CachedMainDead = false;
+		this->AOEState.WarpingOut = false;
 		this->AOEState.ExtraWarpAdded = 0;
+		this->AOEState.WarpTimer = 0;
+		this->AOEState.ContributedTargets.clear();
 		this->AOEState.ScanCounter = 0;
 	}
 }
@@ -124,15 +136,15 @@ bool TechnoExt::LoadGlobals(PhobosStreamReader& Stm)
 	// ⚠ 此时引擎指针修复尚未完成，不能访问任何游戏对象指针
 
 	// 清理全局 maps（旧会话的指针在新会话中无效）
-	FakeTemporals.clear();
-	TemporalAOESecondaryClaims.clear();
-	TemporalAOEWarpingOutTargets.clear();
-	TemporalAOECachedMainOwners.clear();
+	TemporalAOE::FakeTemporals.clear();
+	TemporalAOE::SecondaryClaims.clear();
+	TemporalAOE::WarpingOutTargets.clear();
+	TemporalAOE::CachedMainOwners.clear();
 	TemporalExclusiveTargetsMap.clear();
 	BerzerkRestoreClearCache();
 
 	// 标记：指针修复完成后在第一帧执行深度清理
-	s_PostLoadCleanupNeeded = true;
+	TemporalAOE::s_PostLoadCleanupNeeded = true;
 
 	return Stm
 		.Success();
@@ -168,13 +180,13 @@ DEFINE_HOOK(0x6F4500, TechnoClass_DTOR, 0x5)
 {
 	GET(TechnoClass*, pItem, ECX);
 
-	InvalidateAOESecondaryClaims(pItem);
+	TemporalAOE::InvalidatePtr(pItem);
 	BerzerkRestorePointerInvalidate(pItem);
-	// 清理 TemporalAOECachedMainOwners 中指向已销毁对象的条目
-	for (auto it = TemporalAOECachedMainOwners.begin(); it != TemporalAOECachedMainOwners.end(); )
+	// 清理 CachedMainOwners 中指向已销毁对象的条目
+	for (auto it = TemporalAOE::CachedMainOwners.begin(); it != TemporalAOE::CachedMainOwners.end(); )
 	{
 		if (it->first == pItem || it->second == pItem)
-			it = TemporalAOECachedMainOwners.erase(it);
+			it = TemporalAOE::CachedMainOwners.erase(it);
 		else
 			++it;
 	}
