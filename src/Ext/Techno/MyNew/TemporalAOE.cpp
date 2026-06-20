@@ -44,7 +44,10 @@ std::unordered_set<TechnoClass* /*正在被抹除的目标*/> WarpingOutTargets;
 /* 3. 主目标→攻击者映射 */
 std::unordered_map<TechnoClass* /*主目标*/, TechnoClass* /*攻击者*/> CachedMainOwners;
 
-/* 4. 读档后第一帧深度清理标记 */
+/* 4. 攻击者 → 副目标集合（逆向映射，快速销毁用） */
+std::unordered_map<TechnoClass* /*攻击者*/, std::unordered_set<TechnoClass* /*副目标*/>> SecondariesByAttacker;
+
+/* 5. 读档后第一帧深度清理标记 */
 bool s_PostLoadCleanupNeeded = false;
 
 // 前向声明
@@ -130,12 +133,27 @@ void ReleaseAttackerLocks(TechnoClass* pAttacker)
 void InvalidatePtr(void* ptr)
 {
 	if (!ptr) return;
-	// FakeTemporals (副目标→假 Temporal)：先收集再清理，防迭代失效
+	auto pTechPtr = static_cast<TechnoClass*>(ptr);
+
+	// ptr 是攻击者 → 直接从 SecondariesByAttacker 取所有副目标批量销毁
 	{
+		auto setIt = SecondariesByAttacker.find(pTechPtr);
+		if (setIt != SecondariesByAttacker.end())
+		{
+			auto targets = setIt->second;
+			SecondariesByAttacker.erase(setIt);
+			for (auto pTarget : targets)
+				DestroyFakeTemporal(pTarget);
+		}
+	}
+
+	// ptr 是副目标 → 遍历 FakeTemporals 查找并移除
+	{
+		// 先收集再清理，防迭代失效
 		std::vector<TechnoClass*> toRemove;
 		for (auto& ft : FakeTemporals)
 		{
-			if (ft.first == ptr || ft.second.Attacker == ptr)
+			if (ft.first == ptr)
 				toRemove.push_back(ft.first);
 		}
 		for (auto pTarget : toRemove)
@@ -167,6 +185,7 @@ static void PostLoadCleanup()
 
 	// 1. 扫描 TemporalClass::Array 中残存的假 Temporal 实例
 	//    此时指针已修复，可安全访问 pTemp->Target
+	SecondariesByAttacker.clear();
 	{
 		std::vector<TemporalClass*> fakes;
 		for (int i = 0; i < TemporalClass::Array.Count; ++i)
@@ -420,7 +439,7 @@ static void ForceTechnoRedraw(TechnoClass* pTechno)
 	}
 }
 
-// 释放攻击者的所有副目标（保留建筑状态，不清除 CachedMain）
+// 释放攻击者的所有副目标（恢复建筑功能）
 static void ReleaseAOESecondaries(TechnoClass* pAttacker, TechnoExt::TemporalAOEState& state)
 {
 	if (!pAttacker) return;
@@ -428,6 +447,7 @@ static void ReleaseAOESecondaries(TechnoClass* pAttacker, TechnoExt::TemporalAOE
 	int oldExtra = state.ExtraWarpAdded;
 	ReleaseAttackerLocks(pAttacker);
 	DestroyFakeTemporalsByAttacker(pAttacker);
+	ClearBuildingsDisabled(state.BuildingsDisabled); // 恢复被禁用的建筑
 	state.TargetsInRange.clear();
 	state.ExtraWarpAdded = 0;
 	state.ContributedTargets.clear();
@@ -527,6 +547,7 @@ void CreateFakeTemporal(TechnoClass* pAttacker, TechnoClass* pTarget)
 
 	// 登记到映射
 	FakeTemporals[pTarget] = { pTemp, pAttacker };
+	SecondariesByAttacker[pAttacker].insert(pTarget);
 
 	Debug::Log("[TemporalAOE-TIME] CreateFakeTemporal: %s → %s (hp=%d)\n",
 		pAttacker->GetTechnoType()->ID, pTarget->GetTechnoType()->ID, pTarget->GetTechnoType()->Strength);
@@ -579,23 +600,35 @@ void DestroyFakeTemporal(TechnoClass* pTarget)
 		GameDelete(pTemp);
 	}
 
+	// 从 SecondariesByAttacker 移除（在 erase 前提取 attacker）
+	if (auto* pAtk = it->second.Attacker)
+	{
+		auto setIt = SecondariesByAttacker.find(pAtk);
+		if (setIt != SecondariesByAttacker.end())
+		{
+			setIt->second.erase(pTarget);
+			if (setIt->second.empty())
+				SecondariesByAttacker.erase(setIt);
+		}
+	}
+
 	FakeTemporals.erase(it);
 }
 
-// 销毁某个攻击者的所有假 Temporal
+// 销毁某个攻击者的所有假 Temporal（用逆向映射 O(1) 取列表，无需遍历全表）
 void DestroyFakeTemporalsByAttacker(TechnoClass* pAttacker)
 {
 	if (!pAttacker) return;
 
-	// 拷贝键列表，防迭代失效
-	std::vector<TechnoClass*> toRemove;
-	for (auto& pair : FakeTemporals)
+	// 直接从 SecondariesByAttacker 取列表，O(1)，无需遍历全表
+	auto setIt = SecondariesByAttacker.find(pAttacker);
+	if (setIt != SecondariesByAttacker.end())
 	{
-		if (pair.second.Attacker == pAttacker)
-			toRemove.push_back(pair.first);
+		auto targetsToRemove = setIt->second;
+		SecondariesByAttacker.erase(setIt);
+		for (auto pTarget : targetsToRemove)
+			DestroyFakeTemporal(pTarget);
 	}
-	for (auto pTarget : toRemove)
-		DestroyFakeTemporal(pTarget);
 }
 
 // 批量销毁列表中目标的假 Temporal
@@ -608,6 +641,8 @@ void DestroyFakeTemporalsByTargetList(const std::vector<TechnoClass*>& targets)
 // 销毁所有假 Temporal（用于存档前清理）
 void DestroyAllFakeTemporals()
 {
+	// 清空逆向映射，防迭代失效
+	SecondariesByAttacker.clear();
 	// 拷贝键列表，防迭代失效
 	std::vector<TechnoClass*> toRemove;
 	for (auto& pair : FakeTemporals)
@@ -1280,17 +1315,16 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 				// 新目标进入范围 → 累加其时间贡献（永不扣减）
 				if (state.ContributedTargets.find(pNew) == state.ContributedTargets.end())
 				{
-					int weaponDmg = state.WeaponDamage > 0 ? state.WeaponDamage : 1;
 					int contribution = static_cast<int>(
-						10.0 * pNew->GetTechnoType()->Strength * state.SecondaryWeight / weaponDmg);
-					FILELOG("[TemporalAOE-TIME] 贡献: %s 生命=%d 伤害=%d 权重=%.2f → +%d (累积=%d 计时器=%d)\n",
+						10.0 * pNew->GetTechnoType()->Strength * state.SecondaryWeight);
+					FILELOG("[TemporalAOE-TIME] 贡献: %s 生命=%d 权重=%.2f → +%d (累积=%d 计时器=%d)\n",
 						pNew->GetTechnoType()->ID, pNew->GetTechnoType()->Strength,
-						weaponDmg, state.SecondaryWeight, contribution,
+						state.SecondaryWeight, contribution,
 						state.ExtraWarpAdded + contribution,
 						state.WarpTimer + contribution);
-					Debug::Log(L"[TemporalAOE-TIME] 贡献: %hs 生命=%d 伤害=%d → +%d\n",
+					Debug::Log(L"[TemporalAOE-TIME] 贡献: %hs 生命=%d 权重=%.2f → +%d\n",
 						pNew->GetTechnoType()->ID, pNew->GetTechnoType()->Strength,
-						weaponDmg, contribution);
+						state.SecondaryWeight, contribution);
 					state.ExtraWarpAdded += contribution;
 					state.WarpTimer += contribution; // 同步展开计时器
 					state.ContributedTargets.insert(pNew);
@@ -1424,21 +1458,18 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 	// 计时器只会上涨（新目标加入）或自然衰减（每帧 -8），防止瞬杀
 	if (state.Active && pThis->TemporalImUsing)
 	{
-		int weaponDmg = state.WeaponDamage > 0 ? state.WeaponDamage : 1;
-
 		// 仅在首次激活时设初始值，之后自由倒计时（不每帧顶回）
 		// 新目标加入时由扫描块累加 ExtraWarpAdded，但 WarpTimer 不会自动膨胀
 		{
 			int baseWarp = 0;
 			if (pThis->TemporalImUsing->Target && pThis->TemporalImUsing->Target->Health > 0)
-				baseWarp = 10 * pThis->TemporalImUsing->Target->GetTechnoType()->Strength / weaponDmg;
+				baseWarp = 10 * pThis->TemporalImUsing->Target->GetTechnoType()->Strength;
 			if (state.WarpTimer == 0)
 			{
 				state.WarpTimer = baseWarp + state.ExtraWarpAdded;
-				FILELOG("[TemporalAOE-TIME] 计时器初始化: 主目标基值=%d(10*%d/%d) 累积=%d → 计时器=%d\n",
+				FILELOG("[TemporalAOE-TIME] 计时器初始化: 主目标基值=%d(10*%d) 累积=%d → 计时器=%d\n",
 					baseWarp,
 					pThis->TemporalImUsing->Target ? pThis->TemporalImUsing->Target->GetTechnoType()->Strength : 0,
-					weaponDmg,
 					state.ExtraWarpAdded,
 					state.WarpTimer);
 				Debug::Log(L"[TemporalAOE-TIME] 计时器初始化: 基值=%d 累积=%d → %d\n",
