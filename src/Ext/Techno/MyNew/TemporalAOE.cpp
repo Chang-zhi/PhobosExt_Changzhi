@@ -276,9 +276,13 @@ void ValidateGlobals()
 			else if (!pAttacker->TemporalImUsing || !pAttacker->TemporalImUsing->Target
 				|| pAttacker->TemporalImUsing->Target->Health <= 0)
 			{
-				if (!(pExt->AOEState.CachedMain
+				// 有缓存且缓存正在被冻住（BeingWarpedOut）→ 继续保留
+				// 无缓存或缓存没被冻住（攻击者停火）→ 释放
+				bool hasValidCache = pExt->AOEState.CachedMain
 					&& pExt->AOEState.CachedMain->Health > 0
-					&& !pExt->AOEState.CachedMain->InLimbo))
+					&& !pExt->AOEState.CachedMain->InLimbo
+					&& pExt->AOEState.CachedMain->BeingWarpedOut;
+				if (!hasValidCache)
 					invalid = true;
 			}
 		}
@@ -940,6 +944,7 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 		state.CachedMain = nullptr;
 		state.CachedMainDead = false;
 		state.WarpTimer = 0;
+		state.ContributedTargets.clear();
 		state.Active = false;
 		return;
 	}
@@ -967,11 +972,12 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 			}
 			else
 			{
-				// 目标未被冻结 → CLEG 暂时停止攻击
-				// 保持副目标冻结，计时器继续跑，等 CLEG 恢复攻击或计时到 0
-				Debug::Log("[TemporalAOE] %s stopped attacking (target alive), keeping %d secondaries frozen\n",
+				// 目标未被冻结 → 攻击者已停止攻击，释放副目标
+				Debug::Log("[TemporalAOE] %s stopped attacking, releasing %d secondaries\n",
 					pThis->GetTechnoType()->ID, state.TargetsInRange.size());
-				// 不 return！让下方的 per-frame 计时器继续更新 WarpTimer 和 WarpRemaining
+				TemporalAOE::ReleaseAOESecondaries(pThis, state);
+				state.CachedMain = nullptr;
+				return;
 			}
 		}
 		else if (!state.CachedMain && !state.CachedMainDead)
@@ -1277,6 +1283,14 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 					int weaponDmg = state.WeaponDamage > 0 ? state.WeaponDamage : 1;
 					int contribution = static_cast<int>(
 						10.0 * pNew->GetTechnoType()->Strength * state.SecondaryWeight / weaponDmg);
+					FILELOG("[TemporalAOE-TIME] 贡献: %s 生命=%d 伤害=%d 权重=%.2f → +%d (累积=%d 计时器=%d)\n",
+						pNew->GetTechnoType()->ID, pNew->GetTechnoType()->Strength,
+						weaponDmg, state.SecondaryWeight, contribution,
+						state.ExtraWarpAdded + contribution,
+						state.WarpTimer + contribution);
+					Debug::Log(L"[TemporalAOE-TIME] 贡献: %hs 生命=%d 伤害=%d → +%d\n",
+						pNew->GetTechnoType()->ID, pNew->GetTechnoType()->Strength,
+						weaponDmg, contribution);
 					state.ExtraWarpAdded += contribution;
 					state.WarpTimer += contribution; // 同步展开计时器
 					state.ContributedTargets.insert(pNew);
@@ -1419,7 +1433,17 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 			if (pThis->TemporalImUsing->Target && pThis->TemporalImUsing->Target->Health > 0)
 				baseWarp = 10 * pThis->TemporalImUsing->Target->GetTechnoType()->Strength / weaponDmg;
 			if (state.WarpTimer == 0)
+			{
 				state.WarpTimer = baseWarp + state.ExtraWarpAdded;
+				FILELOG("[TemporalAOE-TIME] 计时器初始化: 主目标基值=%d(10*%d/%d) 累积=%d → 计时器=%d\n",
+					baseWarp,
+					pThis->TemporalImUsing->Target ? pThis->TemporalImUsing->Target->GetTechnoType()->Strength : 0,
+					weaponDmg,
+					state.ExtraWarpAdded,
+					state.WarpTimer);
+				Debug::Log(L"[TemporalAOE-TIME] 计时器初始化: 基值=%d 累积=%d → %d\n",
+					baseWarp, state.ExtraWarpAdded, state.WarpTimer);
+			}
 		}
 
 		// 每帧扣减（自由倒计时，不再被顶满）
@@ -1443,6 +1467,7 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 				auto targetsToWarp = std::move(state.TargetsInRange);
 				state.TargetsInRange.clear();
 				state.ExtraWarpAdded = 0;
+				state.ContributedTargets.clear();
 				TemporalAOE::DestroyFakeTemporalsByTargetList(targetsToWarp);
 				for (auto pSec : targetsToWarp)
 					TemporalAOE::WarpOutTarget(pSec, pThis, state);
