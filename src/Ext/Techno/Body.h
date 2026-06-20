@@ -29,21 +29,21 @@ public:
 	// Temporal AOE state（定义在 ExtData 外，方便其他文件直接引用）
 	struct TemporalAOEState
 	{
-		// ── 来自 INI（经 WarheadTypeExt 中转） ──
-		double CellSpread = 2.0;                // AOE 半径（格）
-		double SecondaryWeight = 1.0;           // 副目标冻结时间权重
-		int WeaponDamage = 1;                   // 武器基础伤害（来自 WeaponType.Damage）
-
-		// ── 运行时状态 ──
+		// 从 ini 里面读取的自定义配置项
 		bool Active = false;                    // AOE 功能是否激活
+		double CellSpread = 3.0;                // AOE 半径（格）
+		double SecondaryWeight = 1.0;           // 副目标冻结时间权重
+
+		int WeaponDamage = 100;                 // 武器伤害值
 		int ExtraWarpAdded = 0;                 // 已加到主 Temporal 上的额外时间
 		TechnoClass* CachedMain = nullptr;      // 缓存的主目标指针（不由 InvalidatePointer 清空）
 		bool CachedMainDead = false;            // 缓存的主目标已被游戏抹除
 		bool WarpingOut = false;                // 正在抹除副目标中，防止递归
+		int ScanInterval = 5;                   // 扫描间隔（帧）
 		int ScanCounter = 0;                    // 扫描计数器
 
-		// 范围内全部副目标（步兵/车辆/建筑），负责假 Temporal 冻结跟踪
-		std::unordered_set<TechnoClass*>  TargetsInRange;
+		std::vector<TechnoClass*> TargetsInRange;      // 范围内的副目标列表
+		std::unordered_set<TechnoClass*> BuildingsDisabled;      // 已被 DisableTemporal 的建筑
 	};
 
 	class ExtData final : public Extension<TechnoClass>
