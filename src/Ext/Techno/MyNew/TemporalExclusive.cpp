@@ -96,8 +96,8 @@ void HandleTemporalExclusiveTargeting(TechnoClass* pThis)
 			if (pWeapon && pWeapon->Warhead && pWeapon->Warhead->Temporal)
 			{
 				// 检查是否是其他 AOE 的副目标
-				auto ftIt = FakeTemporals.find(pTarget);
-				if (ftIt != FakeTemporals.end() && ftIt->second.Attacker != pThis)
+				auto claimIt = TemporalAOESecondaryClaims.find(pTarget);
+				if (claimIt != TemporalAOESecondaryClaims.end() && claimIt->second != pThis)
 				{
 					Debug::Log("[TemporalAOE] %s forced to abandon AOE secondary target %s\n",
 						pThis->GetTechnoType()->ID, pTarget->GetTechnoType()->ID);

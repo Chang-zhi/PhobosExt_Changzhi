@@ -86,7 +86,7 @@ void TechnoExt::ExtData::InvalidatePointer(void* ptr, bool bRemoved)
 			(DWORD)ptr);
 	}
 
-	// 副目标列表（由 InvalidateTemporalAORecords 统一处理指针失效）
+	// 副目标列表（由 InvalidateAOESecondaryClaims 统一处理指针失效）
 	for (auto it = state.TargetsInRange.begin(); it != state.TargetsInRange.end(); )
 	{
 		if (*it == ptr)
@@ -104,7 +104,7 @@ void TechnoExt::ExtData::InvalidatePointer(void* ptr, bool bRemoved)
 			++it;
 	}
 
-	// 假 Temporal 条目的清理由 InvalidateTemporalAORecords 统一处理（见 TemporalAOE.cpp）
+	// 假 Temporal 条目的清理由 InvalidateAOESecondaryClaims 统一处理（见 TemporalAOE.cpp）
 }
 
 void TechnoExt::ExtData::LoadFromStream(PhobosStreamReader& Stm)
@@ -125,7 +125,7 @@ bool TechnoExt::LoadGlobals(PhobosStreamReader& Stm)
 
 	// 清理全局 maps（旧会话的指针在新会话中无效）
 	FakeTemporals.clear();
-	TemporalAOESecondariesByAttacker.clear();
+	TemporalAOESecondaryClaims.clear();
 	TemporalAOEWarpingOutTargets.clear();
 	TemporalAOECachedMainOwners.clear();
 	TemporalExclusiveTargetsMap.clear();
@@ -140,9 +140,6 @@ bool TechnoExt::LoadGlobals(PhobosStreamReader& Stm)
 
 bool TechnoExt::SaveGlobals(PhobosStreamWriter& Stm)
 {
-	// 存档前清理所有假 Temporal（防止引擎状态残留导致读档后指针悬垂）
-	DestroyAllFakeTemporals();
-
 	return Stm
 		.Success();
 }
@@ -171,7 +168,7 @@ DEFINE_HOOK(0x6F4500, TechnoClass_DTOR, 0x5)
 {
 	GET(TechnoClass*, pItem, ECX);
 
-	InvalidateTemporalAORecords(pItem);
+	InvalidateAOESecondaryClaims(pItem);
 	BerzerkRestorePointerInvalidate(pItem);
 	// 清理 TemporalAOECachedMainOwners 中指向已销毁对象的条目
 	for (auto it = TemporalAOECachedMainOwners.begin(); it != TemporalAOECachedMainOwners.end(); )
