@@ -96,8 +96,8 @@ void HandleTemporalExclusiveTargeting(TechnoClass* pThis)
 			if (pWeapon && pWeapon->Warhead && pWeapon->Warhead->Temporal)
 			{
 				// 检查是否是其他 AOE 的副目标
-				auto ftIt = TemporalAOE::FakeTemporals.find(pTarget);
-				if (ftIt != TemporalAOE::FakeTemporals.end() && ftIt->second.Attacker != pThis)
+				auto ftIt = FakeTemporals.find(pTarget);
+				if (ftIt != FakeTemporals.end() && ftIt->second.Attacker != pThis)
 				{
 					Debug::Log("[TemporalAOE] %s forced to abandon AOE secondary target %s\n",
 						pThis->GetTechnoType()->ID, pTarget->GetTechnoType()->ID);
@@ -106,8 +106,8 @@ void HandleTemporalExclusiveTargeting(TechnoClass* pThis)
 				}
 
 				// 检查是否是其他 AOE 的主目标（其他 CLEG 正在攻击的目标）
-				auto mainIt = TemporalAOE::CachedMainOwners.find(pTarget);
-				if (mainIt != TemporalAOE::CachedMainOwners.end() && mainIt->second != pThis)
+				auto mainIt = TemporalAOECachedMainOwners.find(pTarget);
+				if (mainIt != TemporalAOECachedMainOwners.end() && mainIt->second != pThis)
 				{
 					Debug::Log("[TemporalAOE] %s forced to abandon AOE main target %s\n",
 						pThis->GetTechnoType()->ID, pTarget->GetTechnoType()->ID);

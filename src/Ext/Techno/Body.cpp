@@ -86,7 +86,7 @@ void TechnoExt::ExtData::InvalidatePointer(void* ptr, bool bRemoved)
 			(DWORD)ptr);
 	}
 
-	// 副目标列表（由 TemporalAOE::InvalidateRecords 统一处理指针失效）
+	// 副目标列表（由 InvalidateTemporalAORecords 统一处理指针失效）
 	for (auto it = state.TargetsInRange.begin(); it != state.TargetsInRange.end(); )
 	{
 		if (*it == ptr)
@@ -104,7 +104,7 @@ void TechnoExt::ExtData::InvalidatePointer(void* ptr, bool bRemoved)
 			++it;
 	}
 
-	// 假 Temporal 条目的清理由 TemporalAOE::InvalidateRecords 统一处理（见 TemporalAOE.cpp）
+	// 假 Temporal 条目的清理由 InvalidateTemporalAORecords 统一处理（见 TemporalAOE.cpp）
 }
 
 void TechnoExt::ExtData::LoadFromStream(PhobosStreamReader& Stm)
@@ -124,15 +124,15 @@ bool TechnoExt::LoadGlobals(PhobosStreamReader& Stm)
 	// ⚠ 此时引擎指针修复尚未完成，不能访问任何游戏对象指针
 
 	// 清理全局 maps（旧会话的指针在新会话中无效）
-	TemporalAOE::FakeTemporals.clear();
-	TemporalAOE::SecondariesByAttacker.clear();
-	TemporalAOE::WarpingOutTargets.clear();
-	TemporalAOE::CachedMainOwners.clear();
+	FakeTemporals.clear();
+	TemporalAOESecondariesByAttacker.clear();
+	TemporalAOEWarpingOutTargets.clear();
+	TemporalAOECachedMainOwners.clear();
 	TemporalExclusiveTargetsMap.clear();
 	BerzerkRestoreClearCache();
 
 	// 标记：指针修复完成后在第一帧执行深度清理
-	TemporalAOE::PostLoadCleanupNeeded = true;
+	s_PostLoadCleanupNeeded = true;
 
 	return Stm
 		.Success();
@@ -141,7 +141,7 @@ bool TechnoExt::LoadGlobals(PhobosStreamReader& Stm)
 bool TechnoExt::SaveGlobals(PhobosStreamWriter& Stm)
 {
 	// 存档前清理所有假 Temporal（防止引擎状态残留导致读档后指针悬垂）
-	TemporalAOE::DestroyAll();
+	DestroyAllFakeTemporals();
 
 	return Stm
 		.Success();
@@ -171,13 +171,13 @@ DEFINE_HOOK(0x6F4500, TechnoClass_DTOR, 0x5)
 {
 	GET(TechnoClass*, pItem, ECX);
 
-	TemporalAOE::InvalidateRecords(pItem);
+	InvalidateTemporalAORecords(pItem);
 	BerzerkRestorePointerInvalidate(pItem);
-	// 清理 CachedMainOwners 中指向已销毁对象的条目
-	for (auto it = TemporalAOE::CachedMainOwners.begin(); it != TemporalAOE::CachedMainOwners.end(); )
+	// 清理 TemporalAOECachedMainOwners 中指向已销毁对象的条目
+	for (auto it = TemporalAOECachedMainOwners.begin(); it != TemporalAOECachedMainOwners.end(); )
 	{
 		if (it->first == pItem || it->second == pItem)
-			it = TemporalAOE::CachedMainOwners.erase(it);
+			it = TemporalAOECachedMainOwners.erase(it);
 		else
 			++it;
 	}
