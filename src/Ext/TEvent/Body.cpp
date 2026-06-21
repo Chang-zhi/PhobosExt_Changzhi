@@ -246,8 +246,8 @@ bool TEventExt::ChoiceBoxButtonClickedFunc(TEventClass* pThis, HouseClass* pHous
 	int targetID = std::atoi(pThis->String);
 	int targetButtonIndex = pThis->Value - 1;
 
-	Debug::Log(L"[ChoiceBox] 557: ID=%d, buttonIdx=%d\n",
-		targetID, targetButtonIndex);
+	// Debug::Log(L"[ChoiceBox] 557: ID=%d, buttonIdx=%d\n",
+	// 	targetID, targetButtonIndex);
 
 	auto* pBox = MapChoiceBoxClass::FindByID(targetID);
 	if (!pBox)
@@ -266,7 +266,7 @@ bool TEventExt::ChoiceBoxButtonClickedFunc(TEventClass* pThis, HouseClass* pHous
 bool TEventExt::ChoiceBoxAnyButtonClickedFunc(TEventClass* pThis, HouseClass* pHouse)
 {
 	int targetID = pThis->Value;
-	Debug::Log(L"[ChoiceBox] 558: ID=%d\n", targetID);
+	// Debug::Log(L"[ChoiceBox] 558: ID=%d\n", targetID);
 
 	auto* pBox = MapChoiceBoxClass::FindByID(targetID);
 	if (!pBox)
@@ -285,7 +285,7 @@ bool TEventExt::ChoiceBoxAnyButtonClickedFunc(TEventClass* pThis, HouseClass* pH
 bool TEventExt::ChoiceBoxTimedOutFunc(TEventClass* pThis, HouseClass* pHouse)
 {
 	int targetID = pThis->Value;
-	Debug::Log(L"[ChoiceBox] 559: ID=%d\n", targetID);
+	// Debug::Log(L"[ChoiceBox] 559: ID=%d\n", targetID);
 
 	auto* pBox = MapChoiceBoxClass::FindByID(targetID);
 	if (!pBox)

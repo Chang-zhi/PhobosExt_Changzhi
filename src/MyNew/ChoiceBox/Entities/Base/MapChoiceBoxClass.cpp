@@ -690,6 +690,10 @@ static void DrawChoiceBoxList(std::vector<std::shared_ptr<T>>& boxes)
 		if (!ptr || ptr->IsExpired || !ptr->CanDraw())
 			continue;
 
+		// 如果已点击且 Duration 已耗尽，不绘制但仍保留对象（给 TEvent 检测窗口）
+		if (ptr->ClickedIndex >= 0 && ptr->RemainingFrames <= 0)
+			continue;
+
 		Point2D drawPos;
 		if (!ptr->GetDrawPosition(drawPos))
 			continue;
@@ -699,9 +703,8 @@ static void DrawChoiceBoxList(std::vector<std::shared_ptr<T>>& boxes)
 		if (ptr->CheckMouseClick())
 		{
 			anyClicked = true;
-			// 点击后启动消失倒计时（仅当 DisappearDelay >= 0）
-			if (ptr->ClickExpireCounter < 0 && ptr->Type && ptr->Type->DisappearDelay >= 0)
-				ptr->ClickExpireCounter = ptr->Type->DisappearDelay;
+			// 点击后强制保留 5 帧（给 TEvent 检测窗口）
+			ptr->ClickExpireCounter = 5;
 		}
 	}
 
@@ -722,9 +725,16 @@ static void DrawChoiceBoxList(std::vector<std::shared_ptr<T>>& boxes)
 		{
 			if (--ptr->RemainingFrames <= 0)
 			{
-				ptr->IsExpired = true;
-				if (ptr->ClickedIndex < 0)
+				// 如果已点击过，不立即过期（由 ClickExpireCounter 控制清除）
+				if (ptr->ClickedIndex >= 0)
+				{
+					ptr->RemainingFrames = 0; // 保持为 0，绘制时会跳过
+				}
+				else
+				{
+					ptr->IsExpired = true;
 					ptr->ClickedIndex = -2;
+				}
 			}
 		}
 	}

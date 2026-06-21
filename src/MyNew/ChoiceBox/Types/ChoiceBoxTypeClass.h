@@ -25,17 +25,17 @@ class ChoiceBoxTypeClass final : public Enumerable<ChoiceBoxTypeClass>
 {
 public:
 	// ===== 文本内容 =====
-	Valueable<CSFText> Title;               // 标题 CSF 标签（如 "MSG:TestTitle"）
-	Valueable<bool> Title_Center;           // 标题文本是否居中（INI: Title.Center）
-	Valueable<CSFText> Description;          // 描述 CSF 标签（如 "MSG:TestDesc"）
+	Valueable<CSFText> Title;                    // 标题 CSF 标签
+	Valueable<bool> Title_Center;                // 标题文本是否居中
+	Valueable<CSFText> Description;              // 描述 CSF 标签
 
 	// ===== 按钮配置 =====
-	Valueable<int> Button_Count;                 // 按钮数量（INI: Button.Count）
-	Valueable<int> Button_Layout;                // 布局方向 0=横向 1=纵向（INI: Button.Layout）
-	ValueableVector<std::string> ButtonTexts; // 按钮文字列表（INI: Button.Text1~N）
+	Valueable<int> Button_Count;                 // 按钮数量
+	Valueable<int> Button_Layout;                // 布局方向 0=横向 1=纵向
+	ValueableVector<std::string> ButtonTexts;    // 按钮文字列表
 
 	// ===== 外观参数 =====
-	Valueable<int> MaxWidth;                     // 文本最大像素宽度，<=0 时默认 250（INI: MaxWidth）
+	Valueable<int> MaxWidth;                     // 文本最大像素宽度，<=0 时默认 250
 	Valueable<int> BackgroundOpacity;            // 背景不透明度 (0-100)
 	Valueable<int> ColorR;                       // 文字/边框颜色 — R 分量
 	Valueable<int> ColorG;                       // 文字/边框颜色 — G 分量
