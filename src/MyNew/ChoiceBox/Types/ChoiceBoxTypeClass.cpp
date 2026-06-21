@@ -45,6 +45,7 @@ void ChoiceBoxTypeClass::LoadFromINI(CCINIClass* pINI)
 	INI_EX exINI(pINI);
 
 	this->Title.Read(exINI, section, "Title");
+	this->Title_Center.Read(exINI, section, "Title.Center");
 	this->Description.Read(exINI, section, "Description");
 	this->MaxWidth.Read(exINI, section, "MaxWidth");
 	if (this->MaxWidth <= 0)
@@ -95,6 +96,7 @@ void ChoiceBoxTypeClass::Serialize(T& Stm)
 {
 	Stm
 		.Process(this->Title)
+		.Process(this->Title_Center)
 		.Process(this->Description)
 		.Process(this->Button_Count)
 		.Process(this->Button_Layout)

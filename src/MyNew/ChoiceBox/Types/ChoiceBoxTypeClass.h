@@ -26,6 +26,7 @@ class ChoiceBoxTypeClass final : public Enumerable<ChoiceBoxTypeClass>
 public:
 	// ===== 文本内容 =====
 	Valueable<CSFText> Title;               // 标题 CSF 标签（如 "MSG:TestTitle"）
+	Valueable<bool> Title_Center;           // 标题文本是否居中（INI: Title.Center）
 	Valueable<CSFText> Description;          // 描述 CSF 标签（如 "MSG:TestDesc"）
 
 	// ===== 按钮配置 =====
@@ -43,6 +44,7 @@ public:
 	Valueable<int> DisappearDelay;               // 点击后消失延迟帧数，-1=不自动消失（默认 5）
 
 	ChoiceBoxTypeClass(const char* const pTitle) : Enumerable(pTitle)
+		, Title_Center { false }
 		, Button_Count { 0 }
 		, Button_Layout { 0 }
 		, MaxWidth { 250 }

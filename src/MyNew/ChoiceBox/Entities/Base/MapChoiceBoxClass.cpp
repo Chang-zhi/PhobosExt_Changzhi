@@ -423,13 +423,20 @@ void MapChoiceBoxClass::DrawAt(Point2D centerPos)
 
 	RectangleStruct bounds = DSurface::ViewBounds;
 
-	// ===== 绘制标题（支持多行） =====
+	// ===== 绘制标题（支持多行，可选居中） =====
 	int currentY = topLeft.Y + PADDINGY;
 	if (hasTitle)
 	{
 		for (const std::wstring& line : titleLines)
 		{
-			Point2D textPos = { topLeft.X + PADDINGX, currentY };
+			int textX = topLeft.X + PADDINGX;
+			if (type.Title_Center)
+			{
+				RectangleStruct lineDims = Drawing::GetTextDimensions(line.c_str(), { 0, 0 }, 0, 2, 0);
+				int lineW = (lineDims.Width > 0) ? lineDims.Width : titleWidth;
+				textX = topLeft.X + (bgWidth / 2) - (lineW / 2);
+			}
+			Point2D textPos = { textX, currentY };
 			DSurface::Composite->DrawText(
 				line.c_str(),
 				&bounds,

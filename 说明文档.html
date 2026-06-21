@@ -411,9 +411,11 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本
 <p>在 <code class="doc-code--inline">rulesmd.ini</code> 的 <code class="doc-code--inline">[ChoiceBoxTypes]</code> 段中定义选择框样式，可按需添加任意多个。</p>
 <pre class="doc-code--block"><code>[ChoiceBoxTypes]
 0=MyChoiceBox
+...
 
 [MyChoiceBox]
 Title=                           ; CSF标签，标题文本（可选）（默认无）
+Title.Center=                    ; boolean，标题文本是否居中（默认 false）
 Description=                     ; CSF标签，描述文本（可选）（默认无）
 Button.Count=                    ; integer，按钮数量（默认 0）
 Button.Layout=                   ; integer，布局方向 0=横向 1=纵向（默认 0）
