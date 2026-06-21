@@ -3,6 +3,7 @@
 
 #include <Utilities/SavegameDef.h>
 #include <Utilities/Debug.h>
+#include <cstdlib>
 #include <ScenarioClass.h>
 #include <BuildingClass.h>
 #include <InfantryClass.h>
@@ -13,6 +14,10 @@
 #include <GeneralStructures.h>
 #include <Fundamentals.h>
 // #include <Ext/Techno/MyNew/DetectKiller.h>
+
+#include <MyNew/ChoiceBox/Entities/Derived/WaypointChoiceBoxClass.h>
+#include <MyNew/ChoiceBox/Entities/Derived/ScreenChoiceBoxClass.h>
+#include <MyNew/ChoiceBox/Entities/Base/MapChoiceBoxClass.h>
 
 #include <string>
 #include <map>
@@ -107,6 +112,13 @@ std::optional<bool> TEventExt::Execute(TEventClass* pThis, int iEvent, HouseClas
 		return TEventExt::MissionTimerGreaterFunc(pThis);
 	case PhobosTriggerEvent::MissionTimerLess:
 		return TEventExt::MissionTimerLessFunc(pThis);
+
+	case PhobosTriggerEvent::ChoiceBoxButtonClicked:
+		return TEventExt::ChoiceBoxButtonClickedFunc(pThis, pHouse);
+	case PhobosTriggerEvent::ChoiceBoxAnyButtonClicked:
+		return TEventExt::ChoiceBoxAnyButtonClickedFunc(pThis, pHouse);
+	case PhobosTriggerEvent::ChoiceBoxTimedOut:
+		return TEventExt::ChoiceBoxTimedOutFunc(pThis, pHouse);
 
 	default:
 		return std::nullopt;
@@ -223,6 +235,66 @@ bool TEventExt::MissionTimerLessFunc(TEventClass* pThis)
 	int thresholdFrames = pThis->Value * 15;
 
 	return pTimer->GetTimeLeft() < thresholdFrames;
+}
+
+// ============================================================================
+// 557: ChoiceBox 指定按钮被点击
+// Value = 选择框 ID, String = 按钮索引（0-based 字符串）
+// ============================================================================
+bool TEventExt::ChoiceBoxButtonClickedFunc(TEventClass* pThis, HouseClass* pHouse)
+{
+	int targetID = std::atoi(pThis->String);
+	int targetButtonIndex = pThis->Value - 1;
+
+	Debug::Log(L"[ChoiceBox] 557: ID=%d, buttonIdx=%d\n",
+		targetID, targetButtonIndex);
+
+	auto* pBox = MapChoiceBoxClass::FindByID(targetID);
+	if (!pBox)
+		return false;
+
+	Debug::Log(L"[ChoiceBox] 557: ID=%d, buttonIdx=%d, actual=%d\n",
+		targetID, targetButtonIndex, pBox->ClickedIndex);
+
+	return pBox->ClickedIndex == targetButtonIndex;
+}
+
+// ============================================================================
+// 558: ChoiceBox 任意按钮被点击
+// Value = 选择框 ID
+// ============================================================================
+bool TEventExt::ChoiceBoxAnyButtonClickedFunc(TEventClass* pThis, HouseClass* pHouse)
+{
+	int targetID = pThis->Value;
+	Debug::Log(L"[ChoiceBox] 558: ID=%d\n", targetID);
+
+	auto* pBox = MapChoiceBoxClass::FindByID(targetID);
+	if (!pBox)
+		return false;
+
+	Debug::Log(L"[ChoiceBox] 558: ID=%d, clicked=%d\n",
+		targetID, pBox->ClickedIndex);
+
+	return pBox->ClickedIndex >= 0;
+}
+
+// ============================================================================
+// 559: ChoiceBox 超时未选
+// Value = 选择框 ID
+// ============================================================================
+bool TEventExt::ChoiceBoxTimedOutFunc(TEventClass* pThis, HouseClass* pHouse)
+{
+	int targetID = pThis->Value;
+	Debug::Log(L"[ChoiceBox] 559: ID=%d\n", targetID);
+
+	auto* pBox = MapChoiceBoxClass::FindByID(targetID);
+	if (!pBox)
+		return false;
+
+	Debug::Log(L"[ChoiceBox] 559: ID=%d, expired=%d\n",
+		targetID, pBox->IsExpired);
+
+	return pBox->IsExpired;
 }
 
 // =============================

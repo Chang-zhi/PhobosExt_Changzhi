@@ -23,6 +23,9 @@
 #include <MyNew/TextBox/Types/TextBoxTypeClass.h>
 #include <MyNew/TextBox/Entities/Derived/WaypointTextBoxClass.h>
 #include <MyNew/TextBox/Entities/Derived/TechnoTextBoxClass.h>
+#include <MyNew/ChoiceBox/Types/ChoiceBoxTypeClass.h>
+#include <MyNew/ChoiceBox/Entities/Derived/WaypointChoiceBoxClass.h>
+#include <MyNew/ChoiceBox/Entities/Derived/ScreenChoiceBoxClass.h>
 
 #include <set>
 #include <vector>
@@ -151,6 +154,16 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 		return TActionExt::ClearAllUnitTextBoxs(pThis, pHouse, pObject, pTrigger, location);
 	case PhobosTriggerAction::ClearAllTextBoxs:
 		return TActionExt::ClearAllTextBoxs(pThis, pHouse, pObject, pTrigger, location);
+
+	// ---- ChoiceBox Actions ----
+	case PhobosTriggerAction::SetWaypointChoiceBox:
+		return TActionExt::SetWaypointChoiceBox(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::SetScreenChoiceBox:
+		return TActionExt::SetScreenChoiceBox(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::ClearChoiceBoxByLabel:
+		return TActionExt::ClearChoiceBoxByLabel(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::ClearAllChoiceBoxs:
+		return TActionExt::ClearAllChoiceBoxs(pThis, pHouse, pObject, pTrigger, location);
 
 	// ---- Script Manipulation Actions ----
 	case PhobosTriggerAction::ClearScript:
@@ -1730,6 +1743,58 @@ static int testChangeVar(bool bGlobal, int index, int value)
 	}
 
 	return value;
+}
+
+// ========== ChoiceBox Actions ==========
+
+bool TActionExt::SetWaypointChoiceBox(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	int choiceID = pThis->Param3;
+	int wpIndex = pThis->Param4;
+	int typeIndex = pThis->Param5;
+
+	if (wpIndex >= 0 && typeIndex >= 0
+		&& static_cast<size_t>(typeIndex) < ChoiceBoxTypeClass::Array.size())
+	{
+		const ChoiceBoxTypeClass* pType = ChoiceBoxTypeClass::Array[typeIndex].get();
+		WaypointChoiceBoxClass::FindOrCreate(choiceID, wpIndex, nullptr, pType);
+	}
+	return true;
+}
+
+bool TActionExt::SetScreenChoiceBox(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	int choiceID = pThis->Param3;
+	int screenX = pThis->Param4;
+	int screenY = pThis->Param5;
+	int typeIndex = pThis->Param6;
+
+	Debug::Log(L"Param3 is %d, Param4 is %d, Param5 is %d, Param6 is %d\n",
+				pThis->Param3, pThis->Param4, pThis->Param5, pThis->Param6);
+
+	if (typeIndex >= 0
+		&& static_cast<size_t>(typeIndex) < ChoiceBoxTypeClass::Array.size())
+	{
+		const ChoiceBoxTypeClass* pType = ChoiceBoxTypeClass::Array[typeIndex].get();
+		ScreenChoiceBoxClass::FindOrCreate(choiceID, screenX, screenY, nullptr, pType);
+	}
+	return true;
+}
+
+bool TActionExt::ClearChoiceBoxByLabel(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	int choiceID = pThis->Param3;
+
+	WaypointChoiceBoxClass::RemoveByID(choiceID);
+	ScreenChoiceBoxClass::RemoveByID(choiceID);
+	return true;
+}
+
+bool TActionExt::ClearAllChoiceBoxs(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	WaypointChoiceBoxClass::ClearAll();
+	ScreenChoiceBoxClass::ClearAll();
+	return true;
 }
 
 bool TActionExt::testAction(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)

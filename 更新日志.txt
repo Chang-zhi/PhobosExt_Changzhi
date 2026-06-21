@@ -5,6 +5,18 @@
 2, 新增触发动作:
 - 661=设置作战小队Max值... (修改指定作战小队类型的 Max 值)
 3, 触发动作 653, 654 可以和 Phobos B49+ 一起使用了(我的pr通过了)
+4, 新增选择框系统(ChoiceBox):
+    - 新增触发动作 590-593 (见下)
+    - 新增触发事件 557-559 (见下)
+5, 新增触发动作:
+- 590=Create ChoiceBox at Waypoint (by Type)... 在路径点创建选择框
+- 591=Create ChoiceBox at Screen Position (by Type)... 在屏幕百分比位置创建选择框
+- 592=Clear ChoiceBox by ID... 清除指定编号的选择框
+- 593=Clear All ChoiceBoxes... 清除所有选择框
+6, 新增触发事件:
+- 557=ChoiceBox Specified Button Clicked... 选择框指定按钮被点击
+- 558=ChoiceBox Any Button Clicked... 选择框任意按钮被点击
+- 559=ChoiceBox Timed Out... 选择框超时未选
 
 
 ======V0.0.13.6=======

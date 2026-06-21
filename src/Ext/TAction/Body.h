@@ -134,6 +134,20 @@ enum class PhobosTriggerAction : unsigned int
 	// 移除所有文本(含路径点)...
 	ClearAllTextBoxs = 589,
 
+	// ---- ChoiceBox Actions (590-599) ----
+
+	// 在路径点创建选择框（根据类型）...
+	SetWaypointChoiceBox = 590,
+
+	// 在屏幕坐标创建选择框（根据类型）...
+	SetScreenChoiceBox = 591,
+
+	// 清除指定标签的选择框...
+	ClearChoiceBoxByLabel = 592,
+
+	// 清除所有选择框...
+	ClearAllChoiceBoxs = 593,
+
 	// ---- Script Manipulation Actions (650-659) ----
 
 	// 清空指定脚本的内容
@@ -282,6 +296,12 @@ static bool name(TActionClass* pThis, HouseClass* pHouse, \
 	ACTION_FUNC(ClearUnitTextBoxByTeam);
 	ACTION_FUNC(ClearAllUnitTextBoxs);
 	ACTION_FUNC(ClearAllTextBoxs);
+
+	// ---- ChoiceBox Actions ----
+	ACTION_FUNC(SetWaypointChoiceBox);
+	ACTION_FUNC(SetScreenChoiceBox);
+	ACTION_FUNC(ClearChoiceBoxByLabel);
+	ACTION_FUNC(ClearAllChoiceBoxs);
 
 	// ---- Script Manipulation Actions ----
 	ACTION_FUNC(ClearScript);

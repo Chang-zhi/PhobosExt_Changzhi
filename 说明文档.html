@@ -85,6 +85,7 @@
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_8')" class="sec-toc__link">8. 脚本操作</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_9')" class="sec-toc__link">9. 特遣部队操作</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_10')" class="sec-toc__link">10. 解除部署</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_11')" class="sec-toc__link">11. 选择框系统</a></li>
 </ul>
 </div>
 
@@ -107,12 +108,13 @@
 <pre class="doc-code--block"><code>[TextBoxTypes]
 0=FirstBoxType
 1=YourBoxType
+...
 
 [YourBoxType]
-MaxWidth=300                ;integer - 最大像素宽度(1-1000)，文本超出自动换行，默认250
-BackgroundOpacity=55        ;integer - 背景不透明度百分比(0-100)。默认75
-Color=255,215,0             ;integer,integer,integer - 文本和边框颜色，RGB格式。默认255,215,0(金色)
-Duration=300                ;integer - 自动移除帧数。默认-1(无限显示)
+MaxWidth=                   ;integer - 最大像素宽度(1-1000)，文本超出自动换行，默认250
+BackgroundOpacity=          ;integer - 背景不透明度百分比(0-100)。默认75
+Color=                      ;integer,integer,integer - 文本和边框颜色，RGB格式。默认255,215,0(金色)
+Duration=                   ;integer - 自动移除帧数。默认-1(无限显示)
 </code></pre>
 
 <h4>路径点文本框</h4>
@@ -397,6 +399,50 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本
 </ul>
 </div>
 
+<hr class="sec-divider--double">
+
+<div id="actions_11">
+<h3 class="doc-heading--tertiary" style="margin-top:2em">11. 选择框系统</h3>
+<p>在地图路径点或屏幕百分比位置上创建交互式选择框，支持标题、描述和多个可点击按钮。
+玩家点击按钮后，可通过触发事件检测结果并执行后续动作。
+按钮支持横向/纵向两种布局。</p>
+
+<h4>选择框类型</h4>
+<p>在 <code class="doc-code--inline">rulesmd.ini</code> 的 <code class="doc-code--inline">[ChoiceBoxTypes]</code> 段中定义选择框样式，可按需添加任意多个。</p>
+<pre class="doc-code--block"><code>[ChoiceBoxTypes]
+0=MyChoiceBox
+
+[MyChoiceBox]
+Title=                           ; CSF标签，标题文本（可选）（默认无）
+Description=                     ; CSF标签，描述文本（可选）（默认无）
+Button.Count=                    ; integer，按钮数量（默认 0）
+Button.Layout=                   ; integer，布局方向 0=横向 1=纵向（默认 0）
+Button.Text1=                    ; CSF标签，按钮文字（默认无）
+Button.Text2=                    ; CSF标签，同上, 数量不限(不过不要太多)
+MaxWidth=                        ; integer，文本最大像素宽度（默认 250）
+BackgroundOpacity=               ; integer，背景不透明度 (0-100)(默认75)
+Color=                           ; integer,integer,integer，文字/边框颜色 R,G,B(默认 255,215,0(金色))
+Duration=                        ; integer，自动移除帧数（默认-1，意为无限显示）
+DisappearDelay=                  ; integer，点击后消失延迟帧数，-1=不自动消失（默认 5）</code></pre>
+
+<h4>触发动作说明</h4>
+<table class="doc-table">
+<thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
+<tbody>
+<tr><td class="doc-table__td">590</td><td class="doc-table__td">在路径点创建选择框...</td><td class="doc-table__td">选择框编号, 路径点, 选择框类型索引</td></tr>
+<tr><td class="doc-table__td">591</td><td class="doc-table__td">在屏幕坐标创建选择框...</td><td class="doc-table__td">选择框编号, 屏幕水平位置, 屏幕垂直位置, 选择框类型索引</td></tr>
+<tr><td class="doc-table__td">592</td><td class="doc-table__td">清除指定编号的选择框...</td><td class="doc-table__td">选择框编号</td></tr>
+<tr><td class="doc-table__td">593</td><td class="doc-table__td">清除所有选择框...</td><td class="doc-table__td">无参数</td></tr>
+</tbody>
+</table>
+
+<h4>注意事项</h4>
+<ol class="doc-list--content">
+<li><strong>选择框编号：</strong>由用户自定义的整数标识符，不同编号可同时显示多个选择框。同编号创建时自动覆盖旧的。</li>
+<li><strong>屏幕坐标：</strong>百分比制（0~100），如 X=50,Y=50 表示屏幕正中央。若溢出屏幕则自动钳制到屏幕视野内。</li>
+</ol>
+</div>
+
 </section>
 
 
@@ -411,6 +457,7 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('events_1')" class="sec-toc__link">1. 科技类型坐标检测</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('events_2')" class="sec-toc__link">2. 流逝时间检测</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('events_3')" class="sec-toc__link">3. 任务计时器检测</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('events_4')" class="sec-toc__link">4. 选择框系统</a></li>
 </ul>
 </div>
 
@@ -450,6 +497,29 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本
 <li><code class="doc-code--inline">555</code> – 任务计时器大于... (参数：秒数)</li>
 <li><code class="doc-code--inline">556</code> – 任务计时器小于... (参数：秒数)</li>
 </ul>
+</div>
+
+<hr class="sec-divider--double">
+
+<div id="events_4">
+<h3 class="doc-heading--tertiary" style="margin-top:2em">4. 选择框系统</h3>
+<p>当选择框中的按钮被点击或超时未选时触发，需要配合触发动作 590-593 和 ini 使用。</p>
+<p><a href="javascript:switchPage('actions');setTimeout(function(){scrollToFeature('actions_11')},100)" class="doc-link">→ 查看对应的触发动作及ini说明</a></p>
+
+<p><strong>触发事件说明：</strong></p>
+<table class="doc-table">
+<thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
+<tbody>
+<tr><td class="doc-table__td">557</td><td class="doc-table__td">选择框指定按钮被点击...</td><td class="doc-table__td">选择框编号, 按钮索引</td></tr>
+<tr><td class="doc-table__td">558</td><td class="doc-table__td">选择框任意按钮被点击...</td><td class="doc-table__td">选择框编号</td></tr>
+<tr><td class="doc-table__td">559</td><td class="doc-table__td">选择框超时未选...</td><td class="doc-table__td">选择框编号</td></tr>
+</tbody>
+</table>
+
+<h4>注意事项</h4>
+<ol class="doc-list--content">
+<li><strong>超时：</strong>当选项框的 Duration 耗尽且玩家未点击任何按钮时，事件 559 触发。</li>
+</ol>
 </div>
 
 </section>
