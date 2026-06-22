@@ -4,6 +4,9 @@
 #include <Helpers/Cast.h>
 #include <Utilities/Stream.h>
 #include <Utilities/Debug.h>
+#include <algorithm>
+#include <UnitClass.h>
+#include <InfantryClass.h>
 
 ScriptExt::ExtContainer ScriptExt::ExtMap;
 
@@ -62,6 +65,41 @@ void ScriptExt::LoadIntoTransportsDistributed(TeamClass* pTeam)
 			pTeam->StepCompleted = false;
 			return;
 		}
+		// 不再 Enter 但还有 Destination 指向载具 = 登车被拒/失败
+		if (pUnit->Destination)
+		{
+			auto pDest = generic_cast<TechnoClass*>(pUnit->Destination);
+			if (pDest && pDest != pUnit && pDest->WhatAmI() == AbstractType::Unit)
+			{
+				Debug::Log("[ScriptExt]   %p exited Enter but still has dest %p (mission=%d)\n",
+					pUnit, pDest, (int)pUnit->GetCurrentMission());
+			}
+		}
+	}
+
+	// 每帧检查所有运输载具周围是否有堵塞者，有则散开
+	{
+		for (auto pUnit = pTeam->FirstUnit; pUnit; pUnit = pUnit->NextTeamMember)
+		{
+			auto pType = pUnit->GetTechnoType();
+			if (!pType || pType->Passengers <= 0)
+				continue;
+			auto pCell = MapClass::Instance.TryGetCellAt(pUnit->GetCoords());
+			if (!pCell) continue;
+			for (auto pObj = pCell->GetContent(); pObj; pObj = pObj->NextObject)
+			{
+				auto pBlocking = generic_cast<TechnoClass*>(pObj);
+				if (!pBlocking || !pBlocking->IsAlive || pBlocking->InLimbo)
+					continue;
+				if (pBlocking == pUnit)
+					continue;
+				if (pBlocking->Owner != pTeam->Owner)
+					continue;
+				if (pBlocking->Transporter)
+					continue;
+				pBlocking->Scatter(pBlocking->GetCoords(), true, false);
+			}
+		}
 	}
 
 	// 收集小队内所有有空位的载具
@@ -96,6 +134,38 @@ void ScriptExt::LoadIntoTransportsDistributed(TeamClass* pTeam)
 		return;
 	}
 
+	// SizeLimit 小的载具优先挑选
+	std::sort(transports.begin(), transports.end(), [](const TransportInfo& a, const TransportInfo& b) {
+		return a.Vehicle->GetTechnoType()->SizeLimit < b.Vehicle->GetTechnoType()->SizeLimit;
+	});
+
+	Debug::Log("[ScriptExt]   Transports sorted by SizeLimit:\n");
+	for (auto& t : transports)
+	{
+		Debug::Log("[ScriptExt]     %p cap=%d/%d limit=%.0f\n",
+			t.Vehicle, t.UsedCapacity, t.MaxCapacity,
+			t.Vehicle->GetTechnoType()->SizeLimit);
+	}
+
+	// 统计还有多少非载具队员可分配
+	int nonTransportCount = 0;
+	for (auto pUnit = pTeam->FirstUnit; pUnit; pUnit = pUnit->NextTeamMember)
+	{
+		if (pUnit->Transporter || pUnit->InLimbo || pUnit->Health <= 0)
+			continue;
+		if (pUnit->WhatAmI() == AbstractType::AircraftType)
+			continue;
+		auto pType = pUnit->GetTechnoType();
+		if (!pType || pType->ConsideredAircraft)
+			continue;
+		if (pType->Passengers > 0)
+			continue;
+		if (pUnit->IsInAir())
+			continue;
+		nonTransportCount++;
+	}
+	Debug::Log("[ScriptExt]   nonTransportCount=%d\n", nonTransportCount);
+
 	// 收集所有需要上车的队员（尚未在 Enter 状态的）
 	struct UnitInfo
 	{
@@ -109,23 +179,52 @@ void ScriptExt::LoadIntoTransportsDistributed(TeamClass* pTeam)
 	for (auto pUnit = pTeam->FirstUnit; pUnit; pUnit = pUnit->NextTeamMember)
 	{
 		if (pUnit->Transporter || pUnit->InLimbo || pUnit->Health <= 0)
+		{
+			Debug::Log("[ScriptExt]     Skip %p: Trans=%d Limbo=%d HP=%d\n",
+				pUnit, !!pUnit->Transporter, !!pUnit->InLimbo, pUnit->Health);
 			continue;
+		}
 		if (pUnit->WhatAmI() == AbstractType::AircraftType)
+		{
+			Debug::Log("[ScriptExt]     Skip %p: Aircraft\n", pUnit);
 			continue;
+		}
 
 		auto pUnitType = pUnit->GetTechnoType();
 		if (!pUnitType || pUnitType->ConsideredAircraft)
+		{
+			Debug::Log("[ScriptExt]     Skip %p: ConsideredAircraft\n", pUnit);
 			continue;
+		}
 
-		// 跳过载具自身
-		if (pUnitType->Passengers > 0)
+		// 还有非载具队员可分配时，有空位的载具仍作为司机，跳过
+		// 没有非载具队员了 → "匹配不到成员" → 作为乘客
+		if (pUnitType->Passengers > 0 && nonTransportCount > 0)
+		{
+			int used = pUnit->Passengers.GetTotalSize();
+			if (used < pUnitType->Passengers)
+			{
+				auto mission = pUnit->GetCurrentMission();
+				Debug::Log("[ScriptExt]     Skip %p: driver has space used=%d/%d, mission=%d\n",
+					pUnit, used, pUnitType->Passengers, (int)mission);
+				continue;
+			}
+			Debug::Log("[ScriptExt]     Allow %p: full transport used=%d/%d\n",
+				pUnit, used, pUnitType->Passengers);
+		}
+		if (pUnit->IsInAir())
+		{
+			Debug::Log("[ScriptExt]     Skip %p: InAir\n", pUnit);
 			continue;
+		}
 
 		int unitSize = static_cast<int>(pUnitType->Size);
 		if (unitSize <= 0) unitSize = 1;
 
 		auto unitCell = pUnit->GetMapCoords();
 		units.push_back({ pUnit, unitCell, unitSize, false });
+
+		Debug::Log("[ScriptExt]     Add %p: size=%d\n", pUnit, unitSize);
 	}
 
 	if (units.empty())
@@ -137,59 +236,150 @@ void ScriptExt::LoadIntoTransportsDistributed(TeamClass* pTeam)
 	Debug::Log("[ScriptExt]   %zu units to assign, %zu transports\n",
 		units.size(), transports.size());
 
-	// 一次性分配：轮询配对所有(队员, 载具)，全部发出命令
-	int totalAssigned = 0;
-	bool anyAssigned = true;
-	while (anyAssigned)
+	// 遍历单元格链表，同一格有多个己方单位就散开
 	{
-		anyAssigned = false;
-		for (auto& t : transports)
+		std::vector<CellStruct> scatterCheckedCells;
+		for (auto& u : units)
 		{
-			if (t.UsedCapacity >= t.MaxCapacity)
-				continue;
-
-			int bestIdx = -1;
-			int bestDist = INT_MAX;
-
-			for (size_t i = 0; i < units.size(); ++i)
+			bool alreadyScatterChecked = false;
+			for (auto& cc : scatterCheckedCells)
 			{
-				auto& u = units[i];
-				if (u.Assigned)
-					continue;
-				if (!u.Unit->IsAlive || u.Unit->InLimbo || u.Unit->Health <= 0 || u.Unit->Transporter)
-					continue;
-				if (u.Size > t.MaxCapacity - t.UsedCapacity)
-					continue;
-				if (u.Size > static_cast<int>(t.Vehicle->GetTechnoType()->SizeLimit))
-					continue;
+				if (cc.X == u.Cell.X && cc.Y == u.Cell.Y)
+				{ alreadyScatterChecked = true; break; }
+			}
+			if (alreadyScatterChecked) continue;
+			scatterCheckedCells.push_back(u.Cell);
 
-				int dist = CellSpread::GetDistance(CellStruct{
-					static_cast<short>(u.Cell.X - t.Cell.X),
-					static_cast<short>(u.Cell.Y - t.Cell.Y)
-				});
-				if (dist < bestDist)
-				{
-					bestDist = dist;
-					bestIdx = static_cast<int>(i);
-				}
+			auto pCell = MapClass::Instance.TryGetCellAt(u.Cell);
+			if (!pCell) continue;
+
+			std::vector<ObjectClass*> cellObjs;
+			for (auto pObj = pCell->GetContent(); pObj; pObj = pObj->NextObject)
+			{
+				auto pTechno = generic_cast<TechnoClass*>(pObj);
+				if (!pTechno || !pTechno->IsAlive || pTechno->InLimbo || pTechno->Transporter)
+					continue;
+				if (pTechno->Owner != pTeam->Owner)
+					continue;
+				cellObjs.push_back(pObj);
 			}
 
-			if (bestIdx >= 0)
+			if (cellObjs.size() > 1)
 			{
-				auto& u = units[bestIdx];
-				Debug::Log("[ScriptExt]   Assigning %p to transport %p (dist=%d size=%d)\n",
-					u.Unit, t.Vehicle, bestDist, u.Size);
-
-				u.Unit->QueueMission(Mission::Enter, false);
-				u.Unit->SetTarget(nullptr);
-				u.Unit->SetDestination(t.Vehicle, true);
-
-				t.UsedCapacity += u.Size;
-				u.Assigned = true;
-				++totalAssigned;
-				anyAssigned = true;
+				for (auto pObj : cellObjs)
+					pObj->Scatter(pObj->GetCoords(), true, false);
 			}
 		}
+	}
+
+	// 按 SizeLimit 分组轮询：同组内轮询装满，再下一组
+	int totalAssigned = 0;
+	size_t groupStart = 0;
+	while (groupStart < transports.size())
+	{
+		double groupLimit = transports[groupStart].Vehicle->GetTechnoType()->SizeLimit;
+		size_t groupEnd = groupStart + 1;
+		while (groupEnd < transports.size() &&
+			transports[groupEnd].Vehicle->GetTechnoType()->SizeLimit == groupLimit)
+			groupEnd++;
+
+		Debug::Log("[ScriptExt]   Group SizeLimit=%.0f: [%zu..%zu)\n",
+			groupLimit, groupStart, groupEnd);
+
+		bool anyAssigned = true;
+		while (anyAssigned)
+		{
+			anyAssigned = false;
+			for (size_t ti = groupStart; ti < groupEnd; ti++)
+			{
+				auto& t = transports[ti];
+				if (t.UsedCapacity >= t.MaxCapacity)
+					continue;
+
+				int bestIdx = -1;
+				int bestDist = INT_MAX;
+
+				for (size_t i = 0; i < units.size(); ++i)
+				{
+					auto& u = units[i];
+					if (u.Assigned)
+						continue;
+					if (!u.Unit->IsAlive || u.Unit->InLimbo || u.Unit->Health <= 0 || u.Unit->Transporter)
+						continue;
+					if (u.Size > t.MaxCapacity - t.UsedCapacity)
+						continue;
+					if (u.Size > static_cast<int>(t.Vehicle->GetTechnoType()->SizeLimit))
+						continue;
+
+					// 不能上自己
+					if (u.Unit == t.Vehicle)
+						continue;
+				// 目标载具坐标上有其他单位 → 散开阻塞者
+				{
+					auto pCell = MapClass::Instance.TryGetCellAt(t.Cell);
+					if (pCell)
+					{
+						for (auto pObj = pCell->GetContent(); pObj; pObj = pObj->NextObject)
+						{
+							auto pBlocking = generic_cast<TechnoClass*>(pObj);
+							if (!pBlocking || !pBlocking->IsAlive || pBlocking->InLimbo)
+								continue;
+							if (pBlocking == t.Vehicle || pBlocking == u.Unit)
+								continue;
+							if (pBlocking->Owner != pTeam->Owner)
+								continue;
+							if (pBlocking->Transporter)
+								continue;
+							Debug::Log("[ScriptExt]   Scatter blocker %p at transport %p\n",
+								pBlocking, t.Vehicle);
+							pBlocking->Scatter(pBlocking->GetCoords(), true, false);
+						}
+					}
+				}
+					int dist = CellSpread::GetDistance(CellStruct{
+						static_cast<short>(u.Cell.X - t.Cell.X),
+						static_cast<short>(u.Cell.Y - t.Cell.Y)
+					});
+					if (dist < bestDist || (dist == bestDist && u.Size < units[bestIdx].Size))
+					{
+						bestDist = dist;
+						bestIdx = static_cast<int>(i);
+					}
+				}
+
+				if (bestIdx >= 0)
+				{
+					auto& u = units[bestIdx];
+					Debug::Log("[ScriptExt]   Assigning %p to transport %p (dist=%d size=%d)\n",
+						u.Unit, t.Vehicle, bestDist, u.Size);
+
+					if (auto pUnit = abstract_cast<UnitClass*>(u.Unit))
+					{
+						if (pUnit->Deployed)
+							pUnit->ForceMission(Mission::Unload);
+					}
+					else if (auto pInf = abstract_cast<InfantryClass*>(u.Unit))
+					{
+						if (pInf->IsDeployed())
+							pInf->ForceMission(Mission::Unload);
+					}
+
+					if (u.Cell == t.Cell)
+						u.Unit->Scatter(u.Unit->GetCoords(), true, false);
+
+					u.Unit->QueueMission(Mission::Enter, false);
+					u.Unit->SetTarget(nullptr);
+					u.Unit->SetDestination(t.Vehicle, true);
+
+					t.UsedCapacity += u.Size;
+					u.Assigned = true;
+					++totalAssigned;
+					anyAssigned = true;
+				}
+			}
+		}
+
+		groupStart = groupEnd;
 	}
 
 	Debug::Log("[ScriptExt]   Assigned %d units in batch, waiting for boarding...\n",

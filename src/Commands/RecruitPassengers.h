@@ -5,11 +5,12 @@
 #include <UnitClass.h>
 #include <BuildingClass.h>
 #include <InfantryClass.h>
-#include <MessageListClass.h>
 #include <HouseClass.h>
 #include <CellSpread.h>
 #include <Helpers/Cast.h>
 #include <Ext/Rules/Body.h>
+#include <Utilities/Debug.h>
+#include <algorithm>
 #include "Command.h"
 
 // 选中空载具按 F，自动招募附近单位上车
@@ -38,7 +39,7 @@ public:
 
 	virtual void Execute(WWKey eInput) const override
 	{
-			auto const pPlayer = HouseClass::CurrentPlayer;
+		auto const pPlayer = HouseClass::CurrentPlayer;
 		if (!pPlayer)
 			return;
 
@@ -52,6 +53,8 @@ public:
 		std::vector<TransportInfo> transports;
 		std::vector<TechnoClass*> selectedNonTransports;
 
+		Debug::Log("[RecruitPassengers] CurrentObjects: %d items\n",
+			ObjectClass::CurrentObjects.Count);
 		for (auto pObj : ObjectClass::CurrentObjects)
 		{
 			if (!pObj || !pObj->IsSelected || !pObj->IsAlive || pObj->InLimbo)
@@ -61,21 +64,25 @@ public:
 			if (!pTechno || pTechno->Owner != pPlayer)
 				continue;
 
+			auto pType = pTechno->GetTechnoType();
+			int pass = pType ? pType->Passengers : -1;
+			Debug::Log("[RecruitPassengers]   Sel: %p type=%d pass=%d ctrl=%d\n",
+				pTechno, (int)pTechno->WhatAmI(), pass, pObj->IsControllable());
+
 			bool isTransport = false;
 			if (pTechno->WhatAmI() == AbstractType::Unit)
 			{
-				if (auto pType = pTechno->GetTechnoType())
+				if (pType && pType->Passengers > 0 && pObj->IsControllable())
 				{
-					if (pType->Passengers > 0 && pObj->IsControllable())
+					int used = pTechno->Passengers.GetTotalSize();
+					if (used < pType->Passengers)
 					{
-						int used = pTechno->Passengers.GetTotalSize();
-						if (used < pType->Passengers)
-						{
-							auto cell = CellClass::Coord2Cell(pTechno->GetCoords());
-							transports.push_back({ pTechno, cell, used, pType->Passengers });
-						}
-						isTransport = true;
+						auto cell = CellClass::Coord2Cell(pTechno->GetCoords());
+						transports.push_back({ pTechno, cell, used, pType->Passengers });
+						isTransport = true; // 有空位 → 当作载具（司机）
 					}
+					// else: 满员载具不设 isTransport，会落入 selectedNonTransports
+					// 由游戏 ObjectClickedAction 自动过滤不合法登车操作
 				}
 			}
 
@@ -85,90 +92,263 @@ public:
 
 		if (transports.empty())
 		{
-			MessageListClass::Instance.PrintMessage(L"Recruit: No transport selected!");
-			return;
+				return;
+		}
+
+		// SizeLimit 小的载具优先挑选，保证步兵能上只能装步兵的小车
+		std::sort(transports.begin(), transports.end(), [](const TransportInfo& a, const TransportInfo& b) {
+			return a.Vehicle->GetTechnoType()->SizeLimit < b.Vehicle->GetTechnoType()->SizeLimit;
+		});
+
+		// 检查所有载具周围是否有堵塞者，有则散开
+		for (auto& t : transports)
+		{
+			auto pCell = MapClass::Instance.TryGetCellAt(t.Cell);
+			if (!pCell) continue;
+			for (auto pObj = pCell->GetContent(); pObj; pObj = pObj->NextObject)
+			{
+				auto pBlocking = generic_cast<TechnoClass*>(pObj);
+				if (!pBlocking || !pBlocking->IsAlive || pBlocking->InLimbo)
+					continue;
+				if (pBlocking == t.Vehicle)
+					continue;
+				if (pBlocking->Owner != pPlayer)
+					continue;
+				if (pBlocking->Transporter)
+					continue;
+				pBlocking->Scatter(pBlocking->GetCoords(), true, false);
+			}
+		}
+
+		Debug::Log("[RecruitPassengers] Selected: %zu transports, %zu non-transports\n",
+			transports.size(), selectedNonTransports.size());
+		for (auto& t : transports)
+		{
+			Debug::Log("[RecruitPassengers]   Transport: %p cap=%d/%d cell=%d,%d limit=%.0f\n",
+				t.Vehicle, t.UsedCapacity, t.MaxCapacity, t.Cell.X, t.Cell.Y,
+				t.Vehicle->GetTechnoType()->SizeLimit);
+		}
+		for (auto p : selectedNonTransports)
+		{
+			Debug::Log("[RecruitPassengers]   NonTransport: %p type=%d\n",
+				p, p->WhatAmI());
 		}
 
 		double recruitRange = RulesExt::Global()->RecruitRange;
 		int totalRecruited = 0;
 
-		auto tryAssign = [&](std::vector<TechnoClass*>& candidates) -> void
+		// 记录各载具初始容量，用于判断是否招募到人
+		std::vector<int> initialCapacities;
+		for (auto& t : transports)
+			initialCapacities.push_back(t.UsedCapacity);
+
+		auto tryAssign = [&](std::vector<TechnoClass*>& candidates, bool useRangeLimit) -> void
 		{
 			// 标记哪些已分配
 			struct UnitInfo { TechnoClass* Unit; int Size; CellStruct Cell; bool Assigned; };
 			std::vector<UnitInfo> units;
 
+			// 预先计算失败载具指针集，用于第 3 轮防循环登车（O(1) 查找替代 O(n) 遍历）
+			std::vector<TechnoClass*> failedTransportPtrs;
+			for (size_t ci = 0; ci < transports.size(); ci++)
+			{
+				if (transports[ci].UsedCapacity == initialCapacities[ci])
+					failedTransportPtrs.push_back(transports[ci].Vehicle);
+			}
+			bool needFellowFailedCheck = !failedTransportPtrs.empty()
+				&& failedTransportPtrs.size() < transports.size();
+
 			for (auto pUnit : candidates)
 			{
 				if (!pUnit->IsAlive || pUnit->InLimbo || pUnit->Transporter)
 					continue;
+				if (pUnit->WhatAmI() == AbstractType::AircraftType)
+					continue;
 
 				auto pUnitType = pUnit->GetTechnoType();
-				int unitSize = 1;
-				if (pUnitType)
+				if (!pUnitType || pUnitType->ConsideredAircraft)
+					continue;
+				if (pUnit->IsInAir())
+					continue;
+
+				// 已在去载具路上的跳过，避免重复分配
+				if (auto pFoot = generic_cast<FootClass*>(pUnit))
 				{
-					unitSize = static_cast<int>(pUnitType->Size);
-					if (unitSize <= 0) unitSize = 1;
+					if (pFoot->Destination)
+					{
+						auto pDest = generic_cast<TechnoClass*>(pFoot->Destination);
+						if (pDest && pDest != pUnit && pDest->WhatAmI() == AbstractType::Unit)
+							continue;
+					}
 				}
+
+				int unitSize = static_cast<int>(pUnitType->Size);
+				if (unitSize <= 0) unitSize = 1;
 
 				auto unitCell = pUnit->GetMapCoords();
 				units.push_back({ pUnit, unitSize, unitCell, false });
 			}
 
-			// 轮询分配：各载具轮流挑选最近的未分配队员
-			bool anyAssigned = true;
-			while (anyAssigned)
+			// 遍历单元格链表，同一格有多个己方单位就散开
 			{
-				anyAssigned = false;
-				for (auto& t : transports)
+				std::vector<CellStruct> scatterCheckedCells;
+				for (auto& u : units)
 				{
-					if (t.UsedCapacity >= t.MaxCapacity)
-						continue;
-
-					int bestIdx = -1;
-					int bestDist = INT_MAX;
-
-					for (size_t i = 0; i < units.size(); ++i)
+					bool alreadyScatterChecked = false;
+					for (auto& cc : scatterCheckedCells)
 					{
-						auto& u = units[i];
-						if (u.Assigned)
-							continue;
-						if (!u.Unit->IsAlive || u.Unit->InLimbo || u.Unit->Transporter)
-							continue;
-						if (u.Size > t.MaxCapacity - t.UsedCapacity)
-							continue;
-						if (u.Size > static_cast<int>(t.Vehicle->GetTechnoType()->SizeLimit))
-							continue;
+						if (cc.X == u.Cell.X && cc.Y == u.Cell.Y)
+						{ alreadyScatterChecked = true; break; }
+					}
+					if (alreadyScatterChecked) continue;
+					scatterCheckedCells.push_back(u.Cell);
 
-						int dist = CellSpread::GetDistance(CellStruct{
-							static_cast<short>(u.Cell.X - t.Cell.X),
-							static_cast<short>(u.Cell.Y - t.Cell.Y)
-						});
-						if (dist > recruitRange)
-							continue;
+					auto pCell = MapClass::Instance.TryGetCellAt(u.Cell);
+					if (!pCell) continue;
 
-						if (dist < bestDist)
+					std::vector<ObjectClass*> cellObjs;
+					for (auto pObj = pCell->GetContent(); pObj; pObj = pObj->NextObject)
+					{
+						auto pTechno = generic_cast<TechnoClass*>(pObj);
+						if (!pTechno || !pTechno->IsAlive || pTechno->InLimbo || pTechno->Transporter)
+							continue;
+						if (pTechno->Owner != pPlayer)
+							continue;
+						cellObjs.push_back(pObj);
+					}
+
+					if (cellObjs.size() > 1)
+					{
+						for (auto pObj : cellObjs)
+							pObj->Scatter(pObj->GetCoords(), true, false);
+					}
+				}
+			}
+
+			// 按 SizeLimit 分组轮询：同组内轮询装满，再下一组
+			{
+				size_t groupStart = 0;
+				while (groupStart < transports.size())
+				{
+					double groupLimit = transports[groupStart].Vehicle->GetTechnoType()->SizeLimit;
+					size_t groupEnd = groupStart + 1;
+					while (groupEnd < transports.size() &&
+						transports[groupEnd].Vehicle->GetTechnoType()->SizeLimit == groupLimit)
+						groupEnd++;
+
+					bool anyAssigned = true;
+					while (anyAssigned)
+					{
+						anyAssigned = false;
+						for (size_t ti = groupStart; ti < groupEnd; ti++)
 						{
-							bestDist = dist;
-							bestIdx = static_cast<int>(i);
+							auto& t = transports[ti];
+							if (t.UsedCapacity >= t.MaxCapacity)
+								continue;
+
+							int bestIdx = -1;
+							int bestDist = INT_MAX;
+
+							for (size_t i = 0; i < units.size(); ++i)
+							{
+								auto& u = units[i];
+								if (u.Assigned)
+									continue;
+								if (!u.Unit->IsAlive || u.Unit->InLimbo || u.Unit->Transporter)
+									continue;
+								if (u.Unit == t.Vehicle)
+									continue;
+
+							// 目标载具坐标上有其他单位 → 散开阻塞者
+							{
+								auto pCell = MapClass::Instance.TryGetCellAt(t.Cell);
+								if (pCell)
+								{
+									for (auto pObj = pCell->GetContent(); pObj; pObj = pObj->NextObject)
+									{
+										auto pBlocking = generic_cast<TechnoClass*>(pObj);
+										if (!pBlocking || !pBlocking->IsAlive || pBlocking->InLimbo)
+											continue;
+										if (pBlocking == t.Vehicle || pBlocking == u.Unit)
+											continue;
+										if (pBlocking->Owner != pPlayer)
+											continue;
+										if (pBlocking->Transporter)
+											continue;
+										pBlocking->Scatter(pBlocking->GetCoords(), true, false);
+									}
+								}
+							}
+
+							if (needFellowFailedCheck)
+							{
+								bool candIsFailed = false;
+								for (auto pF : failedTransportPtrs)
+								{
+									if (pF == u.Unit) { candIsFailed = true; break; }
+								}
+								bool vehIsFailed = false;
+								for (auto pF : failedTransportPtrs)
+								{
+									if (pF == t.Vehicle) { vehIsFailed = true; break; }
+									}
+									if (candIsFailed && vehIsFailed)
+										continue;
+								}
+
+								if (u.Size > t.MaxCapacity - t.UsedCapacity)
+									continue;
+								if (u.Size > static_cast<int>(t.Vehicle->GetTechnoType()->SizeLimit))
+									continue;
+
+								int dist = CellSpread::GetDistance(CellStruct{
+									static_cast<short>(u.Cell.X - t.Cell.X),
+									static_cast<short>(u.Cell.Y - t.Cell.Y)
+								});
+								if (useRangeLimit && dist > recruitRange)
+									continue;
+
+								if (dist < bestDist || (dist == bestDist && u.Size < units[bestIdx].Size))
+								{
+									bestDist = dist;
+									bestIdx = static_cast<int>(i);
+								}
+							}
+
+							if (bestIdx >= 0)
+							{
+								auto& u = units[bestIdx];
+
+								if (auto pUnit = abstract_cast<UnitClass*>(u.Unit))
+								{
+									if (pUnit->Deployed)
+										pUnit->ForceMission(Mission::Unload);
+								}
+								else if (auto pInf = abstract_cast<InfantryClass*>(u.Unit))
+								{
+									if (pInf->IsDeployed())
+										pInf->ForceMission(Mission::Unload);
+								}
+
+								if (u.Cell == t.Cell)
+									u.Unit->Scatter(u.Unit->GetCoords(), true, false);
+
+								u.Unit->ObjectClickedAction(Action::Enter, t.Vehicle, false);
+								t.UsedCapacity += u.Size;
+								u.Assigned = true;
+								totalRecruited++;
+								anyAssigned = true;
+							}
 						}
 					}
 
-					if (bestIdx >= 0)
-					{
-						auto& u = units[bestIdx];
-						u.Unit->ObjectClickedAction(Action::Enter, t.Vehicle, false);
-						t.UsedCapacity += u.Size;
-						u.Assigned = true;
-						totalRecruited++;
-						anyAssigned = true;
-					}
+					groupStart = groupEnd;
 				}
 			}
 		};
 
-		// 第 1 轮：选中的非载具优先
-		tryAssign(selectedNonTransports);
+		// 第 1 轮：选中的非载具优先（不限距离）
+		tryAssign(selectedNonTransports, false);
 
 		// 第 2 轮：全场非选中
 		{
@@ -194,18 +374,166 @@ public:
 
 				unselected.push_back(pFoot);
 			}
-			tryAssign(unselected);
+			tryAssign(unselected, true);
 		}
 
-		if (totalRecruited > 0)
+		// 第 3 轮
 		{
-			wchar_t msg[0x100];
-			swprintf_s(msg, L"招募到 %d 个单位上车", totalRecruited);
-			MessageListClass::Instance.PrintMessage(msg);
-		}
-		else
-		{
-			MessageListClass::Instance.PrintMessage(L"附近没有可招募的单位");
+			// 统计还有多少非载具队员可匹配
+			int nonTransportCount = 0;
+			for (auto pFoot : FootClass::Array)
+			{
+				if (!pFoot || !pFoot->IsAlive || pFoot->InLimbo || pFoot->Transporter)
+					continue;
+				if (pFoot->Owner != pPlayer)
+					continue;
+				auto pType = pFoot->GetTechnoType();
+				if (!pType || pType->Passengers > 0 || pType->ConsideredAircraft)
+					continue;
+				if (pFoot->WhatAmI() == AbstractType::AircraftType || pFoot->IsInAir())
+					continue;
+				nonTransportCount++;
+			}
+			Debug::Log("[RecruitPassengers] nonTransportCount=%d\n", nonTransportCount);
+
+			Debug::Log("[RecruitPassengers] After R1+R2: totalRecruited=%d\n", totalRecruited);
+			for (size_t di = 0; di < transports.size(); di++)
+			{
+				Debug::Log("[RecruitPassengers]   Transport[%zu] %p: init=%d used=%d max=%d\n",
+					di, transports[di].Vehicle,
+					initialCapacities[di], transports[di].UsedCapacity, transports[di].MaxCapacity);
+			}
+
+			std::vector<TechnoClass*> failedTransports;
+			std::vector<TransportInfo*> successfulTransports;
+
+			for (size_t i = 0; i < transports.size(); i++)
+			{
+				// 没有非载具可匹配时，还有空位的载具一律作为"匹配不到"→ 可当乘客
+				// 有非载具可匹配时，只有真正没招到人的才当乘客
+				bool isFailed = (nonTransportCount == 0)
+					? (transports[i].UsedCapacity < transports[i].MaxCapacity)
+					: (transports[i].UsedCapacity == initialCapacities[i] &&
+					   transports[i].UsedCapacity < transports[i].MaxCapacity);
+
+				if (isFailed)
+				{
+					if (auto pTechno = transports[i].Vehicle)
+					{
+						if (pTechno->IsAlive && !pTechno->InLimbo && !pTechno->Transporter)
+							failedTransports.push_back(pTechno);
+					}
+				}
+				else if (transports[i].UsedCapacity > initialCapacities[i])
+				{
+					successfulTransports.push_back(&transports[i]);
+				}
+			}
+
+			Debug::Log("[RecruitPassengers] Round3: %zu failed, %zu successful\n",
+				failedTransports.size(), successfulTransports.size());
+
+			if (failedTransports.empty())
+				return;
+
+			if (!successfulTransports.empty())
+			{
+				// 有成功载具（司机）→ 失败载具上司机，fellow-failed 检查会防止循环登车
+				Debug::Log("[RecruitPassengers]   Mixed: failed board successes\n");
+				tryAssign(failedTransports, false);
+			}
+			else if (failedTransports.size() >= 2)
+			{
+				// 全是失败载具且至少 2 个：选剩余容量最大的做接收方，其他的上它
+				// 避免 tryAssign 的轮询导致循环登车（A派B上A、B派A上B）
+				int bestIdx = 0;
+				int bestRemaining = 0;
+				for (size_t i = 0; i < transports.size(); i++)
+				{
+					int rem = transports[i].MaxCapacity - transports[i].UsedCapacity;
+					if (rem > bestRemaining)
+					{
+						bestRemaining = rem;
+						bestIdx = static_cast<int>(i);
+					}
+				}
+
+				auto& receiver = transports[bestIdx];
+				Debug::Log("[RecruitPassengers]   All failed, receiver=%p cap=%d/%d\n",
+					receiver.Vehicle, receiver.UsedCapacity, receiver.MaxCapacity);
+
+				// 遍历单元格链表，同一格有多个己方单位就散开
+				{
+					std::vector<CellStruct> scatterCheckedCells;
+					for (auto pFailed : failedTransports)
+					{
+						auto failedCell = CellClass::Coord2Cell(pFailed->GetCoords());
+						bool alreadyScatterChecked = false;
+						for (auto& cc : scatterCheckedCells)
+						{
+							if (cc.X == failedCell.X && cc.Y == failedCell.Y)
+							{ alreadyScatterChecked = true; break; }
+						}
+						if (alreadyScatterChecked) continue;
+						scatterCheckedCells.push_back(failedCell);
+
+						auto pCell = MapClass::Instance.TryGetCellAt(failedCell);
+						if (!pCell) continue;
+
+						std::vector<ObjectClass*> cellObjs;
+						for (auto pObj = pCell->GetContent(); pObj; pObj = pObj->NextObject)
+						{
+							auto pTechno = generic_cast<TechnoClass*>(pObj);
+							if (!pTechno || !pTechno->IsAlive || pTechno->InLimbo || pTechno->Transporter)
+								continue;
+							if (pTechno->Owner != pPlayer)
+								continue;
+							cellObjs.push_back(pObj);
+						}
+
+						if (cellObjs.size() > 1)
+						{
+							for (auto pObj : cellObjs)
+								pObj->Scatter(pObj->GetCoords(), true, false);
+						}
+					}
+				}
+
+				for (auto pFailed : failedTransports)
+				{
+					if (pFailed == receiver.Vehicle)
+						continue;
+
+					auto pFailedType = pFailed->GetTechnoType();
+					if (!pFailedType)
+						continue;
+					int failedSize = static_cast<int>(pFailedType->Size);
+					if (failedSize <= 0) failedSize = 1;
+
+					if (failedSize > receiver.MaxCapacity - receiver.UsedCapacity)
+						continue;
+					if (failedSize > static_cast<int>(receiver.Vehicle->GetTechnoType()->SizeLimit))
+						continue;
+
+					// 如果已部署则先解除部署
+					if (auto pUnit = abstract_cast<UnitClass*>(pFailed))
+					{
+						if (pUnit->Deployed)
+							pUnit->ForceMission(Mission::Unload);
+					}
+
+					// 同一单元格先散开
+					auto failedCell = CellClass::Coord2Cell(pFailed->GetCoords());
+					if (failedCell == receiver.Cell)
+						pFailed->Scatter(pFailed->GetCoords(), true, false);
+
+					Debug::Log("[RecruitPassengers]   Boarding %p -> %p (size=%d)\n",
+						pFailed, receiver.Vehicle, failedSize);
+
+					pFailed->ObjectClickedAction(Action::Enter, receiver.Vehicle, false);
+					receiver.UsedCapacity += failedSize;
+				}
+			}
 		}
 	}
 };

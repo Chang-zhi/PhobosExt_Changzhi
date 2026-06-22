@@ -539,6 +539,17 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本
 <li>将<strong>合法的</strong>小队成员按距离分配到各载具，全员上车后继续执行下一条脚本。</li>
 <li>不会出现原版脚本 14 的问题：<strong>不会</strong>只认最后一个载具、<strong>不会</strong>不考虑 <code class="doc-code--inline">SizeLimit</code>、<strong>不会</strong>不考虑剩余空间导致卡死。</li>
 </ul>
+
+<h4>分配算法</h4>
+<ol class="doc-list--content">
+<li><strong>SizeLimit 排序：</strong>按 SizeLimit 从小到大排序，小的优先挑选。</li>
+<li><strong>分组轮询：</strong>相同 SizeLimit 的载具为一组，组内轮询分配。一组装满或没合适单位时才轮到下一组。</li>
+<li><strong>同距离选小单位：</strong>距离相同时优先选 Size 更小的单位，最大化装载数量。</li>
+<li><strong>满员载具可当乘客：</strong>已满的载具也会加入候选列表，可登上更大的运输船。</li>
+<li>每帧检查载具周围，若有友方单位堵塞入口则自动散开。</li>
+<li>自动跳过飞行器、已在天上的单位。</li>
+<li>部署状态的单位会自动解除部署后再登车。</li>
+</ol>
 </div>
 
 </section>
@@ -837,10 +848,30 @@ Button.Text3=         ; CSF标签  更多按钮以此类推  (默认无)
 <p>可在 <code class="doc-code--inline">rulemd.ini</code> 里面自定义招募半径。</p>
 <pre class="doc-code--block"><code>[General]
 Command.RecruitRange=             ; double，默认 7.5</code></pre>
-<p><strong>上车顺序：</strong></p>
+<p><strong>招募顺序：</strong></p>
 <ol class="doc-list--content">
-<li>选中的非载具单位优先上车，然后附近非选中的单位。不考虑单位招募属性。</li>
+<li><strong>第 1 轮 — 选中的单位优先：</strong>当前选中的非载具单位<strong>不限距离</strong>全部上车，按就近原则分配到各载具。</li>
+<li><strong>第 2 轮 — 附近单位补位：</strong>仅在 <code class="doc-code--inline">Command.RecruitRange</code> 范围内招满剩余座位，同样就近分配。</li>
+<li><strong>第 3 轮 — 载具互上：</strong>非载具成员匹配完毕后，匹配不到人的载具可上其他载具。</li>
 </ol>
+
+<p><strong>分配算法：</strong></p>
+<ul class="doc-list--content">
+<li><strong>SizeLimit 排序：</strong>按 SizeLimit 从小到大排序，小车先挑。</li>
+<li><strong>分组轮询：</strong>相同 SizeLimit 的载具一组，组内轮询。一组满了才轮到下一组。</li>
+<li><strong>同距离选小单位：</strong>距离相同时优先选 Size 更小的单位。</li>
+<li><strong>满员载具可当乘客：</strong>装满的载具不再当"司机"，可登上其他载具。</li>
+</ul>
+
+<p><strong>特殊处理：</strong></p>
+<ul class="doc-list--content">
+<li>自动跳过飞行器、已在天上的单位、以及部署后解除部署会飞行的单位。</li>
+<li>部署状态的单位会自动解除部署后再上车。</li>
+<li>与载具在同一格的单位会先散开再上车。</li>
+<li>已在去载具路上的单位会被跳过，避免重复分配。</li>
+<li>每次分配前检查载具格子，若有其他单位堵塞入口则自动散开。</li>
+<li>同一格有多个己方单位时自动散开，避免互相阻挡。</li>
+</ul>
 </div>
 
 </section>
