@@ -13,11 +13,9 @@
 #include "Command.h"
 
 // 选中空载具按 F，自动招募附近单位上车
-// 范围可通过 rules(md).ini [General] Command.RecruitRange= 配置（默认 7.5）
 class RecruitPassengersClass : public AresCommandClass
 {
 public:
-	// CommandClass
 	virtual const char* GetName() const override
 	{
 		return "Recruit Passengers";
@@ -25,7 +23,7 @@ public:
 
 	virtual const wchar_t* GetUIName() const override
 	{
-		return L"Recruit Passengers";
+		return L"自动装载";
 	}
 
 	virtual const wchar_t* GetUICategory() const override
@@ -40,12 +38,10 @@ public:
 
 	virtual void Execute(WWKey eInput) const override
 	{
-		// 获取当前玩家
-		auto const pPlayer = HouseClass::CurrentPlayer;
+			auto const pPlayer = HouseClass::CurrentPlayer;
 		if (!pPlayer)
 			return;
 
-		// 从选中对象中收集合法的载具（招募方），并标记哪些选中单位是载具
 		struct TransportInfo
 		{
 			TechnoClass* Vehicle;
@@ -54,7 +50,7 @@ public:
 			int MaxCapacity;
 		};
 		std::vector<TransportInfo> transports;
-		std::vector<TechnoClass*> selectedNonTransports; // 选中但非载具的单位，优先上车
+		std::vector<TechnoClass*> selectedNonTransports;
 
 		for (auto pObj : ObjectClass::CurrentObjects)
 		{
@@ -65,7 +61,6 @@ public:
 			if (!pTechno || pTechno->Owner != pPlayer)
 				continue;
 
-			// 标记：这个选中单位是不是载具（有乘客容量）
 			bool isTransport = false;
 			if (pTechno->WhatAmI() == AbstractType::Unit)
 			{
@@ -84,7 +79,6 @@ public:
 				}
 			}
 
-			// 不是载具的选中单位，列入优先上车名单
 			if (!isTransport)
 				selectedNonTransports.push_back(pTechno);
 		}
@@ -97,109 +91,112 @@ public:
 
 		double recruitRange = RulesExt::Global()->RecruitRange;
 		int totalRecruited = 0;
-		std::vector<TechnoClass*> succeededTransports; // 成功招募到人的载具，不被其他载具招募
 
-		// ---- 第 1 轮：优先让"选中但不是载具"的单位上车 ----
-		for (auto pFoot : selectedNonTransports)
+		auto tryAssign = [&](std::vector<TechnoClass*>& candidates) -> void
 		{
-			if (!pFoot->IsAlive || pFoot->InLimbo || pFoot->Transporter)
-				continue;
+			// 标记哪些已分配
+			struct UnitInfo { TechnoClass* Unit; int Size; CellStruct Cell; bool Assigned; };
+			std::vector<UnitInfo> units;
 
-			auto pFootType = pFoot->GetTechnoType();
-			auto footCell = pFoot->GetMapCoords();
-
-			int footSize = 1;
-			if (pFootType)
+			for (auto pUnit : candidates)
 			{
-				footSize = static_cast<int>(pFootType->Size);
-				if (footSize <= 0) footSize = 1;
+				if (!pUnit->IsAlive || pUnit->InLimbo || pUnit->Transporter)
+					continue;
+
+				auto pUnitType = pUnit->GetTechnoType();
+				int unitSize = 1;
+				if (pUnitType)
+				{
+					unitSize = static_cast<int>(pUnitType->Size);
+					if (unitSize <= 0) unitSize = 1;
+				}
+
+				auto unitCell = pUnit->GetMapCoords();
+				units.push_back({ pUnit, unitSize, unitCell, false });
 			}
 
-			// 找最近的且有空间的载具
-			TransportInfo* best = nullptr;
-			int bestDist = INT_MAX;
-			for (auto& t : transports)
+			// 轮询分配：各载具轮流挑选最近的未分配队员
+			bool anyAssigned = true;
+			while (anyAssigned)
 			{
-				if (footSize > static_cast<int>(t.Vehicle->GetTechnoType()->SizeLimit))
-					continue;
-				if (t.UsedCapacity + footSize > t.MaxCapacity)
-					continue;
+				anyAssigned = false;
+				for (auto& t : transports)
+				{
+					if (t.UsedCapacity >= t.MaxCapacity)
+						continue;
 
-				int dist = CellSpread::GetDistance(CellStruct{
-					static_cast<short>(footCell.X - t.Cell.X),
-					static_cast<short>(footCell.Y - t.Cell.Y)
-				});
-				if (dist > recruitRange)
-					continue;
-				if (dist < bestDist) { bestDist = dist; best = &t; }
+					int bestIdx = -1;
+					int bestDist = INT_MAX;
+
+					for (size_t i = 0; i < units.size(); ++i)
+					{
+						auto& u = units[i];
+						if (u.Assigned)
+							continue;
+						if (!u.Unit->IsAlive || u.Unit->InLimbo || u.Unit->Transporter)
+							continue;
+						if (u.Size > t.MaxCapacity - t.UsedCapacity)
+							continue;
+						if (u.Size > static_cast<int>(t.Vehicle->GetTechnoType()->SizeLimit))
+							continue;
+
+						int dist = CellSpread::GetDistance(CellStruct{
+							static_cast<short>(u.Cell.X - t.Cell.X),
+							static_cast<short>(u.Cell.Y - t.Cell.Y)
+						});
+						if (dist > recruitRange)
+							continue;
+
+						if (dist < bestDist)
+						{
+							bestDist = dist;
+							bestIdx = static_cast<int>(i);
+						}
+					}
+
+					if (bestIdx >= 0)
+					{
+						auto& u = units[bestIdx];
+						u.Unit->ObjectClickedAction(Action::Enter, t.Vehicle, false);
+						t.UsedCapacity += u.Size;
+						u.Assigned = true;
+						totalRecruited++;
+						anyAssigned = true;
+					}
+				}
 			}
-			if (!best) continue;
+		};
 
-			pFoot->ObjectClickedAction(Action::Enter, best->Vehicle, false);
-			best->UsedCapacity += footSize;
-			totalRecruited++;
-			succeededTransports.push_back(best->Vehicle);
+		// 第 1 轮：选中的非载具优先
+		tryAssign(selectedNonTransports);
+
+		// 第 2 轮：全场非选中
+		{
+			std::vector<TechnoClass*> unselected;
+			for (auto pFoot : FootClass::Array)
+			{
+				if (!pFoot || !pFoot->IsAlive || pFoot->InLimbo)
+					continue;
+				if (pFoot->Owner != pPlayer)
+					continue;
+				if (pFoot->Transporter)
+					continue;
+				if (pFoot->IsSelected)
+					continue;
+
+				// 已在去载具路上的跳过
+				if (pFoot->Destination)
+				{
+					auto pDestTechno = generic_cast<TechnoClass*>(pFoot->Destination);
+					if (pDestTechno && pDestTechno->WhatAmI() == AbstractType::Unit)
+						continue;
+				}
+
+				unselected.push_back(pFoot);
+			}
+			tryAssign(unselected);
 		}
 
-		// ---- 第 2 轮：再招募全场 FootClass ----
-		for (auto pFoot : FootClass::Array)
-		{
-			if (!pFoot || !pFoot->IsAlive || pFoot->InLimbo)
-				continue;
-
-			if (pFoot->Owner != pPlayer)
-				continue;
-			if (pFoot->Transporter)
-				continue;
-
-			// 跳过已经成功招募到人的载具（它们不可被其他载具招募）
-			if (std::find(succeededTransports.begin(), succeededTransports.end(), pFoot) != succeededTransports.end())
-				continue;
-
-			auto pFootType = pFoot->GetTechnoType();
-			auto footCell = pFoot->GetMapCoords();
-
-			int footSize = 1;
-			if (pFootType)
-			{
-				footSize = static_cast<int>(pFootType->Size);
-				if (footSize <= 0) footSize = 1;
-			}
-
-			// 已经在去载具的路上了就跳过
-			if (pFoot->Destination)
-			{
-				auto pDestTechno = generic_cast<TechnoClass*>(pFoot->Destination);
-				if (pDestTechno && pDestTechno->WhatAmI() == AbstractType::Unit)
-					continue;
-			}
-
-			// 找最近的且有空间的载具
-			TransportInfo* best = nullptr;
-			int bestDist = INT_MAX;
-			for (auto& t : transports)
-			{
-				if (footSize > static_cast<int>(t.Vehicle->GetTechnoType()->SizeLimit))
-					continue;
-				if (t.UsedCapacity + footSize > t.MaxCapacity)
-					continue;
-
-				int dist = CellSpread::GetDistance(CellStruct{
-					static_cast<short>(footCell.X - t.Cell.X),
-					static_cast<short>(footCell.Y - t.Cell.Y)
-				});
-				if (dist > recruitRange)
-					continue;
-				if (dist < bestDist) { bestDist = dist; best = &t; }
-			}
-			if (!best) continue;
-
-			pFoot->ObjectClickedAction(Action::Enter, best->Vehicle, false);
-			best->UsedCapacity += footSize;
-			totalRecruited++;
-		}
-
-		// 反馈
 		if (totalRecruited > 0)
 		{
 			wchar_t msg[0x100];

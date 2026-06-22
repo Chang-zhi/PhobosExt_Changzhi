@@ -19,10 +19,10 @@
 - 559=ChoiceBox Timed Out... 选择框超时未选
 7, 新增按键命令系统:
     - 新增 [General] -> Command.RecruitRange=     ;double 默认7.5 自动招募半径
-    - 新增按键 Recruit Passengers: 选中空载具按 F，自动招募附近单位上车
-    - 通过 ObjectClickedAction 模拟玩家操作，依次排队上车
-    - 支持多载具同时选中，优先招募选中的非载具单位
+    - 新增按键 Recruit Passengers: 选中空载具按指定按键，自动招募附近单位上车
+8, 新增脚本动作 5500=分布式装载(PhobosExt)
 
+2026,6,22
 ======V0.0.13.6=======
 1,新增/更名 文本框系统(TextBox):可在路径点或科技类型(TechnoClass)上绘制自定义文本框.
 2,新增 [TextBoxTypes] 规则段 - 预定义文本框样式(宽度,不透明度,颜色).
