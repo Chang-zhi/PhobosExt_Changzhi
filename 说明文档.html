@@ -520,6 +520,7 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_4')" class="sec-toc__link">4. 基地节点跨所属方判定</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_5')" class="sec-toc__link">5. 混乱机制</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_6')" class="sec-toc__link">6. 选择框类型配置</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_7')" class="sec-toc__link">7. 按键命令系统</a></li>
 </ul>
 </div>
 
@@ -783,6 +784,25 @@ Button.Text3=         ; CSF标签  更多按钮以此类推  (默认无)
 </tbody>
 </table>
 
+</ol>
+</div>
+
+<hr class="sec-divider--double">
+
+<div id="gameplay_7">
+<h3 class="doc-heading--tertiary" style="margin-top:2em">7. 按键命令系统</h3>
+<p>新增自定义按键命令，可在游戏按键设置中绑定快捷键。</p>
+
+
+
+<h4>7.1 Recruit Passengers</h4>
+<p>选中空载具按 F，自动招募附近单位上车。</p>
+<p>可在 <code class="doc-code--inline">rulemd.ini</code> 里面自定义招募半径。</p>
+<pre class="doc-code--block"><code>[General]
+Command.RecruitRange=             ; double，默认 7.5</code></pre>
+<p><strong>上车顺序：</strong></p>
+<ol class="doc-list--content">
+<li>选中的非载具单位优先上车，然后附近非选中的单位。不考虑单位招募属性。</li>
 </ol>
 </div>
 

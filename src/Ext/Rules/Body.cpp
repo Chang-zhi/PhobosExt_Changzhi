@@ -57,6 +57,7 @@ void RulesExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 	INI_EX exINI(pINI);
 
 	this->BerzerkRestoreClearTarget.Read(exINI, GameStrings::General, "BerzerkRestoreClearTarget");
+	this->RecruitRange.Read(exINI, GameStrings::General, "Command.RecruitRange");
 }
 
 void RulesExt::ExtData::LoadBeforeTypeData(RulesClass* pThis, CCINIClass* pINI)
@@ -98,6 +99,7 @@ void RulesExt::ExtData::Serialize(T& Stm)
 		.Process(this->ShowTextBoxInShroud_Waypoint)
 		.Process(this->ShowTextBoxInShroud_Techno)
 		.Process(this->BerzerkRestoreClearTarget)
+		.Process(this->RecruitRange)
 		;
 }
 
