@@ -18,16 +18,31 @@
 #include <memory>
 
 #include <Windows.h>
+#include <cstdio>
 
 // ========== 布局常量 ==========
-constexpr static const int PADDINGX = 8;          // 水平内边距
-constexpr static const int PADDINGY = 8;          // 垂直内边距
+constexpr static const int PADDINGX = 8;          // 背景框水平内边距
+constexpr static const int PADDINGY = 8;          // 背景框垂直内边距
 constexpr static const int LINE_HEIGHT = 18;       // 每行文字高度
-constexpr static const int BUTTON_PADDINGX = 11;   // 按钮文字水平内边距
-constexpr static const int BUTTON_PADDINGY = 4;    // 按钮文字垂直内边距
+constexpr static const int BUTTON_PADDINGX = 11;   // 按钮内文字水平内边距
+constexpr static const int BUTTON_PADDINGY = 4;    // 按钮内文字垂直内边距
 constexpr static const int BUTTON_SPACING = 10;     // 按钮之间的间距
-constexpr static const int SECTION_SPACING = 4;    // 不同区块（标题/描述/按钮）之间的间距
-constexpr static const int BOTTOM_SAFE_HEIGHT = 0; // 底部安全区域
+constexpr static const int SECTION_SPACING = 4;    // 标题/描述/按钮区块之间的间距
+constexpr static const int BOTTOM_SAFE_HEIGHT = 0; // 底部安全区域（保留）
+constexpr static const int CLICK_EXPIRE_FRAMES = 5;// 隐藏期帧数（Duration 耗尽后保留供 TEvent 检测）
+
+// ========== 按钮布局元数据 ==========
+/**
+ * @brief 单个按钮的布局信息（每帧在 DrawAt 中计算）
+ */
+struct MapChoiceBoxClass::BtnLayoutItem
+{
+	int Index;                               ///< 按钮索引
+	std::wstring Text;                       ///< 解析后的宽字符串文本
+	std::vector<std::wstring> TextLines;     ///< 按钮内换行后的各行文字
+	int Width;                               ///< 按钮宽度（固定或自动）
+	int Height;                              ///< 按钮高度（固定或自动撑高）
+};
 
 // 全局数组
 std::vector<std::shared_ptr<MapChoiceBoxClass>> MapChoiceBoxClass::Array;
@@ -206,6 +221,23 @@ bool MapChoiceBoxClass::CheckMouseClick()
 
 // ========== 绘制 ==========
 
+/**
+ * @brief 在指定屏幕坐标绘制选择框
+ *
+ * 绘制流程：
+ *   1) 计算标题、描述文本尺寸（支持自动换行）
+ *   2) 测量每个按钮尺寸（固定/自动宽，固定/自动高）
+ *   3) 执行布局（横向折行/纵向排列）
+ *   4) 确定背景框尺寸
+ *   5) 屏幕钳制 + 底部裁剪
+ *   6) 绘制半透明背景 + 边框
+ *   7) 绘制标题（可选居中）
+ *   8) 绘制描述
+ *   9) 绘制所有按钮（多行、多行内文字居中）
+ *
+ * @param centerPos 选择框中心定位点（屏幕像素坐标）
+ */
+
 void MapChoiceBoxClass::DrawAt(Point2D centerPos)
 {
 	if (!DSurface::Composite || !TacticalClass::Instance)
@@ -215,6 +247,24 @@ void MapChoiceBoxClass::DrawAt(Point2D centerPos)
 		return;
 
 	const auto& type = *this->Type;
+
+	// 验证 Type 指针是否仍在 Array 中（防止悬空指针）
+	{
+		bool typeValid = false;
+		for (auto& tp : ChoiceBoxTypeClass::Array)
+		{
+			if (tp.get() == this->Type)
+			{
+				typeValid = true;
+				break;
+			}
+		}
+		if (!typeValid)
+		{
+			this->Type = nullptr;
+			return;
+		}
+	}
 
 	// 计算各区块内容
 	const auto& csfTitle = type.Title.Get();
@@ -277,13 +327,27 @@ void MapChoiceBoxClass::DrawAt(Point2D centerPos)
 		}
 	}
 
-	// 计算按钮尺寸
-	int btnTextMaxWidth = 0;
-	std::vector<std::wstring> btnWTexts;
+	// ===== 测量按钮尺寸 =====
+	int btnFixedW = type.Button_Width;   // >0 固定宽度（文字自动换行适配）
+	int btnFixedH = type.Button_Height;  // >0 固定高度（文字超出截断）
+	bool isVertical = (type.Button_Layout != 0);
+
+	// 存储每个按钮的元数据
+	std::vector<BtnLayoutItem> btnItems;
+	btnItems.reserve(btnCount);
+
+	// 刷新 maxW/useWrapping（用于后续背景框宽度计算）
+	maxW = type.MaxWidth;
+	useWrapping = (maxW > 0);
+
 	for (int i = 0; i < btnCount; ++i)
 	{
+		BtnLayoutItem item;
+		item.Index = i;
+
+		// 获取按钮文字（CSF 解析，空时回退到 "BtnN"）
 		std::wstring wtext = GetCSFText(
-			(i < static_cast<int>(type.ButtonTexts.size())) ? type.ButtonTexts[i].c_str() : "");
+			(i < static_cast<int>(type.Buttons.size())) ? type.Buttons[i].Text.c_str() : "");
 		if (wtext.empty())
 		{
 			char fallback[32];
@@ -291,51 +355,162 @@ void MapChoiceBoxClass::DrawAt(Point2D centerPos)
 			for (const char* p = fallback; *p; ++p)
 				wtext += static_cast<wchar_t>(static_cast<unsigned char>(*p));
 		}
-		btnWTexts.push_back(wtext);
+		item.Text = wtext;
 
-		RectangleStruct dims = Drawing::GetTextDimensions(wtext.c_str(), { 0, 0 }, 0, 2, 0);
-		if (dims.Width > btnTextMaxWidth)
-			btnTextMaxWidth = dims.Width;
+		// 按钮宽度：固定宽度或自动取文本宽度
+		if (btnFixedW > 0)
+		{
+			item.Width = btnFixedW;
+		}
+		else
+		{
+			RectangleStruct dims = Drawing::GetTextDimensions(wtext.c_str(), { 0, 0 }, 0, 2, 0);
+			item.Width = dims.Width + BUTTON_PADDINGX * 2;
+		}
+
+		// 按钮内文本自动换行
+		int textMaxW = item.Width - BUTTON_PADDINGX * 2;
+		if (textMaxW > 0)
+		{
+			item.TextLines = WrapText(wtext.c_str(), textMaxW);
+		}
+		else
+		{
+			item.TextLines = { wtext };
+		}
+		if (item.TextLines.empty())
+			item.TextLines = { wtext };
+
+		// 按钮高度：固定高度或按文本行数自动撑高
+		if (btnFixedH > 0)
+		{
+			item.Height = btnFixedH;
+		}
+		else
+		{
+			item.Height = static_cast<int>(item.TextLines.size()) * LINE_HEIGHT
+				+ BUTTON_PADDINGY * 2;
+		}
+
+		btnItems.push_back(std::move(item));
 	}
 
-	int btnWidth = btnTextMaxWidth + (BUTTON_PADDINGX * 2);
-	int btnHeight = LINE_HEIGHT + (BUTTON_PADDINGY * 2);
+	// ===== 执行按钮布局 =====
+	struct BtnPos { int X, Y, W, H; };
+	std::vector<BtnPos> btnPositions;
+	btnPositions.reserve(btnCount);
 
-	// 判断布局方向
-	bool isVertical = (type.Button_Layout != 0);
+	// 根据布局方向决定背景框宽度
+	int btnContentMaxW = 0;
+	int btnTotalH = 0;
 
-	// 计算整体背景框宽度
-	int btnContentW = isVertical ? btnWidth : ((btnWidth * btnCount) + (BUTTON_SPACING * (btnCount - 1)));
-	int maxTextWidth = std::max({ btnContentW, titleWidth, descWidth });
-	int bgWidth;
-	if (useWrapping)
+	if (isVertical)
 	{
-		// 固定宽度模式：背景框 = MaxWidth + 内边距
-		bgWidth = maxW + (PADDINGX * 2);
+		// 纵向：所有按钮居中排成一列
+		int maxBtnW = 0;
+		for (auto& item : btnItems)
+			if (item.Width > maxBtnW) maxBtnW = item.Width;
+		btnContentMaxW = maxBtnW;
+
+		for (int i = 0; i < btnCount; ++i)
+		{
+			btnPositions.push_back({ 0, btnTotalH, btnItems[i].Width, btnItems[i].Height });
+			btnTotalH += btnItems[i].Height;
+			if (i < btnCount - 1)
+				btnTotalH += BUTTON_SPACING;
+		}
 	}
 	else
 	{
-		// 自动宽度模式：取最宽内容
-		bgWidth = maxTextWidth + (PADDINGX * 2);
+		// 横向：先确定 bgWidth，再折行布局
+		// 先计算单行总宽度（假设不折行），同时填充 btnPositions
+		int curX = 0, curY = 0, rowH = 0;
+		for (int i = 0; i < btnCount; ++i)
+		{
+			const auto& item = btnItems[i];
+			btnPositions.push_back({ curX, curY, item.Width, item.Height });
+			curX += item.Width + BUTTON_SPACING;
+			if (item.Height > rowH) rowH = item.Height;
+		}
+		btnTotalH = rowH;
+		if (curX > 0)
+			btnContentMaxW = curX - BUTTON_SPACING;
 	}
-	int bgHeight = PADDINGY * 2;
 
+	// ===== 确定背景框尺寸 =====
+	int maxTextWidth = 0;
+	{
+		int titleW = 0, descW = 0;
+		// 取标题/描述/按钮的最大宽度（估算）
+		if (hasTitle) titleW = titleWidth;
+		if (hasDesc) descW = descWidth;
+		maxTextWidth = std::max({ btnContentMaxW, titleW, descW });
+	}
+
+	int bgWidth;
+	if (useWrapping)
+	{
+		bgWidth = maxW + PADDINGX * 2;
+	}
+	else
+	{
+		bgWidth = maxTextWidth + PADDINGX * 2;
+	}
+
+	// 横向模式下，如果按钮总宽度超过背景框，重新布局折行
+	if (!isVertical && btnContentMaxW > bgWidth - PADDINGX * 2)
+	{
+		// 用背景框宽度重新折行
+		btnPositions.clear();
+		int availW = bgWidth - PADDINGX * 2;
+		int curX = 0, curY = 0, rowH = 0;
+		int newMaxW = 0;
+
+		for (int i = 0; i < btnCount; ++i)
+		{
+			const auto& item = btnItems[i];
+			int itemW = (item.Width > availW) ? availW : item.Width;
+
+			if (curX + itemW > availW && curX > 0)
+			{
+				if (curX > newMaxW) newMaxW = curX;
+				curX = 0;
+				curY += rowH + BUTTON_SPACING;
+				rowH = 0;
+			}
+			btnPositions.push_back({ curX, curY, itemW, item.Height });
+			curX += itemW + BUTTON_SPACING;
+			if (item.Height > rowH) rowH = item.Height;
+		}
+		if (curX > 0)
+		{
+			if (curX - BUTTON_SPACING > newMaxW)
+				newMaxW = curX - BUTTON_SPACING;
+			curY += rowH;
+		}
+		else
+		{
+			curY += rowH;
+		}
+		btnContentMaxW = newMaxW;
+		btnTotalH = curY;
+		// 若背景框是自动宽度则更新
+		if (!useWrapping)
+			bgWidth = std::max(btnContentMaxW, maxTextWidth) + PADDINGX * 2;
+	}
+
+	int bgHeight = PADDINGY * 2;
 	if (hasTitle)
 		bgHeight += titleHeight + SECTION_SPACING;
 	if (hasDesc)
 		bgHeight += descHeight + SECTION_SPACING;
+	bgHeight += btnTotalH;
 
 	int buttonsStartY = PADDINGY;
 	if (hasTitle)
 		buttonsStartY += titleHeight + SECTION_SPACING;
 	if (hasDesc)
 		buttonsStartY += descHeight + SECTION_SPACING;
-
-	// 按钮区域高度
-	if (isVertical)
-		bgHeight += (btnHeight * btnCount) + (BUTTON_SPACING * (btnCount - 1));
-	else
-		bgHeight += btnHeight;
 
 	// 背景框左上角（居中定位）
 	Point2D topLeft = {
@@ -469,143 +644,190 @@ void MapChoiceBoxClass::DrawAt(Point2D centerPos)
 
 	// ===== 更新按钮区域缓存 =====
 	const_cast<MapChoiceBoxClass*>(this)->UpdateButtonRects(
-		topLeft, bgWidth, topLeft.Y + buttonsStartY, btnHeight);
+		topLeft, bgWidth, topLeft.Y + buttonsStartY, btnItems);
 
-	// ===== 绘制按钮 =====
-	int btnStartX = isVertical
-		? topLeft.X + (bgWidth - btnWidth) / 2
-		: topLeft.X + (bgWidth - btnContentW) / 2;
-
+	// ===== 绘制按钮（多行布局） =====
 	for (int i = 0; i < btnCount; ++i)
 	{
-		int btnX = isVertical ? btnStartX : (btnStartX + (i * (btnWidth + BUTTON_SPACING)));
-		int btnY = isVertical
-			? (topLeft.Y + buttonsStartY + (i * (btnHeight + BUTTON_SPACING)))
-			: (topLeft.Y + buttonsStartY);
+		const auto& pos = btnPositions[i];
 
-		// 检测鼠标是否悬停在此按钮上
-		bool isHover = (mousePos.X >= btnX && mousePos.X <= btnX + btnWidth &&
-			mousePos.Y >= btnY && mousePos.Y <= btnY + btnHeight);
+		// 计算按钮在屏幕上的实际位置（横向居中）
+		int btnX, btnY;
+		if (isVertical)
+		{
+			btnX = topLeft.X + (bgWidth - pos.W) / 2;
+			btnY = topLeft.Y + buttonsStartY + pos.Y;
+		}
+		else
+		{
+			btnX = topLeft.X + (bgWidth - btnContentMaxW) / 2 + pos.X;
+			btnY = topLeft.Y + buttonsStartY + pos.Y;
+		}
+
+		// 检测鼠标是否悬停
+		bool isHover = (mousePos.X >= btnX && mousePos.X <= btnX + pos.W &&
+			mousePos.Y >= btnY && mousePos.Y <= btnY + pos.H);
 
 		// 检测是否已被选中
 		bool isChosen = (this->ClickedIndex == i);
 
-		// 按钮背景色（黑色，不透明度与 BackgroundOpacity 联动）
-		ColorStruct btnColor = { 0, 0, 0 };
+		// 按钮背景色（黑色半透明，悬停时偏白）
+		ColorStruct btnColor = isHover ? ColorStruct{ 255, 255, 255 } : ColorStruct{ 0, 0, 0 };
 		int btnOpacity = isHover
-			? std::clamp(type.BackgroundOpacity * 3 / 4, 0, 100)
+			? std::clamp(type.BackgroundOpacity * 1 / 4, 0, 100)
 			: std::clamp(type.BackgroundOpacity / 2, 0, 100);
 
-		RectangleStruct btnRect = { btnX, btnY, btnWidth, btnHeight };
+		RectangleStruct btnRect = { btnX, btnY, pos.W, pos.H };
 		DSurface::Composite->FillRectTrans(&btnRect, &btnColor, btnOpacity);
 
-		// 按钮边框（选中或悬停时加亮）
-		int btnBorderColor = colorInt;
+		// 按钮边框 + 文字颜色（悬停/选中时加亮）
+		int btnHighlightColor = colorInt;
 		if (isChosen)
 		{
-			// 选中时用红色边框
-			btnBorderColor = Drawing::RGB_To_Int(ColorStruct(255, 0, 0));
+			btnHighlightColor = Drawing::RGB_To_Int(ColorStruct(255, 0, 0));
 		}
 		else if (isHover)
 		{
-			// 悬停时加亮（大幅提亮使变化更明显）
 			ColorStruct brightColor = {
 				static_cast<BYTE>(std::min(255, type.ColorR + 100)),
 				static_cast<BYTE>(std::min(255, type.ColorG + 100)),
 				static_cast<BYTE>(std::min(255, type.ColorB + 100))
 			};
-			btnBorderColor = Drawing::RGB_To_Int(brightColor);
+			btnHighlightColor = Drawing::RGB_To_Int(brightColor);
 		}
 
-		// 上边
+		// 四条边框
 		p1 = { btnX, btnY };
-		p2 = { btnX + btnWidth - 1, btnY };
-		DSurface::Composite->DrawLine(&p1, &p2, btnBorderColor);
-
-		// 左边
+		p2 = { btnX + pos.W - 1, btnY };
+		DSurface::Composite->DrawLine(&p1, &p2, btnHighlightColor);
 		p1 = { btnX, btnY };
-		p2 = { btnX, btnY + btnHeight - 1 };
-		DSurface::Composite->DrawLine(&p1, &p2, btnBorderColor);
+		p2 = { btnX, btnY + pos.H - 1 };
+		DSurface::Composite->DrawLine(&p1, &p2, btnHighlightColor);
+		p1 = { btnX + pos.W - 1, btnY };
+		p2 = { btnX + pos.W - 1, btnY + pos.H - 1 };
+		DSurface::Composite->DrawLine(&p1, &p2, btnHighlightColor);
+		p1 = { btnX, btnY + pos.H - 1 };
+		p2 = { btnX + pos.W - 1, btnY + pos.H - 1 };
+		DSurface::Composite->DrawLine(&p1, &p2, btnHighlightColor);
 
-		// 右边
-		p1 = { btnX + btnWidth - 1, btnY };
-		p2 = { btnX + btnWidth - 1, btnY + btnHeight - 1 };
-		DSurface::Composite->DrawLine(&p1, &p2, btnBorderColor);
+		// 按钮文字：在按钮内部居中，支持多行/截断（悬停时颜色随之加亮）
+		const auto& item = btnItems[i];
+		int textAreaH = pos.H - BUTTON_PADDINGY * 2;
+		int textAreaW = pos.W - BUTTON_PADDINGX * 2;
 
-		// 底边
-		p1 = { btnX, btnY + btnHeight - 1 };
-		p2 = { btnX + btnWidth - 1, btnY + btnHeight - 1 };
-		DSurface::Composite->DrawLine(&p1, &p2, btnBorderColor);
+		if (textAreaH > 0 && textAreaW > 0)
+		{
+			int totalTextH = static_cast<int>(item.TextLines.size()) * LINE_HEIGHT;
+			int lineOffsetY = (textAreaH - totalTextH) / 2;
+			if (lineOffsetY < 0) lineOffsetY = 0;
 
-		// 按钮文字（居中）
-		RectangleStruct txtDims = Drawing::GetTextDimensions(btnWTexts[i].c_str(), { 0, 0 }, 0, 2, 0);
-		Point2D textPos = {
-			btnX + (btnWidth - txtDims.Width) / 2,
-			btnY + (btnHeight - LINE_HEIGHT) / 2
-		};
-		DSurface::Composite->DrawText(
-			btnWTexts[i].c_str(),
-			&bounds,
-			&textPos,
-			colorInt,
-			0,
-			TextPrintType::Metal12 | TextPrintType::BrightColor);
+			for (size_t li = 0; li < item.TextLines.size(); ++li)
+			{
+				int lineY = btnY + BUTTON_PADDINGY + lineOffsetY + static_cast<int>(li) * LINE_HEIGHT;
+
+				if (btnFixedH > 0 && lineY + LINE_HEIGHT > btnY + pos.H)
+					break;
+
+				RectangleStruct txtDims = Drawing::GetTextDimensions(
+					item.TextLines[li].c_str(), { 0, 0 }, 0, 2, 0);
+
+				Point2D textPos = {
+					btnX + (pos.W - txtDims.Width) / 2,
+					lineY
+				};
+				DSurface::Composite->DrawText(
+					item.TextLines[li].c_str(),
+					&bounds,
+					&textPos,
+					btnHighlightColor,
+					0,
+					TextPrintType::Metal12 | TextPrintType::BrightColor);
+			}
+		}
 	}
 }
 
-void MapChoiceBoxClass::UpdateButtonRects(Point2D topLeft, int bgWidth, int buttonsStartY, int buttonHeight)
+void MapChoiceBoxClass::UpdateButtonRects(Point2D topLeft, int bgWidth, int buttonsStartY,
+	const std::vector<BtnLayoutItem>& btnItems)
 {
-	if (!this->Type)
-		return;
+	this->m_buttonRects.clear();
 
-	const auto& type = *this->Type;
-	int btnCount = type.Button_Count;
-	if (btnCount <= 0)
-		return;
+	bool isVertical = (this->Type) ? (this->Type->Button_Layout != 0) : false;
+	int btnCount = static_cast<int>(btnItems.size());
 
-	// 计算按钮宽度（与 DrawAt 中一致的算法）
-	int btnTextMaxWidth = 0;
-	for (int i = 0; i < btnCount; ++i)
-	{
-		std::wstring wtext = GetCSFText(
-			(i < static_cast<int>(type.ButtonTexts.size())) ? type.ButtonTexts[i].c_str() : "");
-		if (wtext.empty())
-			wtext = L"Btn";
-
-		RectangleStruct dims = Drawing::GetTextDimensions(wtext.c_str(), { 0, 0 }, 0, 2, 0);
-		if (dims.Width > btnTextMaxWidth)
-			btnTextMaxWidth = dims.Width;
-	}
-	int btnWidth = btnTextMaxWidth + (BUTTON_PADDINGX * 2);
-
-	bool isVertical = (type.Button_Layout != 0);
-
-	int btnStartX;
 	if (isVertical)
 	{
-		btnStartX = topLeft.X + (bgWidth - btnWidth) / 2;
+		for (int i = 0; i < btnCount; ++i)
+		{
+			const auto& item = btnItems[i];
+			int btnX = topLeft.X + (bgWidth - item.Width) / 2;
+			int btnY = buttonsStartY;
+			for (int j = 0; j < i; ++j)
+				btnY += btnItems[j].Height + BUTTON_SPACING;
+			this->m_buttonRects.push_back({ i, { btnX, btnY, item.Width, item.Height } });
+		}
 	}
 	else
 	{
-		int contentWidth = (btnWidth * btnCount) + (BUTTON_SPACING * (btnCount - 1));
-		btnStartX = topLeft.X + (bgWidth - contentWidth) / 2;
-	}
+		// 横向多行：重新走一遍与 DrawAt 相同的 layout
+		int availW = bgWidth - PADDINGX * 2;
+		int curX = 0, curY = 0, rowH = 0;
+		int maxRowW = 0;
 
-	this->m_buttonRects.clear();
-	for (int i = 0; i < btnCount; ++i)
-	{
-		int btnX = isVertical ? btnStartX : (btnStartX + (i * (btnWidth + BUTTON_SPACING)));
-		int btnY = isVertical
-			? (buttonsStartY + (i * (buttonHeight + BUTTON_SPACING)))
-			: buttonsStartY;
-		this->m_buttonRects.push_back({
-			i,
-			{ btnX, btnY, btnWidth, buttonHeight }
-		});
+		// 先计算 btnContentMaxW（与 DrawAt 保持一致）
+		for (int i = 0; i < btnCount; ++i)
+		{
+			const auto& item = btnItems[i];
+			int itemW = (item.Width > availW) ? availW : item.Width;
+
+			if (curX + itemW > availW && curX > 0)
+			{
+				if (curX > maxRowW) maxRowW = curX;
+				curX = 0;
+				curY += rowH + BUTTON_SPACING;
+				rowH = 0;
+			}
+			if (item.Height > rowH) rowH = item.Height;
+			curX += itemW + BUTTON_SPACING;
+		}
+		if (curX > 0)
+		{
+			if (curX - BUTTON_SPACING > maxRowW)
+				maxRowW = curX - BUTTON_SPACING;
+		}
+		int btnContentMaxW = maxRowW;
+
+		// 再次遍历生成实际 Rects
+		curX = 0; curY = 0; rowH = 0;
+		for (int i = 0; i < btnCount; ++i)
+		{
+			const auto& item = btnItems[i];
+			int itemW = (item.Width > availW) ? availW : item.Width;
+
+			if (curX + itemW > availW && curX > 0)
+			{
+				curX = 0;
+				curY += rowH + BUTTON_SPACING;
+				rowH = 0;
+			}
+			int btnX = topLeft.X + (bgWidth - btnContentMaxW) / 2 + curX;
+			int btnY = buttonsStartY + curY;
+			this->m_buttonRects.push_back({ i, { btnX, btnY, itemW, item.Height } });
+			curX += itemW + BUTTON_SPACING;
+			if (item.Height > rowH) rowH = item.Height;
+		}
 	}
 }
 
 // ========== 序列化 ==========
+
+/**
+ * @brief 基类字段序列化
+ *
+ * 序列化 ID, Label, TypeIndex（用于重建 Type 指针），
+ * 以及点击/过期状态字段。
+ * 注意：ClickExpireCounter 是隐藏期计时器，与 ClickedIndex 配合使用。
+ */
 
 template <typename T>
 bool MapChoiceBoxClass::Serialize(T& Stm)
@@ -615,6 +837,7 @@ bool MapChoiceBoxClass::Serialize(T& Stm)
 		.Process(this->Label)
 		.Process(this->TypeIndex)
 		.Process(this->ClickedIndex)
+		.Process(this->ClickedConsumed)
 		.Process(this->RemainingFrames)
 		.Process(this->ClickExpireCounter)
 		.Process(this->IsExpired)
@@ -677,21 +900,26 @@ MapChoiceBoxClass* MapChoiceBoxClass::FindByID(int id)
 
 /**
  * @brief 绘制一组选择框并处理点击和过期
+ *
+ * 每帧三个顺序处理阶段：
+ *   1) 绘制 + 检测点击（仅记录 ClickedIndex）
+ *   2) 隐藏期倒计时（ClickExpireCounter 递减，归零后终结/回弹）
+ *   3) Duration 递减（归零后停止显示，已点击的启动隐藏期，未点击的超时）
+ *
  * @tparam T 派生类类型（WaypointChoiceBoxClass 或 ScreenChoiceBoxClass）
  * @param boxes 要绘制和更新的实例列表
  */
 template <typename T>
 static void DrawChoiceBoxList(std::vector<std::shared_ptr<T>>& boxes)
 {
-	// 绘制并检测点击
-	bool anyClicked = false;
+	// 阶段一：绘制并检测点击
 	for (auto& ptr : boxes)
 	{
 		if (!ptr || ptr->IsExpired || !ptr->CanDraw())
 			continue;
 
-		// 如果已点击且 Duration 已耗尽，不绘制但仍保留对象（给 TEvent 检测窗口）
-		if (ptr->ClickedIndex >= 0 && ptr->RemainingFrames <= 0)
+		// 隐藏期：已点击且 Duration 刚好耗尽 → 不绘制，保留对象供 TEvent 检测
+		if (ptr->ClickedIndex >= 0 && ptr->RemainingFrames == 0)
 			continue;
 
 		Point2D drawPos;
@@ -702,33 +930,59 @@ static void DrawChoiceBoxList(std::vector<std::shared_ptr<T>>& boxes)
 
 		if (ptr->CheckMouseClick())
 		{
-			anyClicked = true;
-			// 点击后强制保留 5 帧（给 TEvent 检测窗口）
-			ptr->ClickExpireCounter = 5;
+			ptr->ClickedConsumed = false;
+			// 回弹模式：点击即启动隐藏期倒计时（不依赖 Duration 耗尽）
+			if (ptr->Type && ptr->Type->Button_Mode == static_cast<int>(ChoiceBoxButtonMode::Bounce))
+				ptr->ClickExpireCounter = CLICK_EXPIRE_FRAMES;
 		}
 	}
 
-	// 处理点击后消失倒计时
+	// 阶段二：处理隐藏期倒计时（含回弹模式）
 	for (auto& ptr : boxes)
 	{
 		if (ptr && !ptr->IsExpired && ptr->ClickExpireCounter >= 0)
 		{
 			if (--ptr->ClickExpireCounter <= 0)
-				ptr->IsExpired = true;
+			{
+				// 检查被点击的按钮是否为回弹模式
+				bool isBounce = (ptr->ClickedIndex >= 0 && ptr->Type
+					&& ptr->Type->Button_Mode == static_cast<int>(ChoiceBoxButtonMode::Bounce));
+
+				// 未消费则继续等待（给 TEvent 更多时间）
+				if (!ptr->ClickedConsumed)
+				{
+					ptr->ClickExpireCounter = 0;
+					continue;
+				}
+
+				if (isBounce)
+				{
+					// 回弹：重置点击状态，不清除对象
+					ptr->ClickedIndex = -1;
+					ptr->ClickExpireCounter = -1;
+					ptr->ClickedConsumed = false;
+				}
+				else
+				{
+					ptr->IsExpired = true;
+				}
+			}
 		}
 	}
 
-	// 处理 Duration 自动移除
+	// 阶段三：处理 Duration 自动移除
 	for (auto& ptr : boxes)
 	{
 		if (ptr && !ptr->IsExpired && ptr->RemainingFrames >= 0)
 		{
 			if (--ptr->RemainingFrames <= 0)
 			{
-				// 如果已点击过，不立即过期（由 ClickExpireCounter 控制清除）
+				// Duration 耗尽且已点击 → 不销毁，启动隐藏期供 TEvent 检测
 				if (ptr->ClickedIndex >= 0)
 				{
-					ptr->RemainingFrames = 0; // 保持为 0，绘制时会跳过
+					ptr->RemainingFrames = 0;
+					if (ptr->ClickExpireCounter < 0)
+						ptr->ClickExpireCounter = CLICK_EXPIRE_FRAMES;
 				}
 				else
 				{

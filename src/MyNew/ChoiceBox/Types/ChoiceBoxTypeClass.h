@@ -15,11 +15,31 @@ class PhobosStreamWriter;
 class PhobosStreamReader;
 
 /**
+ * @brief 选择框按钮模式（类型级定义，所有按钮共用）
+ */
+enum class ChoiceBoxButtonMode : int
+{
+	Normal = 0, ///< 普通模式：点击后 5 帧隐藏期 → 过期清除
+	Bounce = 1, ///< 回弹模式：点击后 5 帧隐藏期 → 回弹可再按
+};
+
+/**
+ * @brief 选择框按钮数据
+ */
+struct ChoiceBoxButton
+{
+	std::string Text;             ///< CSF 标签（INI: Button.TextN）
+
+	bool Load(PhobosStreamReader& Stm, bool RegisterForChange);
+	bool Save(PhobosStreamWriter& Stm) const;
+};
+
+/**
  * @brief 选择框样式类型（预定义配置）
  *
- * 该类型在 rulesmd.ini 的 [ChoiceBoxTypes] 段中定义，
- * 用于预配置选择框的外观（颜色、不透明度）以及按钮的
- * 数量和文本。选择框在创建时引用此类型以获取完整参数。
+ * 在 rulesmd.ini 的 [ChoiceBoxTypes] 段中定义，用于预配置选择框的
+ * 外观（颜色、不透明度）、按钮配置（数量、文字、模式、尺寸）以及
+ * 标题、描述等文本内容。选择框在创建时引用此类型以获取完整参数。
  */
 class ChoiceBoxTypeClass final : public Enumerable<ChoiceBoxTypeClass>
 {
@@ -30,30 +50,34 @@ public:
 	Valueable<CSFText> Description;              // 描述 CSF 标签
 
 	// ===== 按钮配置 =====
-	Valueable<int> Button_Count;                 // 按钮数量
-	Valueable<int> Button_Layout;                // 布局方向 0=横向 1=纵向
-	ValueableVector<std::string> ButtonTexts;    // 按钮文字列表
+	Valueable<int> Button_Count;                 ///< 按钮数量（INI: Button.Count）
+	Valueable<int> Button_Layout;                ///< 布局方向 0=横向 1=纵向（INI: Button.Layout=Horizontal/Vertical）
+	Valueable<int> Button_Mode;                  ///< 按钮模式 0=普通 1=回弹（INI: Button.Mode）
+	Valueable<int> Button_Width;                 ///< 按钮固定宽度，0=自动（INI: Button.Width）
+	Valueable<int> Button_Height;                ///< 按钮固定高度，0=自动撑高（INI: Button.Height）
+	ValueableVector<ChoiceBoxButton> Buttons;    ///< 按钮文字列表（INI: Button.TextN）
 
 	// ===== 外观参数 =====
-	Valueable<int> MaxWidth;                     // 文本最大像素宽度，<=0 时默认 250
-	Valueable<int> BackgroundOpacity;            // 背景不透明度 (0-100)
-	Valueable<int> ColorR;                       // 文字/边框颜色 — R 分量
-	Valueable<int> ColorG;                       // 文字/边框颜色 — G 分量
-	Valueable<int> ColorB;                       // 文字/边框颜色 — B 分量
-	Valueable<int> Duration;                     // 自动移除帧数，-1=无限显示
-	Valueable<int> DisappearDelay;               // 点击后消失延迟帧数，-1=不自动消失（默认 5）
+	Valueable<int> MaxWidth;                     ///< 文本最大像素宽度，≤0 时默认 250（INI: MaxWidth）
+	Valueable<int> BackgroundOpacity;            ///< 背景不透明度 0-100（INI: BackgroundOpacity）
+	Valueable<int> ColorR;                       ///< 文字/边框颜色 R 分量（INI: Color=R,G,B）
+	Valueable<int> ColorG;                       ///< 文字/边框颜色 G 分量
+	Valueable<int> ColorB;                       ///< 文字/边框颜色 B 分量
+	Valueable<int> Duration;                     ///< 自动移除帧数，-1=无限显示（INI: Duration）
 
 	ChoiceBoxTypeClass(const char* const pTitle) : Enumerable(pTitle)
 		, Title_Center { false }
 		, Button_Count { 0 }
 		, Button_Layout { 0 }
+		, Button_Mode { 0 }
+		, Button_Width { 0 }
+		, Button_Height { 0 }
 		, MaxWidth { 250 }
 		, BackgroundOpacity { 75 }
 		, ColorR { 255 }
 		, ColorG { 215 }
 		, ColorB { 0 }
 		, Duration { -1 }
-		, DisappearDelay { 5 }
 	{ }
 
 	virtual void LoadFromINI(CCINIClass* pINI);

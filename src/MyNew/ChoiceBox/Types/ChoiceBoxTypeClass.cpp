@@ -21,19 +21,32 @@ const char* Enumerable<ChoiceBoxTypeClass>::GetMainSection()
 	return "ChoiceBoxTypes";
 }
 
+// ========== ChoiceBoxButton 序列化 ==========
+
+bool ChoiceBoxButton::Load(PhobosStreamReader& Stm, bool RegisterForChange)
+{
+	return Stm.Process(this->Text, RegisterForChange).Success();
+}
+
+bool ChoiceBoxButton::Save(PhobosStreamWriter& Stm) const
+{
+	return Stm.Process(const_cast<std::string&>(this->Text)).Success();
+}
+
 // ========== INI 加载 ==========
 
 /**
  * @brief 从 INI 文件中加载选择框类型配置
  *
- * 从以类型名为段名的节中读取以下字段：
- *   - Title               : 标题文本（CSF 标签）
- *   - Description         : 描述文本（CSF 标签）
- *   - Button.Count        : 按钮数量
- *   - ButtonText1~N       : 各按钮文字
- *   - BackgroundOpacity   : 背景不透明度
- *   - Duration            : 自动移除帧数
- *   - Color=R,G,B         : 文本和边框颜色
+ * 读取字段（[TypeName] 段下）：
+ *   - Title / Title.Center     : 标题
+ *   - Description               : 描述
+ *   - MaxWidth                  : 文本最大宽度
+ *   - BackgroundOpacity         : 背景不透明度
+ *   - Duration                  : 显示时长
+ *   - Button.Count / .Layout(Horizontal/Vertical) / .Mode / .Width / .Height : 按钮配置
+ *   - Button.Text1~N            : 各按钮文字
+ *   - Color=R,G,B               : 文字和边框颜色
  */
 void ChoiceBoxTypeClass::LoadFromINI(CCINIClass* pINI)
 {
@@ -56,23 +69,51 @@ void ChoiceBoxTypeClass::LoadFromINI(CCINIClass* pINI)
 	// Button.Count - INI 用点，代码变量用下划线
 	this->Button_Count.Read(exINI, section, "Button.Count");
 
-	// Button.Layout - 0=横向, 1=纵向
-	this->Button_Layout.Read(exINI, section, "Button.Layout");
+	// Button.Layout - 枚举字符串 Horizontal/Vertical（兼容 0/1）
+	if (pINI->ReadString(section, "Button.Layout", "", Phobos::readBuffer))
+	{
+		const char* layoutStr = Phobos::readBuffer;
+		if (_stricmp(layoutStr, "Vertical") == 0)
+			this->Button_Layout = 1;
+		else if (_stricmp(layoutStr, "Horizontal") == 0)
+			this->Button_Layout = 0;
+		else
+			this->Button_Layout.Read(exINI, section, "Button.Layout");
+	}
 
-	// DisappearDelay - 点击后消失延迟帧数
-	this->DisappearDelay.Read(exINI, section, "DisappearDelay");
+	// Button.Mode - 枚举字符串 Normal/Bounce（兼容 0/1）
+	if (pINI->ReadString(section, "Button.Mode", "", Phobos::readBuffer))
+	{
+		const char* modeStr = Phobos::readBuffer;
+		if (_stricmp(modeStr, "Bounce") == 0)
+			this->Button_Mode = 1;
+		else if (_stricmp(modeStr, "Normal") == 0)
+			this->Button_Mode = 0;
+		else
+			this->Button_Mode.Read(exINI, section, "Button.Mode");
+	}
 
-	// 逐个读取 Button.Text1 ~ Button.TextN
-	this->ButtonTexts.clear();
+	// Button.Width - 固定宽度（0=自动）
+	this->Button_Width.Read(exINI, section, "Button.Width");
+
+	// Button.Height - 固定高度（0=自动撑高）
+	this->Button_Height.Read(exINI, section, "Button.Height");
+
+	// 逐个读取 Button.Text1~N
+	this->Buttons.clear();
 	for (int i = 1; i <= this->Button_Count; ++i)
 	{
 		char key[32];
 		std::sprintf(key, "Button.Text%d", i);
 
+		ChoiceBoxButton btn;
+
 		if (pINI->ReadString(section, key, "", Phobos::readBuffer))
 		{
-			this->ButtonTexts.push_back(Phobos::readBuffer);
+			btn.Text = Phobos::readBuffer;
 		}
+
+		this->Buttons.push_back(btn);
 	}
 
 	// Color 格式：Color=255,215,0  （RGB 逗号分隔）
@@ -100,14 +141,16 @@ void ChoiceBoxTypeClass::Serialize(T& Stm)
 		.Process(this->Description)
 		.Process(this->Button_Count)
 		.Process(this->Button_Layout)
-		.Process(this->ButtonTexts)
+		.Process(this->Button_Mode)
+		.Process(this->Button_Width)
+		.Process(this->Button_Height)
+		.Process(this->Buttons)
 		.Process(this->MaxWidth)
 		.Process(this->BackgroundOpacity)
 		.Process(this->ColorR)
 		.Process(this->ColorG)
 		.Process(this->ColorB)
 		.Process(this->Duration)
-		.Process(this->DisappearDelay)
 		;
 }
 

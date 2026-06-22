@@ -250,13 +250,18 @@ bool TEventExt::ChoiceBoxButtonClickedFunc(TEventClass* pThis, HouseClass* pHous
 	// 	targetID, targetButtonIndex);
 
 	auto* pBox = MapChoiceBoxClass::FindByID(targetID);
-	if (!pBox)
+	if (!pBox || pBox->ClickedConsumed)
 		return false;
 
-	Debug::Log(L"[ChoiceBox] 557: ID=%d, buttonIdx=%d, actual=%d\n",
-		targetID, targetButtonIndex, pBox->ClickedIndex);
+	// /Debug::Log(L"[ChoiceBox] 557: ID=%d, buttonIdx=%d, actual=%d\n",
+	//	targetID, targetButtonIndex, pBox->ClickedIndex);
 
-	return pBox->ClickedIndex == targetButtonIndex;
+	if (pBox->ClickedIndex == targetButtonIndex)
+	{
+		pBox->ClickedConsumed = true;
+		return true;
+	}
+	return false;
 }
 
 // ============================================================================
@@ -269,13 +274,18 @@ bool TEventExt::ChoiceBoxAnyButtonClickedFunc(TEventClass* pThis, HouseClass* pH
 	// Debug::Log(L"[ChoiceBox] 558: ID=%d\n", targetID);
 
 	auto* pBox = MapChoiceBoxClass::FindByID(targetID);
-	if (!pBox)
+	if (!pBox || pBox->ClickedConsumed)
 		return false;
 
-	Debug::Log(L"[ChoiceBox] 558: ID=%d, clicked=%d\n",
-		targetID, pBox->ClickedIndex);
+	// Debug::Log(L"[ChoiceBox] 558: ID=%d, clicked=%d\n",
+	//	targetID, pBox->ClickedIndex);
 
-	return pBox->ClickedIndex >= 0;
+	if (pBox->ClickedIndex >= 0)
+	{
+		pBox->ClickedConsumed = true;
+		return true;
+	}
+	return false;
 }
 
 // ============================================================================
@@ -291,8 +301,8 @@ bool TEventExt::ChoiceBoxTimedOutFunc(TEventClass* pThis, HouseClass* pHouse)
 	if (!pBox)
 		return false;
 
-	Debug::Log(L"[ChoiceBox] 559: ID=%d, expired=%d\n",
-		targetID, pBox->IsExpired);
+	// Debug::Log(L"[ChoiceBox] 559: ID=%d, expired=%d\n",
+	//	targetID, pBox->IsExpired);
 
 	return pBox->IsExpired;
 }
