@@ -53,27 +53,13 @@ void ScriptExt::ProcessAction(TeamClass* pTeam)
 
 void ScriptExt::LoadIntoTransportsDistributed(TeamClass* pTeam)
 {
-	Debug::Log("[ScriptExt] LoadIntoTransportsDistributed called for team %p\n", pTeam);
-
 	// 检查是否还有人在装载中 → 等待
 	for (auto pUnit = pTeam->FirstUnit; pUnit; pUnit = pUnit->NextTeamMember)
 	{
 		if (pUnit->GetCurrentMission() == Mission::Enter)
 		{
-			Debug::Log("[ScriptExt]   %p still entering (mission=%d), waiting...\n",
-				pUnit, (int)pUnit->GetCurrentMission());
 			pTeam->StepCompleted = false;
 			return;
-		}
-		// 不再 Enter 但还有 Destination 指向载具 = 登车被拒/失败
-		if (pUnit->Destination)
-		{
-			auto pDest = generic_cast<TechnoClass*>(pUnit->Destination);
-			if (pDest && pDest != pUnit && pDest->WhatAmI() == AbstractType::Unit)
-			{
-				Debug::Log("[ScriptExt]   %p exited Enter but still has dest %p (mission=%d)\n",
-					pUnit, pDest, (int)pUnit->GetCurrentMission());
-			}
 		}
 	}
 
@@ -122,15 +108,12 @@ void ScriptExt::LoadIntoTransportsDistributed(TeamClass* pTeam)
 			{
 				auto cell = CellClass::Coord2Cell(pUnit->GetCoords());
 				transports.push_back({ pUnit, cell, used, pType->Passengers });
-				Debug::Log("[ScriptExt]   Transport: %p used=%d max=%d\n",
-					pUnit, used, pType->Passengers);
 			}
 		}
 	}
 
 	if (transports.empty())
 	{
-		Debug::Log("[ScriptExt]   No transports with space, step completed\n");
 		return;
 	}
 
@@ -138,14 +121,6 @@ void ScriptExt::LoadIntoTransportsDistributed(TeamClass* pTeam)
 	std::sort(transports.begin(), transports.end(), [](const TransportInfo& a, const TransportInfo& b) {
 		return a.Vehicle->GetTechnoType()->SizeLimit < b.Vehicle->GetTechnoType()->SizeLimit;
 	});
-
-	Debug::Log("[ScriptExt]   Transports sorted by SizeLimit:\n");
-	for (auto& t : transports)
-	{
-		Debug::Log("[ScriptExt]     %p cap=%d/%d limit=%.0f\n",
-			t.Vehicle, t.UsedCapacity, t.MaxCapacity,
-			t.Vehicle->GetTechnoType()->SizeLimit);
-	}
 
 	// 统计还有多少非载具队员可分配
 	int nonTransportCount = 0;
@@ -164,7 +139,6 @@ void ScriptExt::LoadIntoTransportsDistributed(TeamClass* pTeam)
 			continue;
 		nonTransportCount++;
 	}
-	Debug::Log("[ScriptExt]   nonTransportCount=%d\n", nonTransportCount);
 
 	// 收集所有需要上车的队员（尚未在 Enter 状态的）
 	struct UnitInfo
@@ -180,20 +154,16 @@ void ScriptExt::LoadIntoTransportsDistributed(TeamClass* pTeam)
 	{
 		if (pUnit->Transporter || pUnit->InLimbo || pUnit->Health <= 0)
 		{
-			Debug::Log("[ScriptExt]     Skip %p: Trans=%d Limbo=%d HP=%d\n",
-				pUnit, !!pUnit->Transporter, !!pUnit->InLimbo, pUnit->Health);
 			continue;
 		}
 		if (pUnit->WhatAmI() == AbstractType::AircraftType)
 		{
-			Debug::Log("[ScriptExt]     Skip %p: Aircraft\n", pUnit);
 			continue;
 		}
 
 		auto pUnitType = pUnit->GetTechnoType();
 		if (!pUnitType || pUnitType->ConsideredAircraft)
 		{
-			Debug::Log("[ScriptExt]     Skip %p: ConsideredAircraft\n", pUnit);
 			continue;
 		}
 
@@ -204,17 +174,11 @@ void ScriptExt::LoadIntoTransportsDistributed(TeamClass* pTeam)
 			int used = pUnit->Passengers.GetTotalSize();
 			if (used < pUnitType->Passengers)
 			{
-				auto mission = pUnit->GetCurrentMission();
-				Debug::Log("[ScriptExt]     Skip %p: driver has space used=%d/%d, mission=%d\n",
-					pUnit, used, pUnitType->Passengers, (int)mission);
 				continue;
 			}
-			Debug::Log("[ScriptExt]     Allow %p: full transport used=%d/%d\n",
-				pUnit, used, pUnitType->Passengers);
 		}
 		if (pUnit->IsInAir())
 		{
-			Debug::Log("[ScriptExt]     Skip %p: InAir\n", pUnit);
 			continue;
 		}
 
@@ -223,18 +187,12 @@ void ScriptExt::LoadIntoTransportsDistributed(TeamClass* pTeam)
 
 		auto unitCell = pUnit->GetMapCoords();
 		units.push_back({ pUnit, unitCell, unitSize, false });
-
-		Debug::Log("[ScriptExt]     Add %p: size=%d\n", pUnit, unitSize);
 	}
 
 	if (units.empty())
 	{
-		Debug::Log("[ScriptExt]   All units already assigned, step completed\n");
 		return;
 	}
-
-	Debug::Log("[ScriptExt]   %zu units to assign, %zu transports\n",
-		units.size(), transports.size());
 
 	// 遍历单元格链表，同一格有多个己方单位就散开
 	{
@@ -283,9 +241,6 @@ void ScriptExt::LoadIntoTransportsDistributed(TeamClass* pTeam)
 			transports[groupEnd].Vehicle->GetTechnoType()->SizeLimit == groupLimit)
 			groupEnd++;
 
-		Debug::Log("[ScriptExt]   Group SizeLimit=%.0f: [%zu..%zu)\n",
-			groupLimit, groupStart, groupEnd);
-
 		bool anyAssigned = true;
 		while (anyAssigned)
 		{
@@ -330,8 +285,6 @@ void ScriptExt::LoadIntoTransportsDistributed(TeamClass* pTeam)
 								continue;
 							if (pBlocking->Transporter)
 								continue;
-							Debug::Log("[ScriptExt]   Scatter blocker %p at transport %p\n",
-								pBlocking, t.Vehicle);
 							pBlocking->Scatter(pBlocking->GetCoords(), true, false);
 						}
 					}
@@ -350,8 +303,6 @@ void ScriptExt::LoadIntoTransportsDistributed(TeamClass* pTeam)
 				if (bestIdx >= 0)
 				{
 					auto& u = units[bestIdx];
-					Debug::Log("[ScriptExt]   Assigning %p to transport %p (dist=%d size=%d)\n",
-						u.Unit, t.Vehicle, bestDist, u.Size);
 
 					if (auto pUnit = abstract_cast<UnitClass*>(u.Unit))
 					{
@@ -382,8 +333,6 @@ void ScriptExt::LoadIntoTransportsDistributed(TeamClass* pTeam)
 		groupStart = groupEnd;
 	}
 
-	Debug::Log("[ScriptExt]   Assigned %d units in batch, waiting for boarding...\n",
-		totalAssigned);
 	if (totalAssigned > 0)
 		pTeam->StepCompleted = false;
 	// 如果 totalAssigned == 0，说明没有可分配的，Phobos 已设 StepCompleted=true

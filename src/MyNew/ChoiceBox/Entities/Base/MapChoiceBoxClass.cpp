@@ -211,7 +211,6 @@ bool MapChoiceBoxClass::CheckMouseClick()
 			mousePos.Y <= btn.Rect.Y + btn.Rect.Height)
 		{
 			this->ClickedIndex = btn.Index;
-			Debug::Log(L"点击了, 点击的索引是\"%d\"\n", btn.Index);
 			return true;
 		}
 	}

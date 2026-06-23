@@ -53,8 +53,6 @@ public:
 		std::vector<TransportInfo> transports;
 		std::vector<TechnoClass*> selectedNonTransports;
 
-		Debug::Log("[RecruitPassengers] CurrentObjects: %d items\n",
-			ObjectClass::CurrentObjects.Count);
 		for (auto pObj : ObjectClass::CurrentObjects)
 		{
 			if (!pObj || !pObj->IsSelected || !pObj->IsAlive || pObj->InLimbo)
@@ -65,10 +63,6 @@ public:
 				continue;
 
 			auto pType = pTechno->GetTechnoType();
-			int pass = pType ? pType->Passengers : -1;
-			Debug::Log("[RecruitPassengers]   Sel: %p type=%d pass=%d ctrl=%d\n",
-				pTechno, (int)pTechno->WhatAmI(), pass, pObj->IsControllable());
-
 			bool isTransport = false;
 			if (pTechno->WhatAmI() == AbstractType::Unit)
 			{
@@ -118,20 +112,6 @@ public:
 					continue;
 				pBlocking->Scatter(pBlocking->GetCoords(), true, false);
 			}
-		}
-
-		Debug::Log("[RecruitPassengers] Selected: %zu transports, %zu non-transports\n",
-			transports.size(), selectedNonTransports.size());
-		for (auto& t : transports)
-		{
-			Debug::Log("[RecruitPassengers]   Transport: %p cap=%d/%d cell=%d,%d limit=%.0f\n",
-				t.Vehicle, t.UsedCapacity, t.MaxCapacity, t.Cell.X, t.Cell.Y,
-				t.Vehicle->GetTechnoType()->SizeLimit);
-		}
-		for (auto p : selectedNonTransports)
-		{
-			Debug::Log("[RecruitPassengers]   NonTransport: %p type=%d\n",
-				p, p->WhatAmI());
 		}
 
 		double recruitRange = RulesExt::Global()->RecruitRange;
@@ -394,16 +374,6 @@ public:
 					continue;
 				nonTransportCount++;
 			}
-			Debug::Log("[RecruitPassengers] nonTransportCount=%d\n", nonTransportCount);
-
-			Debug::Log("[RecruitPassengers] After R1+R2: totalRecruited=%d\n", totalRecruited);
-			for (size_t di = 0; di < transports.size(); di++)
-			{
-				Debug::Log("[RecruitPassengers]   Transport[%zu] %p: init=%d used=%d max=%d\n",
-					di, transports[di].Vehicle,
-					initialCapacities[di], transports[di].UsedCapacity, transports[di].MaxCapacity);
-			}
-
 			std::vector<TechnoClass*> failedTransports;
 			std::vector<TransportInfo*> successfulTransports;
 
@@ -430,16 +400,11 @@ public:
 				}
 			}
 
-			Debug::Log("[RecruitPassengers] Round3: %zu failed, %zu successful\n",
-				failedTransports.size(), successfulTransports.size());
-
 			if (failedTransports.empty())
 				return;
 
 			if (!successfulTransports.empty())
 			{
-				// 有成功载具（司机）→ 失败载具上司机，fellow-failed 检查会防止循环登车
-				Debug::Log("[RecruitPassengers]   Mixed: failed board successes\n");
 				tryAssign(failedTransports, false);
 			}
 			else if (failedTransports.size() >= 2)
@@ -459,8 +424,6 @@ public:
 				}
 
 				auto& receiver = transports[bestIdx];
-				Debug::Log("[RecruitPassengers]   All failed, receiver=%p cap=%d/%d\n",
-					receiver.Vehicle, receiver.UsedCapacity, receiver.MaxCapacity);
 
 				// 遍历单元格链表，同一格有多个己方单位就散开
 				{
@@ -526,9 +489,6 @@ public:
 					auto failedCell = CellClass::Coord2Cell(pFailed->GetCoords());
 					if (failedCell == receiver.Cell)
 						pFailed->Scatter(pFailed->GetCoords(), true, false);
-
-					Debug::Log("[RecruitPassengers]   Boarding %p -> %p (size=%d)\n",
-						pFailed, receiver.Vehicle, failedSize);
 
 					pFailed->ObjectClickedAction(Action::Enter, receiver.Vehicle, false);
 					receiver.UsedCapacity += failedSize;
