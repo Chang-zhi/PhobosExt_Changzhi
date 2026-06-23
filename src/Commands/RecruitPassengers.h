@@ -39,7 +39,7 @@ public:
 
 	virtual void Execute(WWKey eInput) const override
 	{
-		auto const pPlayer = HouseClass::CurrentPlayer;
+		HouseClass* const pPlayer = HouseClass::CurrentPlayer;
 		if (!pPlayer)
 			return;
 
@@ -53,16 +53,16 @@ public:
 		std::vector<TransportInfo> transports;
 		std::vector<TechnoClass*> selectedNonTransports;
 
-		for (auto pObj : ObjectClass::CurrentObjects)
+		for (ObjectClass* pObj : ObjectClass::CurrentObjects)
 		{
 			if (!pObj || !pObj->IsSelected || !pObj->IsAlive || pObj->InLimbo)
 				continue;
 
-			auto pTechno = generic_cast<TechnoClass*>(pObj);
+			TechnoClass pTechno = generic_cast<TechnoClass*>(pObj);
 			if (!pTechno || pTechno->Owner != pPlayer)
 				continue;
 
-			auto pType = pTechno->GetTechnoType();
+			TechnoTypeClass* pType = pTechno->GetTechnoType();
 			bool isTransport = false;
 			if (pTechno->WhatAmI() == AbstractType::Unit)
 			{

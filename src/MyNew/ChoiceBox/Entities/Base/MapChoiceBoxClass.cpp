@@ -663,7 +663,22 @@ void MapChoiceBoxClass::DrawAt(Point2D centerPos)
 			btnY = topLeft.Y + buttonsStartY + pos.Y;
 		}
 
-		// 检测鼠标是否悬停
+		// 底部裁剪：完全在裁剪区外则跳过
+		if (btnY >= topLeft.Y + drawHeight)
+			continue;
+
+		// 按钮可见高度（裁剪超出部分）
+		int btnDrawH = pos.H;
+		bool btnClipped = false;
+		if (btnY + btnDrawH > topLeft.Y + drawHeight)
+		{
+			btnDrawH = topLeft.Y + drawHeight - btnY;
+			btnClipped = true;
+			if (btnDrawH <= 0)
+				continue;
+		}
+
+		// 检测鼠标是否悬停（部分可见按钮仍可悬停高亮）
 		bool isHover = (mousePos.X >= btnX && mousePos.X <= btnX + pos.W &&
 			mousePos.Y >= btnY && mousePos.Y <= btnY + pos.H);
 
@@ -676,7 +691,7 @@ void MapChoiceBoxClass::DrawAt(Point2D centerPos)
 			? std::clamp(type.BackgroundOpacity * 1 / 4, 0, 100)
 			: std::clamp(type.BackgroundOpacity / 2, 0, 100);
 
-		RectangleStruct btnRect = { btnX, btnY, pos.W, pos.H };
+		RectangleStruct btnRect = { btnX, btnY, pos.W, btnDrawH };
 		DSurface::Composite->FillRectTrans(&btnRect, &btnColor, btnOpacity);
 
 		// 按钮边框 + 文字颜色（悬停/选中时加亮）
@@ -695,19 +710,22 @@ void MapChoiceBoxClass::DrawAt(Point2D centerPos)
 			btnHighlightColor = Drawing::RGB_To_Int(brightColor);
 		}
 
-		// 四条边框
+		// 四条边框（底部边框在裁剪时跳过）
 		p1 = { btnX, btnY };
 		p2 = { btnX + pos.W - 1, btnY };
 		DSurface::Composite->DrawLine(&p1, &p2, btnHighlightColor);
 		p1 = { btnX, btnY };
-		p2 = { btnX, btnY + pos.H - 1 };
+		p2 = { btnX, btnY + btnDrawH - 1 };
 		DSurface::Composite->DrawLine(&p1, &p2, btnHighlightColor);
 		p1 = { btnX + pos.W - 1, btnY };
-		p2 = { btnX + pos.W - 1, btnY + pos.H - 1 };
+		p2 = { btnX + pos.W - 1, btnY + btnDrawH - 1 };
 		DSurface::Composite->DrawLine(&p1, &p2, btnHighlightColor);
-		p1 = { btnX, btnY + pos.H - 1 };
-		p2 = { btnX + pos.W - 1, btnY + pos.H - 1 };
-		DSurface::Composite->DrawLine(&p1, &p2, btnHighlightColor);
+		if (!btnClipped)
+		{
+			p1 = { btnX, btnY + pos.H - 1 };
+			p2 = { btnX + pos.W - 1, btnY + pos.H - 1 };
+			DSurface::Composite->DrawLine(&p1, &p2, btnHighlightColor);
+		}
 
 		// 按钮文字：在按钮内部居中，支持多行/截断（悬停时颜色随之加亮）
 		const auto& item = btnItems[i];
@@ -725,6 +743,10 @@ void MapChoiceBoxClass::DrawAt(Point2D centerPos)
 				int lineY = btnY + BUTTON_PADDINGY + lineOffsetY + static_cast<int>(li) * LINE_HEIGHT;
 
 				if (btnFixedH > 0 && lineY + LINE_HEIGHT > btnY + pos.H)
+					break;
+
+				// 当前行超出裁剪区则停止
+				if (lineY + LINE_HEIGHT > topLeft.Y + drawHeight)
 					break;
 
 				RectangleStruct txtDims = Drawing::GetTextDimensions(
