@@ -46,6 +46,27 @@ void ScriptExt::ProcessAction(TeamClass* pTeam)
 	}
 }
 
+// 散开指定格子上非载具自身的己方单位
+static void ScatterBlockersOnCell(CellStruct cell, HouseClass* owner, TechnoClass* exclude = nullptr)
+{
+	auto pCell = MapClass::Instance.TryGetCellAt(cell);
+	if (!pCell) return;
+
+	for (auto pObj = pCell->GetContent(); pObj; pObj = pObj->NextObject)
+	{
+		auto pBlocking = generic_cast<TechnoClass*>(pObj);
+		if (!pBlocking || !pBlocking->IsAlive || pBlocking->InLimbo)
+			continue;
+		if (pBlocking == exclude)
+			continue;
+		if (pBlocking->Owner != owner)
+			continue;
+		if (pBlocking->Transporter)
+			continue;
+		pBlocking->Scatter(pBlocking->GetCoords(), true, false);
+	}
+}
+
 // =============================
 // DistributedLoadIntoTransports - 分布式装载
 // 各载具轮流挑选最近的队员，确保均匀分布
@@ -53,6 +74,8 @@ void ScriptExt::ProcessAction(TeamClass* pTeam)
 
 void ScriptExt::LoadIntoTransportsDistributed(TeamClass* pTeam)
 {
+	HouseClass* const pOwner = pTeam->Owner;
+
 	// 检查是否还有人在装载中 → 等待
 	for (auto pUnit = pTeam->FirstUnit; pUnit; pUnit = pUnit->NextTeamMember)
 	{
@@ -63,29 +86,13 @@ void ScriptExt::LoadIntoTransportsDistributed(TeamClass* pTeam)
 		}
 	}
 
-	// 每帧检查所有运输载具周围是否有堵塞者，有则散开
+	// 每帧清空载具格上的阻塞者
+	for (auto pUnit = pTeam->FirstUnit; pUnit; pUnit = pUnit->NextTeamMember)
 	{
-		for (auto pUnit = pTeam->FirstUnit; pUnit; pUnit = pUnit->NextTeamMember)
-		{
-			auto pType = pUnit->GetTechnoType();
-			if (!pType || pType->Passengers <= 0)
-				continue;
-			auto pCell = MapClass::Instance.TryGetCellAt(pUnit->GetCoords());
-			if (!pCell) continue;
-			for (auto pObj = pCell->GetContent(); pObj; pObj = pObj->NextObject)
-			{
-				auto pBlocking = generic_cast<TechnoClass*>(pObj);
-				if (!pBlocking || !pBlocking->IsAlive || pBlocking->InLimbo)
-					continue;
-				if (pBlocking == pUnit)
-					continue;
-				if (pBlocking->Owner != pTeam->Owner)
-					continue;
-				if (pBlocking->Transporter)
-					continue;
-				pBlocking->Scatter(pBlocking->GetCoords(), true, false);
-			}
-		}
+		auto pType = pUnit->GetTechnoType();
+		if (!pType || pType->Passengers <= 0)
+			continue;
+		ScatterBlockersOnCell(CellClass::Coord2Cell(pUnit->GetCoords()), pOwner, pUnit);
 	}
 
 	// 收集小队内所有有空位的载具
@@ -194,42 +201,6 @@ void ScriptExt::LoadIntoTransportsDistributed(TeamClass* pTeam)
 		return;
 	}
 
-	// 遍历单元格链表，同一格有多个己方单位就散开
-	{
-		std::vector<CellStruct> scatterCheckedCells;
-		for (auto& u : units)
-		{
-			bool alreadyScatterChecked = false;
-			for (auto& cc : scatterCheckedCells)
-			{
-				if (cc.X == u.Cell.X && cc.Y == u.Cell.Y)
-				{ alreadyScatterChecked = true; break; }
-			}
-			if (alreadyScatterChecked) continue;
-			scatterCheckedCells.push_back(u.Cell);
-
-			auto pCell = MapClass::Instance.TryGetCellAt(u.Cell);
-			if (!pCell) continue;
-
-			std::vector<ObjectClass*> cellObjs;
-			for (auto pObj = pCell->GetContent(); pObj; pObj = pObj->NextObject)
-			{
-				auto pTechno = generic_cast<TechnoClass*>(pObj);
-				if (!pTechno || !pTechno->IsAlive || pTechno->InLimbo || pTechno->Transporter)
-					continue;
-				if (pTechno->Owner != pTeam->Owner)
-					continue;
-				cellObjs.push_back(pObj);
-			}
-
-			if (cellObjs.size() > 1)
-			{
-				for (auto pObj : cellObjs)
-					pObj->Scatter(pObj->GetCoords(), true, false);
-			}
-		}
-	}
-
 	// 按 SizeLimit 分组轮询：同组内轮询装满，再下一组
 	int totalAssigned = 0;
 	size_t groupStart = 0;
@@ -269,26 +240,8 @@ void ScriptExt::LoadIntoTransportsDistributed(TeamClass* pTeam)
 					// 不能上自己
 					if (u.Unit == t.Vehicle)
 						continue;
-				// 目标载具坐标上有其他单位 → 散开阻塞者
-				{
-					auto pCell = MapClass::Instance.TryGetCellAt(t.Cell);
-					if (pCell)
-					{
-						for (auto pObj = pCell->GetContent(); pObj; pObj = pObj->NextObject)
-						{
-							auto pBlocking = generic_cast<TechnoClass*>(pObj);
-							if (!pBlocking || !pBlocking->IsAlive || pBlocking->InLimbo)
-								continue;
-							if (pBlocking == t.Vehicle || pBlocking == u.Unit)
-								continue;
-							if (pBlocking->Owner != pTeam->Owner)
-								continue;
-							if (pBlocking->Transporter)
-								continue;
-							pBlocking->Scatter(pBlocking->GetCoords(), true, false);
-						}
-					}
-				}
+					// 目标载具坐标上有其他单位 → 散开阔塞者
+					ScatterBlockersOnCell(t.Cell, pOwner, t.Vehicle);
 					int dist = CellSpread::GetDistance(CellStruct{
 						static_cast<short>(u.Cell.X - t.Cell.X),
 						static_cast<short>(u.Cell.Y - t.Cell.Y)
@@ -314,9 +267,6 @@ void ScriptExt::LoadIntoTransportsDistributed(TeamClass* pTeam)
 						if (pInf->IsDeployed())
 							pInf->ForceMission(Mission::Unload);
 					}
-
-					if (u.Cell == t.Cell)
-						u.Unit->Scatter(u.Unit->GetCoords(), true, false);
 
 					u.Unit->QueueMission(Mission::Enter, false);
 					u.Unit->SetTarget(nullptr);
