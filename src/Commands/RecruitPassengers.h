@@ -34,7 +34,7 @@ public:
 
 	virtual const wchar_t* GetUIDescription() const override
 	{
-		return L"选中空载具按指定按键，自动招募附近单位上车";
+		return L"选中空载具按指定按键，自动招募附近单位上车\nRecruit nearby units to board selected empty transports";
 	}
 
 	virtual void Execute(WWKey eInput) const override
