@@ -12,15 +12,27 @@
 .sec-toc__link:hover{background:#f8e8e8;color:#d92929}
 @media(max-width:1170px){.doc-container{margin-right:.5rem}}@media(max-width:800px){.nav{width:130px}}@media(max-width:640px){.doc-container{margin:.5rem;padding:1rem}}</style></head>
 <body>
+
+<!----------------->
+<!----- 侧边栏 ----->
+<!----------------->
+
 <button class="nav-toggle" id="navToggle" onclick="toggleNav()">☰</button>
 <nav class="nav" id="mainNav"><div class="nav__title"><span class="nav__close" onclick="toggleNav()">◀</span>PhobosExt<span class="nav__lock" onclick="toggleLock()"><svg class="lock-icon lock-icon--locked" viewBox="0 0 24 24" width="17" height="17" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="11" width="16" height="11" rx="2.5" fill="#d92929"/><path d="M7 11V7a5 5 0 0 1 10 0v4" fill="none" stroke="#d92929" stroke-width="2.5" stroke-linecap="round"/></svg><svg class="lock-icon lock-icon--unlocked" viewBox="0 0 24 24" width="17" height="17" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="11" width="16" height="11" rx="2.5" fill="#d92929"/><path d="M7 11V7a5 5 0 0 1 10 0" fill="none" stroke="#d92929" stroke-width="2.5" stroke-linecap="round"/></svg></span></div><ul class="nav__list">
 <li class="nav__item nav__item--active" page="home">首页</li>
-<li class="nav__item" page="actions">触发器新动作</li>
-<li class="nav__item" page="events">触发器新事件</li>
-<li class="nav__item" page="scripts">新增脚本</li>
-<li class="nav__item" page="gameplay">游戏扩展机制</li>
+<li class="nav__item" page="gameplay">新增游戏机制</li>
+<li class="nav__item" page="commands">新增按键命令</li>
+<li class="nav__item" page="actions">新增触发行为</li>
+<li class="nav__item" page="events">新增触发事件</li>
+<li class="nav__item" page="scripts">新增动作脚本</li>
 </ul></nav>
+
 <div class="doc-container">
+
+<!----------------->
+<!------ 首页 ------>
+<!----------------->
+
 <section id="sec_home" class="active">
 <h1 class="doc-title"><a href="https://github.com/Chang-zhi/PhobosExt_Changzhi" target="_blank" class="doc-link" style="border-bottom:none">PhobosExt</a> <span class="doc-title__sub">扩展 DLL</span></h1>
 
@@ -33,13 +45,13 @@
 <h2 class="doc-heading--secondary">兼容性说明</h2>
 <p>需保证游戏版本为 YR 1.001。</p>
 <p><strong>不依赖 Ares 或 Phobos，可单独使用。</strong> </p>
-<p>部分功能（如触发动作 653、654）依赖 Phobos ，详见对应章节。</p>
+<p>部分功能（如触发行为 653、654）依赖 Phobos ，详见对应章节。</p>
 <p>本 DLL 已避免使用 <code class="doc-code--inline">ExtPointerOffset</code> ，改用独立 <code class="doc-code--inline">unordered_map</code> 存储扩展数据，不会与 Ares 或 Phobos 的原生扩展数据冲突。(严格来说可能变慢, 但对现代cpu的影响应该可以忽略不计)</p>
 
 <h2 class="doc-heading--secondary">已知问题</h2>
 <p>1. 当单位当前正在使用带有 <code class="doc-code--inline">Temporal=yes</code> 和 <code class="doc-code--inline">Temporal.Exclusive=yes</code> 弹头的武器时, 会强制改变单位的索敌逻辑, 可能会产生bug。</p>
 <p>2. 当科技类型的 <code class="doc-code--inline">LegalTargetWhenAIOwner=no</code> 且不由人类玩家控制时, 会强制改变其他单位的索敌逻辑, 可能会产生bug。</p>
-<p>3. 基地节点跨所属方判定：开启后不要让 AI 造围墙，与触发动作 30 不兼容。详见<a href="javascript:switchPage('gameplay');setTimeout(function(){scrollToFeature('gameplay_4')},100)" class="doc-link">对应章节</a>。</p>
+<p>3. 基地节点跨所属方判定：开启后不要让 AI 造围墙，与触发行为 30 不兼容。详见<a href="javascript:switchPage('gameplay');setTimeout(function(){scrollToFeature('gameplay_4')},100)" class="doc-link">对应章节</a>。</p>
 <p>4. 当单位当前正在使用带有 <code class="doc-code--inline">Temporal=yes</code> 弹头的武器反复攻击同一个目标时, 可能会出现中间的目标没有进入冻结状态但其他目标进入的情况(不过时间到了仍会被一同抹除)。</p>
 <br>
 <p><strong>如果遇到bug或兼容性问题可以我发私信, 我会尽量解决。</strong></p>
@@ -64,511 +76,26 @@
 《红色警戒2：尤里的复仇》及其相关素材归 Electronic Arts 所有。</p>
 
 <h2 class="doc-heading--secondary">触发编辑器配置</h2>
-<p>为了在触发编辑器中使用新的触发动作，您需要复制压缩包里面的 <code class="doc-code--inline">FAData_TriggerAndScript.ini</code> 到地编的根目录下。</p><br>
+<p>为了在触发编辑器中使用新的触发行为，您需要复制压缩包里面的 <code class="doc-code--inline">FAData_TriggerAndScript.ini</code> 到地编的根目录下。</p><br>
 <p>仅支持 <a href="https://github.com/handama/FA2sp" target="_blank" class="doc-link">FA2SP_HDM_Edition</a>(韩大妈版本)<br>其他版本请自行移植。</p>
 
 </section>
 
-<!-- 触发器新动作 -->
-
-<section id="sec_actions">
-<h2 class="doc-heading--secondary">触发器新动作</h2>
-<div class="sec-toc">
-<p class="sec-toc__title">目录：</p>
-<ul class="sec-toc__list">
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_1')" class="sec-toc__link">1. 文本框系统</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_2')" class="sec-toc__link">2. 动态标签绑定功能</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_3')" class="sec-toc__link">3. 金钱操作功能</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_4')" class="sec-toc__link">4. 基地节点操作功能</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_5')" class="sec-toc__link">5. 单位可招募属性设置</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_6')" class="sec-toc__link">6. 更新建筑动画功能</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_7')" class="sec-toc__link">7. 作战小队操作</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_8')" class="sec-toc__link">8. 脚本操作</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_9')" class="sec-toc__link">9. 特遣部队操作</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_10')" class="sec-toc__link">10. 解除部署</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_11')" class="sec-toc__link">11. 选择框系统</a></li>
-</ul>
-</div>
-
-<hr class="sec-divider">
-
-<div id="actions_1">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">1. 文本框系统</h3>
-<p>在地图路径点或科技类型上绘制自定义文本框，支持预定义样式(TextBoxType)或直接指定参数。</p>
-<p class="doc-paragraph--only-vertical"><strong>特性：</strong></p>
-<ul class="doc-list--content">
-<li>可自定义文本内容、最大显示宽度(像素)、背景不透明度。</li>
-<li>支持预定义样式(TextBoxType)，包括文本颜色和边框颜色(RGB)。</li>
-<li>鼠标移动到文本框上时，文本会暂时停止绘制(避免遮挡操作)。</li>
-<li>单位进入载具(limbo状态)时，文本框会暂时停止绘制，离开载具后自动恢复。</li>
-<li>单位标签支持所有科技类型(TechnoClass，含建筑)。小队相关动作限制为FootClass。</li>
-</ul>
-
-<h4>文本框类型</h4>
-<p>在 <code class="doc-code--inline">rulesmd.ini</code> 的 <code class="doc-code--inline">[TextBoxTypes]</code> 段中定义文本框样式，可按需添加任意多个。</p>
-<pre class="doc-code--block"><code>[TextBoxTypes]
-0=FirstBoxType
-1=YourBoxType
-...
-
-[YourBoxType]
-MaxWidth=                   ;integer - 最大像素宽度(1-1000)，文本超出自动换行，默认250
-BackgroundOpacity=          ;integer - 背景不透明度百分比(0-100)。默认75
-Color=                      ;integer,integer,integer - 文本和边框颜色，RGB格式。默认255,215,0(金色)
-Duration=                   ;integer - 自动移除帧数。默认-1(无限显示)
-</code></pre>
-
-<h4>路径点文本框</h4>
-<p><strong>触发动作说明：</strong></p>
-<ul class="doc-list--content">
-<li><code class="doc-code--inline">549</code> – 在指定路径点绘制文本框(根据类型)...(参数：路径点，TextBoxType)</li>
-<li><code class="doc-code--inline">550</code> – 在指定路径点绘制文本框(根据数据)...(参数：路径点，文本内容，像素宽度，不透明度百分比，文本颜色)</li>
-<li><code class="doc-code--inline">551</code> – 清除指定路径点的文本框...(参数：路径点索引)</li>
-<li><code class="doc-code--inline">552</code> – 清除所有路径点文本框...</li>
-</ul>
-
-<h4>单位文本框</h4>
-<p><strong>触发动作说明：</strong></p>
-<div class="doc-table--action">
-<table class="doc-table">
-<thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
-<tbody>
-<tr><td class="doc-table__td">579</td><td class="doc-table__td">在关联单位上绘制文本框(根据类型)...</td><td class="doc-table__td">CSF标签，文本框类型</td></tr>
-<tr><td class="doc-table__td">580</td><td class="doc-table__td">在关联单位上绘制文本框(根据数据)...</td><td class="doc-table__td">CSF标签，宽度，不透明度，颜色</td></tr>
-<tr><td class="doc-table__td">581</td><td class="doc-table__td">在作战小队成员上绘制文本框(根据类型)...</td><td class="doc-table__td">CSF标签，小队索引，文本框类型</td></tr>
-<tr><td class="doc-table__td">582</td><td class="doc-table__td">在作战小队成员上绘制文本框(根据数据)...</td><td class="doc-table__td">CSF标签，小队索引，宽度，不透明度，颜色</td></tr>
-<tr><td class="doc-table__td">583</td><td class="doc-table__td">清除单位文本框(根据类型)...</td><td class="doc-table__td">文本框类型</td></tr>
-<tr><td class="doc-table__td">584</td><td class="doc-table__td">清除关联单位文本框...</td><td class="doc-table__td">无参数</td></tr>
-<tr><td class="doc-table__td">585</td><td class="doc-table__td">清除单位文本框(根据科技类型)...</td><td class="doc-table__td">科技类型ID</td></tr>
-<tr><td class="doc-table__td">586</td><td class="doc-table__td">清除单位文本框(根据所属方和科技类型)...</td><td class="doc-table__td">科技类型ID，国家索引</td></tr>
-<tr><td class="doc-table__td">587</td><td class="doc-table__td">清除单位文本框(根据作战小队)...</td><td class="doc-table__td">小队索引</td></tr>
-<tr><td class="doc-table__td">588</td><td class="doc-table__td">清除所有单位文本框...</td><td class="doc-table__td">无参数</td></tr>
-<tr><td class="doc-table__td">589</td><td class="doc-table__td">清除所有文本框...</td><td class="doc-table__td">无参数(含路径点)</td></tr>
-</tbody>
-</table>
-</div>
-
-<p>在 <code class="doc-code--inline">[General]</code> 中增加新变量，用来控制文本框在黑幕中是否绘制。</p>
-<pre class="doc-code--block"><code>[General]
-ShowTextBoxInShroud.Waypoint=           ; boolean，默认 true — 路径点文本框在黑幕中是否显示
-ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本框在黑幕中是否显示</code></pre>
-<p><strong>注:</strong> 仅检测路径点格子或单位所在单元格是否被黑幕遮挡, 不检测整个文本框区域。</p>
-<br>
-<p><strong>关于文本框持续时长：</strong></p>
-<ul class="doc-list--content">
-<li>在 <code class="doc-code--inline">[TextBoxTypes]</code> 中设置 <code class="doc-code--inline">Duration=</code> 可控制文本框自动移除的帧数。</li>
-<li><code class="doc-code--inline">Duration=-1</code>（默认）表示无限显示，需通过触发动作手动清除。</li>
-<li>仅通过类型创建时有效；通过数据创建时需由用户手动控制。</li>
-</ul>
-</div>
-
-<hr class="sec-divider--double">
-
-<div id="actions_2">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">2. 动态标签绑定功能</h3>
-<div class="doc-notice--warning">
-<strong>注意!</strong> 触发系统事实上很复杂，需读者了解其组成和运行机制。<br>
-这里默认读者已经具备了相关知识，可以阅读 <code class="doc-code--inline--deepColor">Handama</code> 的 <code class="doc-code--inline--deepColor">触发系统.docx</code> 以了解相关知识。</div>
-<p>允许将游戏中的科技类型实例与标签(Tag)动态关联，便于后续通过触发器执行逻辑。<br>
-若标签不存在/已销毁，则会根据标签类型(TagType)创建一个新标签，确保目标会与标签关联。</p>
-<p class="doc-text--gray">事实上，触发也会在小队创建时实例化，因此动作 <code class="doc-code--inline">553</code> 和 <code class="doc-code--inline">554</code> 实际上可能并没有必要，
-只需要在 <code class="doc-code--inline">作战小队</code> 的 <code class="doc-code--inline">挂载标签</code> 上挂载所需标签即可以实现与该动作类似的效果，但仍保留以备不时之需。<br>
-(写都写了.jpg，不过确实有所不同)</p>
-<h4>触发动作说明</h4>
-<div class="doc-table--action">
-<table class="doc-table">
-<thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
-<tbody>
-<tr><td class="doc-table__td">553</td><td class="doc-table__td">将指定小队全部成员关联到指定标签...</td><td class="doc-table__td">小队索引，标签索引，强制新建标签</td></tr>
-<tr><td class="doc-table__td">554</td><td class="doc-table__td">将指定所属方的指定小队全部成员关联到指定标签...</td><td class="doc-table__td">小队索引，标签索引，所属方国家索引，强制新建标签</td></tr>
-<tr><td class="doc-table__td">555</td><td class="doc-table__td">将特定科技类型全部关联到指定标签...</td><td class="doc-table__td">科技类型ID，标签索引，强制新建标签</td></tr>
-<tr><td class="doc-table__td">556</td><td class="doc-table__td">将指定所属方的特定科技类型全部关联到指定标签...</td><td class="doc-table__td">科技类型ID，标签索引，所属方国家索引，强制新建标签</td></tr>
-<tr><td class="doc-table__td">563</td><td class="doc-table__td">安全地销毁指定标签类型的所有实例...</td><td class="doc-table__td">标签索引</td></tr>
-<tr><td class="doc-table__td">564</td><td class="doc-table__td">为路径点上的指定科技类型绑定标签...</td><td class="doc-table__td">路径点索引，科技类型ID，标签索引，强制新建标签</td></tr>
-<tr><td class="doc-table__td">565</td><td class="doc-table__td">为路径点上指定所属方的指定科技类型绑定标签...</td><td class="doc-table__td">路径点索引，科技类型ID，标签索引，所属方国家索引，强制新建标签</td></tr>
-<tr><td class="doc-table__td">566</td><td class="doc-table__td">为路径点范围内的指定科技类型绑定标签...</td><td class="doc-table__td">路径点索引，科技类型ID，标签索引，范围，强制新建标签</td></tr>
-<tr><td class="doc-table__td">567</td><td class="doc-table__td">为路径点范围内触发所属方的指定科技类型绑定标签...</td><td class="doc-table__td">路径点索引，科技类型ID，标签索引，范围，强制新建标签</td></tr>
-<tr><td class="doc-table__td">568</td><td class="doc-table__td">为路径点范围内的所有科技类型绑定标签...</td><td class="doc-table__td">路径点索引，标签索引，范围，强制新建标签</td></tr>
-<tr><td class="doc-table__td">569</td><td class="doc-table__td">为路径点范围内指定所属方的所有科技类型绑定标签...</td><td class="doc-table__td">路径点索引，所属方国家索引，标签索引，范围，强制新建标签</td></tr>
-<tr><td class="doc-table__td">570</td><td class="doc-table__td">统一指定标签类型的所有实例...</td><td class="doc-table__td">标签索引</td></tr>
-<tr><td class="doc-table__td">572</td><td class="doc-table__td">将路径点范围内除指定类型外的所有科技类型关联到指定标签...</td><td class="doc-table__td">路径点索引，科技类型ID，标签索引，范围，强制新建标签</td></tr>
-<tr><td class="doc-table__td">573</td><td class="doc-table__td">将路径点范围内触发所属方的除指定类型外的所有科技类型关联到指定标签...</td><td class="doc-table__td">路径点索引，科技类型ID，标签索引，范围，强制新建标签</td></tr>
-</tbody>
-</table>
-</div>
-<p><strong>范围</strong>：整数，以单元格为单位的圆形半径 。<br>
-<strong>强制新建标签</strong>：<code class="doc-code--inline">0</code>=使用已有实例，<code class="doc-code--inline">1</code>=强制创建新实例。见下文注意事项第9条。</p>
-
-<h4>注意事项</h4>
-<ol class="doc-list--content">
-<li>使用本组触发时，会更新指定标签的 <code class="doc-code--inline">InstanceCount</code>(引用计数)。</li>
-<li>由本组触发创建的标签可以被原版动作 <code class="doc-code--inline">70</code>(摧毁标签... )安全销毁而不会弹框。</li>
-<li>即使想要绑定的科技类型<strong>正在建造中</strong>，也会被关联到指定标签，但是建筑造出来之前触发不起作用。</li>
-<li>通过本组触发给小队成员关联的标签，在小队解散后标签不会自动消失。</li>
-<li>对于动作 <code class="doc-code--inline">564</code>、<code class="doc-code--inline">565</code>，若科技类型为建筑，则<strong>每一格都会检测，支持 Ares 自定义建筑地基。</strong></li>
-<li>当指定对象已经拥有标签时，新标签会<strong>覆盖</strong>原有标签，并且原有标签的 <code class="doc-code--inline">InstanceCount</code> 会相应更新。</li>
-<li>与常规销毁(动作 <code class="doc-code--inline">70</code>)不同，动作 <code class="doc-code--inline">563</code> <strong>不会导致由小队创建的标签被销毁时弹框崩溃</strong>，因此可安全用于标签的批量清理。</li>
-<li>动作 <code class="doc-code--inline">570</code> 的原理：该动作会强制创建一个<strong>全新</strong>的标签实例，然后将当前所有已经绑定了该标签类型(TagType)的科技对象<strong>全部重新指向</strong>这个新标签，最后销毁原有的所有标签实例。</li>
-<li><strong>强制新建标签参数</strong>：
-<ul class="doc-list--content">
-<li>若为 <code class="doc-code--inline">1</code>(真)，则无论当前是否存在相同标签类型的实例，都会创建一个<strong>全新的标签实例</strong>。(新实例与同类型其他实例独立存在，引擎允许多实例)</li>
-<li>若为 <code class="doc-code--inline">0</code>(假)，则优先寻找游戏内已存在的该标签类型实例，找到则直接使用，找不到才会创建新标签。</li>
-<li>注意：当使用 <code class="doc-code--inline">0</code> 时，若存在多个同类型标签实例，实际绑定到哪一个<strong>不确定</strong>(取决于遍历顺序)，建议在需要明确控制实例时使用 <code class="doc-code--inline">1</code>。</li>
-</ul>
-</li>
-</ol>
-</div>
-
-<hr class="sec-divider--double">
-
-<div id="actions_3">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">3. 金钱操作功能</h3>
-<p>允许动态调整指定所属方的资金数额。</p>
-<p>所有操作均以所属方国家索引作为目标标识，金额单位为游戏内货币单位(即"钱")。</p>
-<p><strong>触发动作说明：</strong></p>
-<ul class="doc-list--content">
-<li><code class="doc-code--inline">557</code> – 为指定所属方添加金钱数额...(参数：所属方国家索引，金额数额)</li>
-<li><code class="doc-code--inline">558</code> – 为指定所属方扣除金钱数额...(参数：所属方国家索引，金额数额)</li>
-<li><code class="doc-code--inline">559</code> – 设置指定所属方的金钱数额...(参数：所属方国家索引，金额数额)</li>
-</ul>
-</div>
-
-<hr class="sec-divider--double">
-
-<div id="actions_4">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">4. 基地节点操作功能</h3>
-<p>允许动态添加或移除指定所属方的AI基地节点。</p>
-<p><strong>触发动作说明：</strong></p>
-<ul class="doc-list--content">
-<li><code class="doc-code--inline">560</code> – 在指定路径点添加基地节点...(参数：所属方国家索引，路径点编号，建筑类型索引，立即建造)</li>
-<li><code class="doc-code--inline">561</code> – 移除指定路径点上的所有基地节点...(参数：所属方国家索引，路径点编号)</li>
-<li><code class="doc-code--inline">562</code> – 移除特定所属方所有指定建筑类型的基地节点...(参数：所属方国家索引，建筑类型索引)</li>
-</ul>
-<h4>注意事项</h4>
-<ol class="doc-list--content">
-<li>对于动作 <code class="doc-code--inline">560</code>，立即建造：<code class="doc-code--inline">0</code>=仅添加到建造队列，<code class="doc-code--inline">1</code>=立即开始建造。为真时AI会立即开始建造指定建筑并清空建筑生产序列。</li>
-<li>对于动作 <code class="doc-code--inline">561</code>,<code class="doc-code--inline">562</code>, 会重置 ai 的建造序列, 如果基地正在建造需要移除的基地节点, 则会强制中断建造。</li>
-</ol>
-</div>
-
-<hr class="sec-divider--double">
-
-<div id="actions_5">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">5. 单位可招募属性设置</h3>
-<p><strong>触发动作说明：</strong></p>
-<ul class="doc-list--content">
-<li><code class="doc-code--inline">571</code> – 设置关联单位的可招募属性... (参数：可招募A，可招募B)</li>
-</ul>
-<p class="doc-paragraph--wrapped"><strong>注意事项：</strong> 只会修改 <code class="doc-code--inline">FootClass</code> 的实例。可招募A对应 <code class="doc-code--inline">RecruitableA</code>，可招募B对应 <code class="doc-code--inline">RecruitableB</code>。</p>
-</div>
-
-<hr class="sec-divider--double">
-
-<div id="actions_6">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">6. AI 更新建筑动画功能</h3>
-<p>更新建筑的动画，用于处理建筑改变所属后动画会停止播放的问题。</p>
-<p>(但遥控坦克的状态仍然不会更新)</p>
-<p><strong>触发动作说明：</strong></p>
-<ul class="doc-list--content">
-<li><code class="doc-code--inline">574</code> – 更新所有建筑的动画...</li>
-<li><code class="doc-code--inline">575</code> – 更新关联建筑的动画...</li>
-<li><code class="doc-code--inline">576</code> – 更新指定所属方所有建筑的动画... (参数：所属方国家索引)</li>
-</ul>
-</div>
-
-<hr class="sec-divider--double">
-
-<div id="actions_7">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">7. 作战小队操作</h3>
-<p><strong>触发动作说明：</strong></p>
-<ul class="doc-list--content">
-<li><code class="doc-code--inline">577</code> – 建立作战小队(考虑限制)... (参数：小队索引，上限限制开关，区域检查开关，连通模式)</li>
-<li><code class="doc-code--inline">578</code> – 将路径点范围内可招募单位加入已存在的作战小队... (参数：小队索引，路径点，范围，仅招募可招募单位)</li>
-<li><code class="doc-code--inline">661</code> – 设置作战小队Max值... (参数：作战小队类型，新的Max值)</li>
-<li><code class="doc-code--inline">678</code> – 将指定分组的单位加入小队... (参数：分组号(0-9,-1=不限)，所属方国家索引，小队索引)</li>
-</ul>
-<br>
-<p><strong>动作 577 (建立作战小队)：</strong></p>
-<ul class="doc-list--content">
-<li><strong>上限限制(参数2)：</strong><code class="doc-code--inline">0</code>=无限制，<code class="doc-code--inline">1</code>=启用上限。若当前实例数已达到"作战小队"里的"最大"值，则不创建。</li>
-<li><strong>区域检查(参数3)：</strong><code class="doc-code--inline">0</code>=不检查，<code class="doc-code--inline">1</code>=启用检查。检测所属方与敌对方之间是否存在区域连通路径，无连接则跳过。</li>
-<li><strong>连通模式(参数4)：</strong>仅在区域检查启用时生效。
-<ul class="doc-list--content">
-<li><code class="doc-code--inline">0</code>：小队内任一兵种可以抵达目的地即可。</li>
-<li><code class="doc-code--inline">1</code>：小队内全部兵种都需要可以抵达目的地才行。</li>
-</ul></li>
-</ul>
-<br>
-<p><strong>动作 578 (招募单位到已有小队)：</strong></p>
-<ul class="doc-list--content">
-<li>将指定路径点指定范围内的所有可招募地面单位(FootClass)加入一个已存在的作战小队实例。</li>
-<li>如果没有该类型的已有实例，则无动作。</li>
-<li>只会招募满足以下条件的单位：属于该小队所属方、未加入其他小队、在路径点指定范围内。</li>
-<li><strong>仅招募可招募单位(参数4)：</strong><code class="doc-code--inline">0</code>=不检查可招募属性，<code class="doc-code--inline">1</code>=仅招募 <code class="doc-code--inline">CanBeRecruited</code> 返回 <code class="doc-code--inline">true</code> 的单位。</li>
-</ul>
-<br>
-<p><strong>动作 661 (设置作战小队Max值)：</strong></p>
-<ul class="doc-list--content">
-<li>修改指定作战小队类型(TeamType)的 <code class="doc-code--inline">Max</code> 属性。</li>
-<li>配合动作 <code class="doc-code--inline">577</code>(建立作战小队(考虑限制)) 的上限限制开关使用，以实现灵活的小队创建控制。</li>
-</ul>
-<br>
-<p><strong>动作 678 (将指定分组的单位加入小队)：</strong></p>
-<ul class="doc-list--content">
-<li>将指定分组(Group)和所属方(House)的所有地面单位(FootClass)加入一个已存在的作战小队实例。</li>
-<li>如果没有该类型的已有实例，则无动作。</li>
-<li>分组号为 <code class="doc-code--inline">-1</code> 时不限制分组（即招募该所属方的所有可用单位）。</li>
-<li>只会招募满足以下条件的单位：属于指定所属方、未加入其他小队、分组号匹配。</li>
-</ul>
-</div>
-
-<hr class="sec-divider--double">
-
-<div id="actions_8">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">8. 脚本操作</h3>
-
-<div class="doc-table--action">
-<table class="doc-table">
-<thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
-<tbody>
-<tr><td class="doc-table__td">650</td><td class="doc-table__td">清空指定脚本内容...</td><td class="doc-table__td">脚本类型</td></tr>
-<tr><td class="doc-table__td">651</td><td class="doc-table__td">复制脚本内容...</td><td class="doc-table__td">源脚本类型，目标脚本类型</td></tr>
-<tr><td class="doc-table__td">652</td><td class="doc-table__td">以参数修改脚本行...</td><td class="doc-table__td">脚本类型，行号，动作类型，参数，额外参数</td></tr>
-<tr><td class="doc-table__td">653</td><td class="doc-table__td">以局部变量修改脚本行... <em></em></td><td class="doc-table__td">脚本类型，行号，动作类型(变量索引)，参数(变量索引)，额外参数(变量索引)</td></tr>
-<tr><td class="doc-table__td">654</td><td class="doc-table__td">以全局变量修改脚本行... <em></em></td><td class="doc-table__td">脚本类型，行号，动作类型(变量索引)，参数(变量索引)，额外参数(变量索引)</td></tr>
-<tr><td class="doc-table__td">655</td><td class="doc-table__td">重新指定小队脚本索引...</td><td class="doc-table__td">作战小队类型，目标脚本类型</td></tr>
-<tr><td class="doc-table__td">656</td><td class="doc-table__td">恢复小队脚本索引...</td><td class="doc-table__td">作战小队类型</td></tr>
-<tr><td class="doc-table__td">657</td><td class="doc-table__td">恢复所有小队脚本索引...</td><td class="doc-table__td">无参数</td></tr>
-<tr><td class="doc-table__td">658</td><td class="doc-table__td">恢复脚本内容...</td><td class="doc-table__td">脚本类型</td></tr>
-<tr><td class="doc-table__td">659</td><td class="doc-table__td">恢复所有脚本内容...</td><td class="doc-table__td">无参数</td></tr>
-<tr><td class="doc-table__td">660</td><td class="doc-table__td">将小队脚本执行行号跳转至...</td><td class="doc-table__td">作战小队类型，目标行号(0-based)</td></tr>
-</tbody>
-</table>
-</div>
-
-<p class="doc-paragraph--only-vertical"><strong>说明：</strong></p>
-<ul class="doc-list--content">
-<li>动作 650-654 在游戏运行时动态修改脚本类型(ScriptType)的动作内容（即该脚本的各行具体指令）。</li>
-<li>动作 655-657 改变作战小队类型(TeamType)引用的脚本类型（即该小队执行的脚本是哪个），不对脚本内容本身做任何修改。</li>
-<li>动作 658-659 将之前通过 650-654 修改过的脚本内容恢复到 INI 定义的原始状态，不影响小队绑定索引。</li>
-<li>动作 660 将指定作战小队类型的所有实例的脚本执行行号跳转到指定位置(0-based)，不会修改脚本内容或小队绑定。</li>
-<li>以上所有动作执行后，使用该脚本的作战小队会立即重置到第 0 行执行。</li>
-<li><strong>注意：动作 653、654 无法单独使用，需配合 Phobos B49+ 使用。</strong></li>
-</ul>
-</div>
-
-<hr class="sec-divider--double">
-
-<div id="actions_9">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">9. 特遣部队操作</h3>
-
-<div class="doc-table--action">
-<table class="doc-table">
-<thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
-<tbody>
-<tr><td class="doc-table__td">670</td><td class="doc-table__td">清空特遣部队内容...</td><td class="doc-table__td">特遣部队</td></tr>
-<tr><td class="doc-table__td">671</td><td class="doc-table__td">复制特遣部队内容...</td><td class="doc-table__td">源特遣部队，目标特遣部队</td></tr>
-<tr><td class="doc-table__td">672</td><td class="doc-table__td">修改特遣部队条目...</td><td class="doc-table__td">科技类型，特遣部队，条目索引(0-5)，数量</td></tr>
-<tr><td class="doc-table__td">673</td><td class="doc-table__td">重新指定小队特遣部队...</td><td class="doc-table__td">作战小队类型，目标特遣部队</td></tr>
-<tr><td class="doc-table__td">674</td><td class="doc-table__td">恢复特遣部队内容...</td><td class="doc-table__td">特遣部队</td></tr>
-<tr><td class="doc-table__td">675</td><td class="doc-table__td">恢复所有特遣部队内容...</td><td class="doc-table__td">无参数</td></tr>
-<tr><td class="doc-table__td">676</td><td class="doc-table__td">恢复小队特遣部队索引...</td><td class="doc-table__td">作战小队类型</td></tr>
-<tr><td class="doc-table__td">677</td><td class="doc-table__td">恢复所有小队特遣部队索引...</td><td class="doc-table__td">无参数</td></tr>
-</tbody>
-</table>
-</div>
-
-<p class="doc-paragraph--only-vertical"><strong>说明：</strong></p>
-<ul class="doc-list--content">
-<li><strong>内容</strong>指特遣部队的编制条目；<strong>索引</strong>指作战小队类型绑定了哪个特遣部队。</li>
-<li>所有动作执行后自动刷新活跃小队（重新统计成员、释放超额、更新满编/缺编状态）。</li>
-</ul>
-</div>
-
-<hr class="sec-divider--double">
-
-<div id="actions_10">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">10. 解除部署</h3>
-<p><strong>触发动作说明：</strong></p>
-<ul class="doc-list--content">
-<li><code class="doc-code--inline">679</code> – 解除所属方单位部署... (参数：所属方国家索引)</li>
-</ul>
-<p class="doc-paragraph--only-vertical"><strong>说明：</strong></p>
-<ul class="doc-list--content">
-<li><strong>原理:</strong> 设置任务为 <code class="doc-code--inline">Unload</code>。</li>
-<li>仅作用于参数指定的所属方，不影响其他国家的单位。</li>
-</ul>
-</div>
-
-<hr class="sec-divider--double">
-
-<div id="actions_11">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">11. 选择框系统</h3>
-<p>在地图路径点或屏幕百分比位置上创建交互式选择框，支持标题、描述和多个可点击按钮。
-玩家点击按钮后，可通过触发事件检测结果并执行后续动作。</p>
-<p><a href="javascript:switchPage('events');setTimeout(function(){scrollToFeature('events_4')},100)" class="doc-link">→ 查看对应的触发事件</a> <a href="javascript:switchPage('gameplay');setTimeout(function(){scrollToFeature('gameplay_6')},100)" class="doc-link">→ 查看 ini 配置说明</a></p>
-
-<table class="doc-table">
-<thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
-<tbody>
-<tr><td class="doc-table__td">590</td><td class="doc-table__td">在路径点创建选择框...</td><td class="doc-table__td">选择框编号, 路径点, 选择框类型索引</td></tr>
-<tr><td class="doc-table__td">591</td><td class="doc-table__td">在屏幕坐标创建选择框...</td><td class="doc-table__td">选择框编号, 屏幕水平位置, 屏幕垂直位置, 选择框类型索引</td></tr>
-<tr><td class="doc-table__td">592</td><td class="doc-table__td">清除指定编号的选择框...</td><td class="doc-table__td">选择框编号</td></tr>
-<tr><td class="doc-table__td">593</td><td class="doc-table__td">清除所有选择框...</td><td class="doc-table__td">无参数</td></tr>
-</tbody>
-</table>
-
-<h4>注意事项</h4>
-<ol class="doc-list--content">
-<li><strong>选择框编号：</strong>由用户自定义的整数，不同编号可同时显示多个选择框。同编号创建时自动覆盖旧的。</li>
-<li><strong>屏幕坐标：</strong>百分比制（0~100），如 X=50, Y=50 表示屏幕正中央。选择框会自动保持在屏幕视野内。</li>
-</div>
-
-</section>
-
-
-
-<!-- 触发器新事件 -->
-
-<section id="sec_events">
-<h2 class="doc-heading--secondary">触发器新事件</h2>
-<div class="sec-toc">
-<p class="sec-toc__title">目录：</p>
-<ul class="sec-toc__list">
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('events_1')" class="sec-toc__link">1. 科技类型坐标检测</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('events_2')" class="sec-toc__link">2. 流逝时间检测</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('events_3')" class="sec-toc__link">3. 任务计时器检测</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('events_4')" class="sec-toc__link">4. 选择框系统</a></li>
-</ul>
-</div>
-
-<hr class="sec-divider">
-
-<div id="events_1">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">1. 科技类型坐标检测</h3>
-<p>在指定路径点上或附近距离，检测是否存在触发所属方的科技类型。</p>
-<p><strong>触发事件说明：</strong></p>
-<ul class="doc-list--content">
-<li><code class="doc-code--inline">550</code> – 路径点附近存在所属方的科技类型... (参数：距离，路径点索引)</li>
-<li><code class="doc-code--inline">551</code> – 路径点附近不存在所属方的科技类型... (参数：距离，路径点索引)</li>
-<li><code class="doc-code--inline">552</code> – 路径点上存在所属方的指定科技类型... (参数：路径点索引，科技类型)</li>
-<li><code class="doc-code--inline">553</code> – 路径点上不存在所属方的指定科技类型... (参数：路径点索引，科技类型)</li>
-</ul>
-<p class="doc-paragraph--wrapped"><strong>注意事项：</strong> 对于事件 <code class="doc-code--inline">552</code>,<code class="doc-code--inline">553</code>, 若科技类型为建筑，则<strong>每一格都会检测，支持ares的自定义Foundation。</strong></p>
-</div>
-
-<hr class="sec-divider--double">
-
-<div id="events_2">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">2. 流逝时间检测</h3>
-<p>从触发器激活时开始计时，当流逝帧数达到指定值时触发。</p>
-<p><strong>触发事件说明：</strong></p>
-<ul class="doc-list--content">
-<li><code class="doc-code--inline">554</code> – 流逝时间(帧)... (参数：等待帧数)</li>
-</ul>
-</div>
-
-<hr class="sec-divider--double">
-
-<div id="events_3">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">3. 任务计时器检测</h3>
-<p>比较任务计时器(MissionTimer)剩余时间与指定秒数。</p>
-<p><strong>触发事件说明：</strong></p>
-<ul class="doc-list--content">
-<li><code class="doc-code--inline">555</code> – 任务计时器大于... (参数：秒数)</li>
-<li><code class="doc-code--inline">556</code> – 任务计时器小于... (参数：秒数)</li>
-</ul>
-</div>
-
-<hr class="sec-divider--double">
-
-<div id="events_4">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">4. 选择框系统</h3>
-<p>当选择框中的按钮被点击或超时未选时触发，需要配合触发动作 590-593 使用。</p>
-<p><a href="javascript:switchPage('actions');setTimeout(function(){scrollToFeature('actions_11')},100)" class="doc-link">→ 查看对应的触发动作</a> <a href="javascript:switchPage('gameplay');setTimeout(function(){scrollToFeature('gameplay_6')},100)" class="doc-link">→ 查看 ini 配置说明</a></p>
-
-<p><strong>触发事件说明：</strong></p>
-<table class="doc-table">
-<thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
-<tbody>
-<tr><td class="doc-table__td">557</td><td class="doc-table__td">选择框指定按钮被点击...</td><td class="doc-table__td">选择框编号, 按钮索引</td></tr>
-<tr><td class="doc-table__td">558</td><td class="doc-table__td">选择框任意按钮被点击...</td><td class="doc-table__td">选择框编号</td></tr>
-<tr><td class="doc-table__td">559</td><td class="doc-table__td">选择框超时未选...</td><td class="doc-table__td">选择框编号</td></tr>
-</tbody>
-</table>
-
-<h4>注意事项</h4>
-<ol class="doc-list--content">
-<li><strong>超时：</strong>当选择框的 Duration 耗尽且玩家未点击任何按钮时，事件 559 触发。</li>
-<li><strong>回弹模式：</strong>使用 <code>Bounce</code>（回弹模式）时，每次点击都会触发事件，需用 Duration=-1 防止选择框自动消失。</li>
-</ol>
-</div>
-
-</section>
-
-
-
-<!-- 新增脚本 -->
-
-<section id="sec_scripts">
-<h2 class="doc-heading--secondary">新增 AI 脚本动作</h2>
-<div class="sec-toc">
-<p class="sec-toc__title">目录：</p>
-<ul class="sec-toc__list">
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('scripts_1')" class="sec-toc__link">1. 分布式装载</a></li>
-</ul>
-</div>
-
-<hr class="sec-divider">
-
-<div id="scripts_1">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">1. 分布式装载</h3>
-<p>将小队成员分配到各运输载具中，优先装载距离最近的队员。</p>
-
-<div class="doc-table--action">
-<table class="doc-table">
-<thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
-<tbody>
-<tr><td class="doc-table__td">5500</td><td class="doc-table__td">分布式装载入运输载具</td><td class="doc-table__td">无参数。</td></tr>
-</tbody>
-</table>
-</div>
-
-<h4>说明</h4>
-<ul class="doc-list--content">
-<li>将<strong>合法的</strong>小队成员按距离分配到各载具，全员上车后继续执行下一条脚本。</li>
-<li>不会出现原版脚本 14 的问题：<strong>不会</strong>只认最后一个载具、<strong>不会</strong>不考虑 <code class="doc-code--inline">SizeLimit</code>、<strong>不会</strong>不考虑剩余空间导致卡死。</li>
-</ul>
-
-<h4>分配算法</h4>
-<ol class="doc-list--content">
-<li><strong>SizeLimit 排序：</strong>按 SizeLimit 从小到大排序，小的优先挑选。</li>
-<li><strong>分组轮询：</strong>相同 SizeLimit 的载具为一组，组内轮询分配。一组装满或没合适单位时才轮到下一组。</li>
-<li><strong>同距离选小单位：</strong>距离相同时优先选 Size 更小的单位，最大化装载数量。</li>
-<li><strong>满员载具可当乘客：</strong>已满的载具也会加入候选列表，可登上更大的运输船。</li>
-<li>每帧检查载具周围，若有友方单位堵塞入口则自动散开。</li>
-<li>自动跳过飞行器、已在天上的单位。</li>
-<li>部署状态的单位会自动解除部署后再登车。</li>
-</ol>
-</div>
-
-</section>
-
-
-<!-- 游戏扩展机制 -->
+<!----------------->
+<!-- 新增游戏机制 -->
+<!----------------->
 
 <section id="sec_gameplay">
-<h2 class="doc-heading--secondary">游戏扩展机制</h2>
+<h2 class="doc-heading--secondary">新增游戏机制</h2>
 <div class="sec-toc">
 <p class="sec-toc__title">目录：</p>
 <ul class="sec-toc__list">
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_1')" class="sec-toc__link">1. 超时空武器扩展</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_2')" class="sec-toc__link">2. 自动游猎</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_3')" class="sec-toc__link">3. AI 所属单位目标判定</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_3')" class="sec-toc__link">3. AI单位是否可被选为常规攻击目标</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_4')" class="sec-toc__link">4. 基地节点跨所属方判定</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_5')" class="sec-toc__link">5. 混乱机制</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_6')" class="sec-toc__link">6. 选择框类型配置</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_7')" class="sec-toc__link">7. 按键命令系统</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_5')" class="sec-toc__link">5. 混乱机制扩展</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_6')" class="sec-toc__link">6. 选择框系统</a></li>
 </ul>
 </div>
 
@@ -614,7 +141,7 @@ AutoHunt=                       ; boolean，默认 false</code></pre>
 <li><strong>小队优先：</strong>如果单位在某个小队里，则不会启用逻辑。</li>
 <li><strong>帧间隔：</strong>每个 <code class="doc-code--inline">AutoHunt=yes</code> 的单位每 <code class="doc-code--inline">15</code> 帧执行一次逻辑检查，避免性能浪费。</li>
 <li><strong>载具内无效：</strong>如果单位位于载具内，AutoHunt 逻辑不会生效(离开载具后自动生效)。</li>
-<li><strong>自动解除部署：</strong>如果单位当前处于部署状态，会先尝试解除部署，然后进入 <code class="doc-code--inline">Hunt</code> 状态。</li>
+<li><strong>自动解除部署功能：</strong>如果单位当前处于部署状态，会先尝试解除部署功能，然后进入 <code class="doc-code--inline">Hunt</code> 状态。</li>
 <li><strong>目标可达性检查：</strong>当单位有攻击目标时，会检查目标单元格是否可达。如果不可达，则跳过本次逻辑。</li>
 <li><strong>禁止招募：</strong>单位的 <code class="doc-code--inline">RecruitableA</code> 和 <code class="doc-code--inline">RecruitableB</code> 会强制被设置为<code class="doc-code--inline">false</code>。</li>
 <li><strong>攻击地面修正：</strong>如果单位当前攻击目标是单元格(强制攻击地面)，会自动清除该目标，转为 <code class="doc-code--inline">Hunt</code> 索敌。</li>
@@ -624,13 +151,15 @@ AutoHunt=                       ; boolean，默认 false</code></pre>
 <hr class="sec-divider--double">
 
 <div id="gameplay_3">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">3. AI 所属单位目标判定</h3>
+<h3 class="doc-heading--tertiary" style="margin-top:2em">3. AI单位是否可被选为常规攻击目标</h3>
 <pre class="doc-code--block"><code>[TechnoType]
 LegalTargetWhenAIOwner=             ; boolean，默认 true</code></pre>
 <p>当科技类型的 <code class="doc-code--inline">LegalTargetWhenAIOwner=no</code> 且不由人类玩家控制时，该科技类型不会被其他单位选为普通武器攻击对象。<br>
 (但仍可被 C4 爆破、受到伤害反馈等)</p>
 </div>
+
 <hr class="sec-divider">
+
 <div id="gameplay_4">
 <h3 class="doc-heading--tertiary" style="margin-top:2em">4. 基地节点跨所属方判定</h3>
 <pre class="doc-code--block"><code>[Country House]
@@ -655,21 +184,21 @@ BaseNodeCrossOwners=                  ; boolean，默认 false</code></pre>
 <p><strong>捕获时机：</strong></p>
 <ul class="doc-list--content">
 <li>首次进入本逻辑时，自动将 <code class="doc-code--inline">BaseNodes</code> 中所有有效节点捕获到注册表。此捕获<strong>仅执行一次</strong>。</li>
-<li>后续通过触发动作添加/移除的节点会同步更新注册表。</li>
+<li>后续通过触发行为添加/移除的节点会同步更新注册表。</li>
 </ul>
-<p><strong>与触发动作的联动：</strong></p>
+<p><strong>与触发行为的联动：</strong></p>
 <ul class="doc-list--content">
 <li><code class="doc-code--inline">560</code>(添加基地节点)：添加节点到游戏中的同时加入注册表。</li>
 <li><code class="doc-code--inline">561</code>(移除路径点上的节点)：从游戏中删除的同时从注册表删除。</li>
 <li><code class="doc-code--inline">562</code>(移除指定类型的节点)：从游戏中删除的同时从注册表删除。</li>
-<li>所有通过触发动作添加的节点都会被注册表追踪，不会被 AI 自动生成逻辑覆盖。</li>
+<li>所有通过触发行为添加的节点都会被注册表追踪，不会被 AI 自动生成逻辑覆盖。</li>
 </ul>
 <div class="doc-notice--warning">
 <strong>兼容性说明：</strong>
 <ol style="margin:4px 0 0 18px;line-height:1.8">
-<li><strong>与触发动作 <code class="doc-code--inline--deepColor">30(自动建设基地)</code>不兼容：</strong><br>本功能接管了 AI 的基地节点建造逻辑，强制按注册表顺序和数据依次建造。即使开启自动建设基地模式 AI 也不会更换建筑位置。</li>
+<li><strong>与触发行为 <code class="doc-code--inline--deepColor">30(自动建设基地)</code>不兼容：</strong><br>本功能接管了 AI 的基地节点建造逻辑，强制按注册表顺序和数据依次建造。即使开启自动建设基地模式 AI 也不会更换建筑位置。</li>
 <li><strong>开启时不要让 AI 造围墙：</strong><br>围墙会扰乱控制，可能导致节点队列卡死。请确保 AI 的基地节点中不包含围墙类型。</li>
-<li><strong>动作 <code class="doc-code--inline--deepColor">560</code> 的立即建造参数：</strong><br>当 <code class="doc-code--inline--deepColor">BaseNodeCrossOwners=yes</code> 时，使用 <code class="doc-code--inline--deepColor">立即建造</code> 会将节点插入注册表头部，确保 AI 在下帧优先建造该节点。</li>
+<li><strong>行为 <code class="doc-code--inline--deepColor">560</code> 的立即建造参数：</strong><br>当 <code class="doc-code--inline--deepColor">BaseNodeCrossOwners=yes</code> 时，使用 <code class="doc-code--inline--deepColor">立即建造</code> 会将节点插入注册表头部，确保 AI 在下帧优先建造该节点。</li>
 </ol>
 </div>
 </div>
@@ -677,7 +206,7 @@ BaseNodeCrossOwners=                  ; boolean，默认 false</code></pre>
 <hr class="sec-divider--double">
 
 <div id="gameplay_5">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">5. 混乱机制</h3>
+<h3 class="doc-heading--tertiary" style="margin-top:2em">5. 混乱机制扩展</h3>
 <h4 style="margin-top:1.2em">5.1 混乱恢复设置</h4>
 <pre class="doc-code--block"><code>[General]
 BerzerkRestoreClearTarget=               ; boolean，默认 false</code></pre>
@@ -696,9 +225,9 @@ BerserkReduce=                           ; integer，默认 0</code></pre>
 <hr class="sec-divider--double">
 
 <div id="gameplay_6">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">6. 选择框类型配置</h3>
+<h3 class="doc-heading--tertiary" style="margin-top:2em">6. 选择框系统</h3>
 <p>在 <code class="doc-code--inline">rulesmd.ini</code> 的 <code class="doc-code--inline">[ChoiceBoxTypes]</code> 段中定义选择框的样式和按钮配置，可按需添加任意多个类型。</p>
-<p><a href="javascript:switchPage('actions');setTimeout(function(){scrollToFeature('actions_11')},100)" class="doc-link">→ 查看对应的触发动作</a> <a href="javascript:switchPage('events');setTimeout(function(){scrollToFeature('events_4')},100)" class="doc-link">→ 查看对应的触发事件</a></p>
+<p><a href="javascript:switchPage('actions');setTimeout(function(){scrollToFeature('actions_11')},100)" class="doc-link">→ 查看对应的触发行为</a> <a href="javascript:switchPage('events');setTimeout(function(){scrollToFeature('events_4')},100)" class="doc-link">→ 查看对应的触发事件</a></p>
 <pre class="doc-code--block"><code>[ChoiceBoxTypes]
 0=MyChoiceBox
 ...
@@ -760,7 +289,7 @@ Button.Text3=         ; CSF标签  更多按钮以此类推  (默认无)
 <td class="doc-table__td"><code>Duration</code></td>
 <td class="doc-table__td">
 选择框自动消失的帧数。游戏一般每秒 60 帧。<br>
-<code>-1</code> = 无限显示，需通过触发动作手动清除。
+<code>-1</code> = 无限显示，需通过触发行为手动清除。
 </td>
 </tr>
 <tr>
@@ -835,16 +364,45 @@ Button.Text3=         ; CSF标签  更多按钮以此类推  (默认无)
 </ol>
 </div>
 
+</section>
+
+<!----------------->
+<!-- 新增按键命令 -->
+<!----------------->
+
+<section id="sec_commands">
+<h2 class="doc-heading--secondary">新增按键命令</h2>
+<p>新增自定义按键命令，可在游戏按键设置中绑定快捷键。<br>
+所有命令的名称均可在 CSF 文件中自定义，以便本地化。</p>
+
+<div class="sec-toc">
+<p class="sec-toc__title">目录：</p>
+<ul class="sec-toc__list">
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('commands_csf')" class="sec-toc__link">CSF 自定义名称</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('commands_1')" class="sec-toc__link">1. 自动装载</a></li>
+</ul>
+</div>
+
+<hr class="sec-divider">
+
+<div id="commands_csf">
+<h3 class="doc-heading--tertiary" style="margin-top:2em">CSF 自定义名称</h3>
+<p>可在 CSF 文件中添加以下标签，自定义新增按键在游戏设置界面中显示的文本：</p>
+<table class="doc-table">
+<thead><tr><th class="doc-table__th" style="width:260px">CSF 标签</th><th class="doc-table__th" style="width:100px">说明</th><th class="doc-table__th">默认值</th></tr></thead>
+<tbody>
+<tr><td class="doc-table__td"><code>CMND:UICATEGORY_PHOBOSEXT</code></td><td class="doc-table__td">所属类别</td><td class="doc-table__td">PhobosExt</td></tr>
+<tr><td class="doc-table__td"><code>CMND:UINAME_AUTOLOAD</code></td><td class="doc-table__td">按键名称</td><td class="doc-table__td">自动装载 Auto passengers load</td></tr>
+<tr><td class="doc-table__td"><code>CMND:UIDESCR_AUTOLOAD</code></td><td class="doc-table__td">描述文本</td><td class="doc-table__td">选中空载具按指定按键，自动招募附近单位上车<br>Recruit nearby units to board selected empty transports</td></tr>
+</tbody>
+</table>
+</div>
+
 <hr class="sec-divider--double">
 
-<div id="gameplay_7">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">7. 按键命令系统</h3>
-<p>新增自定义按键命令，可在游戏按键设置中绑定快捷键。</p>
-
-
-
-<h4>7.1 Recruit Passengers</h4>
-<p>选中空载具按 F，自动招募附近单位上车。</p>
+<div id="commands_1">
+<h3 class="doc-heading--tertiary" style="margin-top:2em">1. 自动装载</h3>
+<p>选中空载具按指定按键，自动招募附近单位上车。</p>
 <p>可在 <code class="doc-code--inline">rulemd.ini</code> 里面自定义招募半径。</p>
 <pre class="doc-code--block"><code>[General]
 Command.RecruitRange=             ; double，默认 10.0</code></pre>
@@ -865,8 +423,8 @@ Command.RecruitRange=             ; double，默认 10.0</code></pre>
 
 <p><strong>特殊处理：</strong></p>
 <ul class="doc-list--content">
-<li>自动跳过飞行器、已在天上的单位、以及部署后解除部署会飞行的单位。</li>
-<li>部署状态的单位会自动解除部署后再上车。</li>
+<li>自动跳过飞行器、已在天上的单位、以及部署后解除部署功能会飞行的单位。</li>
+<li>部署状态的单位会自动解除部署功能后再上车。</li>
 <li>与载具在同一格的单位会先散开再上车。</li>
 <li>已在去载具路上的单位会被跳过，避免重复分配。</li>
 <li>每次分配前检查载具格子，若有其他单位堵塞入口则自动散开。</li>
@@ -875,6 +433,500 @@ Command.RecruitRange=             ; double，默认 10.0</code></pre>
 </div>
 
 </section>
+
+<!----------------->
+<!-- 新增触发行为 -->
+<!----------------->
+
+<section id="sec_actions">
+<h2 class="doc-heading--secondary">新增触发行为</h2>
+<div class="sec-toc">
+<p class="sec-toc__title">目录：</p>
+<ul class="sec-toc__list">
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_1')" class="sec-toc__link">1. 文本框系统</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_2')" class="sec-toc__link">2. 动态标签绑定功能</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_3')" class="sec-toc__link">3. 金钱操作功能</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_4')" class="sec-toc__link">4. 基地节点操作功能</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_5')" class="sec-toc__link">5. 单位可招募属性设置</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_6')" class="sec-toc__link">6. 更新建筑动画功能</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_7')" class="sec-toc__link">7. 作战小队操作</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_8')" class="sec-toc__link">8. 脚本操作功能</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_9')" class="sec-toc__link">9. 特遣部队操作功能</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_10')" class="sec-toc__link">10. 解除部署功能</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_11')" class="sec-toc__link">11. 选择框系统</a></li>
+</ul>
+</div>
+
+<hr class="sec-divider">
+
+<div id="actions_1">
+<h3 class="doc-heading--tertiary" style="margin-top:2em">1. 文本框系统</h3>
+<p>在地图路径点或科技类型上绘制自定义文本框，支持预定义样式(TextBoxType)或直接指定参数。</p>
+<p class="doc-paragraph--only-vertical"><strong>特性：</strong></p>
+<ul class="doc-list--content">
+<li>可自定义文本内容、最大显示宽度(像素)、背景不透明度。</li>
+<li>支持预定义样式(TextBoxType)，包括文本颜色和边框颜色(RGB)。</li>
+<li>鼠标移动到文本框上时，文本会暂时停止绘制(避免遮挡操作)。</li>
+<li>单位进入载具(limbo状态)时，文本框会暂时停止绘制，离开载具后自动恢复。</li>
+<li>单位标签支持所有科技类型(TechnoClass，含建筑)。小队相关行为限制为FootClass。</li>
+</ul>
+
+<h4>文本框类型</h4>
+<p>在 <code class="doc-code--inline">rulesmd.ini</code> 的 <code class="doc-code--inline">[TextBoxTypes]</code> 段中定义文本框样式，可按需添加任意多个。</p>
+<pre class="doc-code--block"><code>[TextBoxTypes]
+0=FirstBoxType
+1=YourBoxType
+...
+
+[YourBoxType]
+MaxWidth=                   ;integer - 最大像素宽度(1-1000)，文本超出自动换行，默认250
+BackgroundOpacity=          ;integer - 背景不透明度百分比(0-100)。默认75
+Color=                      ;integer,integer,integer - 文本和边框颜色，RGB格式。默认255,215,0(金色)
+Duration=                   ;integer - 自动移除帧数。默认-1(无限显示)
+</code></pre>
+
+<h4>路径点文本框</h4>
+<p><strong>触发行为说明：</strong></p>
+<ul class="doc-list--content">
+<li><code class="doc-code--inline">549</code> – 在指定路径点绘制文本框(根据类型)...(参数：路径点，TextBoxType)</li>
+<li><code class="doc-code--inline">550</code> – 在指定路径点绘制文本框(根据数据)...(参数：路径点，文本内容，像素宽度，不透明度百分比，文本颜色)</li>
+<li><code class="doc-code--inline">551</code> – 清除指定路径点的文本框...(参数：路径点索引)</li>
+<li><code class="doc-code--inline">552</code> – 清除所有路径点文本框...</li>
+</ul>
+
+<h4>单位文本框</h4>
+<p><strong>触发行为说明：</strong></p>
+<div class="doc-table--action">
+<table class="doc-table">
+<thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
+<tbody>
+<tr><td class="doc-table__td">579</td><td class="doc-table__td">在关联单位上绘制文本框(根据类型)...</td><td class="doc-table__td">CSF标签，文本框类型</td></tr>
+<tr><td class="doc-table__td">580</td><td class="doc-table__td">在关联单位上绘制文本框(根据数据)...</td><td class="doc-table__td">CSF标签，宽度，不透明度，颜色</td></tr>
+<tr><td class="doc-table__td">581</td><td class="doc-table__td">在作战小队成员上绘制文本框(根据类型)...</td><td class="doc-table__td">CSF标签，小队索引，文本框类型</td></tr>
+<tr><td class="doc-table__td">582</td><td class="doc-table__td">在作战小队成员上绘制文本框(根据数据)...</td><td class="doc-table__td">CSF标签，小队索引，宽度，不透明度，颜色</td></tr>
+<tr><td class="doc-table__td">583</td><td class="doc-table__td">清除单位文本框(根据类型)...</td><td class="doc-table__td">文本框类型</td></tr>
+<tr><td class="doc-table__td">584</td><td class="doc-table__td">清除关联单位文本框...</td><td class="doc-table__td">无参数</td></tr>
+<tr><td class="doc-table__td">585</td><td class="doc-table__td">清除单位文本框(根据科技类型)...</td><td class="doc-table__td">科技类型ID</td></tr>
+<tr><td class="doc-table__td">586</td><td class="doc-table__td">清除单位文本框(根据所属方和科技类型)...</td><td class="doc-table__td">科技类型ID，国家索引</td></tr>
+<tr><td class="doc-table__td">587</td><td class="doc-table__td">清除单位文本框(根据作战小队)...</td><td class="doc-table__td">小队索引</td></tr>
+<tr><td class="doc-table__td">588</td><td class="doc-table__td">清除所有单位文本框...</td><td class="doc-table__td">无参数</td></tr>
+<tr><td class="doc-table__td">589</td><td class="doc-table__td">清除所有文本框...</td><td class="doc-table__td">无参数(含路径点)</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>在 <code class="doc-code--inline">[General]</code> 中增加新变量，用来控制文本框在黑幕中是否绘制。</p>
+<pre class="doc-code--block"><code>[General]
+ShowTextBoxInShroud.Waypoint=           ; boolean，默认 true — 路径点文本框在黑幕中是否显示
+ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本框在黑幕中是否显示</code></pre>
+<p><strong>注:</strong> 仅检测路径点格子或单位所在单元格是否被黑幕遮挡, 不检测整个文本框区域。</p>
+<br>
+<p><strong>关于文本框持续时长：</strong></p>
+<ul class="doc-list--content">
+<li>在 <code class="doc-code--inline">[TextBoxTypes]</code> 中设置 <code class="doc-code--inline">Duration=</code> 可控制文本框自动移除的帧数。</li>
+<li><code class="doc-code--inline">Duration=-1</code>（默认）表示无限显示，需通过触发行为手动清除。</li>
+<li>仅通过类型创建时有效；通过数据创建时需由用户手动控制。</li>
+</ul>
+</div>
+
+<hr class="sec-divider--double">
+
+<div id="actions_2">
+<h3 class="doc-heading--tertiary" style="margin-top:2em">2. 动态标签绑定功能</h3>
+<div class="doc-notice--warning">
+<strong>注意!</strong> 触发系统事实上很复杂，需读者了解其组成和运行机制。<br>
+这里默认读者已经具备了相关知识，可以阅读 <code class="doc-code--inline--deepColor">Handama</code> 的 <code class="doc-code--inline--deepColor">触发系统.docx</code> 以了解相关知识。</div>
+<p>允许将游戏中的科技类型实例与标签(Tag)动态关联，便于后续通过触发器执行逻辑。<br>
+若标签不存在/已销毁，则会根据标签类型(TagType)创建一个新标签，确保目标会与标签关联。</p>
+<p class="doc-text--gray">事实上，触发也会在小队创建时实例化，因此行为 <code class="doc-code--inline">553</code> 和 <code class="doc-code--inline">554</code> 实际上可能并没有必要，
+只需要在 <code class="doc-code--inline">作战小队</code> 的 <code class="doc-code--inline">挂载标签</code> 上挂载所需标签即可以实现与该行为类似的效果，但仍保留以备不时之需。<br>
+(写都写了.jpg，不过确实有所不同)</p>
+<h4>触发行为说明</h4>
+<div class="doc-table--action">
+<table class="doc-table">
+<thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
+<tbody>
+<tr><td class="doc-table__td">553</td><td class="doc-table__td">将指定小队全部成员关联到指定标签...</td><td class="doc-table__td">小队索引，标签索引，强制新建标签</td></tr>
+<tr><td class="doc-table__td">554</td><td class="doc-table__td">将指定所属方的指定小队全部成员关联到指定标签...</td><td class="doc-table__td">小队索引，标签索引，所属方国家索引，强制新建标签</td></tr>
+<tr><td class="doc-table__td">555</td><td class="doc-table__td">将特定科技类型全部关联到指定标签...</td><td class="doc-table__td">科技类型ID，标签索引，强制新建标签</td></tr>
+<tr><td class="doc-table__td">556</td><td class="doc-table__td">将指定所属方的特定科技类型全部关联到指定标签...</td><td class="doc-table__td">科技类型ID，标签索引，所属方国家索引，强制新建标签</td></tr>
+<tr><td class="doc-table__td">563</td><td class="doc-table__td">安全地销毁指定标签类型的所有实例...</td><td class="doc-table__td">标签索引</td></tr>
+<tr><td class="doc-table__td">564</td><td class="doc-table__td">为路径点上的指定科技类型绑定标签...</td><td class="doc-table__td">路径点索引，科技类型ID，标签索引，强制新建标签</td></tr>
+<tr><td class="doc-table__td">565</td><td class="doc-table__td">为路径点上指定所属方的指定科技类型绑定标签...</td><td class="doc-table__td">路径点索引，科技类型ID，标签索引，所属方国家索引，强制新建标签</td></tr>
+<tr><td class="doc-table__td">566</td><td class="doc-table__td">为路径点范围内的指定科技类型绑定标签...</td><td class="doc-table__td">路径点索引，科技类型ID，标签索引，范围，强制新建标签</td></tr>
+<tr><td class="doc-table__td">567</td><td class="doc-table__td">为路径点范围内触发所属方的指定科技类型绑定标签...</td><td class="doc-table__td">路径点索引，科技类型ID，标签索引，范围，强制新建标签</td></tr>
+<tr><td class="doc-table__td">568</td><td class="doc-table__td">为路径点范围内的所有科技类型绑定标签...</td><td class="doc-table__td">路径点索引，标签索引，范围，强制新建标签</td></tr>
+<tr><td class="doc-table__td">569</td><td class="doc-table__td">为路径点范围内指定所属方的所有科技类型绑定标签...</td><td class="doc-table__td">路径点索引，所属方国家索引，标签索引，范围，强制新建标签</td></tr>
+<tr><td class="doc-table__td">570</td><td class="doc-table__td">统一指定标签类型的所有实例...</td><td class="doc-table__td">标签索引</td></tr>
+<tr><td class="doc-table__td">572</td><td class="doc-table__td">将路径点范围内除指定类型外的所有科技类型关联到指定标签...</td><td class="doc-table__td">路径点索引，科技类型ID，标签索引，范围，强制新建标签</td></tr>
+<tr><td class="doc-table__td">573</td><td class="doc-table__td">将路径点范围内触发所属方的除指定类型外的所有科技类型关联到指定标签...</td><td class="doc-table__td">路径点索引，科技类型ID，标签索引，范围，强制新建标签</td></tr>
+</tbody>
+</table>
+</div>
+<p><strong>范围</strong>：整数，以单元格为单位的圆形半径 。<br>
+<strong>强制新建标签</strong>：<code class="doc-code--inline">0</code>=使用已有实例，<code class="doc-code--inline">1</code>=强制创建新实例。见下文注意事项第9条。</p>
+
+<h4>注意事项</h4>
+<ol class="doc-list--content">
+<li>使用本组触发时，会更新指定标签的 <code class="doc-code--inline">InstanceCount</code>(引用计数)。</li>
+<li>由本组触发创建的标签可以被原版行为 <code class="doc-code--inline">70</code>(摧毁标签... )安全销毁而不会弹框。</li>
+<li>即使想要绑定的科技类型<strong>正在建造中</strong>，也会被关联到指定标签，但是建筑造出来之前触发不起作用。</li>
+<li>通过本组触发给小队成员关联的标签，在小队解散后标签不会自动消失。</li>
+<li>对于行为 <code class="doc-code--inline">564</code>、<code class="doc-code--inline">565</code>，若科技类型为建筑，则<strong>每一格都会检测，支持 Ares 自定义建筑地基。</strong></li>
+<li>当指定对象已经拥有标签时，新标签会<strong>覆盖</strong>原有标签，并且原有标签的 <code class="doc-code--inline">InstanceCount</code> 会相应更新。</li>
+<li>与常规销毁(行为 <code class="doc-code--inline">70</code>)不同，行为 <code class="doc-code--inline">563</code> <strong>不会导致由小队创建的标签被销毁时弹框崩溃</strong>，因此可安全用于标签的批量清理。</li>
+<li>行为 <code class="doc-code--inline">570</code> 的原理：该行为会强制创建一个<strong>全新</strong>的标签实例，然后将当前所有已经绑定了该标签类型(TagType)的科技对象<strong>全部重新指向</strong>这个新标签，最后销毁原有的所有标签实例。</li>
+<li><strong>强制新建标签参数</strong>：
+<ul class="doc-list--content">
+<li>若为 <code class="doc-code--inline">1</code>(真)，则无论当前是否存在相同标签类型的实例，都会创建一个<strong>全新的标签实例</strong>。(新实例与同类型其他实例独立存在，引擎允许多实例)</li>
+<li>若为 <code class="doc-code--inline">0</code>(假)，则优先寻找游戏内已存在的该标签类型实例，找到则直接使用，找不到才会创建新标签。</li>
+<li>注意：当使用 <code class="doc-code--inline">0</code> 时，若存在多个同类型标签实例，实际绑定到哪一个<strong>不确定</strong>(取决于遍历顺序)，建议在需要明确控制实例时使用 <code class="doc-code--inline">1</code>。</li>
+</ul>
+</li>
+</ol>
+</div>
+
+<hr class="sec-divider--double">
+
+<div id="actions_3">
+<h3 class="doc-heading--tertiary" style="margin-top:2em">3. 金钱操作功能</h3>
+<p>允许动态调整指定所属方的资金数额。</p>
+<p>所有操作均以所属方国家索引作为目标标识，金额单位为游戏内货币单位(即"钱")。</p>
+<p><strong>触发行为说明：</strong></p>
+<ul class="doc-list--content">
+<li><code class="doc-code--inline">557</code> – 为指定所属方添加金钱数额...(参数：所属方国家索引，金额数额)</li>
+<li><code class="doc-code--inline">558</code> – 为指定所属方扣除金钱数额...(参数：所属方国家索引，金额数额)</li>
+<li><code class="doc-code--inline">559</code> – 设置指定所属方的金钱数额...(参数：所属方国家索引，金额数额)</li>
+</ul>
+</div>
+
+<hr class="sec-divider--double">
+
+<div id="actions_4">
+<h3 class="doc-heading--tertiary" style="margin-top:2em">4. 基地节点操作功能</h3>
+<p>允许动态添加或移除指定所属方的AI基地节点。</p>
+<p><strong>触发行为说明：</strong></p>
+<ul class="doc-list--content">
+<li><code class="doc-code--inline">560</code> – 在指定路径点添加基地节点...(参数：所属方国家索引，路径点编号，建筑类型索引，立即建造)</li>
+<li><code class="doc-code--inline">561</code> – 移除指定路径点上的所有基地节点...(参数：所属方国家索引，路径点编号)</li>
+<li><code class="doc-code--inline">562</code> – 移除特定所属方所有指定建筑类型的基地节点...(参数：所属方国家索引，建筑类型索引)</li>
+</ul>
+<h4>注意事项</h4>
+<ol class="doc-list--content">
+<li>对于行为 <code class="doc-code--inline">560</code>，立即建造：<code class="doc-code--inline">0</code>=仅添加到建造队列，<code class="doc-code--inline">1</code>=立即开始建造。为真时AI会立即开始建造指定建筑并清空建筑生产序列。</li>
+<li>对于行为 <code class="doc-code--inline">561</code>,<code class="doc-code--inline">562</code>, 会重置 ai 的建造序列, 如果基地正在建造需要移除的基地节点, 则会强制中断建造。</li>
+</ol>
+</div>
+
+<hr class="sec-divider--double">
+
+<div id="actions_5">
+<h3 class="doc-heading--tertiary" style="margin-top:2em">5. 单位可招募属性设置</h3>
+<p><strong>触发行为说明：</strong></p>
+<ul class="doc-list--content">
+<li><code class="doc-code--inline">571</code> – 设置关联单位的可招募属性... (参数：可招募A，可招募B)</li>
+</ul>
+<p class="doc-paragraph--wrapped"><strong>注意事项：</strong> 只会修改 <code class="doc-code--inline">FootClass</code> 的实例。可招募A对应 <code class="doc-code--inline">RecruitableA</code>，可招募B对应 <code class="doc-code--inline">RecruitableB</code>。</p>
+</div>
+
+<hr class="sec-divider--double">
+
+<div id="actions_6">
+<h3 class="doc-heading--tertiary" style="margin-top:2em">6. AI 更新建筑动画功能</h3>
+<p>更新建筑的动画，用于处理建筑改变所属后动画会停止播放的问题。</p>
+<p>(但遥控坦克的状态仍然不会更新)</p>
+<p><strong>触发行为说明：</strong></p>
+<ul class="doc-list--content">
+<li><code class="doc-code--inline">574</code> – 更新所有建筑的动画...</li>
+<li><code class="doc-code--inline">575</code> – 更新关联建筑的动画...</li>
+<li><code class="doc-code--inline">576</code> – 更新指定所属方所有建筑的动画... (参数：所属方国家索引)</li>
+</ul>
+</div>
+
+<hr class="sec-divider--double">
+
+<div id="actions_7">
+<h3 class="doc-heading--tertiary" style="margin-top:2em">7. 作战小队操作</h3>
+<p><strong>触发行为说明：</strong></p>
+<ul class="doc-list--content">
+<li><code class="doc-code--inline">577</code> – 建立作战小队(考虑限制)... (参数：小队索引，上限限制开关，区域检查开关，连通模式)</li>
+<li><code class="doc-code--inline">578</code> – 将路径点范围内可招募单位加入已存在的作战小队... (参数：小队索引，路径点，范围，仅招募可招募单位)</li>
+<li><code class="doc-code--inline">661</code> – 设置作战小队Max值... (参数：作战小队类型，新的Max值)</li>
+<li><code class="doc-code--inline">678</code> – 将指定分组的单位加入小队... (参数：分组号(0-9,-1=不限)，所属方国家索引，小队索引)</li>
+</ul>
+<br>
+<p><strong>行为 577 (建立作战小队)：</strong></p>
+<ul class="doc-list--content">
+<li><strong>上限限制(参数2)：</strong><code class="doc-code--inline">0</code>=无限制，<code class="doc-code--inline">1</code>=启用上限。若当前实例数已达到"作战小队"里的"最大"值，则不创建。</li>
+<li><strong>区域检查(参数3)：</strong><code class="doc-code--inline">0</code>=不检查，<code class="doc-code--inline">1</code>=启用检查。检测所属方与敌对方之间是否存在区域连通路径，无连接则跳过。</li>
+<li><strong>连通模式(参数4)：</strong>仅在区域检查启用时生效。
+<ul class="doc-list--content">
+<li><code class="doc-code--inline">0</code>：小队内任一兵种可以抵达目的地即可。</li>
+<li><code class="doc-code--inline">1</code>：小队内全部兵种都需要可以抵达目的地才行。</li>
+</ul></li>
+</ul>
+<br>
+<p><strong>行为 578 (招募单位到已有小队)：</strong></p>
+<ul class="doc-list--content">
+<li>将指定路径点指定范围内的所有可招募地面单位(FootClass)加入一个已存在的作战小队实例。</li>
+<li>如果没有该类型的已有实例，则无行为。</li>
+<li>只会招募满足以下条件的单位：属于该小队所属方、未加入其他小队、在路径点指定范围内。</li>
+<li><strong>仅招募可招募单位(参数4)：</strong><code class="doc-code--inline">0</code>=不检查可招募属性，<code class="doc-code--inline">1</code>=仅招募 <code class="doc-code--inline">CanBeRecruited</code> 返回 <code class="doc-code--inline">true</code> 的单位。</li>
+</ul>
+<br>
+<p><strong>行为 661 (设置作战小队Max值)：</strong></p>
+<ul class="doc-list--content">
+<li>修改指定作战小队类型(TeamType)的 <code class="doc-code--inline">Max</code> 属性。</li>
+<li>配合行为 <code class="doc-code--inline">577</code>(建立作战小队(考虑限制)) 的上限限制开关使用，以实现灵活的小队创建控制。</li>
+</ul>
+<br>
+<p><strong>行为 678 (将指定分组的单位加入小队)：</strong></p>
+<ul class="doc-list--content">
+<li>将指定分组(Group)和所属方(House)的所有地面单位(FootClass)加入一个已存在的作战小队实例。</li>
+<li>如果没有该类型的已有实例，则无行为。</li>
+<li>分组号为 <code class="doc-code--inline">-1</code> 时不限制分组（即招募该所属方的所有可用单位）。</li>
+<li>只会招募满足以下条件的单位：属于指定所属方、未加入其他小队、分组号匹配。</li>
+</ul>
+</div>
+
+<hr class="sec-divider--double">
+
+<div id="actions_8">
+<h3 class="doc-heading--tertiary" style="margin-top:2em">8. 脚本操作功能</h3>
+
+<div class="doc-table--action">
+<table class="doc-table">
+<thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
+<tbody>
+<tr><td class="doc-table__td">650</td><td class="doc-table__td">清空指定脚本内容...</td><td class="doc-table__td">脚本类型</td></tr>
+<tr><td class="doc-table__td">651</td><td class="doc-table__td">复制脚本内容...</td><td class="doc-table__td">源脚本类型，目标脚本类型</td></tr>
+<tr><td class="doc-table__td">652</td><td class="doc-table__td">以参数修改脚本行...</td><td class="doc-table__td">脚本类型，行号，行为类型，参数，额外参数</td></tr>
+<tr><td class="doc-table__td">653</td><td class="doc-table__td">以局部变量修改脚本行... <em></em></td><td class="doc-table__td">脚本类型，行号，行为类型(变量索引)，参数(变量索引)，额外参数(变量索引)</td></tr>
+<tr><td class="doc-table__td">654</td><td class="doc-table__td">以全局变量修改脚本行... <em></em></td><td class="doc-table__td">脚本类型，行号，行为类型(变量索引)，参数(变量索引)，额外参数(变量索引)</td></tr>
+<tr><td class="doc-table__td">655</td><td class="doc-table__td">重新指定小队脚本索引...</td><td class="doc-table__td">作战小队类型，目标脚本类型</td></tr>
+<tr><td class="doc-table__td">656</td><td class="doc-table__td">恢复小队脚本索引...</td><td class="doc-table__td">作战小队类型</td></tr>
+<tr><td class="doc-table__td">657</td><td class="doc-table__td">恢复所有小队脚本索引...</td><td class="doc-table__td">无参数</td></tr>
+<tr><td class="doc-table__td">658</td><td class="doc-table__td">恢复脚本内容...</td><td class="doc-table__td">脚本类型</td></tr>
+<tr><td class="doc-table__td">659</td><td class="doc-table__td">恢复所有脚本内容...</td><td class="doc-table__td">无参数</td></tr>
+<tr><td class="doc-table__td">660</td><td class="doc-table__td">将小队脚本执行行号跳转至...</td><td class="doc-table__td">作战小队类型，目标行号(0-based)</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="doc-paragraph--only-vertical"><strong>说明：</strong></p>
+<ul class="doc-list--content">
+<li>行为 650-654 在游戏运行时动态修改脚本类型(ScriptType)的行为内容（即该脚本的各行具体指令）。</li>
+<li>行为 655-657 改变作战小队类型(TeamType)引用的脚本类型（即该小队执行的脚本是哪个），不对脚本内容本身做任何修改。</li>
+<li>行为 658-659 将之前通过 650-654 修改过的脚本内容恢复到 INI 定义的原始状态，不影响小队绑定索引。</li>
+<li>行为 660 将指定作战小队类型的所有实例的脚本执行行号跳转到指定位置(0-based)，不会修改脚本内容或小队绑定。</li>
+<li>以上所有行为执行后，使用该脚本的作战小队会立即重置到第 0 行执行。</li>
+<li><strong>注意：行为 653、654 无法单独使用，需配合 Phobos B49+ 使用。</strong></li>
+</ul>
+</div>
+
+<hr class="sec-divider--double">
+
+<div id="actions_9">
+<h3 class="doc-heading--tertiary" style="margin-top:2em">9. 特遣部队操作功能</h3>
+
+<div class="doc-table--action">
+<table class="doc-table">
+<thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
+<tbody>
+<tr><td class="doc-table__td">670</td><td class="doc-table__td">清空特遣部队内容...</td><td class="doc-table__td">特遣部队</td></tr>
+<tr><td class="doc-table__td">671</td><td class="doc-table__td">复制特遣部队内容...</td><td class="doc-table__td">源特遣部队，目标特遣部队</td></tr>
+<tr><td class="doc-table__td">672</td><td class="doc-table__td">修改特遣部队条目...</td><td class="doc-table__td">科技类型，特遣部队，条目索引(0-5)，数量</td></tr>
+<tr><td class="doc-table__td">673</td><td class="doc-table__td">重新指定小队特遣部队...</td><td class="doc-table__td">作战小队类型，目标特遣部队</td></tr>
+<tr><td class="doc-table__td">674</td><td class="doc-table__td">恢复特遣部队内容...</td><td class="doc-table__td">特遣部队</td></tr>
+<tr><td class="doc-table__td">675</td><td class="doc-table__td">恢复所有特遣部队内容...</td><td class="doc-table__td">无参数</td></tr>
+<tr><td class="doc-table__td">676</td><td class="doc-table__td">恢复小队特遣部队索引...</td><td class="doc-table__td">作战小队类型</td></tr>
+<tr><td class="doc-table__td">677</td><td class="doc-table__td">恢复所有小队特遣部队索引...</td><td class="doc-table__td">无参数</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="doc-paragraph--only-vertical"><strong>说明：</strong></p>
+<ul class="doc-list--content">
+<li><strong>内容</strong>指特遣部队的编制条目；<strong>索引</strong>指作战小队类型绑定了哪个特遣部队。</li>
+<li>所有行为执行后自动刷新活跃小队（重新统计成员、释放超额、更新满编/缺编状态）。</li>
+</ul>
+</div>
+
+<hr class="sec-divider--double">
+
+<div id="actions_10">
+<h3 class="doc-heading--tertiary" style="margin-top:2em">10. 解除部署功能</h3>
+<p><strong>触发行为说明：</strong></p>
+<ul class="doc-list--content">
+<li><code class="doc-code--inline">679</code> – 解除所属方单位部署... (参数：所属方国家索引)</li>
+</ul>
+<p class="doc-paragraph--only-vertical"><strong>说明：</strong></p>
+<ul class="doc-list--content">
+<li><strong>原理:</strong> 设置任务为 <code class="doc-code--inline">Unload</code>。</li>
+<li>仅作用于参数指定的所属方，不影响其他国家的单位。</li>
+</ul>
+</div>
+
+<hr class="sec-divider--double">
+
+<div id="actions_11">
+<h3 class="doc-heading--tertiary" style="margin-top:2em">11. 选择框系统</h3>
+<p>在地图路径点或屏幕百分比位置上创建交互式选择框，支持标题、描述和多个可点击按钮。
+玩家点击按钮后，可通过触发事件检测结果并执行后续行为。</p>
+<p><a href="javascript:switchPage('events');setTimeout(function(){scrollToFeature('events_4')},100)" class="doc-link">→ 查看对应的触发事件</a> <a href="javascript:switchPage('gameplay');setTimeout(function(){scrollToFeature('gameplay_6')},100)" class="doc-link">→ 查看 ini 配置说明</a></p>
+
+<table class="doc-table">
+<thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
+<tbody>
+<tr><td class="doc-table__td">590</td><td class="doc-table__td">在路径点创建选择框...</td><td class="doc-table__td">选择框编号, 路径点, 选择框类型索引</td></tr>
+<tr><td class="doc-table__td">591</td><td class="doc-table__td">在屏幕坐标创建选择框...</td><td class="doc-table__td">选择框编号, 屏幕水平位置, 屏幕垂直位置, 选择框类型索引</td></tr>
+<tr><td class="doc-table__td">592</td><td class="doc-table__td">清除指定编号的选择框...</td><td class="doc-table__td">选择框编号</td></tr>
+<tr><td class="doc-table__td">593</td><td class="doc-table__td">清除所有选择框...</td><td class="doc-table__td">无参数</td></tr>
+</tbody>
+</table>
+
+<h4>注意事项</h4>
+<ol class="doc-list--content">
+<li><strong>选择框编号：</strong>由用户自定义的整数，不同编号可同时显示多个选择框。同编号创建时自动覆盖旧的。</li>
+<li><strong>屏幕坐标：</strong>百分比制（0~100），如 X=50, Y=50 表示屏幕正中央。选择框会自动保持在屏幕视野内。</li>
+</div>
+
+</section>
+
+
+<!----------------->
+<!-- 新增触发事件 -->
+<!----------------->
+
+<section id="sec_events">
+<h2 class="doc-heading--secondary">新增触发事件</h2>
+<div class="sec-toc">
+<p class="sec-toc__title">目录：</p>
+<ul class="sec-toc__list">
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('events_1')" class="sec-toc__link">1. 科技类型坐标检测功能</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('events_2')" class="sec-toc__link">2. 流逝时间(帧)</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('events_3')" class="sec-toc__link">3. 任务计时器检测功能</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('events_4')" class="sec-toc__link">4. 选择框系统</a></li>
+</ul>
+</div>
+
+<hr class="sec-divider">
+
+<div id="events_1">
+<h3 class="doc-heading--tertiary" style="margin-top:2em">1. 科技类型坐标检测功能</h3>
+<p>在指定路径点上或附近距离，检测是否存在触发所属方的科技类型。</p>
+<p><strong>触发事件说明：</strong></p>
+<ul class="doc-list--content">
+<li><code class="doc-code--inline">550</code> – 路径点附近存在所属方的科技类型... (参数：距离，路径点索引)</li>
+<li><code class="doc-code--inline">551</code> – 路径点附近不存在所属方的科技类型... (参数：距离，路径点索引)</li>
+<li><code class="doc-code--inline">552</code> – 路径点上存在所属方的指定科技类型... (参数：路径点索引，科技类型)</li>
+<li><code class="doc-code--inline">553</code> – 路径点上不存在所属方的指定科技类型... (参数：路径点索引，科技类型)</li>
+</ul>
+<p class="doc-paragraph--wrapped"><strong>注意事项：</strong> 对于事件 <code class="doc-code--inline">552</code>,<code class="doc-code--inline">553</code>, 若科技类型为建筑，则<strong>每一格都会检测，支持ares的自定义Foundation。</strong></p>
+</div>
+
+<hr class="sec-divider--double">
+
+<div id="events_2">
+<h3 class="doc-heading--tertiary" style="margin-top:2em">2. 流逝时间(帧)</h3>
+<p>从触发器激活时开始计时，当流逝帧数达到指定值时触发。</p>
+<p><strong>触发事件说明：</strong></p>
+<ul class="doc-list--content">
+<li><code class="doc-code--inline">554</code> – 流逝时间(帧)... (参数：等待帧数)</li>
+</ul>
+</div>
+
+<hr class="sec-divider--double">
+
+<div id="events_3">
+<h3 class="doc-heading--tertiary" style="margin-top:2em">3. 任务计时器检测功能</h3>
+<p>比较任务计时器(MissionTimer)剩余时间与指定秒数。</p>
+<p><strong>触发事件说明：</strong></p>
+<ul class="doc-list--content">
+<li><code class="doc-code--inline">555</code> – 任务计时器大于... (参数：秒数)</li>
+<li><code class="doc-code--inline">556</code> – 任务计时器小于... (参数：秒数)</li>
+</ul>
+</div>
+
+<hr class="sec-divider--double">
+
+<div id="events_4">
+<h3 class="doc-heading--tertiary" style="margin-top:2em">4. 选择框系统</h3>
+<p>当选择框中的按钮被点击或超时未选时触发，需要配合触发行为 590-593 使用。</p>
+<p><a href="javascript:switchPage('actions');setTimeout(function(){scrollToFeature('actions_11')},100)" class="doc-link">→ 查看对应的触发行为</a> <a href="javascript:switchPage('gameplay');setTimeout(function(){scrollToFeature('gameplay_6')},100)" class="doc-link">→ 查看 ini 配置说明</a></p>
+
+<p><strong>触发事件说明：</strong></p>
+<table class="doc-table">
+<thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
+<tbody>
+<tr><td class="doc-table__td">557</td><td class="doc-table__td">选择框指定按钮被点击...</td><td class="doc-table__td">选择框编号, 按钮索引</td></tr>
+<tr><td class="doc-table__td">558</td><td class="doc-table__td">选择框任意按钮被点击...</td><td class="doc-table__td">选择框编号</td></tr>
+<tr><td class="doc-table__td">559</td><td class="doc-table__td">选择框超时未选...</td><td class="doc-table__td">选择框编号</td></tr>
+</tbody>
+</table>
+
+<h4>注意事项</h4>
+<ol class="doc-list--content">
+<li><strong>超时：</strong>当选择框的 Duration 耗尽且玩家未点击任何按钮时，事件 559 触发。</li>
+<li><strong>回弹模式：</strong>使用 <code>Bounce</code>（回弹模式）时，每次点击都会触发事件，需用 Duration=-1 防止选择框自动消失。</li>
+</ol>
+</div>
+
+</section>
+
+
+<!----------------->
+<!---- 新增脚本 ---->
+<!----------------->
+
+<section id="sec_scripts">
+<h2 class="doc-heading--secondary">新增 AI 脚本行为</h2>
+<div class="sec-toc">
+<p class="sec-toc__title">目录：</p>
+<ul class="sec-toc__list">
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('scripts_1')" class="sec-toc__link">1. 分布式装载</a></li>
+</ul>
+</div>
+
+<hr class="sec-divider">
+
+<div id="scripts_1">
+<h3 class="doc-heading--tertiary" style="margin-top:2em">1. 分布式装载</h3>
+<p>将小队成员分配到各运输载具中，优先装载距离最近的队员。</p>
+
+<div class="doc-table--action">
+<table class="doc-table">
+<thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
+<tbody>
+<tr><td class="doc-table__td">5500</td><td class="doc-table__td">分布式装载入运输载具</td><td class="doc-table__td">无参数。</td></tr>
+</tbody>
+</table>
+</div>
+
+<h4>说明</h4>
+<ul class="doc-list--content">
+<li>将<strong>合法的</strong>小队成员按距离分配到各载具，全员上车后继续执行下一条脚本。</li>
+<li>不会出现原版脚本 14 的问题：<strong>不会</strong>只认最后一个载具、<strong>不会</strong>不考虑 <code class="doc-code--inline">SizeLimit</code>、<strong>不会</strong>不考虑剩余空间导致卡死。</li>
+</ul>
+
+<h4>分配算法</h4>
+<ol class="doc-list--content">
+<li><strong>SizeLimit 排序：</strong>按 SizeLimit 从小到大排序，小的优先挑选。</li>
+<li><strong>分组轮询：</strong>相同 SizeLimit 的载具为一组，组内轮询分配。一组装满或没合适单位时才轮到下一组。</li>
+<li><strong>同距离选小单位：</strong>距离相同时优先选 Size 更小的单位，最大化装载数量。</li>
+<li><strong>满员载具可当乘客：</strong>已满的载具也会加入候选列表，可登上更大的运输船。</li>
+<li>每帧检查载具周围，若有友方单位堵塞入口则自动散开。</li>
+<li>自动跳过飞行器、已在天上的单位。</li>
+<li>部署状态的单位会自动解除部署功能后再登车。</li>
+</ol>
+</div>
+
+</section>
+
+
+<!----------------->
+<!-------END------->
+<!----------------->
 
 
 <footer class="doc-footer">
