@@ -66,10 +66,10 @@ void ChoiceBoxTypeClass::LoadFromINI(CCINIClass* pINI)
 	this->BackgroundOpacity.Read(exINI, section, "BackgroundOpacity");
 	this->Duration.Read(exINI, section, "Duration");
 
-	// Button.Count - INI 用点，代码变量用下划线
+	// Button.Count
 	this->Button_Count.Read(exINI, section, "Button.Count");
 
-	// Button.Layout - 枚举字符串 Horizontal/Vertical（兼容 0/1）
+	// Button.Layout - 枚举字符串 Horizontal/Vertical
 	if (pINI->ReadString(section, "Button.Layout", "", Phobos::readBuffer))
 	{
 		const char* layoutStr = Phobos::readBuffer;
@@ -85,7 +85,7 @@ void ChoiceBoxTypeClass::LoadFromINI(CCINIClass* pINI)
 			this->Button_Layout.Read(exINI, section, "Button.Layout");
 	}
 
-	// Button.Mode - 枚举字符串 Normal/Bounce（兼容 0/1）
+	// Button.Mode - 枚举字符串 Normal/Bounce
 	if (pINI->ReadString(section, "Button.Mode", "", Phobos::readBuffer))
 	{
 		const char* modeStr = Phobos::readBuffer;
