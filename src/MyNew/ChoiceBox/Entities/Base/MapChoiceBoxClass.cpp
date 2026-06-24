@@ -21,15 +21,15 @@
 #include <cstdio>
 
 // ========== 布局常量 ==========
-constexpr static const int PADDINGX = 8;          // 背景框水平内边距
-constexpr static const int PADDINGY = 8;          // 背景框垂直内边距
-constexpr static const int LINE_HEIGHT = 18;       // 每行文字高度
-constexpr static const int BUTTON_PADDINGX = 11;   // 按钮内文字水平内边距
-constexpr static const int BUTTON_PADDINGY = 4;    // 按钮内文字垂直内边距
-constexpr static const int BUTTON_SPACING = 10;     // 按钮之间的间距
-constexpr static const int SECTION_SPACING = 4;    // 标题/描述/按钮区块之间的间距
-constexpr static const int BOTTOM_SAFE_HEIGHT = 0; // 底部安全区域（保留）
-constexpr static const int CLICK_EXPIRE_FRAMES = 5;// 隐藏期帧数（Duration 耗尽后保留供 TEvent 检测）
+constexpr static const int PADDINGX = 8;                // 背景框水平内边距
+constexpr static const int PADDINGY = 8;                // 背景框垂直内边距
+constexpr static const int LINE_HEIGHT = 18;            // 每行文字高度
+constexpr static const int BUTTON_PADDINGX = 11;        // 按钮内文字水平内边距
+constexpr static const int BUTTON_PADDINGY = 4;         // 按钮内文字垂直内边距
+constexpr static const int BUTTON_SPACING = 10;         // 按钮之间的间距
+constexpr static const int SECTION_SPACING = 4;         // 标题/描述/按钮区块之间的间距
+constexpr static const int BOTTOM_SAFE_HEIGHT = 0;      // 底部安全区域（保留）
+constexpr static const int CLICK_EXPIRE_FRAMES = 5;     // 隐藏期帧数（Duration 耗尽后保留供 TEvent 检测）
 
 // ========== 按钮布局元数据 ==========
 /**
