@@ -94,10 +94,10 @@ static int TryAssign(
 	// 候选单位信息：用于内部标记分配状态
 	struct UnitInfo
 	{
-		TechnoClass* Unit;
-		int Size;
-		CellStruct Cell;
-		bool Assigned;
+		TechnoClass* Unit;		// 候选单位指针
+		int Size;				// 该单位的 Size（<=0 时视为 1）
+		CellStruct Cell;		// 候选单位所在单元格
+		bool Assigned;			// 是否已被分配给某载具
 	};
 	std::vector<UnitInfo> units;
 
@@ -231,29 +231,38 @@ static int TryAssign(
 
 	return totalRecruited;
 }
-
 // 选中空载具按指定按键，自动招募附近单位上车
-class RecruitPassengersClass : public AresCommandClass
+class AutoPassengersLoad : public AresCommandClass
 {
 public:
 	virtual const char* GetName() const override
 	{
-		return "Recruit Passengers";
+		return "Auto_passengers_load";
 	}
 
 	virtual const wchar_t* GetUIName() const override
 	{
-		return L"自动装载";
+		const wchar_t* textPtr
+			= StringTable::TryFetchString("CMND:UINAME_AUTOLOAD", L"自动装载 Auto passengers load");
+
+		return textPtr;
 	}
 
 	virtual const wchar_t* GetUICategory() const override
 	{
-		return L"PhobosExt";
+		const wchar_t* textPtr
+			= StringTable::TryFetchString("CMND:UICATEGORY_PHOBOSEXT", L"PhobosExt");
+
+		return textPtr;
 	}
 
 	virtual const wchar_t* GetUIDescription() const override
 	{
-		return L"选中空载具按指定按键，自动招募附近单位上车\nRecruit nearby units to board selected empty transports";
+		const wchar_t* textPtr
+			= StringTable::TryFetchString("CMND:UIDESCR_AUTOLOAD"
+				, L"选中空载具按指定按键，自动招募附近单位上车\nRecruit nearby units to board selected empty transports");
+
+		return textPtr;
 	}
 
 	virtual void Execute(WWKey eInput) const override

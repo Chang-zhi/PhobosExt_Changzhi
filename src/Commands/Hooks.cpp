@@ -12,7 +12,7 @@
 /// </summary>
 DEFINE_HOOK(0x533066, CommandClassCallback_Register, 0x6)
 {
-	MakeCommand<RecruitPassengersClass>();
+	MakeCommand<AutoPassengersLoad>();
 
 	return 0;
 }
