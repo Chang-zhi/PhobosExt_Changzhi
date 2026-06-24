@@ -74,9 +74,13 @@ void ChoiceBoxTypeClass::LoadFromINI(CCINIClass* pINI)
 	{
 		const char* layoutStr = Phobos::readBuffer;
 		if (_stricmp(layoutStr, "Vertical") == 0)
-			this->Button_Layout = 1;
+		{
+			this->Button_Layout = ChoiceBoxButtonLayout::Vertical;
+		}
 		else if (_stricmp(layoutStr, "Horizontal") == 0)
-			this->Button_Layout = 0;
+		{
+			this->Button_Layout = ChoiceBoxButtonLayout::Horizontal;
+		}
 		else
 			this->Button_Layout.Read(exINI, section, "Button.Layout");
 	}
@@ -86,9 +90,13 @@ void ChoiceBoxTypeClass::LoadFromINI(CCINIClass* pINI)
 	{
 		const char* modeStr = Phobos::readBuffer;
 		if (_stricmp(modeStr, "Bounce") == 0)
-			this->Button_Mode = 1;
+		{
+			this->Button_Mode = ChoiceBoxButtonMode::Bounce;
+		}
 		else if (_stricmp(modeStr, "Normal") == 0)
-			this->Button_Mode = 0;
+		{
+			this->Button_Mode = ChoiceBoxButtonMode::Normal;
+		}
 		else
 			this->Button_Mode.Read(exINI, section, "Button.Mode");
 	}
