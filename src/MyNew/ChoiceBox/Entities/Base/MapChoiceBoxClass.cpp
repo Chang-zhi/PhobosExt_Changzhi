@@ -37,11 +37,11 @@ constexpr static const int CLICK_EXPIRE_FRAMES = 5;     // 隐藏期帧数（Dur
  */
 struct MapChoiceBoxClass::BtnLayoutItem
 {
-	int Index;                               ///< 按钮索引
-	std::wstring Text;                       ///< 解析后的宽字符串文本
-	std::vector<std::wstring> TextLines;     ///< 按钮内换行后的各行文字
-	int Width;                               ///< 按钮宽度（固定或自动）
-	int Height;                              ///< 按钮高度（固定或自动撑高）
+	int Index;                               // 按钮索引
+	std::wstring Text;                       // 解析后的宽字符串文本
+	std::vector<std::wstring> TextLines;     // 按钮内换行后的各行文字
+	int Width;                               // 按钮宽度（固定或自动）
+	int Height;                              // 按钮高度（固定或自动撑高）
 };
 
 // 全局数组
