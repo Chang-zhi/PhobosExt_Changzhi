@@ -1178,7 +1178,7 @@ bool TActionExt::RecruitNearbyFootToTeam(TActionClass* pThis, HouseClass* pHouse
 
 	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
 	if (cell.X < 0 || cell.Y < 0) return false;
-\
+
 
 	for (FootClass* pFoot : FootClass::Array)
 	{
