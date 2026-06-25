@@ -65,6 +65,15 @@ static void ScatterFriendlyCell(
 			continue;
 		if (whitelist.count(pTech))
 			continue;
+		// 正在前往该载具的单位不散开（避免打断登车流程）
+		if (transportRoot)
+		{
+			if (FootClass* pFoot = abstract_cast<FootClass*>(pTech))
+			{
+				if (pFoot->Destination == transportRoot)
+					continue;
+			}
+		}
 		pTech->Scatter(pTech->GetCoords(), true, false);
 	}
 }

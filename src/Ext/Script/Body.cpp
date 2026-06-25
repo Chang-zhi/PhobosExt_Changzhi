@@ -63,6 +63,15 @@ static void ScatterBlockersOnCell(CellStruct cell, HouseClass* owner, TechnoClas
 			continue;
 		if (pBlocking->Transporter)
 			continue;
+		// 正在前往该载具的单位不散开（避免打断登车流程）
+		if (exclude)
+		{
+			if (FootClass* pFoot = generic_cast<FootClass*>(pBlocking))
+			{
+				if (pFoot->Destination == exclude)
+					continue;
+			}
+		}
 		pBlocking->Scatter(pBlocking->GetCoords(), true, false);
 	}
 }
