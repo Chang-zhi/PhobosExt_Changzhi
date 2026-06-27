@@ -120,6 +120,20 @@ std::optional<bool> TEventExt::Execute(TEventClass* pThis, int iEvent, HouseClas
 	case PhobosTriggerEvent::ChoiceBoxTimedOut:
 		return TEventExt::ChoiceBoxTimedOutFunc(pThis, pHouse);
 
+	case PhobosTriggerEvent::HousePowerOutputMuch:
+		return TEventExt::PowerHander(pThis, pHouse, PowerEventMode::Output, true);
+	case PhobosTriggerEvent::HousePowerOutputLess:
+		return TEventExt::PowerHander(pThis, pHouse, PowerEventMode::Output, false);
+	case PhobosTriggerEvent::HousePowerDrainMuch:
+		return TEventExt::PowerHander(pThis, pHouse, PowerEventMode::Drain, true);
+	case PhobosTriggerEvent::HousePowerDrainLess:
+		return TEventExt::PowerHander(pThis, pHouse, PowerEventMode::Drain, false);
+	case PhobosTriggerEvent::HousePowerSurplusMuch:
+		return TEventExt::PowerHander(pThis, pHouse, PowerEventMode::Surplus, true);
+	case PhobosTriggerEvent::HousePowerSurplusLess:
+		return TEventExt::PowerHander(pThis, pHouse, PowerEventMode::Surplus, false);
+
+
 	default:
 		return std::nullopt;
 	};
@@ -239,7 +253,6 @@ bool TEventExt::MissionTimerLessFunc(TEventClass* pThis)
 
 // ============================================================================
 // 557: ChoiceBox 指定按钮被点击
-// Value = 选择框 ID, String = 按钮索引（0-based 字符串）
 // ============================================================================
 bool TEventExt::ChoiceBoxButtonClickedFunc(TEventClass* pThis, HouseClass* pHouse)
 {
@@ -305,6 +318,32 @@ bool TEventExt::ChoiceBoxTimedOutFunc(TEventClass* pThis, HouseClass* pHouse)
 	//	targetID, pBox->IsExpired);
 
 	return pBox->IsExpired;
+}
+
+bool TEventExt::PowerHander(TEventClass* pThis, HouseClass* pHouse, PowerEventMode mode, bool isMuch)
+{
+	if (!pHouse) return false;
+	if (Unsorted::CurrentFrame == 0) return false;
+
+	int val = pThis->Value;
+	int target = 0;
+
+	switch (mode)
+	{
+	case PowerEventMode::Output:
+		target = pHouse->PowerOutput;
+		break;
+	case PowerEventMode::Drain:
+		target = pHouse->PowerDrain;
+		break;
+	case PowerEventMode::Surplus:
+		target = pHouse->PowerOutput - pHouse->PowerDrain;
+		break;
+	default:
+		break;
+	}
+
+	return isMuch ? (val < target) : (val > target);
 }
 
 // =============================
