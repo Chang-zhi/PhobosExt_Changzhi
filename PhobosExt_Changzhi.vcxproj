@@ -25,6 +25,8 @@
     <ClCompile Include="src\Ext\Rules\Body.cpp" />
     <ClCompile Include="src\Ext\Script\Body.cpp" />
     <ClCompile Include="src\Ext\Script\Hooks.cpp" />
+    <ClCompile Include="src\Ext\Script\MyNew\FootPathVisualizer.cpp" />
+    <ClCompile Include="src\Ext\Script\MyNew\Hooks.FootPathVisualizer.cpp" />
     <ClCompile Include="src\Ext\TAction\Body.cpp" />
     <ClCompile Include="src\Ext\TAction\Hooks.cpp" />
     <ClCompile Include="src\Ext\TAction\MyNew\Helper.cpp" />
