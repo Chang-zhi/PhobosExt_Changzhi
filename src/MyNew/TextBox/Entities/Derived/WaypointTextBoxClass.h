@@ -19,15 +19,6 @@ class PhobosStreamWriter;
 class PhobosStreamReader;
 class TextBoxTypeClass;
 
-/**
- * @brief 路径点文本框（绑定到地图路径点）
- *
- * 在地图路径点（Waypoint）所在位置绘制文本框。
- * 支持：
- *   - 路径点不存在或索引无效时不绘制
- *   - 黑幕遮挡检测
- *   - 颜色枚举快速转换（供触发动作数据参数使用）
- */
 class WaypointTextBoxClass final : public MapTextBoxClass
 {
 public:

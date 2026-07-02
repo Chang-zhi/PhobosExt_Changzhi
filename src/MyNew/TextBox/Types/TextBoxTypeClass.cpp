@@ -9,12 +9,6 @@
 
 #include <cstdio>
 
-/**
- * @brief 指定 TextBoxType 在 INI 中的主段名
- *
- * Enumerable 模板通过此函数确定该类型从哪个 INI 段中读取。
- * 对应 rulesmd.ini 中的 [TextBoxTypes] 段。
- */
 template<>
 const char* Enumerable<TextBoxTypeClass>::GetMainSection()
 {
@@ -22,16 +16,6 @@ const char* Enumerable<TextBoxTypeClass>::GetMainSection()
 }
 
 // ========== INI 加载 ==========
-
-/**
- * @brief 从 INI 文件中加载文本框类型配置
- *
- * 从以类型名为段名的节中读取以下字段：
- *   - MaxWidth           : 最大像素宽度
- *   - BackgroundOpacity  : 背景不透明度
- *   - Duration           : 自动移除帧数
- *   - Color=R,G,B        : 文本和边框颜色（RGB 格式，逗号分隔）
- */
 void TextBoxTypeClass::LoadFromINI(CCINIClass* pINI)
 {
 	const char* section = this->Name;
@@ -60,12 +44,6 @@ void TextBoxTypeClass::LoadFromINI(CCINIClass* pINI)
 }
 
 // ========== 序列化模板 ==========
-
-/**
- * @brief 序列化核心模板
- *
- * 持久化所有样式字段，确保存/读档时文本框外观一致。
- */
 template <typename T>
 void TextBoxTypeClass::Serialize(T& Stm)
 {

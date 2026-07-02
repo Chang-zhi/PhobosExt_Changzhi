@@ -32,9 +32,6 @@ constexpr static const int BOTTOM_SAFE_HEIGHT = 0;      // 底部安全区域（
 constexpr static const int CLICK_EXPIRE_FRAMES = 5;     // 隐藏期帧数（Duration 耗尽后保留供 TEvent 检测）
 
 // ========== 按钮布局元数据 ==========
-/**
- * @brief 单个按钮的布局信息（每帧在 DrawAt 中计算）
- */
 struct MapChoiceBoxClass::BtnLayoutItem
 {
 	int Index;                               // 按钮索引
@@ -74,16 +71,6 @@ MapChoiceBoxClass::MapChoiceBoxClass(int id, const char* label, const ChoiceBoxT
 }
 
 // ========== 获取 CSF 文本工具函数 ==========
-
-/**
- * @brief 从 CSF 标签名获取本地化文本
- *
- * 与 TextBox 相同的策略：先用 StringTable::TryFetchString 查找 CSF 翻译，
- * 若找不到（CSF 标签不存在或为空），则将标签名本身作为显示文本。
- *
- * @param csfLabel CSF 标签名（如 "MSG:MyText"）
- * @return 宽字符串文本
- */
 static std::wstring GetCSFText(const char* csfLabel)
 {
 	if (!csfLabel || csfLabel[0] == '\0')
@@ -103,17 +90,6 @@ static std::wstring GetCSFText(const char* csfLabel)
 }
 
 // ========== 自动换行（与 TextBox 相同算法） ==========
-
-/**
- * @brief 对宽字符串进行自动换行处理
- *
- * 逐字累加测量宽度，超过 maxWidth 时换行。
- * \n 或 \r\n 强制换行，控制字符（除 \t 外）被过滤。
- *
- * @param text     输入的宽字符串
- * @param maxWidth 单行最大像素宽度
- * @return          换行后的字符串数组
- */
 static std::vector<std::wstring> WrapText(const wchar_t* text, int maxWidth)
 {
 	if (!text || wcslen(text) == 0 || maxWidth <= 0)
@@ -176,13 +152,6 @@ void MapChoiceBoxClass::ResetChoice()
 	this->ClickedIndex = -1;
 }
 
-/**
- * @brief 检测鼠标左键点击
- *
- * 使用 Windows GetAsyncKeyState 检测左键按下状态。
- * 遍历缓存的按钮区域，检查鼠标位置是否落在某个按钮上。
- * 通过静态变量跟踪上一帧的左键状态，检测"按下"事件而非"按住"状态。
- */
 bool MapChoiceBoxClass::CheckMouseClick()
 {
 	if (this->ClickedIndex >= 0)
@@ -219,24 +188,6 @@ bool MapChoiceBoxClass::CheckMouseClick()
 }
 
 // ========== 绘制 ==========
-
-/**
- * @brief 在指定屏幕坐标绘制选择框
- *
- * 绘制流程：
- *   1) 计算标题、描述文本尺寸（支持自动换行）
- *   2) 测量每个按钮尺寸（固定/自动宽，固定/自动高）
- *   3) 执行布局（横向折行/纵向排列）
- *   4) 确定背景框尺寸
- *   5) 屏幕钳制 + 底部裁剪
- *   6) 绘制半透明背景 + 边框
- *   7) 绘制标题（可选居中）
- *   8) 绘制描述
- *   9) 绘制所有按钮（多行、多行内文字居中）
- *
- * @param centerPos 选择框中心定位点（屏幕像素坐标）
- */
-
 void MapChoiceBoxClass::DrawAt(Point2D centerPos)
 {
 	if (!DSurface::Composite || !TacticalClass::Instance)
@@ -841,15 +792,6 @@ void MapChoiceBoxClass::UpdateButtonRects(Point2D topLeft, int bgWidth, int butt
 }
 
 // ========== 序列化 ==========
-
-/**
- * @brief 基类字段序列化
- *
- * 序列化 ID, Label, TypeIndex（用于重建 Type 指针），
- * 以及点击/过期状态字段。
- * 注意：ClickExpireCounter 是隐藏期计时器，与 ClickedIndex 配合使用。
- */
-
 template <typename T>
 bool MapChoiceBoxClass::Serialize(T& Stm)
 {
@@ -918,18 +860,6 @@ MapChoiceBoxClass* MapChoiceBoxClass::FindByID(int id)
 }
 
 // ========== 内部绘制逻辑（共享给 DrawAll/DrawWaypoint/DrawScreen） ==========
-
-/**
- * @brief 绘制一组选择框并处理点击和过期
- *
- * 每帧三个顺序处理阶段：
- *   1) 绘制 + 检测点击（仅记录 ClickedIndex）
- *   2) 隐藏期倒计时（ClickExpireCounter 递减，归零后终结/回弹）
- *   3) Duration 递减（归零后停止显示，已点击的启动隐藏期，未点击的超时）
- *
- * @tparam T 派生类类型（WaypointChoiceBoxClass 或 ScreenChoiceBoxClass）
- * @param boxes 要绘制和更新的实例列表
- */
 template <typename T>
 static void DrawChoiceBoxList(std::vector<std::shared_ptr<T>>& boxes)
 {

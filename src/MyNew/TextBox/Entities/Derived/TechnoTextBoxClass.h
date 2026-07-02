@@ -12,17 +12,6 @@
 class PhobosStreamWriter;
 class PhobosStreamReader;
 
-/**
- * @brief 单位文本框（绑定到 TechnoClass 实例）
- *
- * 跟踪一个 TechnoClass（单位/建筑）并在其头顶绘制文本框。
- * 支持：
- *   - 跟随目标移动
- *   - 进入载具 (InLimbo) 时隐藏
- *   - 单位被摧毁后自动清理
- *   - 黑幕遮挡检测
- *   - 按类型/触发/小队等多种条件批量移除
- */
 class TechnoTextBoxClass final : public MapTextBoxClass
 {
 public:

@@ -26,7 +26,6 @@ WaypointChoiceBoxClass::WaypointChoiceBoxClass(int id, int wpIndex, const char* 
 }
 
 // ========== 虚接口实现 ==========
-
 bool WaypointChoiceBoxClass::CanDraw() const
 {
 	if (this->WaypointIndex < 0)
@@ -85,7 +84,6 @@ WaypointChoiceBoxClass* WaypointChoiceBoxClass::FindOrCreate(int id, int wpIndex
 }
 
 // ========== 移除 ==========
-
 void WaypointChoiceBoxClass::Remove(int wpIndex)
 {
 	auto it = std::find_if(Array.begin(), Array.end(),

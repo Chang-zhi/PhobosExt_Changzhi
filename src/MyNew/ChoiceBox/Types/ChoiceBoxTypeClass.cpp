@@ -9,12 +9,6 @@
 
 #include <cstdio>
 
-/**
- * @brief 指定 ChoiceBoxType 在 INI 中的主段名
- *
- * Enumerable 模板通过此函数确定该类型从哪个 INI 段中读取。
- * 对应 rulesmd.ini 中的 [ChoiceBoxTypes] 段。
- */
 template<>
 const char* Enumerable<ChoiceBoxTypeClass>::GetMainSection()
 {
@@ -22,7 +16,6 @@ const char* Enumerable<ChoiceBoxTypeClass>::GetMainSection()
 }
 
 // ========== ChoiceBoxButton 序列化 ==========
-
 bool ChoiceBoxButton::Load(PhobosStreamReader& Stm, bool RegisterForChange)
 {
 	return Stm.Process(this->Text, RegisterForChange).Success();
@@ -34,20 +27,6 @@ bool ChoiceBoxButton::Save(PhobosStreamWriter& Stm) const
 }
 
 // ========== INI 加载 ==========
-
-/**
- * @brief 从 INI 文件中加载选择框类型配置
- *
- * 读取字段（[TypeName] 段下）：
- *   - Title / Title.Center     : 标题
- *   - Description               : 描述
- *   - MaxWidth                  : 文本最大宽度
- *   - BackgroundOpacity         : 背景不透明度
- *   - Duration                  : 显示时长
- *   - Button.Count / .Layout(Horizontal/Vertical) / .Mode / .Width / .Height : 按钮配置
- *   - Button.Text1~N            : 各按钮文字
- *   - Color=R,G,B               : 文字和边框颜色
- */
 void ChoiceBoxTypeClass::LoadFromINI(CCINIClass* pINI)
 {
 	const char* section = this->Name;
@@ -139,7 +118,6 @@ void ChoiceBoxTypeClass::LoadFromINI(CCINIClass* pINI)
 }
 
 // ========== 序列化模板 ==========
-
 template <typename T>
 void ChoiceBoxTypeClass::Serialize(T& Stm)
 {

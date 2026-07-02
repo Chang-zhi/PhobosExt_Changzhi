@@ -16,29 +16,19 @@
 
 #include <Ext/Rules/Body.h>
 
-// 前向声明：通过 UID 在 TechnoClass::Array 中查找目标指针
-static TechnoClass* ResolveTargetByUID(DWORD uid);
-
 #include <algorithm>
 #include <memory>
+
+static TechnoClass* ResolveTargetByUID(DWORD uid);
 
 // ===== 静态成员 =====
 std::vector<std::shared_ptr<TechnoTextBoxClass>> TechnoTextBoxClass::Array;
 
 // ========== 构造 ==========
-
-/**
- * @brief 构造函数
- *
- * 根据样式类型名查找 TextBoxTypeClass 并复制样式参数。
- * 若类型不存在，仅记录标签内容并发出警告。
- *
- * @param pTarget  绑定的目标 TechnoClass 指针
- * @param csfLabel CSF 标签名
- * @param typeName 引用的样式类型名
- */
-TechnoTextBoxClass::TechnoTextBoxClass(TechnoClass* pTarget, const char* csfLabel,
-							   const char* typeName)
+TechnoTextBoxClass::TechnoTextBoxClass(
+	TechnoClass* pTarget,
+	const char* csfLabel,
+	const char* typeName)
 	: Target(pTarget)
 {
 	const TextBoxTypeClass* pType = TextBoxTypeClass::Find(typeName);
@@ -62,16 +52,6 @@ TechnoTextBoxClass::TechnoTextBoxClass(TechnoClass* pTarget, const char* csfLabe
 }
 
 // ========== 虚接口实现 ==========
-
-/**
- * @brief 判断单位文本框是否允许绘制
- *
- * 以下情况不绘制：
- *   - 目标指针为空（尝试通过 SavedTargetUID 重建后仍为空）
- *   - 目标处于载具中 (InLimbo)
- *   - 目标已被摧毁 (Health <= 0)
- *   - 目标所在格子被黑幕遮挡（且配置允许黑幕遮挡控制）
- */
 bool TechnoTextBoxClass::CanDraw() const
 {
 	// 读档后指针为空但 SavedTargetUID 有效时，尝试重建指针
@@ -100,14 +80,6 @@ bool TechnoTextBoxClass::CanDraw() const
 	return true;
 }
 
-/**
- * @brief 获取单位文本框的屏幕绘制位置
- *
- * 将目标的 3D 世界坐标转换为 2D 屏幕坐标。
- *
- * @param outPos [out] 屏幕坐标输出
- * @return       转换成功返回 true
- */
 bool TechnoTextBoxClass::GetDrawPosition(Point2D& outPos) const
 {
 	if (!TacticalClass::Instance || !this->Target)
@@ -118,10 +90,6 @@ bool TechnoTextBoxClass::GetDrawPosition(Point2D& outPos) const
 }
 
 // ========== 查找/创建 ==========
-
-/**
- * @brief 按目标查找现有文本框
- */
 TechnoTextBoxClass* TechnoTextBoxClass::Find(TechnoClass* pTarget)
 {
 	auto it = std::find_if(Array.begin(), Array.end(),
@@ -131,12 +99,6 @@ TechnoTextBoxClass* TechnoTextBoxClass::Find(TechnoClass* pTarget)
 	return (it != Array.end()) ? it->get() : nullptr;
 }
 
-/**
- * @brief 查找或创建单位文本框
- *
- * 如果目标已有文本框则更新其内容和样式，否则创建新的实例。
- * 新实例会同时加入派生类 Array 和基类 Array。
- */
 TechnoTextBoxClass* TechnoTextBoxClass::FindOrCreate(TechnoClass* pTarget,
 	const char* csfLabel, const char* typeName)
 {
@@ -182,10 +144,6 @@ TechnoTextBoxClass* TechnoTextBoxClass::FindOrCreate(TechnoClass* pTarget,
 }
 
 // ========== 移除（按不同条件） ==========
-
-/**
- * @brief 移除指定目标的文本框
- */
 void TechnoTextBoxClass::Remove(TechnoClass* pTarget)
 {
 	if (!pTarget) return;
@@ -214,12 +172,6 @@ void TechnoTextBoxClass::Remove(TechnoClass* pTarget)
 		baseArray.erase(baseIt);
 }
 
-/**
- * @brief 按样式类型索引移除文本框
- *
- * 通过比较样式参数（MaxWidth、Opacity、Color）来匹配类型，
- * 而非直接通过类型名匹配。
- */
 void TechnoTextBoxClass::RemoveByType(int typeIndex)
 {
 	if (typeIndex < 0 || static_cast<size_t>(typeIndex) >= TextBoxTypeClass::Array.size())
@@ -263,11 +215,6 @@ void TechnoTextBoxClass::RemoveByType(int typeIndex)
 	}
 }
 
-/**
- * @brief 移除关联指定触发的单位的文本框
- *
- * 检查单位上绑定的 Tag 是否包含该触发。
- */
 void TechnoTextBoxClass::RemoveByTrigger(TriggerClass* pTrigger)
 {
 	auto it = Array.begin();
@@ -301,11 +248,6 @@ void TechnoTextBoxClass::RemoveByTrigger(TriggerClass* pTrigger)
 	}
 }
 
-/**
- * @brief 移除指定作战小队中所有单位的文本框
- *
- * @param teamIndex 小队索引（内部拼成 "0" + index 格式与 TeamType ID 比较）
- */
 void TechnoTextBoxClass::RemoveByTeam(int teamIndex)
 {
 	std::string teamID = "0" + std::to_string(teamIndex);
@@ -343,12 +285,6 @@ void TechnoTextBoxClass::RemoveByTeam(int teamIndex)
 }
 
 // ========== 全局清理 ==========
-
-/**
- * @brief 清空所有单位文本框
- *
- * 同时从基类 Array 和派生类 Array 中移除所有实例。
- */
 void TechnoTextBoxClass::ClearAll()
 {
 	auto& baseArray = MapTextBoxClass::Array;
@@ -374,13 +310,6 @@ void TechnoTextBoxClass::Clear()
 	ClearAll();
 }
 
-/**
- * @brief 清理已摧毁单位的残留标签
- *
- * 每帧由 DrawAll 调用。
- * 尝试通过 SavedTargetUID 重建已失效的指针，
- * 若 Target 仍然无效或 Health <= 0 则移除该标签。
- */
 void TechnoTextBoxClass::CleanupDeadLabels()
 {
 	auto it = Array.begin();
@@ -414,14 +343,6 @@ void TechnoTextBoxClass::CleanupDeadLabels()
 	}
 }
 
-/**
- * @brief 按 UniqueID 在 TechnoClass::Array 中查找目标
- *
- * 用于读档后重建 Target 指针。
- *
- * @param uid 目标的 UniqueID
- * @return 找到的 TechnoClass 指针，未找到返回 nullptr
- */
 static TechnoClass* ResolveTargetByUID(DWORD uid)
 {
 	if (uid == 0) return nullptr;
@@ -435,12 +356,6 @@ static TechnoClass* ResolveTargetByUID(DWORD uid)
 
 // ========== 序列化 ==========
 
-/**
- * @brief 序列化核心模板
- *
- * 持久化所有样式字段。注意 Target 指针本身不序列化，
- * 而是由 Save/Load 方法单独处理 SavedTargetUID。
- */
 template <typename T>
 bool TechnoTextBoxClass::Serialize(T& Stm)
 {
@@ -455,12 +370,6 @@ bool TechnoTextBoxClass::Serialize(T& Stm)
 		.Success();
 }
 
-/**
- * @brief 保存到存档流
- *
- * 将目标的 UniqueID 写入流（而非直接保存指针），
- * 读档时通过 UID 重建指针。
- */
 bool TechnoTextBoxClass::Save(PhobosStreamWriter& Stm) const
 {
 	DWORD uid = this->Target ? this->Target->UniqueID : 0;
@@ -468,12 +377,6 @@ bool TechnoTextBoxClass::Save(PhobosStreamWriter& Stm) const
 	return const_cast<TechnoTextBoxClass*>(this)->Serialize(Stm);
 }
 
-/**
- * @brief 从存档流加载
- *
- * 读取保存的 UniqueID 后，立即通过 ResolveTargetByUID
- * 尝试重建 Target 指针。
- */
 bool TechnoTextBoxClass::Load(PhobosStreamReader& Stm, bool RegisterForChange)
 {
 	Stm.Process(this->SavedTargetUID);

@@ -11,17 +11,6 @@
 class PhobosStreamWriter;
 class PhobosStreamReader;
 
-/**
- * @brief 文本框基类
- *
- * 提供在地图上绘制半透明背景 + 文字标签的核心能力。
- * 包含自动换行、缓存布局、鼠标悬停暂停、底部裁剪等特性。
- *
- * 派生类需实现：
- *   - GetDrawPosition()  — 确定文本框在屏幕上的绘制位置
- *   - GetTypeMarker()    — 返回类型标识字符串（用于序列化）
- *   - CanDraw()          — （可选）控制是否允许绘制
- */
 class MapTextBoxClass
 {
 public:
@@ -81,12 +70,7 @@ protected:
 	bool Serialize(T& Stm);
 
 private:
-	/**
-	 * @brief 内部缓存结构
-	 *
-	 * 记录换行后的每行文字和背景框尺寸，
-	 * 避免每帧重复计算布局。
-	 */
+
 	struct Cache
 	{
 		bool IsLayoutDirty { true };                // 是否需要重新计算布局
