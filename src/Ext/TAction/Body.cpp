@@ -16,6 +16,7 @@
 #include <Ext/Script/MyNew/FootPathVisualizer.h>
 #include <ArrayClasses.h>
 #include <MessageListClass.h>
+#include <ScenarioClass.h>
 
 #include <Utilities/SavegameDef.h>
 #include <Utilities/SpawnerHelper.h>
@@ -31,6 +32,7 @@
 #include <set>
 #include <vector>
 #include <string>
+#include <cstring>
 #include <Unsorted.h>
 
 //Static init
@@ -196,8 +198,26 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 	case PhobosTriggerAction::UnregisterFootPathVisualizer:
 		return TActionExt::UnregisterFootPathVisualizer(pThis, pHouse, pObject, pTrigger, location);
 
+	// ---- 任务简报 / 最佳时间 Actions ----
+	// case PhobosTriggerAction::SetMissionBriefing:
+	// 	return TActionExt::SetMissionBriefing(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::SetOverParTitle:
+		return TActionExt::SetOverParTitle(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::SetOverParMessage:
+		return TActionExt::SetOverParMessage(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::SetUnderParTitle:
+		return TActionExt::SetUnderParTitle(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::SetUnderParMessage:
+		return TActionExt::SetUnderParMessage(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::SetParTimeEasy:
+		return TActionExt::SetParTimeEasy(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::SetParTimeMedium:
+		return TActionExt::SetParTimeMedium(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::SetParTimeDifficult:
+		return TActionExt::SetParTimeDifficult(pThis, pHouse, pObject, pTrigger, location);
 
-		// ---- TaskForce Editing Actions ----
+
+	// ---- TaskForce Editing Actions ----
 	case PhobosTriggerAction::ClearTaskForce:
 		return TActionExt::ClearTaskForce(pThis, pHouse, pObject, pTrigger, location);
 	case PhobosTriggerAction::CopyTaskForce:
@@ -264,7 +284,7 @@ bool TActionExt::SetWaypointTextBoxByData(TActionClass* pThis, HouseClass* pHous
 
 	if (wpIndex >= 0 && csfLabel && csfLabel[0])
 	{
-		// 动态生成一个类型名(保证每个路径点独�?后续触发可更�?
+		// 动态生成一个类型名(保证每个路径点独立，后续触发可更改)
 		char typeName[64];
 		sprintf_s(typeName, "__AutoWPLabel_%d", wpIndex);
 
@@ -379,7 +399,7 @@ bool TActionExt::BindAllTechnoTypeToTag(TActionClass* pThis, HouseClass* pHouse,
 	TagClass* pTagClass = GetTagClassByIndex(tagIndex, forceNew);
 	if (!pTagClass) return false;
 
-	// 遍历 TechnoClass, 尝试�?TagClass 绑定�?TechnoClass �?
+	// 遍历 TechnoClass, 尝试将 TagClass 绑定到 TechnoClass 上
 	for (auto const pTechno : TechnoClass::Array)
 	{
 		if (pTechno->get_ID() == std::string(techno))
@@ -405,7 +425,7 @@ bool TActionExt::BindOwnerTechnoTypeToTag(TActionClass* pThis, HouseClass* pHous
 	HouseClass* pOwner = HouseClass::FindByCountryIndex(houseIndex);
 	if (!pOwner) return false;
 
-	// 遍历 TechnoClass, 尝试�?TagClass 绑定�?TechnoClass �?
+	// 遍历 TechnoClass, 尝试将 TagClass 绑定到 TechnoClass 上
 	for (auto const pTechno : TechnoClass::Array)
 	{
 		if (pTechno->Owner == pOwner)
@@ -528,12 +548,12 @@ bool TActionExt::AddBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseClass* 
 		nodes.Items[0] = newNode;
 		++nodes.Count;
 	}
-	// ===== 直接加就�? 不管他什么时�?====
+	// ===== 直接加就好了, 不管他什么时候====
 	else
 		pOwner->Base.BaseNodes.AddItem(newNode);
 
 	// 将此节点加入授权列表，防止被自动清理
-	// forceAtFront 时插入到授权列表头部, 确保优先�?
+	// forceAtFront 时插入到授权列表头部, 确保优先级
 	HouseExt::AuthorizeBaseNode(pOwner, buildTypeIndex, cell.X, cell.Y, forceAtFront);
 
 	return true;
@@ -564,9 +584,9 @@ bool TActionExt::RemoveAllBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseC
 	}
 
 	if (indicesToRemove.empty())
-		return true; // 无节点需要删�?
+		return true; // 无节点需要删除
 
-	// 2. 清理工厂生产队列(仅影响被删除节点相关的建筑类�?
+	// 2. 清理工厂生产队列(仅影响被删除节点相关的建筑类型)
 	for (int buildTypeIndex : uniqueBuildingTypes)
 	{
 		if (buildTypeIndex < 0 || buildTypeIndex >= BuildingTypeClass::Array.Count)
@@ -599,7 +619,7 @@ bool TActionExt::RemoveAllBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseC
 		pOwner->Base.BaseNodes.RemoveItem(*it);
 	}
 
-	// 同步删除授权注册表中的条�?
+	// 同步删除授权注册表中的条目
 	HouseExt::RemoveAuthorizedNodeByCoord(pOwner, cell.X, cell.Y);
 
 	return true;
@@ -607,7 +627,7 @@ bool TActionExt::RemoveAllBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseC
 
 bool TActionExt::RemoveBaseNodesOfBuildingTypeForHouse(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {
-	// AI 真好�?
+	// AI 真好用
 	const int houseIndex = pThis->Param3;
 	const int buildTypeIndex = pThis->Param4;
 
@@ -660,7 +680,7 @@ bool TActionExt::RemoveBaseNodesOfBuildingTypeForHouse(TActionClass* pThis, Hous
 		pOwner->Base.BaseNodes.RemoveItem(*it);
 	}
 
-	// 同步删除授权注册表中的条�?
+	// 同步删除授权注册表中的条目
 	HouseExt::RemoveAuthorizedNodeByType(pOwner, buildTypeIndex);
 
 	return true;
@@ -704,7 +724,7 @@ bool TActionExt::BindTagToTechnoTypeAtWaypoint(TActionClass* pThis, HouseClass* 
 	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
 	if (cell.X < 0 || cell.Y < 0) return false;
 
-	// 遍历 TechnoClass, 尝试�?TagClass 绑定�?TechnoClass �?
+	// 遍历 TechnoClass, 尝试将 TagClass 绑定到 TechnoClass 上
 	for (TechnoClass* const pTechno : TechnoClass::Array)
 	{
 		if (pTechno && pTechno->get_ID() == std::string(techno))
@@ -748,7 +768,7 @@ bool TActionExt::BindTagToTechnoTypeOfHouseAtWaypoint(TActionClass* pThis, House
 	HouseClass* pOwner = HouseClass::FindByCountryIndex(houseIndex);
 	if (!pOwner) return false;
 
-	// 遍历 TechnoClass, 尝试�?TagClass 绑定�?TechnoClass �?
+	// 遍历 TechnoClass, 尝试将 TagClass 绑定到 TechnoClass 上
 	for (auto const pTechno : TechnoClass::Array)
 	{
 		if (pTechno
@@ -793,7 +813,7 @@ bool TActionExt::BindTagToSpecificTechnoTypeWithinWaypointRange(TActionClass* pT
 	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
 	if (cell.X < 0 || cell.Y < 0) return false;
 
-	// 遍历 TechnoClass, 尝试�?TagClass 绑定�?TechnoClass �?
+	// 遍历 TechnoClass, 尝试将 TagClass 绑定到 TechnoClass 上
 	for (TechnoClass* pTechno : TechnoClass::Array)
 	{
 		if (pTechno && pTechno->get_ID() == std::string(techno))
@@ -824,7 +844,7 @@ bool TActionExt::BindTagToSpecificTechnoTypeOfSpecificOwnerWithinWaypointRange(T
 	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
 	if (cell.X < 0 || cell.Y < 0) return false;
 
-	// 遍历 TechnoClass, 尝试�?TagClass 绑定�?TechnoClass �?
+	// 遍历 TechnoClass, 尝试将 TagClass 绑定到 TechnoClass 上
 	for (TechnoClass* pTechno : TechnoClass::Array)
 	{
 		if (pTechno
@@ -859,7 +879,7 @@ bool TActionExt::BindTagToAllTechnoTypesWithinWaypointRange(TActionClass* pThis,
 	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
 	if (cell.X < 0 || cell.Y < 0) return false;
 
-	// 遍历 TechnoClass, 尝试�?TagClass 绑定�?TechnoClass �?
+	// 遍历 TechnoClass, 尝试将 TagClass 绑定到 TechnoClass 上
 	for (TechnoClass* pTechno : TechnoClass::Array)
 	{
 		if (IsTechnoNearCell(pTechno, cell, range))
@@ -893,7 +913,7 @@ bool TActionExt::BindTagToAllTechnoTypesOfSpecificOwnerWithinWaypointRange(TActi
 	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
 	if (cell.X < 0 || cell.Y < 0) return false;
 
-	// 遍历 TechnoClass, 尝试�?TagClass 绑定�?TechnoClass �?
+	// 遍历 TechnoClass, 尝试将 TagClass 绑定到 TechnoClass 上
 	for (TechnoClass *pTechno : TechnoClass::Array)
 	{
 		if(pOwner == pTechno->Owner)
@@ -969,7 +989,7 @@ bool TActionExt::BindTagsToAllTechTypesInWaypointRangeExceptSpecified
 	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
 	if (cell.X < 0 || cell.Y < 0) return false;
 
-	// 遍历 TechnoClass, 尝试�?TagClass 绑定�?TechnoClass �?
+	// 遍历 TechnoClass, 尝试将 TagClass 绑定到 TechnoClass 上
 	for (TechnoClass* pTechno : TechnoClass::Array)
 	{
 		if (!pTechno)
@@ -1005,7 +1025,7 @@ bool TActionExt::BindTagsToAllTechTypesOfTriggerOwnerInWaypointRangeExceptSpecif
 	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
 	if (cell.X < 0 || cell.Y < 0) return false;
 
-	// 遍历 TechnoClass, 尝试�?TagClass 绑定�?TechnoClass �?
+	// 遍历 TechnoClass, 尝试将 TagClass 绑定到 TechnoClass 上
 	for (TechnoClass* pTechno : TechnoClass::Array)
 	{
 		if (pTechno && pHouse == pTechno->Owner)
@@ -1465,14 +1485,12 @@ bool TActionExt::ModifyScriptByParam(TActionClass* pThis, HouseClass* pHouse, Ob
 	return true;
 }
 
-// 暂时不可�? 需要等我的pr通过
 bool TActionExt::ModifyScriptByLocalVar(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {
 	ScriptManipulator::ModifyScriptByLocalVar(pThis);
 	return true;
 }
 
-// 暂时不可�? 需要等我的pr通过
 bool TActionExt::ModifyScriptByGlobalVar(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {
 	ScriptManipulator::ModifyScriptByGlobalVar(pThis);
@@ -1559,6 +1577,114 @@ bool TActionExt::UnregisterFootPathVisualizer(TActionClass* pThis, HouseClass* p
 		if (pFoot && pFoot->AttachedTag && pFoot->AttachedTag->ContainsTrigger(pTrigger))
 			FootPathVisualizer::Unregister(pFoot);
 	}
+	return true;
+}
+
+// =============================
+// 664-668: 任务简报 / 超时按时标题与信息
+
+// 手动限界拷贝 char 字符串(保证 \0 结尾)
+static void CopyActionText(char* dest, size_t destSize, const char* text)
+{
+	if (!dest || destSize == 0)
+		return;
+
+	if (!text)
+	{
+		dest[0] = '\0';
+		return;
+	}
+
+	size_t i = 0;
+	while (text[i] && i + 1 < destSize)
+	{
+		dest[i] = text[i];
+		++i;
+	}
+	dest[i] = '\0';
+}
+
+// 手动限界拷贝宽字符字符串(保证 L'\0' 结尾)
+static void CopyActionTextW(wchar_t* dest, size_t destSize, const wchar_t* text)
+{
+	if (!dest || destSize == 0)
+		return;
+
+	if (!text)
+	{
+		dest[0] = L'\0';
+		return;
+	}
+
+	size_t i = 0;
+	while (text[i] && i + 1 < destSize)
+	{
+		dest[i] = text[i];
+		++i;
+	}
+	dest[i] = L'\0';
+}
+
+/*
+bool TActionExt::SetMissionBriefing(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	ScenarioClass* pScenario = ScenarioClass::Instance;
+	if (!pScenario)
+		return false;
+
+	const char* label = pThis->Text;
+
+	Debug::Log(L"[TAction] SetMissionBriefing: label=%hs\n", label ? label : "(null)");
+
+	CopyActionText(pScenario->BriefingCSF, sizeof(pScenario->BriefingCSF), label);
+
+	const wchar_t* text = StringTable::TryFetchString(label, L"");
+
+	Debug::Log(L"[TAction] SetMissionBriefing: csfKey=%hs, text=%ls\n", label ? label : "(null)", text ? text : L"(null)");
+
+	CopyActionTextW(pScenario->Briefing, sizeof(pScenario->Briefing) / sizeof(wchar_t), text);
+
+	return true;
+}
+*/
+
+bool TActionExt::SetOverParTitle(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	ScenarioClass* pScenario = ScenarioClass::Instance;
+	if (!pScenario)
+		return false;
+
+	CopyActionText(pScenario->OverParTitle, sizeof(pScenario->OverParTitle), pThis->Text);
+	return true;
+}
+
+bool TActionExt::SetOverParMessage(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	ScenarioClass* pScenario = ScenarioClass::Instance;
+	if (!pScenario)
+		return false;
+
+	CopyActionText(pScenario->OverParMessage, sizeof(pScenario->OverParMessage), pThis->Text);
+	return true;
+}
+
+bool TActionExt::SetUnderParTitle(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	ScenarioClass* pScenario = ScenarioClass::Instance;
+	if (!pScenario)
+		return false;
+
+	CopyActionText(pScenario->UnderParTitle, sizeof(pScenario->UnderParTitle), pThis->Text);
+	return true;
+}
+
+bool TActionExt::SetUnderParMessage(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	ScenarioClass* pScenario = ScenarioClass::Instance;
+	if (!pScenario)
+		return false;
+
+	CopyActionText(pScenario->UnderParMessage, sizeof(pScenario->UnderParMessage), pThis->Text);
 	return true;
 }
 
@@ -1686,6 +1812,48 @@ bool TActionExt::UndeployHouseUnits(TActionClass* pThis, HouseClass* pHouse, Obj
 		}
 	}
 
+	return true;
+}
+
+bool TActionExt::SetParTimeEasy(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	ScenarioClass* pScenario = ScenarioClass::Instance;
+	if (!pScenario)
+		return false;
+
+	const int value = pThis->Param3;
+	if (value < 0) // 负数表示不修改
+		return true;
+
+	pScenario->ParTimeEasy = value * 60;
+	return true;
+}
+
+bool TActionExt::SetParTimeMedium(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	ScenarioClass* pScenario = ScenarioClass::Instance;
+	if (!pScenario)
+		return false;
+
+	const int value = pThis->Param3;
+	if (value < 0) // 负数表示不修改
+		return true;
+
+	pScenario->ParTimeMedium = value * 60;
+	return true;
+}
+
+bool TActionExt::SetParTimeDifficult(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	ScenarioClass* pScenario = ScenarioClass::Instance;
+	if (!pScenario)
+		return false;
+
+	const int value = pThis->Param3;
+	if (value < 0) // 负数表示不修改
+		return true;
+
+	pScenario->ParTimeDifficult = value * 60;
 	return true;
 }
 
@@ -1819,15 +1987,18 @@ bool TActionExt::ClearAllChoiceBoxs(TActionClass* pThis, HouseClass* pHouse, Obj
 
 bool TActionExt::testAction(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {
-	int valIndex = pThis->Param3;
-	int targetVal = pThis->Param4;
-	bool isGlobal = (pThis->Param5 != 0);
-	bool isChange = (pThis->Param6 != 0);
+	ScenarioClass* pScenario = ScenarioClass::Instance;
+	if (!pScenario)
+		return false;
 
-	if (isChange)
-		testChangeVar(isGlobal, valIndex, targetVal);
-	else
-		testReadVar(isGlobal, valIndex);
+	Debug::Log(L"[testAction]: ParTimeEasy=%d, ParTimeMedium=%d, ParTimeDifficult=%d\n"
+		L"  UnderParTitle = %hs, UnderParMessage = %hs\n"
+		L"  OverParTitle = %hs, OverParMessage = %hs\n"
+		L"  BriefingCSF = %hs\n  Briefing = %ls\n",
+		pScenario->ParTimeEasy, pScenario->ParTimeMedium, pScenario->ParTimeDifficult,
+		pScenario->UnderParTitle, pScenario->UnderParMessage,
+		pScenario->OverParTitle, pScenario->OverParMessage,
+		pScenario->BriefingCSF, pScenario->Briefing);
 
 	return true;
 }

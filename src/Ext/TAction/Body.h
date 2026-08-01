@@ -11,7 +11,7 @@ class HouseClass;
 
 enum class PhobosTriggerAction : unsigned int
 {
-	// 指定类型设置路径点标�?新式)
+	// 指定类型设置路径点标签
 	SetWaypointTextBoxByType = 549,
 
 	// 在指定路径点绘制文本...
@@ -29,10 +29,10 @@ enum class PhobosTriggerAction : unsigned int
 	// 将指定所属方的指定小队全部成员关联到指定标签...
 	BindOwnerTeamMemberToTag = 554,
 
-	// 将特定科技类型全部关联到指定标�?..
+	// 将特定科技类型全部关联到指定标签...
 	BindAllTechnoTypeToTag = 555,
 
-	// 将指定所属方的特定科技类型全部关联到指定标�?..
+	// 将指定所属方的特定科技类型全部关联到指定标签...
 	BindOwnerTechnoTypeToTag = 556,
 
 	// 为指定所属方添加金钱数额...
@@ -41,19 +41,19 @@ enum class PhobosTriggerAction : unsigned int
 	// 为向指定所属方扣除金钱数额...
 	TakeHouseMoney = 558,
 
-	// 设置指定所属方的金钱数�?..
+	// 设置指定所属方的金钱数额...
 	SetHouseMoney = 559,
 
-	// 在指定路径点添加指定所属方的基地节�?..
+	// 在指定路径点添加指定所属方的基地节点...
 	AddBaseNodeForHouseAtWaypoint = 560,
 
-	// 移除指定路径点的指定所属方的所有基地节�?..
+	// 移除指定路径点的指定所属方的所有基地节点...
 	RemoveAllBaseNodeForHouseAtWaypoint = 561,
 
-	// 移除指定所属方的指定建筑类型的所有基地节�?..
+	// 移除指定所属方的指定建筑类型的所有基地节点...
 	RemoveBaseNodesOfBuildingTypeForHouse = 562,
 
-	// 安全地销毁标�?..
+	// 安全地销毁标签...
 	DestroyAllTagByTagTypeSafely = 563,
 
 	// 为路径点上的科技类型绑定标签...
@@ -65,7 +65,7 @@ enum class PhobosTriggerAction : unsigned int
 	// 为路径点范围内的指定科技类型绑定标签...
 	BindTagToSpecificTechnoTypeWithinWaypointRange = 566,
 
-	// 将路径点范围内触发所属方的指定科技类型关联到指定标�?..
+	// 将路径点范围内触发所属方的指定科技类型关联到指定标签...
 	BindTagToSpecificTechnoTypeOfSpecificOwnerWithinWaypointRange = 567,
 
 	// 为路径点范围内的所有科技类型绑定标签...
@@ -74,10 +74,10 @@ enum class PhobosTriggerAction : unsigned int
 	// 为路径点范围内指定所属方的所有科技类型绑定标签...
 	BindTagToAllTechnoTypesOfSpecificOwnerWithinWaypointRange = 569,
 
-	// 统一指定标签类型的所有实�?
+	// 统一指定标签类型的所有实例
 	UnifyAllInstancesOfSameTagType = 570,
 
-	// 设置关联单位单位的可招募属�?..
+	// 设置关联单位单位的可招募属性...
 	SetRecruitableForFoot = 571,
 
 	// 为路径点范围内除指定类型外的所有科技类型绑定标签...
@@ -89,7 +89,7 @@ enum class PhobosTriggerAction : unsigned int
 	// 更新所有建筑的动画
 	UpdateAllBuildingAnims = 574,
 
-	// 更新关联建筑的动�?
+	// 更新关联建筑的动画
 	UpdateAssociatedBuildingsAnims = 575,
 
 	// 更新指定所属方所有建筑的动画
@@ -113,7 +113,7 @@ enum class PhobosTriggerAction : unsigned int
 	// 在指定小队所有单位上绘制文本(根据数据)...
 	SetUnitTextBoxByTeamData = 582,
 
-	// 移除指定类型的所有文�?..
+	// 移除指定类型的所有文本...
 	ClearUnitTextBoxByType = 583,
 
 	// 移除关联单位上的文本...
@@ -125,106 +125,129 @@ enum class PhobosTriggerAction : unsigned int
 	// 移除指定所属方的指定科技类型上的文本...
 	ClearUnitTextBoxByHouseAndType = 586,
 
-	// 移除指定小队类型的所有单位上的文�?..
+	// 移除指定小队类型的所有单位上的文本...
 	ClearUnitTextBoxByTeam = 587,
 
-	// 移除所有单位上的文�?..
+	// 移除所有单位上的文本...
 	ClearAllUnitTextBoxs = 588,
 
-	// 移除所有文�?含路径点)...
+	// 移除所有文本(含路径点)...
 	ClearAllTextBoxs = 589,
 
 	// ---- ChoiceBox Actions (590-599) ----
 
-	// 在路径点创建选择框（根据类型�?..
+	// 在路径点创建选择框（根据类型）...
 	SetWaypointChoiceBox = 590,
 
-	// 在屏幕坐标创建选择框（根据类型�?..
+	// 在屏幕坐标创建选择框（根据类型）...
 	SetScreenChoiceBox = 591,
 
-	// 清除指定标签的选择�?..
+	// 清除指定标签的选择框...
 	ClearChoiceBoxByLabel = 592,
 
-	// 清除所有选择�?..
+	// 清除所有选择框...
 	ClearAllChoiceBoxs = 593,
 
 	// ---- Script Manipulation Actions (650-659) ----
 
-	// 清空指定脚本的内�?
+	// 清空指定脚本的内容
 	ClearScript = 650,
 
-	// 复制源脚本的内容到目标脚�?
+	// 复制源脚本的内容到目标脚本
 	CopyScript = 651,
 
-	// 以直接参数修改指定脚本的指定�?
+	// 以直接参数修改指定脚本的指定行
 	ModifyScriptByParam = 652,
 
-	// 以局部变量修改指定脚本的指定�?
+	// 以局部变量修改指定脚本的指定行
 	ModifyScriptByLocalVar = 653,
 
 	// 以全局变量修改指定脚本的指定行
 	ModifyScriptByGlobalVar = 654,
 
-	// 重新指定作战小队类型绑定的脚�?
+	// 重新指定作战小队类型绑定的脚本
 	RebindTeamTypeScript = 655,
 
-	// 恢复作战小队类型绑定的脚本索引到初始状�?
+	// 恢复作战小队类型绑定的脚本索引到初始状态
 	ResetTeamTypeScript = 656,
 
-	// 恢复所有作战小队类型绑定的脚本索引到初始状�?
+	// 恢复所有作战小队类型绑定的脚本索引到初始状态
 	ResetAllTeamTypeScripts = 657,
 
-	// 恢复指定脚本的内容到初始状�?
+	// 恢复指定脚本的内容到初始状态
 	RestoreScriptContent = 658,
 
-	// 恢复所有脚本的内容到初始状�?
+	// 恢复所有脚本的内容到初始状态
 	RestoreAllScriptContents = 659,
 
-	// 将指定作战小队类型的所有实例的脚本执行行号调整�?
+	// 将指定作战小队类型的所有实例的脚本执行行号跳转到指定位置
 	SeekTeamTypeScript = 660,
 
-	// 修改指定作战小队类型�?Max �?
+	// 修改指定作战小队类型的 Max 值
 	SetTeamTypeMaxValue = 661,
 
-	// 绘制关联单位的移动路�?
+	// 绘制关联单位的移动路径
 	RegisterFootPathVisualizer = 662,
 
-	// 停止绘制关联单位的移动路�?
+	// 停止绘制关联单位的移动路径
 	UnregisterFootPathVisualizer = 663,
+
+	// SetMissionBriefing = 664,
+
+	// 设置超时标题
+	SetOverParTitle = 665,
+
+	// 设置超时信息
+	SetOverParMessage = 666,
+
+	// 设置按时标题
+	SetUnderParTitle = 667,
+
+	// 设置按时信息
+	SetUnderParMessage = 668,
 
 	// ---- TaskForce Editing Actions (670-677) ----
 
-	// 清空指定作战小队类型的所有内�?
+	// 清空指定作战小队类型的所有内容
 	ClearTaskForce = 670,
 
-	// 复制源作战小队类型的内容到目标作战小队类�?
+	// 复制源作战小队类型的内容到目标作战小队类型
 	CopyTaskForce = 671,
 
-	// 修改指定作战小队类型的指定条�?
+	// 修改指定作战小队类型的指定条目
 	ModifyTaskForceEntry = 672,
 
-	// 重新指定作战小队类型绑定的特遣部�?
+	// 重新指定作战小队类型绑定的特遣部队
 	RebindTeamTypeTaskForce = 673,
 
-	// 恢复指定作战小队类型的内容到初始状�?
+	// 恢复指定作战小队类型的内容到初始状态
 	RestoreTaskForce = 674,
 
-	// 恢复所有作战小队类型的内容到初始状�?
+	// 恢复所有作战小队类型的内容到初始状态
 	RestoreAllTaskForces = 675,
 
-	// 恢复指定作战小队类型绑定的特遣部队到初始状�?
+	// 恢复指定作战小队类型绑定的特遣部队到初始状态
 	ResetTeamTypeTaskForce = 676,
 
-	// 恢复所有作战小队类型绑定的特遣部队到初始状�?
+	// 恢复所有作战小队类型绑定的特遣部队到初始状态
 	ResetAllTeamTypeTaskForces = 677,
 
-	// 将指定分组的指定所属方的所有单位加入指定小队类�?
+	// 将指定分组的指定所属方的所有单位加入指定小队类型
 	RecruitGroupToTeam = 678,
 
-	// 解除指定所属方所有已部署的单�?
+	// 解除指定所属方所有已部署的单位
 	UndeployHouseUnits = 679,
 
-	// 测试�?
+	// 设置简单难度最佳时间
+	SetParTimeEasy = 669,
+
+	// 设置普通难度最佳时间
+	SetParTimeMedium = 680,
+
+	// 设置困难难度最佳时间
+	SetParTimeDifficult = 681,
+
+	// 测试用
 	testAction = 1150,
 };
 
@@ -339,7 +362,17 @@ static bool name(TActionClass* pThis, HouseClass* pHouse, \
 	ACTION_FUNC(RegisterFootPathVisualizer);
 	ACTION_FUNC(UnregisterFootPathVisualizer);
 
-	// 测试�?
+	// ---- 任务简报 / 最佳时间 Actions ----
+	// ACTION_FUNC(SetMissionBriefing);
+	ACTION_FUNC(SetOverParTitle);
+	ACTION_FUNC(SetOverParMessage);
+	ACTION_FUNC(SetUnderParTitle);
+	ACTION_FUNC(SetUnderParMessage);
+	ACTION_FUNC(SetParTimeEasy);
+	ACTION_FUNC(SetParTimeMedium);
+	ACTION_FUNC(SetParTimeDifficult);
+
+	// 测试用
 	ACTION_FUNC(testAction);
 
 
