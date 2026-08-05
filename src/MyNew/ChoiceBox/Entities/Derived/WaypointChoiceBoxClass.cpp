@@ -11,6 +11,7 @@
 #include <Utilities/Stream.h>
 
 #include <algorithm>
+#include <cstring>
 #include <memory>
 
 // ===== 静态数组定义 =====
@@ -147,6 +148,14 @@ void WaypointChoiceBoxClass::RemoveByID(int id)
 
 void WaypointChoiceBoxClass::ClearAll()
 {
+	// 同步从基类数组中移除本类所有实例，避免基类数组残留（内存泄漏 + 事件误命中）
+	// 注：项目关闭了 RTTI，故用 GetTypeMarker() 识别派生类型
+	auto& baseArray = MapChoiceBoxClass::Array;
+	baseArray.erase(std::remove_if(baseArray.begin(), baseArray.end(),
+		[](const std::shared_ptr<MapChoiceBoxClass>& pBase) {
+			return pBase && std::strcmp(pBase->GetTypeMarker(), "WaypointChoiceBoxClass") == 0;
+		}), baseArray.end());
+
 	Array.clear();
 }
 
@@ -160,13 +169,9 @@ void WaypointChoiceBoxClass::Clear()
 template <typename T>
 bool WaypointChoiceBoxClass::Serialize(T& Stm)
 {
+	// 仅序列化本类独有的字段；公共字段由基类 MapChoiceBoxClass::Serialize 统一处理
 	return Stm
-		.Process(this->ID)
-		.Process(this->Label)
 		.Process(this->WaypointIndex)
-		.Process(this->ClickedIndex)
-		.Process(this->RemainingFrames)
-		.Process(this->IsExpired)
 		.Success();
 }
 

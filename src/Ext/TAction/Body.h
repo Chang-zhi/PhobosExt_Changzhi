@@ -142,8 +142,8 @@ enum class PhobosTriggerAction : unsigned int
 	// 在屏幕坐标创建选择框（根据类型）...
 	SetScreenChoiceBox = 591,
 
-	// 清除指定标签的选择框...
-	ClearChoiceBoxByLabel = 592,
+	// 清除指定编号的选择框...
+	ClearChoiceBoxByID = 592,
 
 	// 清除所有选择框...
 	ClearAllChoiceBoxs = 593,
@@ -329,7 +329,7 @@ static bool name(TActionClass* pThis, HouseClass* pHouse, \
 	// ---- ChoiceBox Actions ----
 	ACTION_FUNC(SetWaypointChoiceBox);
 	ACTION_FUNC(SetScreenChoiceBox);
-	ACTION_FUNC(ClearChoiceBoxByLabel);
+	ACTION_FUNC(ClearChoiceBoxByID);
 	ACTION_FUNC(ClearAllChoiceBoxs);
 
 	// ---- Script Manipulation Actions ----

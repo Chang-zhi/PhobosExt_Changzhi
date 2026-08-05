@@ -21,11 +21,18 @@ public:
 	const ChoiceBoxTypeClass* Type { nullptr };
 	int TypeIndex { -1 };
 
+	// 超时标记：ClickedIndex == TIMEOUT_MARKER 表示选择框因 Duration 耗尽而超时（区别于点击）
+	static constexpr int TIMEOUT_MARKER = -2;
+
 	int ClickedIndex { -1 };
 	bool ClickedConsumed { false };
 	int RemainingFrames { -1 };
 	int ClickExpireCounter { -1 };
+	int ExpiredCounter { -1 };        // 已销毁实例的宽限清理倒计时（防止长期累积）
 	bool IsExpired { false };
+
+	// 是否为"超时未选"状态（Duration 耗尽且从未点击）
+	bool IsTimedOut() const { return this->IsExpired && this->ClickedIndex == TIMEOUT_MARKER; }
 
 	// 禁止拷贝
 	MapChoiceBoxClass(const MapChoiceBoxClass&) = delete;
@@ -82,7 +89,7 @@ private:
 		int Index;
 		RectangleStruct Rect;
 	};
-	std::vector<ButtonRect> m_buttonRects;
+	mutable std::vector<ButtonRect> m_buttonRects;  // 绘制时更新，故为 mutable
 
 	void UpdateButtonRects(Point2D topLeft, int bgWidth, int buttonsStartY,
 		const std::vector<BtnLayoutItem>& btnItems);

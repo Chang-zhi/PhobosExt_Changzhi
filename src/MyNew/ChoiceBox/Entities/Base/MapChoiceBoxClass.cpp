@@ -9,6 +9,7 @@
 #include <Drawing.h>
 #include <TacticalClass.h>
 #include <WWMouseClass.h>
+#include <Unsorted.h>
 
 #include <Utilities/Stream.h>
 #include <Utilities/Debug.h>
@@ -29,7 +30,8 @@ constexpr static const int BUTTON_PADDINGY = 4;         // 按钮内文字垂直
 constexpr static const int BUTTON_SPACING = 10;         // 按钮之间的间距
 constexpr static const int SECTION_SPACING = 4;         // 标题/描述/按钮区块之间的间距
 constexpr static const int BOTTOM_SAFE_HEIGHT = 0;      // 底部安全区域（保留）
-constexpr static const int CLICK_EXPIRE_FRAMES = 5;     // 隐藏期帧数（Duration 耗尽后保留供 TEvent 检测）
+constexpr static const int CLICK_EXPIRE_FRAMES = 5;     // 隐藏期帧数（点击后保留供 TEvent 检测）
+constexpr static const int EXPIRED_GRACE_FRAMES = 60;   // 已销毁实例的宽限帧数（保留供 TEvent 检测后清理）
 
 // ========== 按钮布局元数据 ==========
 struct MapChoiceBoxClass::BtnLayoutItem
@@ -147,9 +149,30 @@ static std::vector<std::wstring> WrapText(const wchar_t* text, int maxWidth)
 
 // ========== 交互 ==========
 
+// 帧缓存的左键"按下瞬间"检测：每帧只计算一次，供所有选择框实例共享，
+// 避免多个选择框同时存在时只有第一个能响应点击。
+static bool IsLeftButtonJustPressed()
+{
+	static bool s_prevLeftDown = false;
+	static bool s_justPressed = false;
+	static int s_cachedFrame = -1;
+
+	const int frame = Unsorted::CurrentFrame;
+	if (s_cachedFrame != frame)
+	{
+		s_cachedFrame = frame;
+		const bool currentLeftDown = (GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0;
+		s_justPressed = currentLeftDown && !s_prevLeftDown;
+		s_prevLeftDown = currentLeftDown;
+	}
+	return s_justPressed;
+}
+
 void MapChoiceBoxClass::ResetChoice()
 {
 	this->ClickedIndex = -1;
+	this->ClickedConsumed = false;
+	this->ClickExpireCounter = -1;
 }
 
 bool MapChoiceBoxClass::CheckMouseClick()
@@ -157,13 +180,7 @@ bool MapChoiceBoxClass::CheckMouseClick()
 	if (this->ClickedIndex >= 0)
 		return false; // 已经选过了，不再响应
 
-	// 用静态变量跟踪左键的上一帧状态，检测按下瞬间
-	static bool s_prevLeftDown = false;
-	bool currentLeftDown = (GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0;
-	bool justPressed = currentLeftDown && !s_prevLeftDown;
-	s_prevLeftDown = currentLeftDown;
-
-	if (!justPressed)
+	if (!IsLeftButtonJustPressed())
 		return false;
 
 	const auto pMouse = WWMouseClass::Instance;
@@ -593,7 +610,7 @@ void MapChoiceBoxClass::DrawAt(Point2D centerPos)
 	}
 
 	// ===== 更新按钮区域缓存 =====
-	const_cast<MapChoiceBoxClass*>(this)->UpdateButtonRects(
+	this->UpdateButtonRects(
 		topLeft, bgWidth, topLeft.Y + buttonsStartY, btnItems);
 
 	// ===== 绘制按钮（多行布局） =====
@@ -803,6 +820,7 @@ bool MapChoiceBoxClass::Serialize(T& Stm)
 		.Process(this->ClickedConsumed)
 		.Process(this->RemainingFrames)
 		.Process(this->ClickExpireCounter)
+		.Process(this->ExpiredCounter)
 		.Process(this->IsExpired)
 		.Success();
 }
@@ -869,8 +887,8 @@ static void DrawChoiceBoxList(std::vector<std::shared_ptr<T>>& boxes)
 		if (!ptr || ptr->IsExpired || !ptr->CanDraw())
 			continue;
 
-		// 隐藏期：已点击且 Duration 刚好耗尽 → 不绘制，保留对象供 TEvent 检测
-		if (ptr->ClickedIndex >= 0 && ptr->RemainingFrames == 0)
+		// 隐藏期：点击后暂不绘制，保留对象供 TEvent 检测
+		if (ptr->ClickExpireCounter >= 0)
 			continue;
 
 		Point2D drawPos;
@@ -882,41 +900,35 @@ static void DrawChoiceBoxList(std::vector<std::shared_ptr<T>>& boxes)
 		if (ptr->CheckMouseClick())
 		{
 			ptr->ClickedConsumed = false;
-			// 回弹模式：点击即启动隐藏期倒计时（不依赖 Duration 耗尽）
-			if (ptr->Type && ptr->Type->Button_Mode == static_cast<int>(ChoiceBoxButtonMode::Bounce))
-				ptr->ClickExpireCounter = CLICK_EXPIRE_FRAMES;
+			// 点击即启动隐藏期倒计时（Normal/Bounce 统一），不再依赖 Duration 是否有限
+			ptr->ClickExpireCounter = CLICK_EXPIRE_FRAMES;
 		}
 	}
 
-	// 阶段二：处理隐藏期倒计时（含回弹模式）
+	// 阶段二：处理隐藏期倒计时（Normal 销毁 / Bounce 回弹，未消费也有兜底）
 	for (auto& ptr : boxes)
 	{
-		if (ptr && !ptr->IsExpired && ptr->ClickExpireCounter >= 0)
+		if (!ptr || ptr->IsExpired || ptr->ClickExpireCounter < 0)
+			continue;
+
+		if (--ptr->ClickExpireCounter <= 0)
 		{
-			if (--ptr->ClickExpireCounter <= 0)
+			const bool isBounce = (ptr->ClickedIndex >= 0 && ptr->Type
+				&& ptr->Type->Button_Mode == static_cast<int>(ChoiceBoxButtonMode::Bounce));
+
+			if (isBounce)
 			{
-				// 检查被点击的按钮是否为回弹模式
-				bool isBounce = (ptr->ClickedIndex >= 0 && ptr->Type
-					&& ptr->Type->Button_Mode == static_cast<int>(ChoiceBoxButtonMode::Bounce));
-
-				// 未消费则继续等待（给 TEvent 更多时间）
-				if (!ptr->ClickedConsumed)
-				{
-					ptr->ClickExpireCounter = 0;
-					continue;
-				}
-
-				if (isBounce)
-				{
-					// 回弹：重置点击状态，不清除对象
-					ptr->ClickedIndex = -1;
-					ptr->ClickExpireCounter = -1;
-					ptr->ClickedConsumed = false;
-				}
-				else
-				{
-					ptr->IsExpired = true;
-				}
+				// 回弹：无论是否被事件消费都重置点击状态
+				// （已消费则事件已触发；未消费则兜底，避免永久卡住）
+				ptr->ClickedIndex = -1;
+				ptr->ClickExpireCounter = -1;
+				ptr->ClickedConsumed = false;
+			}
+			else
+			{
+				// 普通模式：点击后无论是否被事件消费都销毁（未消费则兜底清理）
+				ptr->IsExpired = true;
+				ptr->ExpiredCounter = EXPIRED_GRACE_FRAMES;
 			}
 		}
 	}
@@ -924,23 +936,50 @@ static void DrawChoiceBoxList(std::vector<std::shared_ptr<T>>& boxes)
 	// 阶段三：处理 Duration 自动移除
 	for (auto& ptr : boxes)
 	{
-		if (ptr && !ptr->IsExpired && ptr->RemainingFrames >= 0)
+		if (!ptr || ptr->IsExpired || ptr->RemainingFrames < 0)
+			continue;
+
+		if (--ptr->RemainingFrames <= 0)
 		{
-			if (--ptr->RemainingFrames <= 0)
+			if (ptr->ClickedIndex >= 0 && ptr->ClickExpireCounter >= 0)
 			{
-				// Duration 耗尽且已点击 → 不销毁，启动隐藏期供 TEvent 检测
-				if (ptr->ClickedIndex >= 0)
-				{
-					ptr->RemainingFrames = 0;
-					if (ptr->ClickExpireCounter < 0)
-						ptr->ClickExpireCounter = CLICK_EXPIRE_FRAMES;
-				}
-				else
-				{
-					ptr->IsExpired = true;
-					ptr->ClickedIndex = -2;
-				}
+				// 点击尚未处理完（隐藏期内）：冻结计时，等待隐藏期结束，避免覆盖点击结果
+				ptr->RemainingFrames = 0;
 			}
+			else
+			{
+				// 超时：标记为超时状态，供 TEvent 559 检测
+				ptr->IsExpired = true;
+				ptr->ClickedIndex = MapChoiceBoxClass::TIMEOUT_MARKER;
+				ptr->ExpiredCounter = EXPIRED_GRACE_FRAMES;
+			}
+		}
+	}
+
+	// 阶段四：清理已销毁实例（宽限期结束后移除，防止长期累积）
+	for (auto it = boxes.begin(); it != boxes.end(); )
+	{
+		auto& ptr = *it;
+		if (ptr && ptr->IsExpired)
+		{
+			if (--ptr->ExpiredCounter > 0)
+			{
+				++it;
+				continue;
+			}
+
+			// 同步从基类数组移除，保持两处数组一致
+			auto& baseArray = MapChoiceBoxClass::Array;
+			baseArray.erase(std::remove_if(baseArray.begin(), baseArray.end(),
+				[raw = ptr.get()](const std::shared_ptr<MapChoiceBoxClass>& pBase) {
+					return pBase.get() == raw;
+				}), baseArray.end());
+
+			it = boxes.erase(it);
+		}
+		else
+		{
+			++it;
 		}
 	}
 }
