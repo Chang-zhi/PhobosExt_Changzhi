@@ -16,19 +16,28 @@ namespace
 {
 	FILE* GetLogFile()
 	{
+#ifdef DEBUG
 		static FILE* const s_pLogFile = fopen("PhobosExt.log", "w");
 		return s_pLogFile;
+#else
+		return nullptr; // 仅 DEBUG 构建生成日志文件
+#endif
 	}
 
 	void WriteToLogFile(const char* pText)
 	{
+#ifdef DEBUG
 		FILE* const pLog = GetLogFile();
 		if (!pLog)
 			return;
 		fprintf(pLog, "[PhobosExt] %s\n", pText);
 		fflush(pLog);
+#endif
 	}
 }
+
+// 独立日志文件说明:游戏原版 debug 函数 0x4068E0 是空壳,Release 无控制台,
+// 仅 DEBUG 构建写入工作目录下的 PhobosExt.log(见上方 #ifdef DEBUG)
 
 void Debug::Log(const char* pFormat, ...)
 {
