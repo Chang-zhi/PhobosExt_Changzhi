@@ -216,6 +216,14 @@ public:
 		return (idx >= 0 && idx < MaxCells) ? Cells[idx] : nullptr;
 	}
 
+	// ------ PhobosExt 补充声明(官方 YRpp 未收录) ------
+
+	// 格对象化 (0x5657A0):CellStruct → CellClass*
+	// 原版 sub_68BCE0 (脚本路径点读取) 内部使用的转换函数;
+	// 无效格返回无效格哨兵(unk_ABDC50),而非 nullptr
+	CellClass* CellFromCoords(CellStruct* pCell)
+		JMP_THIS(0x5657A0);
+
 	CellClass* TryGetCellAt(const CoordStruct& Crd) const {
 		CellStruct cell = CellClass::Coord2Cell(Crd);
 		return TryGetCellAt(cell);

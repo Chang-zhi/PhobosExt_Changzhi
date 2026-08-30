@@ -44,6 +44,19 @@ public:
 	void ScanLimit()
 		JMP_THIS(0x6EC3A0);
 
+	// ------ PhobosExt 补充声明(原版脚本动作体系内部函数,官方 YRpp 未收录) ------
+
+	// 成员就位检查 + 脚本推进 (0x6EBAD0)
+	// 每帧检查成员是否进入团队目标格阈值;未就位的成员会被自动指派前往;
+	// 全部就位 → StepCompleted = true → 原版 TeamClass::AI 自动推进到下一条脚本动作
+	void MembersInPlaceCheck()
+		JMP_THIS(0x6EBAD0);
+
+	// 目标异常分支 (0x6EB490)
+	// 团队目标格带异常标志时调用;周期性重选目标 / 换格,直至目标恢复正常
+	char TargetException()
+		JMP_THIS(0x6EB490);
+
 	//AbstractClass
 	virtual AbstractType WhatAmI() const RT(AbstractType);
 	virtual int Size() const R0;
