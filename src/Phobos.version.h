@@ -10,8 +10,8 @@
 // ======================== 独立 DLL 版本号 ========================
 #define VERSION_MAJOR 1          // 主版本号
 #define VERSION_MINOR 0          // 次版本号
-#define VERSION_REVISION 0      // 修订号
-#define VERSION_PATCH 1          // 补丁号
+#define VERSION_REVISION 1      // 修订号
+#define VERSION_PATCH 0          // 补丁号
 
 #define BUILD_NUMBER 48          // 构建号（每次发布递增）
 

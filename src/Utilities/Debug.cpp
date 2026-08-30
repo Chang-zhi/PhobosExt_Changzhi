@@ -12,14 +12,43 @@ char Debug::FinalStringBuffer[0x1000];
 char Debug::DeferredStringBuffer[0x1000];
 int Debug::CurrentBufferSize = 0;
 
+namespace
+{
+	FILE* GetLogFile()
+	{
+#ifdef DEBUG
+		static FILE* const s_pLogFile = fopen("PhobosExt.log", "w");
+		return s_pLogFile;
+#else
+		return nullptr; // 仅 DEBUG 构建生成日志文件
+#endif
+	}
+
+	void WriteToLogFile(const char* pText)
+	{
+#ifdef DEBUG
+		FILE* const pLog = GetLogFile();
+		if (!pLog)
+			return;
+		fprintf(pLog, "[PhobosExt] %s\n", pText);
+		fflush(pLog);
+#endif
+	}
+}
+
+// 独立日志文件说明:游戏原版 debug 函数 0x4068E0 是空壳,Release 无控制台,
+// 仅 DEBUG 构建写入工作目录下的 PhobosExt.log(见上方 #ifdef DEBUG)
+
 void Debug::Log(const char* pFormat, ...)
 {
 	va_list args;
 	va_start(args, pFormat);
 	vsprintf_s(FinalStringBuffer, pFormat, args);
+	va_end(args);
+
+	WriteToLogFile(FinalStringBuffer);
 
 	LogGame("%s %s", "[PhobosExt]", FinalStringBuffer);
-	va_end(args);
 }
 
 void Debug::Log(const wchar_t* pFormat, ...)
@@ -31,9 +60,11 @@ void Debug::Log(const wchar_t* pFormat, ...)
 	// Convert to UTF-8 for console and debug.log output
 	WideCharToMultiByte(CP_UTF8, 0, WideBuffer, -1,
 		FinalStringBuffer, sizeof(FinalStringBuffer), nullptr, nullptr);
+	va_end(args);
+
+	WriteToLogFile(FinalStringBuffer);
 
 	LogGame("%s %s", "[PhobosExt]", FinalStringBuffer);
-	va_end(args);
 }
 
 void Debug::LogGame(const char* pFormat, ...)
