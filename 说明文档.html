@@ -10,7 +10,8 @@
 .sec-toc__item{margin:6px 0}
 .sec-toc__link{color:#333;text-decoration:none;padding:2px 6px;border-radius:2px;transition:background .2s}
 .sec-toc__link:hover{background:#f8e8e8;color:#d92929}
-@media(max-width:1170px){.doc-container{margin-right:.5rem}}@media(max-width:800px){.nav{width:130px}}@media(max-width:640px){.doc-container{margin:.5rem;padding:1rem}}</style></head>
+@media(max-width:1170px){.doc-container{margin-right:.5rem}}@media(max-width:800px){.nav{width:130px}}@media(max-width:640px){.doc-container{margin:.5rem;padding:1rem}}</style>
+</head>
 <body>
 
 <!----------------->
@@ -462,7 +463,7 @@ Command.RecruitRange=             ; double，默认 10.0</code></pre>
 <ul class="doc-list--content">
 <li>鼠标移动到文本框上时，文本会暂时停止绘制(避免遮挡操作)。</li>
 <li>单位进入载具(limbo状态)时，文本框会暂时停止绘制，离开载具后自动恢复。</li>
-<li>单位标签支持所有科技类型(TechnoClass，含建筑)。小队相关行为限制为FootClass。</li>
+<li>单位标签支持所有科技类型。小队相关行为限制为FootClass。</li>
 </ul>
 
 <h4>文本框类型</h4>
@@ -687,7 +688,7 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 yes — 单位文本�
 <li>将指定路径点指定范围内的所有可招募单位加入一个已存在的作战小队实例。</li>
 <li>如果没有该类型的已有小队实例，则无行为。</li>
 <li>只会招募满足以下条件的单位：属于该小队所属方、未加入其他小队、在路径点指定范围内。</li>
-<li><strong>仅招募可招募单位(参数4)：</strong><code class="doc-code--inline">0</code>=不检查可招募属性，<code class="doc-code--inline">1</code>=仅招募 <code class="doc-code--inline">CanBeRecruited</code> 返回 <code class="doc-code--inline">true</code> 的单位。</li>
+<li><strong>仅招募可招募单位(参数4)：</strong><code class="doc-code--inline">0</code>=不检查可招募属性，反之亦然</li>
 </ul>
 <br>
 <p><strong>行为 661 (设置作战小队Max值)：</strong></p>
@@ -1059,7 +1060,7 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 yes — 单位文本�
 
 <div id="scripts_4">
 <h3 class="doc-heading--tertiary" style="margin-top:2em">4. 巡逻系(巡逻到指定建筑/集结点)</h3>
-<p>让小队巡逻(移动)到指定阵营的建筑附近或基地集结点。底层原版脚本动作 16 - 巡逻至路径点。</p>
+<p>让小队巡逻(移动)到指定阵营的建筑附近或基地集结点。底层为原版脚本动作 16 - 巡逻至路径点。</p>
 
 <div class="doc-table--action">
 <table class="doc-table">

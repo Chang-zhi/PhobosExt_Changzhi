@@ -11,6 +11,7 @@
 #include <AircraftClass.h>
 #include <CellClass.h>
 #include <HouseClass.h>
+#include <TriggerClass.h>
 #include <GeneralStructures.h>
 #include <Fundamentals.h>
 // #include <Ext/Techno/MyNew/DetectKiller.h>
@@ -83,7 +84,8 @@ int TEventExt::GetFlags(int iEvent)
 }
 
 std::optional<bool> TEventExt::Execute(TEventClass* pThis, int iEvent, HouseClass* pHouse,
-	ObjectClass* pObject, CDTimerClass* pTimer, bool* isPersitant, TechnoClass* pSource)
+	ObjectClass* pObject, CDTimerClass* pTimer, bool* isPersitant, TechnoClass* pSource,
+	TriggerClass* pTrigger)
 {
 	const auto eventKind = static_cast<PhobosTriggerEvent>(pThis->EventKind);
 

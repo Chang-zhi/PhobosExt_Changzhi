@@ -19,7 +19,7 @@ struct InteropAPIVersion
 //   Major: breaking changes → mismatch disables API
 //   Minor: new features, backward compatible → warns but works
 //   Patch: bug fixes, no API change → same as minor
-constexpr InteropAPIVersion INTEROP_VERSION_CURRENT = { 1, 0, 0 };
+constexpr InteropAPIVersion INTEROP_VERSION_CURRENT = { 1, 1, 0 };
 
 // ============================================================================
 // Exported function type definitions
@@ -48,9 +48,17 @@ typedef HRESULT(__stdcall* fnConvertToType)(void* pThis, void* pToType);
 
 typedef HRESULT(__stdcall* fnBullet_SetFirerOwner)(void* pBullet, void* pHouse);
 
-typedef HRESULT(__stdcall* fnRegisterCalculateExtraThreatCallback)(void* callback);
+typedef double(__stdcall* fnCalculateExtraThreatCallback)(
+	void* pThis, void* pTarget, double originalThreat
+);
 
-typedef HRESULT(__stdcall* fnRegisterCalculateSightCallback)(void* callback);
+typedef double(__stdcall* fnCalculateSightCallback)(
+	void* pThis, double originalSight
+);
+
+typedef HRESULT(__stdcall* fnRegisterCalculateExtraThreatCallback)(fnCalculateExtraThreatCallback callback);
+
+typedef HRESULT(__stdcall* fnRegisterCalculateSightCallback)(fnCalculateSightCallback callback);
 
 typedef HRESULT(__stdcall* fnEventExt_AddEvent)(void* pEventExt);
 

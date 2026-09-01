@@ -9,6 +9,7 @@
 #include <TEventClass.h>
 
 class HouseClass;
+class TriggerClass;
 
 enum PhobosTriggerEvent
 {
@@ -99,8 +100,8 @@ public:
 	static int GetFlags(int iEvent);
 
 	static std::optional<bool> Execute(TEventClass* pThis, int iEvent, HouseClass* pHouse,
-		ObjectClass* pObject, CDTimerClass* pTimer, bool* isPersitant, TechnoClass* pSource);
-
+		ObjectClass* pObject, CDTimerClass* pTimer, bool* isPersitant, TechnoClass* pSource,
+		TriggerClass* pTrigger = nullptr);
 
 	static bool TechnoTypeOfHouseNearWaypoint(TEventClass* pThis, HouseClass* pHouse);
 	static bool TechnoTypeOfHouseExistsAtWaypoint(TEventClass* pThis, HouseClass* pHouse);

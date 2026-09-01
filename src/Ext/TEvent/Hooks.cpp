@@ -3,6 +3,7 @@
 #include <Helpers\Macro.h>
 
 #include <HouseClass.h>
+#include <TriggerClass.h>
 #include <BuildingClass.h>
 #include <InfantryClass.h>
 #include <OverlayTypeClass.h>
@@ -13,6 +14,7 @@
 DEFINE_HOOK(0x71E940, TEventClass_Execute, 0x5)
 {
 	GET(TEventClass*, pThis, ECX);
+	GET(TriggerClass*, pTrigger, ESI);
 	GET_STACK(const int, iEvent, 0x4); // now trigger what?
 	GET_STACK(HouseClass*, pHouse, 0x8);
 	GET_STACK(ObjectClass*, pObject, 0xC);
@@ -20,7 +22,7 @@ DEFINE_HOOK(0x71E940, TEventClass_Execute, 0x5)
 	GET_STACK(bool*, isPersitant, 0x14);
 	GET_STACK(TechnoClass*, pSource, 0x18);
 
-	const auto result = TEventExt::Execute(pThis, iEvent, pHouse, pObject, pTimer, isPersitant, pSource);
+	const auto result = TEventExt::Execute(pThis, iEvent, pHouse, pObject, pTimer, isPersitant, pSource, pTrigger);
 
 	if (!result.has_value())
 		return 0;
