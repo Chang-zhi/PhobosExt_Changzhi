@@ -17,6 +17,7 @@
 #include <ArrayClasses.h>
 #include <MessageListClass.h>
 #include <ScenarioClass.h>
+#include <GameOptionsClass.h>
 
 #include <Utilities/SavegameDef.h>
 #include <Utilities/SpawnerHelper.h>
@@ -211,11 +212,6 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 		return TActionExt::SetUnderParMessage(pThis, pHouse, pObject, pTrigger, location);
 	case PhobosTriggerAction::SetParTimeEasy:
 		return TActionExt::SetParTimeEasy(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::SetParTimeMedium:
-		return TActionExt::SetParTimeMedium(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::SetParTimeDifficult:
-		return TActionExt::SetParTimeDifficult(pThis, pHouse, pObject, pTrigger, location);
-
 
 	// ---- TaskForce Editing Actions ----
 	case PhobosTriggerAction::ClearTaskForce:
@@ -239,6 +235,13 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 		return TActionExt::RecruitGroupToTeam(pThis, pHouse, pObject, pTrigger, location);
 	case PhobosTriggerAction::UndeployHouseUnits:
 		return TActionExt::UndeployHouseUnits(pThis, pHouse, pObject, pTrigger, location);
+
+	case PhobosTriggerAction::SetParTimeMedium:
+		return TActionExt::SetParTimeMedium(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::SetParTimeDifficult:
+		return TActionExt::SetParTimeDifficult(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::SetGameSpeed:
+		return TActionExt::SetGameSpeed(pThis, pHouse, pObject, pTrigger, location);
 
 	case PhobosTriggerAction::testAction:
 		return TActionExt::testAction(pThis, pHouse, pObject, pTrigger, location);
@@ -1464,6 +1467,55 @@ bool TActionExt::ClearAllTextBoxs(TActionClass* pThis, HouseClass* pHouse, Objec
 	return true;
 }
 
+// ========== ChoiceBox Actions ==========
+
+bool TActionExt::SetWaypointChoiceBox(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	int choiceID = pThis->Param3;
+	int wpIndex = pThis->Param4;
+	int typeIndex = pThis->Param5;
+
+	if (wpIndex >= 0 && typeIndex >= 0
+		&& static_cast<size_t>(typeIndex) < ChoiceBoxTypeClass::Array.size())
+	{
+		const ChoiceBoxTypeClass* pType = ChoiceBoxTypeClass::Array[typeIndex].get();
+		WaypointChoiceBoxClass::FindOrCreate(choiceID, wpIndex, nullptr, pType);
+	}
+	return true;
+}
+
+bool TActionExt::SetScreenChoiceBox(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	int choiceID = pThis->Param3;
+	int screenX = pThis->Param4;
+	int screenY = pThis->Param5;
+	int typeIndex = pThis->Param6;
+
+	if (typeIndex >= 0
+		&& static_cast<size_t>(typeIndex) < ChoiceBoxTypeClass::Array.size())
+	{
+		const ChoiceBoxTypeClass* pType = ChoiceBoxTypeClass::Array[typeIndex].get();
+		ScreenChoiceBoxClass::FindOrCreate(choiceID, screenX, screenY, nullptr, pType);
+	}
+	return true;
+}
+
+bool TActionExt::ClearChoiceBoxByID(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	int choiceID = pThis->Param3;
+
+	WaypointChoiceBoxClass::RemoveByID(choiceID);
+	ScreenChoiceBoxClass::RemoveByID(choiceID);
+	return true;
+}
+
+bool TActionExt::ClearAllChoiceBoxs(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	WaypointChoiceBoxClass::ClearAll();
+	ScreenChoiceBoxClass::ClearAll();
+	return true;
+}
+
 // =============================
 // Script Manipulation Actions (650-660)
 
@@ -1688,6 +1740,20 @@ bool TActionExt::SetUnderParMessage(TActionClass* pThis, HouseClass* pHouse, Obj
 	return true;
 }
 
+bool TActionExt::SetParTimeEasy(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	ScenarioClass* pScenario = ScenarioClass::Instance;
+	if (!pScenario)
+		return false;
+
+	const int value = pThis->Param3;
+	if (value < 0) // 负数表示不修改
+		return true;
+
+	pScenario->ParTimeEasy = value * 60;
+	return true;
+}
+
 // =============================
 // TaskForce Editing Actions (670-677)
 
@@ -1815,20 +1881,6 @@ bool TActionExt::UndeployHouseUnits(TActionClass* pThis, HouseClass* pHouse, Obj
 	return true;
 }
 
-bool TActionExt::SetParTimeEasy(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
-{
-	ScenarioClass* pScenario = ScenarioClass::Instance;
-	if (!pScenario)
-		return false;
-
-	const int value = pThis->Param3;
-	if (value < 0) // 负数表示不修改
-		return true;
-
-	pScenario->ParTimeEasy = value * 60;
-	return true;
-}
-
 bool TActionExt::SetParTimeMedium(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {
 	ScenarioClass* pScenario = ScenarioClass::Instance;
@@ -1854,6 +1906,16 @@ bool TActionExt::SetParTimeDifficult(TActionClass* pThis, HouseClass* pHouse, Ob
 		return true;
 
 	pScenario->ParTimeDifficult = value * 60;
+	return true;
+}
+
+bool TActionExt::SetGameSpeed(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	const int value = pThis->Param3;
+	if (value < 0 || value > 6) // 负数表示不修改;越界保护
+		return true;
+
+	GameOptionsClass::Instance.GameSpeed = 6 - value;
 	return true;
 }
 
@@ -1931,55 +1993,6 @@ static int testChangeVar(bool bGlobal, int index, int value)
 	}
 
 	return value;
-}
-
-// ========== ChoiceBox Actions ==========
-
-bool TActionExt::SetWaypointChoiceBox(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
-{
-	int choiceID = pThis->Param3;
-	int wpIndex = pThis->Param4;
-	int typeIndex = pThis->Param5;
-
-	if (wpIndex >= 0 && typeIndex >= 0
-		&& static_cast<size_t>(typeIndex) < ChoiceBoxTypeClass::Array.size())
-	{
-		const ChoiceBoxTypeClass* pType = ChoiceBoxTypeClass::Array[typeIndex].get();
-		WaypointChoiceBoxClass::FindOrCreate(choiceID, wpIndex, nullptr, pType);
-	}
-	return true;
-}
-
-bool TActionExt::SetScreenChoiceBox(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
-{
-	int choiceID = pThis->Param3;
-	int screenX = pThis->Param4;
-	int screenY = pThis->Param5;
-	int typeIndex = pThis->Param6;
-
-	if (typeIndex >= 0
-		&& static_cast<size_t>(typeIndex) < ChoiceBoxTypeClass::Array.size())
-	{
-		const ChoiceBoxTypeClass* pType = ChoiceBoxTypeClass::Array[typeIndex].get();
-		ScreenChoiceBoxClass::FindOrCreate(choiceID, screenX, screenY, nullptr, pType);
-	}
-	return true;
-}
-
-bool TActionExt::ClearChoiceBoxByID(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
-{
-	int choiceID = pThis->Param3;
-
-	WaypointChoiceBoxClass::RemoveByID(choiceID);
-	ScreenChoiceBoxClass::RemoveByID(choiceID);
-	return true;
-}
-
-bool TActionExt::ClearAllChoiceBoxs(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
-{
-	WaypointChoiceBoxClass::ClearAll();
-	ScreenChoiceBoxClass::ClearAll();
-	return true;
 }
 
 bool TActionExt::testAction(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
