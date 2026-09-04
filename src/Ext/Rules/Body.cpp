@@ -1,8 +1,8 @@
 #include "Body.h"
+#include <Windows.h>
 #include <Utilities/TemplateDef.h>
 #include <FPSCounter.h>
 #include <GameOptionsClass.h>
-
 #include <Ext/TechnoType/Body.h>
 #include <MyNew/TextBox/Types/TextBoxTypeClass.h>
 #include <MyNew/ChoiceBox/Types/ChoiceBoxTypeClass.h>
@@ -58,6 +58,7 @@ void RulesExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 
 	this->BerzerkRestoreClearTarget.Read(exINI, GameStrings::General, "BerzerkRestoreClearTarget");
 	this->Command_RecruitRange.Read(exINI, GameStrings::General, "Command.RecruitRange");
+	this->AllowTabBriefingInSinglePlayer.Read(exINI, GameStrings::General, "AllowTabBriefingInSinglePlayer");
 }
 
 void RulesExt::ExtData::LoadBeforeTypeData(RulesClass* pThis, CCINIClass* pINI)
@@ -100,6 +101,7 @@ void RulesExt::ExtData::Serialize(T& Stm)
 		.Process(this->ShowTextBoxInShroud_Techno)
 		.Process(this->BerzerkRestoreClearTarget)
 		.Process(this->Command_RecruitRange)
+		.Process(this->AllowTabBriefingInSinglePlayer)
 		;
 }
 
@@ -245,3 +247,27 @@ DEFINE_HOOK(0x6744E4, RulesClass_ReadJumpjetControls_Extra, 0x7)
 
 // skip vanilla JumpjetControls and make it earlier load
 // DEFINE_JUMP(LJMP, 0x668EB5, 0x668EBD); // RulesClass_Process_SkipJumpjetControls // Really necessary? won't hurt to read again
+
+DEFINE_HOOK(0x48C8B0, ScreenStateMachine_AllowTabBriefing, 0x5)
+{
+	auto ext = RulesExt::Global();
+	if (!ext || !ext->AllowTabBriefingInSinglePlayer)
+		return 0;
+
+	int* const pCurrentUI = reinterpret_cast<int*>(0xA8EDA0);
+	if (*pCurrentUI != 0)
+		return 0;
+
+	if (*reinterpret_cast<int*>(0xA8B238) != 0)
+		return 0;
+
+	static bool lastDown = false;
+	const bool down = (GetAsyncKeyState(VK_TAB) & 0x8000) != 0;
+	const bool edge = down && !lastDown;
+	lastDown = down;
+	if (!edge)
+		return 0;
+
+	*pCurrentUI = 9;
+	return 0;
+}
