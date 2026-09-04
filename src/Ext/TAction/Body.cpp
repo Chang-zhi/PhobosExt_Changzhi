@@ -14,6 +14,7 @@
 #include <HouseClass.h>
 #include <Ext/House/Body.h>
 #include <Ext/Script/MyNew/FootPathVisualizer.h>
+#include <Ext/Scenario/Body.h>
 #include <ArrayClasses.h>
 #include <MessageListClass.h>
 #include <ScenarioClass.h>
@@ -200,8 +201,8 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 		return TActionExt::UnregisterFootPathVisualizer(pThis, pHouse, pObject, pTrigger, location);
 
 	// ---- 任务简报 / 最佳时间 Actions ----
-	// case PhobosTriggerAction::SetMissionBriefing:
-	// 	return TActionExt::SetMissionBriefing(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::SetMissionBriefing:
+		return TActionExt::SetMissionBriefing(pThis, pHouse, pObject, pTrigger, location);
 	case PhobosTriggerAction::SetOverParTitle:
 		return TActionExt::SetOverParTitle(pThis, pHouse, pObject, pTrigger, location);
 	case PhobosTriggerAction::SetOverParMessage:
@@ -1677,28 +1678,38 @@ static void CopyActionTextW(wchar_t* dest, size_t destSize, const wchar_t* text)
 	dest[i] = L'\0';
 }
 
-/*
 bool TActionExt::SetMissionBriefing(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {
-	ScenarioClass* pScenario = ScenarioClass::Instance;
-	if (!pScenario)
+	auto pExt = ScenarioExt::Global();
+	if (!pExt)
 		return false;
 
 	const char* label = pThis->Text;
 
-	Debug::Log(L"[TAction] SetMissionBriefing: label=%hs\n", label ? label : "(null)");
-
-	CopyActionText(pScenario->BriefingCSF, sizeof(pScenario->BriefingCSF), label);
-
+	// Try to resolve the parameter as a CSF string reference first, like the
+	// vanilla briefing. Falls back to treating it as literal text otherwise.
 	const wchar_t* text = StringTable::TryFetchString(label, L"");
+	if (text && *text)
+	{
+		CopyActionTextW(pExt->CustomBriefing,
+			sizeof(pExt->CustomBriefing) / sizeof(wchar_t), text);
+	}
+	else
+	{
+		size_t i = 0;
+		while (label && label[i] && i + 1 < sizeof(pExt->CustomBriefing) / sizeof(wchar_t))
+		{
+			pExt->CustomBriefing[i] = static_cast<wchar_t>(static_cast<unsigned char>(label[i]));
+			++i;
+		}
+		pExt->CustomBriefing[i] = L'\0';
+	}
 
-	Debug::Log(L"[TAction] SetMissionBriefing: csfKey=%hs, text=%ls\n", label ? label : "(null)", text ? text : L"(null)");
-
-	CopyActionTextW(pScenario->Briefing, sizeof(pScenario->Briefing) / sizeof(wchar_t), text);
+	// Only override the display when there's actually something to show.
+	pExt->HasCustomBriefing = (pExt->CustomBriefing[0] != L'\0');
 
 	return true;
 }
-*/
 
 bool TActionExt::SetOverParTitle(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {

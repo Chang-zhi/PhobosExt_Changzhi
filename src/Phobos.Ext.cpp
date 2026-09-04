@@ -8,6 +8,7 @@
 #include <Ext/TechnoType/Body.h>
 #include <Ext/WarheadType/Body.h>
 #include <Ext/ScriptType/Body.h>
+#include <Ext/Scenario/Body.h>
 #include <Ext/TeamType/Body.h>
 #include <Ext/Script/Body.h>
 
@@ -186,6 +187,7 @@ using PhobosTypeRegistry = TypeRegistry <
 	// Ext classes
 	HouseExt,
 	TActionExt,
+	ScenarioExt,
 	TechnoExt,
 	TechnoTypeExt,
 	WarheadTypeExt,

@@ -192,7 +192,8 @@ enum class PhobosTriggerAction : unsigned int
 	// 停止绘制关联单位的移动路径
 	UnregisterFootPathVisualizer = 663,
 
-	// SetMissionBriefing = 664,
+	// 设置任务简报
+	SetMissionBriefing = 664,
 
 	// 设置超时标题
 	SetOverParTitle = 665,
@@ -366,7 +367,7 @@ static bool name(TActionClass* pThis, HouseClass* pHouse, \
 	ACTION_FUNC(UnregisterFootPathVisualizer);
 
 	// ---- 任务简报 / 最佳时间 Actions ----
-	// ACTION_FUNC(SetMissionBriefing);
+	ACTION_FUNC(SetMissionBriefing);
 	ACTION_FUNC(SetOverParTitle);
 	ACTION_FUNC(SetOverParMessage);
 	ACTION_FUNC(SetUnderParTitle);

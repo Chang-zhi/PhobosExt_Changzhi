@@ -23,6 +23,7 @@
     <ClCompile Include="src\Ext\House\AIBaseNode.cpp" />
     <ClCompile Include="src\Ext\House\Body.cpp" />
     <ClCompile Include="src\Ext\Rules\Body.cpp" />
+    <ClCompile Include="src\Ext\Scenario\Body.cpp" />
     <ClCompile Include="src\Ext\Script\Body.cpp" />
     <ClCompile Include="src\Ext\Script\Hooks.cpp" />
     <ClCompile Include="src\Ext\Script\MyNew\FootPathVisualizer.cpp" />
