@@ -86,7 +86,9 @@ bool TechnoTextBoxClass::GetDrawPosition(Point2D& outPos) const
 		return false;
 
 	CoordStruct coords = this->Target->GetCoords();
-	return TacticalClass::Instance->CoordsToClient(&coords, &outPos);
+	auto [point, visible] = TacticalClass::Instance->CoordsToClient(coords);
+	outPos = point;
+	return visible;
 }
 
 // ========== 查找/创建 ==========

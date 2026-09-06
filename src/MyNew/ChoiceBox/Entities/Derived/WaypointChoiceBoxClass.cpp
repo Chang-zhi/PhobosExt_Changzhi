@@ -51,7 +51,9 @@ bool WaypointChoiceBoxClass::GetDrawPosition(Point2D& outPos) const
 	CellClass* pCellData = MapClass::Instance.GetCellAt(cell);
 	int cellZ = pCellData ? pCellData->GetLevel() * Unsorted::LevelHeight : 0;
 	CoordStruct coords = CellClass::Cell2Coord(cell, cellZ);
-	return TacticalClass::Instance->CoordsToClient(&coords, &outPos);
+	auto [point, visible] = TacticalClass::Instance->CoordsToClient(coords);
+	outPos = point;
+	return visible;
 }
 
 // ========== 查找/创建 ==========

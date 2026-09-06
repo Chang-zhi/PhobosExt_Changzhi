@@ -41,6 +41,7 @@ public:
 	{
 		CellStruct startCell;
 		std::vector<int> directions;
+		std::vector<unsigned char> Levels;
 	};
 	static void CachePath(FootClass* pFoot, const int* pDirs, int count, int startIdx);
 	static std::unordered_map<FootClass*, PathCacheEntry> FullPathCache;
@@ -60,6 +61,7 @@ private:
 		Point2D from, Point2D to, int baseR, int baseG, int baseB, int thickness, int opacity, int animOffset,
 		double skipFromStart = 0.0);
 	static CellStruct ApplyFacing(CellStruct current, int facing);
-	static void CellToScreen(CellStruct cell, Point2D& outScreen);
+	static unsigned char ResolveCellLevel(CellStruct cell, int& curH);
+	static void CellToScreen(CellStruct cell, Point2D& outScreen, unsigned char level);
 	static void CoordToScreen(CoordStruct coord, Point2D& outScreen);
 };

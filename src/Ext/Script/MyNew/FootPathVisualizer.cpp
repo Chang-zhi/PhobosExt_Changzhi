@@ -16,7 +16,7 @@
 #include <Utilities/Savegame.h>
 
 struct PendingRegistryEntry { DWORD UniqueID; FootPathConfig Config; };
-struct PendingCacheEntry { DWORD UniqueID; CellStruct StartCell; std::vector<int> Directions; };
+struct PendingCacheEntry { DWORD UniqueID; CellStruct StartCell; std::vector<int> Directions; std::vector<unsigned char> Levels; };
 
 std::unordered_map<FootClass*, FootPathConfig> FootPathVisualizer::Registry;
 std::unordered_map<FootClass*, FootPathVisualizer::PathCacheEntry> FootPathVisualizer::FullPathCache;
@@ -86,6 +86,7 @@ void FootPathVisualizer::CachePath(FootClass* pFoot, const int* pDirs, int count
 	auto& cached = FullPathCache[pFoot];
 	cached.startCell = pFoot->CurrentMapCoords;
 	cached.directions.clear();
+	cached.Levels.clear();
 
 	int toCopy = count - startIdx;
 	cached.directions.reserve(toCopy);
@@ -97,6 +98,40 @@ void FootPathVisualizer::CachePath(FootClass* pFoot, const int* pDirs, int count
 		else
 			break;
 	}
+
+	int curH = pFoot->GetCoords().Z;
+	cached.Levels.reserve(cached.directions.size() + 1);
+	CellStruct cell = cached.startCell;
+	cached.Levels.push_back(ResolveCellLevel(cell, curH));
+	for (int dir : cached.directions)
+	{
+		cell = ApplyFacing(cell, dir);
+		cached.Levels.push_back(ResolveCellLevel(cell, curH));
+	}
+}
+
+unsigned char FootPathVisualizer::ResolveCellLevel(CellStruct cell, int& curH)
+{
+	if (auto pCell = MapClass::Instance.TryGetCellAt(cell))
+	{
+		int groundH = pCell->GetCellCoords().Z;
+
+		if (pCell->ContainsBridge())
+		{
+			int bridgeH = groundH + CellClass::BridgeHeight;
+			if (std::abs(curH - bridgeH) < std::abs(curH - groundH))
+			{
+				curH = bridgeH;
+				return 1;
+			}
+		}
+
+		curH = groundH;
+		return 0;
+	}
+
+	curH = CellClass::Cell2Coord(cell).Z;
+	return 0;
 }
 
 void FootPathVisualizer::PointerGotInvalid(void* ptr, bool removed)
@@ -127,12 +162,16 @@ CellStruct FootPathVisualizer::ApplyFacing(CellStruct current, int facing)
 	return current;
 }
 
-void FootPathVisualizer::CellToScreen(CellStruct cell, Point2D& outScreen)
+void FootPathVisualizer::CellToScreen(CellStruct cell, Point2D& outScreen, unsigned char level)
 {
 	CoordStruct world = CellClass::Cell2Coord(cell);
 
 	if (auto pCell = MapClass::Instance.TryGetCellAt(cell))
+	{
 		world = pCell->GetCellCoords();
+		if (level != 0 && pCell->ContainsBridge())
+			world.Z += CellClass::BridgeHeight;
+	}
 
 	CoordToScreen(world, outScreen);
 }
@@ -253,6 +292,11 @@ void FootPathVisualizer::DrawPathForUnit(FootClass* pFoot, const FootPathConfig&
 	}
 
 	const auto& dirs = it->second.directions;
+	const auto& levels = it->second.Levels;
+
+	auto levelAt = [&levels](size_t i) -> unsigned char {
+		return i < levels.size() ? levels[i] : 0;
+	};
 
 	// Step 1: 构建完整的路径格子序列（从 startCell 到终点）
 	std::vector<CellStruct> allCells;
@@ -331,8 +375,8 @@ void FootPathVisualizer::DrawPathForUnit(FootClass* pFoot, const FootPathConfig&
 
 	// Step 3: 在屏幕上找到绘制起点 = 单位在 consumed→consumed+1 段上的投影
 	Point2D fromScr, toScr;
-	CellToScreen(allCells[consumed], fromScr);
-	CellToScreen(allCells[consumed + 1], toScr);
+	CellToScreen(allCells[consumed], fromScr, levelAt(consumed));
+	CellToScreen(allCells[consumed + 1], toScr, levelAt(consumed + 1));
 	Point2D drawStart {
 		static_cast<int>(fromScr.X + (toScr.X - fromScr.X) * progress),
 		static_cast<int>(fromScr.Y + (toScr.Y - fromScr.Y) * progress)
@@ -382,7 +426,7 @@ void FootPathVisualizer::DrawPathForUnit(FootClass* pFoot, const FootPathConfig&
 	for (size_t i = consumed + 2; i < allCells.size(); ++i)
 	{
 		Point2D curScreen;
-		CellToScreen(allCells[i], curScreen);
+		CellToScreen(allCells[i], curScreen, levelAt(i));
 		DrawDashedLineSegment(prevScreen, curScreen,
 			flashR, flashG, flashB,
 			config.PathLineThickness, config.PathLineOpacity, animOffset);
@@ -392,8 +436,10 @@ void FootPathVisualizer::DrawPathForUnit(FootClass* pFoot, const FootPathConfig&
 	// Step 6: 终点箭头（最后一段不显示，避免单位到达后箭头不消失）
 	if (consumed + 2 < allCells.size())
 	{
+		size_t tipIdx = allCells.size() - 1;
+		unsigned char tipLevel = levelAt(tipIdx);
 		Point2D tipScreen;
-		CellToScreen(allCells.back(), tipScreen);
+		CellToScreen(allCells[tipIdx], tipScreen, tipLevel);
 
 		Point2D fwdScreen {};
 		bool hasFwd = false;
@@ -404,8 +450,8 @@ void FootPathVisualizer::DrawPathForUnit(FootClass* pFoot, const FootPathConfig&
 			int lastFacing = dirs.back();
 			if (lastFacing >= 0 && lastFacing < 8)
 			{
-				CellStruct fwdCell = ApplyFacing(allCells.back(), lastFacing);
-				CellToScreen(fwdCell, fwdScreen);
+				CellStruct fwdCell = ApplyFacing(allCells[tipIdx], lastFacing);
+				CellToScreen(fwdCell, fwdScreen, tipLevel);
 				hasFwd = true;
 			}
 		}
@@ -413,7 +459,7 @@ void FootPathVisualizer::DrawPathForUnit(FootClass* pFoot, const FootPathConfig&
 		if (!hasFwd && allCells.size() >= 2)
 		{
 			Point2D prevScr;
-			CellToScreen(allCells[allCells.size() - 2], prevScr);
+			CellToScreen(allCells[allCells.size() - 2], prevScr, levelAt(allCells.size() - 2));
 			double dx = static_cast<double>(tipScreen.X - prevScr.X);
 			double dy = static_cast<double>(tipScreen.Y - prevScr.Y);
 			double dl = std::sqrt(dx * dx + dy * dy);
@@ -503,6 +549,9 @@ bool FootPathVisualizer::SaveGlobals(PhobosStreamWriter& Stm)
 		Stm.Save(entry.directions.size());
 		for (int dir : entry.directions)
 			Stm.Save(dir);
+		Stm.Save(entry.Levels.size());
+		for (unsigned char level : entry.Levels)
+			Stm.Save(level);
 	}
 	return true;
 }
@@ -562,8 +611,22 @@ bool FootPathVisualizer::LoadGlobals(PhobosStreamReader& Stm)
 			dirs.push_back(dir);
 		}
 
+		size_t levelCount = 0;
+		if (!Stm.Load(levelCount))
+			{ return false; }
+
+		std::vector<unsigned char> levels;
+		levels.reserve(levelCount);
+		for (size_t j = 0; j < levelCount; ++j)
+		{
+			unsigned char level = 0;
+			if (!Stm.Load(level))
+				{ return false; }
+			levels.push_back(level);
+		}
+
 		if (uid != 0)
-			PendingCache.push_back({ uid, startCell, std::move(dirs) });
+			PendingCache.push_back({ uid, startCell, std::move(dirs), std::move(levels) });
 	}
 
 	NeedsPostLoadResolve = true;
@@ -589,13 +652,13 @@ void FootPathVisualizer::ResolvePostLoad()
 	}
 	PendingRegistry.clear();
 
-	for (auto& [uid, startCell, dirs] : PendingCache)
+	for (auto& [uid, startCell, dirs, levels] : PendingCache)
 	{
 		for (auto pFoot : FootClass::Array)
 		{
 			if (pFoot && pFoot->UniqueID == uid)
 			{
-				FullPathCache[pFoot] = { startCell, std::move(dirs) };
+				FullPathCache[pFoot] = { startCell, std::move(dirs), std::move(levels) };
 				break;
 			}
 		}

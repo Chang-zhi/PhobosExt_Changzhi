@@ -74,14 +74,14 @@ DEFINE_HOOK(0x689310, ScenarioClass_SaveLoad_Prefix, 0x5)
 
 DEFINE_HOOK(0x689669, ScenarioClass_Load_Suffix, 0x6)
 {
-	auto buffer = ScenarioExt::Global();
+	auto Ext = ScenarioExt::Global();
 
 	PhobosByteStream Stm(0);
 	if (Stm.ReadBlockFromStream(ScenarioExt::g_pStm))
 	{
 		PhobosStreamReader Reader(Stm);
-		if (Reader.Expect(ScenarioExt::Canary) && Reader.RegisterChange(buffer))
-			buffer->LoadFromStream(Reader);
+		if (Reader.Expect(ScenarioExt::Canary) && Reader.RegisterChange(Ext))
+			Ext->LoadFromStream(Reader);
 	}
 
 	return 0;
@@ -89,15 +89,15 @@ DEFINE_HOOK(0x689669, ScenarioClass_Load_Suffix, 0x6)
 
 DEFINE_HOOK(0x68945B, ScenarioClass_Save_Suffix, 0x8)
 {
-	auto buffer = ScenarioExt::Global();
+	auto Ext = ScenarioExt::Global();
 
-	PhobosByteStream saver(sizeof(*buffer));
+	PhobosByteStream saver(sizeof(*Ext));
 	PhobosStreamWriter writer(saver);
 
 	writer.Expect(ScenarioExt::Canary);
-	writer.RegisterChange(buffer);
+	writer.RegisterChange(Ext);
 
-	buffer->SaveToStream(writer);
+	Ext->SaveToStream(writer);
 	saver.WriteBlockToStream(ScenarioExt::g_pStm);
 
 	return 0;
@@ -108,10 +108,10 @@ DEFINE_HOOK(0x68945B, ScenarioClass_Save_Suffix, 0x8)
 // If a custom briefing is set, redirect that buffer to our text.
 DEFINE_HOOK(0x65F639, MissionBriefing_OverrideBriefing, 0x5)
 {
-	auto buffer = ScenarioExt::Global();
+	auto Ext = ScenarioExt::Global();
 
-	if (buffer && buffer->HasCustomBriefing)
-		R->EAX(reinterpret_cast<DWORD>(buffer->CustomBriefing));
+	if (Ext && Ext->HasCustomBriefing)
+		R->EAX(reinterpret_cast<DWORD>(Ext->CustomBriefing));
 
 	return 0;
 }
