@@ -5,6 +5,7 @@
 #include <HouseClass.h>
 
 #include <Utilities/Macro.h>
+#include <Ext/Scenario/body.h>
 
 DEFINE_HOOK(0x6DD8B0, TActionClass_Execute, 0x6)
 {
@@ -27,6 +28,29 @@ DEFINE_HOOK(0x6DD8B0, TActionClass_Execute, 0x6)
 	R->AL(TActionExt::Execute(pThis, pHouse, pObject, pTrigger, *pLocation, handled));
 
 	return handled ? 0x6DD910 : 0;
+}
+
+DEFINE_HOOK(0x4F1814, PauseMenu_LoadBtn_Enable, 0x8)
+{
+	auto Ext = ScenarioExt::Global();
+	if (Ext && Ext->BlockLoadGame)
+		R->ECX(0);
+
+	return 0;
+}
+
+DEFINE_HOOK(0x4F1720, PauseMenu_SaveBtn_Enable, 0x5)
+{
+	auto Ext = ScenarioExt::Global();
+	if (Ext && Ext->BlockSaveGame)
+	{
+		HWND hDlg = reinterpret_cast<HWND>(R->ECX());
+		HWND hSaveBtn = GetDlgItem(hDlg, 1311);
+		if (hSaveBtn)
+			EnableWindow(hSaveBtn, FALSE);
+	}
+
+	return 0;
 }
 
 //DEFINE_HOOK(0x6DD8D7, TActionClass_Execute_Ares, 0xA)

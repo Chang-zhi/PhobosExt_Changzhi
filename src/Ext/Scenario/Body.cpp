@@ -2,6 +2,8 @@
 #include <Utilities/Savegame.h>
 #include <Utilities/SavegameDef.h>
 
+#include <Windows.h>
+
 std::unique_ptr<ScenarioExt::ExtData> ScenarioExt::Data = nullptr;
 IStream* ScenarioExt::g_pStm = nullptr;
 
@@ -32,6 +34,8 @@ void ScenarioExt::ExtData::Serialize(T& Stm)
 	Stm
 		.Process(this->HasCustomBriefing)
 		.Process(this->CustomBriefing)
+		.Process(this->BlockLoadGame)
+		.Process(this->BlockSaveGame)
 		;
 }
 

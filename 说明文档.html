@@ -461,6 +461,7 @@ Command.RecruitRange=             ; double，默认 10.0</code></pre>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_12')" class="sec-toc__link">12. 小队路径可视化</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_13')" class="sec-toc__link">13. 任务信息/通关时间修改</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_14')" class="sec-toc__link">14. 游戏速度修改</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_15')" class="sec-toc__link">15. 暂停菜单存读档按钮禁用</a></li>
 </ul>
 </div>
 
@@ -877,6 +878,27 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 yes — 单位文本�
 
 </div>
 
+<hr class="sec-divider--double">
+
+<div id="actions_15">
+<h3 class="doc-heading--tertiary" style="margin-top:2em">15. 暂停菜单存读档按钮禁用</h3>
+<p>禁用/恢复Esc菜单右侧的「读取游戏」和「储存游戏」按钮，被禁用时按钮会变灰且无法点击。</p>
+<div class="doc-table--action">
+<table class="doc-table">
+<thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
+<tbody>
+<tr><td class="doc-table__td">683</td><td class="doc-table__td">禁止读档</td><td class="doc-table__td">无参数。</td></tr>
+<tr><td class="doc-table__td">684</td><td class="doc-table__td">禁止存档</td><td class="doc-table__td">无参数。</td></tr>
+<tr><td class="doc-table__td">685</td><td class="doc-table__td">恢复读档</td><td class="doc-table__td">无参数。</td></tr>
+<tr><td class="doc-table__td">686</td><td class="doc-table__td">恢复存档</td><td class="doc-table__td">无参数。</td></tr>
+</tbody>
+</table>
+</div>
+
+</div>
+
+</div>
+
 </section>
 
 
@@ -1044,7 +1066,7 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 yes — 单位文本�
 <div id="scripts_2">
 <h3 class="doc-heading--tertiary" style="margin-top:2em">2. 小队路径可视化</h3>
 <p>将小队单位的移动路径以虚线形式实时绘制在地图上, 颜色与所属方相同。</p>
-<p><a href="javascript:switchPage('actions');setTimeout(function(){scrollToFeature('actions_12')},100)" class="doc-link">→ 查看对应的触发行为及参数说明</a></p>
+<p><a href="javascript:switchPage('actions');setTimeout(function(){scrollToFeature('actions_12')},100)" class="doc-link">→ 查看对应的触发行为</a></p>
 
 <div class="doc-table--action">
 <table class="doc-table">

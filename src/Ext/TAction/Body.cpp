@@ -253,6 +253,15 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 	case PhobosTriggerAction::SetGameSpeed:
 		return TActionExt::SetGameSpeed(pThis, pHouse, pObject, pTrigger, location);
 
+	case PhobosTriggerAction::DisableLoadGame:
+		return TActionExt::DisableLoadGame(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::DisableSaveGame:
+		return TActionExt::DisableSaveGame(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::EnableLoadGame:
+		return TActionExt::EnableLoadGame(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::EnableSaveGame:
+		return TActionExt::EnableSaveGame(pThis, pHouse, pObject, pTrigger, location);
+
 	case PhobosTriggerAction::testAction:
 		return TActionExt::testAction(pThis, pHouse, pObject, pTrigger, location);
 
@@ -1936,6 +1945,66 @@ bool TActionExt::SetGameSpeed(TActionClass* pThis, HouseClass* pHouse, ObjectCla
 		return true;
 
 	GameOptionsClass::Instance.GameSpeed = 6 - value;
+	return true;
+}
+
+// 禁止读档
+bool TActionExt::DisableLoadGame(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	auto pExt = ScenarioExt::Global();
+	if (!pExt)
+	{
+		Debug::Log("[SaveLoad] DisableLoadGame: ScenarioExt::Global() == null\n");
+		return false;
+	}
+
+	pExt->BlockLoadGame = true;
+	Debug::Log("[SaveLoad] DisableLoadGame: ActionKind=%d -> BlockLoadGame=true\n", pThis->ActionKind);
+	return true;
+}
+
+// 禁止存档
+bool TActionExt::DisableSaveGame(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	auto pExt = ScenarioExt::Global();
+	if (!pExt)
+	{
+		Debug::Log("[SaveLoad] DisableSaveGame: ScenarioExt::Global() == null\n");
+		return false;
+	}
+
+	pExt->BlockSaveGame = true;
+	Debug::Log("[SaveLoad] DisableSaveGame: ActionKind=%d -> BlockSaveGame=true\n", pThis->ActionKind);
+	return true;
+}
+
+// 恢复读档
+bool TActionExt::EnableLoadGame(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	auto pExt = ScenarioExt::Global();
+	if (!pExt)
+	{
+		Debug::Log("[SaveLoad] EnableLoadGame: ScenarioExt::Global() == null\n");
+		return false;
+	}
+
+	pExt->BlockLoadGame = false;
+	Debug::Log("[SaveLoad] EnableLoadGame: ActionKind=%d -> BlockLoadGame=false\n", pThis->ActionKind);
+	return true;
+}
+
+// 恢复存档
+bool TActionExt::EnableSaveGame(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	auto pExt = ScenarioExt::Global();
+	if (!pExt)
+	{
+		Debug::Log("[SaveLoad] EnableSaveGame: ScenarioExt::Global() == null\n");
+		return false;
+	}
+
+	pExt->BlockSaveGame = false;
+	Debug::Log("[SaveLoad] EnableSaveGame: ActionKind=%d -> BlockSaveGame=false\n", pThis->ActionKind);
 	return true;
 }
 

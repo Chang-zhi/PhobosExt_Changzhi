@@ -14,14 +14,16 @@ public:
 	class ExtData final : public Extension<ScenarioClass>
 	{
 	public:
-		// Custom briefing text that overrides the displayed mission briefing (0xB04CA0)
-		// without touching the map file itself. Set by a trigger action and
-		// persisted through save / load.
 		wchar_t CustomBriefing[0x400];
 		bool HasCustomBriefing;
 
+		bool BlockLoadGame;
+		bool BlockSaveGame;
+
 		ExtData(ScenarioClass* OwnerObject) : Extension<ScenarioClass>(OwnerObject)
 			, HasCustomBriefing(false)
+			, BlockLoadGame(false)
+			, BlockSaveGame(false)
 		{
 			ZeroMemory(CustomBriefing, sizeof(CustomBriefing));
 		}

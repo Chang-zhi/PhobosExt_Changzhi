@@ -251,6 +251,18 @@ enum class PhobosTriggerAction : unsigned int
 	// 设置游戏速度
 	SetGameSpeed = 682,
 
+	// 禁止读档
+	DisableLoadGame = 683,
+
+	// 禁止存档
+	DisableSaveGame = 684,
+
+	// 恢复读档
+	EnableLoadGame = 685,
+
+	// 恢复存档
+	EnableSaveGame = 686,
+
 	// 测试用
 	testAction = 1150,
 };
@@ -378,6 +390,12 @@ static bool name(TActionClass* pThis, HouseClass* pHouse, \
 
 	// 设置游戏速度
 	ACTION_FUNC(SetGameSpeed);
+
+	// 存读档权限控制 Actions
+	ACTION_FUNC(DisableLoadGame);
+	ACTION_FUNC(DisableSaveGame);
+	ACTION_FUNC(EnableLoadGame);
+	ACTION_FUNC(EnableSaveGame);
 
 	// 测试用
 	ACTION_FUNC(testAction);
