@@ -19,6 +19,7 @@
 #include <MessageListClass.h>
 #include <ScenarioClass.h>
 #include <GameOptionsClass.h>
+#include <DisplayClass.h>
 
 #include <Utilities/SavegameDef.h>
 #include <Utilities/SpawnerHelper.h>
@@ -66,12 +67,20 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 {
 	bHandled = true;
 
+	// 行为 48(MoveCameraToWaypoint) / 112(CenterCameraAtWaypoint) 会把视野移动到指定路径点。
+	// 但若玩家正“跟随某个单位”, DisplayClass 每帧都会把战术镜头强制拉回被跟随单位,
+	// 覆盖该行动设置的镜头位置, 导致行为看起来“不执行”。故执行这两个行为时取消跟随状态。
 	// Vanilla
-	// switch (pThis->ActionKind)
-	// {
-	// default:
-	// 	break;
-	// };
+	switch (pThis->ActionKind)
+	{
+	case TriggerAction::MoveCameraToWaypoint:
+	case TriggerAction::CenterCameraAtWaypoint:
+		DisplayClass::Instance.FollowObject = false;
+		DisplayClass::Instance.ObjectToFollow = nullptr;
+		break;
+	default:
+		break;
+	}
 
 	// Phobos
 	switch (static_cast<PhobosTriggerAction>(pThis->ActionKind))

@@ -26,6 +26,7 @@
 <li class="nav__item" page="actions">新增触发行为</li>
 <li class="nav__item" page="events">新增触发事件</li>
 <li class="nav__item" page="scripts">新增动作脚本</li>
+<li class="nav__item" page="fixes">原版Bug修复</li>
 </ul></nav>
 
 <div class="doc-container">
@@ -1105,6 +1106,20 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 yes — 单位文本�
 
 </div>
 
+</section>
+
+
+<!----------------->
+<!---- 原版Bug修复 --->
+<!----------------->
+
+<section id="sec_fixes">
+<h2 class="doc-heading--secondary">原版Bug修复</h2>
+<p>以下针对原版引擎已存在的问题做了修复。</p>
+
+<h3 class="doc-heading--tertiary" style="margin-top:1.5em">1. 跟随单位时触发行为 48 / 112 失效</h3>
+<p>当玩家通过 Follow 按键正跟随某个单位时，执行触发行为 <code class="doc-code--inline">48=移动视野到路径点</code> 或 <code class="doc-code--inline">112=居中视野到路径点</code>，视野会一直被每帧强制拉回被跟随的单位，导致这两个行为看起来“不执行”。</p>
+<p>现已修复为：执行这两个行为时会自动取消当前“跟随单位”状态，确保视野能移动到指定的路径点。</p>
 </section>
 
 
