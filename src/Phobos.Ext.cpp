@@ -12,15 +12,15 @@
 #include <Ext/TeamType/Body.h>
 #include <Ext/Script/Body.h>
 
-#include <MyNew/TextBox/Entities/Base/MapTextBoxClass.h>
-#include <MyNew/TextBox/Entities/Derived/TechnoTextBoxClass.h>
-#include <MyNew/TextBox/Entities/Derived/WaypointTextBoxClass.h>
-#include <MyNew/TextBox/Types/TextBoxTypeClass.h>
-#include <MyNew/FootPath/FootPathVisualizer.h>
-#include <MyNew/ChoiceBox/Entities/Base/MapChoiceBoxClass.h>
-#include <MyNew/ChoiceBox/Entities/Derived/WaypointChoiceBoxClass.h>
-#include <MyNew/ChoiceBox/Entities/Derived/ScreenChoiceBoxClass.h>
-#include <MyNew/ChoiceBox/Types/ChoiceBoxTypeClass.h>
+#include <New/TextBox/Entities/Base/MapTextBoxClass.h>
+#include <New/TextBox/Entities/Derived/TechnoTextBoxClass.h>
+#include <New/TextBox/Entities/Derived/WaypointTextBoxClass.h>
+#include <New/TextBox/Types/TextBoxTypeClass.h>
+#include <New/FootPath/FootPathVisualizer.h>
+#include <New/ChoiceBox/Entities/Base/MapChoiceBoxClass.h>
+#include <New/ChoiceBox/Entities/Derived/WaypointChoiceBoxClass.h>
+#include <New/ChoiceBox/Entities/Derived/ScreenChoiceBoxClass.h>
+#include <New/ChoiceBox/Types/ChoiceBoxTypeClass.h>
 
 #include <utility>
 
@@ -260,83 +260,3 @@ DEFINE_HOOK(0x67FDB1, LoadOptionsClass_GetFileInfo, 0x7)
 	Info->InternalVersion = Info->InternalVersion - SAVEGAME_ID;
 	return 0;
 }
-
-
-#ifdef DEBUG
-
-#pragma warning (disable : 4091)
-#pragma warning (disable : 4245)
-
-#include <Dbghelp.h>
-#include <tlhelp32.h>
-
-bool Phobos::DetachFromDebugger()
-{
-	auto GetDebuggerProcessId = [](DWORD dwSelfProcessId) -> DWORD
-		{
-			DWORD dwParentProcessId = -1;
-			HANDLE hSnapshot = CreateToolhelp32Snapshot(2, 0);
-			PROCESSENTRY32 pe32;
-			pe32.dwSize = sizeof(PROCESSENTRY32);
-			Process32First(hSnapshot, &pe32);
-			do
-			{
-				if (pe32.th32ProcessID == dwSelfProcessId)
-				{
-					dwParentProcessId = pe32.th32ParentProcessID;
-					break;
-				}
-			}
-			while (Process32Next(hSnapshot, &pe32));
-			CloseHandle(hSnapshot);
-			return dwParentProcessId;
-		};
-
-	HMODULE hModule = LoadLibraryA("ntdll.dll");
-	if (hModule != NULL)
-	{
-		auto const NtRemoveProcessDebug =
-			(NTSTATUS(__stdcall*)(HANDLE, HANDLE))GetProcAddress(hModule, "NtRemoveProcessDebug");
-		auto const NtSetInformationDebugObject =
-			(NTSTATUS(__stdcall*)(HANDLE, ULONG, PVOID, ULONG, PULONG))GetProcAddress(hModule, "NtSetInformationDebugObject");
-		auto const NtQueryInformationProcess =
-			(NTSTATUS(__stdcall*)(HANDLE, ULONG, PVOID, ULONG, PULONG))GetProcAddress(hModule, "NtQueryInformationProcess");
-		auto const NtClose =
-			(NTSTATUS(__stdcall*)(HANDLE))GetProcAddress(hModule, "NtClose");
-
-		HANDLE hDebug;
-		HANDLE hCurrentProcess = GetCurrentProcess();
-		NTSTATUS status = NtQueryInformationProcess(hCurrentProcess, 30, &hDebug, sizeof(HANDLE), 0);
-		if (0 <= status)
-		{
-			ULONG killProcessOnExit = FALSE;
-			status = NtSetInformationDebugObject(
-				hDebug,
-				1,
-				&killProcessOnExit,
-				sizeof(ULONG),
-				NULL
-			);
-			if (0 <= status)
-			{
-				const auto pid = GetDebuggerProcessId(GetProcessId(hCurrentProcess));
-				status = NtRemoveProcessDebug(hCurrentProcess, hDebug);
-				if (0 <= status)
-				{
-					HANDLE hDbgProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
-					if (INVALID_HANDLE_VALUE != hDbgProcess)
-					{
-						BOOL ret = TerminateProcess(hDbgProcess, EXIT_SUCCESS);
-						CloseHandle(hDbgProcess);
-						return ret;
-					}
-				}
-			}
-			NtClose(hDebug);
-		}
-		FreeLibrary(hModule);
-	}
-
-	return false;
-}
-#endif

@@ -4,8 +4,8 @@
 #include <FPSCounter.h>
 #include <GameOptionsClass.h>
 #include <Ext/TechnoType/Body.h>
-#include <MyNew/TextBox/Types/TextBoxTypeClass.h>
-#include <MyNew/ChoiceBox/Types/ChoiceBoxTypeClass.h>
+#include <New/TextBox/Types/TextBoxTypeClass.h>
+#include <New/ChoiceBox/Types/ChoiceBoxTypeClass.h>
 #include <Ext/TAction/ScriptManipulator.h>
 #include <Ext/TAction/TaskForceManipulator.h>
 #include <Utilities/Patch.h>

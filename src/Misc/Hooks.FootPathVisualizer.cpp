@@ -1,4 +1,4 @@
-#include "FootPathVisualizer.h"
+#include <New/FootPath/FootPathVisualizer.h>
 #include <Syringe.h>
 #include <Helpers/Macro.h>
 

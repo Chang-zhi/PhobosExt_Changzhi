@@ -1,6 +1,6 @@
 #include "ScriptManipulator.h"
 
-#include "PhobosInterop.h"
+#include <Interop/PhobosInterop.h>
 
 #include <Ext/ScriptType/Body.h>
 #include <Ext/TeamType/Body.h>

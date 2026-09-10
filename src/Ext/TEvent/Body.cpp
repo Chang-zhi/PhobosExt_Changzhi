@@ -16,9 +16,9 @@
 #include <Fundamentals.h>
 // #include <Ext/Techno/DetectKiller.h>
 
-#include <MyNew/ChoiceBox/Entities/Derived/WaypointChoiceBoxClass.h>
-#include <MyNew/ChoiceBox/Entities/Derived/ScreenChoiceBoxClass.h>
-#include <MyNew/ChoiceBox/Entities/Base/MapChoiceBoxClass.h>
+#include <New/ChoiceBox/Entities/Derived/WaypointChoiceBoxClass.h>
+#include <New/ChoiceBox/Entities/Derived/ScreenChoiceBoxClass.h>
+#include <New/ChoiceBox/Entities/Base/MapChoiceBoxClass.h>
 
 #include <string>
 #include <map>

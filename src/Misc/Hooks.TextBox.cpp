@@ -1,4 +1,4 @@
-#include "Base/MapTextBoxClass.h"
+#include <New/TextBox/Entities/Base/MapTextBoxClass.h>
 
 #include <Syringe.h>
 #include <Helpers/Macro.h>
