@@ -1,7 +1,6 @@
 #include "Body.h"
-#include "MyNew/Helper.h"
-#include "MyNew/ScriptManipulator.h"
-#include "MyNew/TaskForceManipulator.h"
+#include "ScriptManipulator.h"
+#include "TaskForceManipulator.h"
 
 #include <PhobosInterop.h>
 
@@ -13,7 +12,7 @@
 #include <InfantryClass.h>
 #include <HouseClass.h>
 #include <Ext/House/Body.h>
-#include <Ext/Script/MyNew/FootPathVisualizer.h>
+#include <MyNew/FootPath/FootPathVisualizer.h>
 #include <Ext/Scenario/Body.h>
 #include <ArrayClasses.h>
 #include <MessageListClass.h>
@@ -23,6 +22,7 @@
 
 #include <Utilities/SavegameDef.h>
 #include <Utilities/SpawnerHelper.h>
+#include <Utilities/GeneralUtils.h>
 
 #include <MyNew/TextBox/Entities/Base/MapTextBoxClass.h>
 #include <MyNew/TextBox/Types/TextBoxTypeClass.h>
@@ -344,7 +344,7 @@ bool TActionExt::BindAllTeamMemberToTag(TActionClass* pThis, HouseClass* pHouse,
 	int tagIndex = pThis->Param4;
 	int forceNew = pThis->Param5;
 
-	TagClass* pTagClass = GetTagClassByIndex(tagIndex, forceNew);
+	TagClass* pTagClass = GeneralUtils::GetTagClassByIndex(tagIndex, forceNew);
 	if (!pTagClass) return false;
 
 	for (auto const pTechno : TechnoClass::Array)
@@ -378,7 +378,7 @@ bool TActionExt::BindOwnerTeamMemberToTag(TActionClass* pThis, HouseClass* pHous
 	int houseIndex = pThis->Param5;
 	int forceNew = pThis->Param6;
 
-	TagClass* pTagClass = GetTagClassByIndex(tagIndex, forceNew);
+	TagClass* pTagClass = GeneralUtils::GetTagClassByIndex(tagIndex, forceNew);
 	if (!pTagClass) return false;
 
 
@@ -418,7 +418,7 @@ bool TActionExt::BindAllTechnoTypeToTag(TActionClass* pThis, HouseClass* pHouse,
 	int tagIndex = pThis->Param3;
 	int forceNew = pThis->Param4;
 
-	TagClass* pTagClass = GetTagClassByIndex(tagIndex, forceNew);
+	TagClass* pTagClass = GeneralUtils::GetTagClassByIndex(tagIndex, forceNew);
 	if (!pTagClass) return false;
 
 	// 遍历 TechnoClass, 尝试将 TagClass 绑定到 TechnoClass 上
@@ -441,7 +441,7 @@ bool TActionExt::BindOwnerTechnoTypeToTag(TActionClass* pThis, HouseClass* pHous
 	int houseIndex = pThis->Param4;
 	int forceNew = pThis->Param5;
 
-	TagClass* pTagClass = GetTagClassByIndex(tagIndex, forceNew);
+	TagClass* pTagClass = GeneralUtils::GetTagClassByIndex(tagIndex, forceNew);
 	if (!pTagClass) return false;
 
 	HouseClass* pOwner = HouseClass::FindByCountryIndex(houseIndex);
@@ -740,7 +740,7 @@ bool TActionExt::BindTagToTechnoTypeAtWaypoint(TActionClass* pThis, HouseClass* 
 	int waypointIndex = pThis->Param4;
 	int forceNew = pThis->Param5;
 
-	TagClass* pTagClass = GetTagClassByIndex(tagIndex, forceNew);
+	TagClass* pTagClass = GeneralUtils::GetTagClassByIndex(tagIndex, forceNew);
 	if (!pTagClass) return false;
 
 	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
@@ -754,7 +754,7 @@ bool TActionExt::BindTagToTechnoTypeAtWaypoint(TActionClass* pThis, HouseClass* 
 			BuildingClass* pBuilding = abstract_cast<BuildingClass*>(pTechno);
 			if (pBuilding && pTechno->WhatAmI() == AbstractType::Building)
 			{
-				if(IsCellInBuildingFoundation(pBuilding, cell))
+				if(GeneralUtils::IsCellInBuildingFoundation(pBuilding, cell))
 				{
 					if (pBuilding->AttachedTag) pBuilding->ReplaceTag(pTagClass);
 					else pBuilding->AttachTrigger(pTagClass);
@@ -781,7 +781,7 @@ bool TActionExt::BindTagToTechnoTypeOfHouseAtWaypoint(TActionClass* pThis, House
 	int houseIndex = pThis->Param5;
 	int forceNew = pThis->Param6;
 
-	TagClass* pTagClass = GetTagClassByIndex(tagIndex, forceNew);
+	TagClass* pTagClass = GeneralUtils::GetTagClassByIndex(tagIndex, forceNew);
 	if (!pTagClass) return false;
 
 	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
@@ -800,7 +800,7 @@ bool TActionExt::BindTagToTechnoTypeOfHouseAtWaypoint(TActionClass* pThis, House
 			BuildingClass* pBuilding = abstract_cast<BuildingClass*>(pTechno);
 			if (pBuilding && pTechno->WhatAmI() == AbstractType::Building)
 			{
-				if (IsCellInBuildingFoundation(pBuilding, cell))
+				if (GeneralUtils::IsCellInBuildingFoundation(pBuilding, cell))
 				{
 					if (pBuilding->AttachedTag) pBuilding->ReplaceTag(pTagClass);
 					else pBuilding->AttachTrigger(pTagClass);
@@ -829,7 +829,7 @@ bool TActionExt::BindTagToSpecificTechnoTypeWithinWaypointRange(TActionClass* pT
 
 	// ======== 参数设置 ========
 
-	TagClass* pTagClass = GetTagClassByIndex(tagIndex, forceNew);
+	TagClass* pTagClass = GeneralUtils::GetTagClassByIndex(tagIndex, forceNew);
 	if (!pTagClass) return false;
 
 	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
@@ -840,7 +840,7 @@ bool TActionExt::BindTagToSpecificTechnoTypeWithinWaypointRange(TActionClass* pT
 	{
 		if (pTechno && pTechno->get_ID() == std::string(techno))
 		{
-			if (IsTechnoNearCell(pTechno, cell, range))
+			if (GeneralUtils::IsTechnoNearCell(pTechno, cell, range))
 			{
 				if (pTechno->AttachedTag) pTechno->ReplaceTag(pTagClass);
 				else pTechno->AttachTrigger(pTagClass);
@@ -860,7 +860,7 @@ bool TActionExt::BindTagToSpecificTechnoTypeOfSpecificOwnerWithinWaypointRange(T
 
 	// ======== 参数设置 ========
 
-	TagClass* pTagClass = GetTagClassByIndex(tagIndex, forceNew);
+	TagClass* pTagClass = GeneralUtils::GetTagClassByIndex(tagIndex, forceNew);
 	if (!pTagClass) return false;
 
 	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
@@ -873,7 +873,7 @@ bool TActionExt::BindTagToSpecificTechnoTypeOfSpecificOwnerWithinWaypointRange(T
 			&& pHouse == pTechno->Owner
 			&& pTechno->get_ID() == std::string(techno))
 		{
-			if (IsTechnoNearCell(pTechno, cell, range))
+			if (GeneralUtils::IsTechnoNearCell(pTechno, cell, range))
 			{
 				if (pTechno->AttachedTag) pTechno->ReplaceTag(pTagClass);
 				else pTechno->AttachTrigger(pTagClass);
@@ -895,7 +895,7 @@ bool TActionExt::BindTagToAllTechnoTypesWithinWaypointRange(TActionClass* pThis,
 
 	// ======== 参数设置 ========
 
-	TagClass* pTagClass = GetTagClassByIndex(tagIndex, forceNew);
+	TagClass* pTagClass = GeneralUtils::GetTagClassByIndex(tagIndex, forceNew);
 	if (!pTagClass) return false;
 
 	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
@@ -904,7 +904,7 @@ bool TActionExt::BindTagToAllTechnoTypesWithinWaypointRange(TActionClass* pThis,
 	// 遍历 TechnoClass, 尝试将 TagClass 绑定到 TechnoClass 上
 	for (TechnoClass* pTechno : TechnoClass::Array)
 	{
-		if (IsTechnoNearCell(pTechno, cell, range))
+		if (GeneralUtils::IsTechnoNearCell(pTechno, cell, range))
 		{
 			if (pTechno->AttachedTag) pTechno->ReplaceTag(pTagClass);
 			else pTechno->AttachTrigger(pTagClass);
@@ -929,7 +929,7 @@ bool TActionExt::BindTagToAllTechnoTypesOfSpecificOwnerWithinWaypointRange(TActi
 	HouseClass* pOwner = HouseClass::FindByCountryIndex(houseIndex);
 	if (!pOwner) return false;
 
-	TagClass* pTagClass = GetTagClassByIndex(tagIndex, forceNew);
+	TagClass* pTagClass = GeneralUtils::GetTagClassByIndex(tagIndex, forceNew);
 	if (!pTagClass) return false;
 
 	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
@@ -940,7 +940,7 @@ bool TActionExt::BindTagToAllTechnoTypesOfSpecificOwnerWithinWaypointRange(TActi
 	{
 		if(pOwner == pTechno->Owner)
 		{
-			if (IsTechnoNearCell(pTechno, cell, range))
+			if (GeneralUtils::IsTechnoNearCell(pTechno, cell, range))
 			{
 				if (pTechno->AttachedTag) pTechno->ReplaceTag(pTagClass);
 				else pTechno->AttachTrigger(pTagClass);
@@ -955,7 +955,7 @@ bool TActionExt::UnifyAllInstancesOfSameTagType(TActionClass* pThis, HouseClass*
 {
 	int tagIndex = pThis->Param3;
 
-	TagClass* pUnifiedTag = GetTagClassByIndex(tagIndex, true);
+	TagClass* pUnifiedTag = GeneralUtils::GetTagClassByIndex(tagIndex, true);
 	if (!pUnifiedTag) return false;
 
 	std::set<TagClass*> tagsToUnify;
@@ -1005,7 +1005,7 @@ bool TActionExt::BindTagsToAllTechTypesInWaypointRangeExceptSpecified
 
 	// ======== 参数设置 ========
 
-	TagClass* pTagClass = GetTagClassByIndex(tagIndex, forceNew);
+	TagClass* pTagClass = GeneralUtils::GetTagClassByIndex(tagIndex, forceNew);
 	if (!pTagClass) return false;
 
 	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
@@ -1020,7 +1020,7 @@ bool TActionExt::BindTagsToAllTechTypesInWaypointRangeExceptSpecified
 		if (pTechno->get_ID() == std::string(techno))
 			continue;
 
-		if (IsTechnoNearCell(pTechno, cell, range))
+		if (GeneralUtils::IsTechnoNearCell(pTechno, cell, range))
 		{
 			if (pTechno->AttachedTag) pTechno->ReplaceTag(pTagClass);
 			else pTechno->AttachTrigger(pTagClass);
@@ -1041,7 +1041,7 @@ bool TActionExt::BindTagsToAllTechTypesOfTriggerOwnerInWaypointRangeExceptSpecif
 
 	// ======== 参数设置 ========
 
-	TagClass* pTagClass = GetTagClassByIndex(tagIndex, forceNew);
+	TagClass* pTagClass = GeneralUtils::GetTagClassByIndex(tagIndex, forceNew);
 	if (!pTagClass) return false;
 
 	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
@@ -1063,7 +1063,7 @@ bool TActionExt::BindTagsToAllTechTypesOfTriggerOwnerInWaypointRangeExceptSpecif
 				continue;
 			}
 
-			if (IsTechnoNearCell(pTechno, cell, range))
+			if (GeneralUtils::IsTechnoNearCell(pTechno, cell, range))
 			{
 				// Debug::Log("AttachedTag, techno is \"%s\"\n", pTechno->get_ID());
 				if (pTechno->AttachedTag) pTechno->ReplaceTag(pTagClass);
@@ -1180,7 +1180,7 @@ bool TActionExt::CreateTeamConsideringLimits(TActionClass* pThis, HouseClass* pH
 			if(pEnemy && pEnemy != pOwner)
 			{
 
-				if(!CheckTaskForceZoneConnection(pOwner, pEnemy, pTeamType->TaskForce, requireAllZone))
+				if(!GeneralUtils::CheckTaskForceZoneConnection(pOwner, pEnemy, pTeamType->TaskForce, requireAllZone))
 				{
 					return true;
 				}
@@ -1232,7 +1232,7 @@ bool TActionExt::RecruitNearbyFootToTeam(TActionClass* pThis, HouseClass* pHouse
 			if (!pFoot->CanBeRecruited(pFoot->Owner))
 				continue;
 		}
-		if (!IsTechnoNearCell(pFoot, cell, range)) continue;
+		if (!GeneralUtils::IsTechnoNearCell(pFoot, cell, range)) continue;
 
 		pTeam->AddMember(pFoot, true);
 	}

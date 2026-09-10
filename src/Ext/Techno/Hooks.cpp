@@ -3,11 +3,11 @@
 #include <Unsorted.h>
 
 #include <Utilities/Debug.h>
-#include <Ext/Techno/MyNew/AutoHunt.h>
-#include <Ext/Techno/MyNew/LegalTargetAI.h>
-#include <Ext/Techno/MyNew/TemporalExclusive.h>
-#include <Ext/Techno/MyNew/TemporalAOE.h>
-#include <Ext/Techno/MyNew/BerzerkRestore.h>
+#include <Ext/Techno/AutoHunt.h>
+#include <Ext/Techno/LegalTargetAI.h>
+#include <Ext/Techno/TemporalExclusive.h>
+#include <Ext/Techno/TemporalAOE.h>
+#include <Ext/Techno/BerzerkRestore.h>
 
 
 // Avoid secondary jump

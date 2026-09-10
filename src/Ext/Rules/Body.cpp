@@ -6,8 +6,8 @@
 #include <Ext/TechnoType/Body.h>
 #include <MyNew/TextBox/Types/TextBoxTypeClass.h>
 #include <MyNew/ChoiceBox/Types/ChoiceBoxTypeClass.h>
-#include <Ext/TAction/MyNew/ScriptManipulator.h>
-#include <Ext/TAction/MyNew/TaskForceManipulator.h>
+#include <Ext/TAction/ScriptManipulator.h>
+#include <Ext/TAction/TaskForceManipulator.h>
 #include <Utilities/Patch.h>
 
 std::unique_ptr<RulesExt::ExtData> RulesExt::Data = nullptr;

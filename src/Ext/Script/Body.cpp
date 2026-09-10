@@ -1,6 +1,6 @@
 #include "Body.h"
-#include "MyNew/FootPathVisualizer.h"
-#include "MyNew/PatrolService.h"
+#include <MyNew/FootPath/FootPathVisualizer.h>
+#include "PatrolService.h"
 
 #include <CellSpread.h>
 #include <Helpers/Cast.h>

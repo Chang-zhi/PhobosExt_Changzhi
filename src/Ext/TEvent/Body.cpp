@@ -1,8 +1,8 @@
 #include "Body.h"
-#include "MyNew/Helper.h"
 
 #include <Utilities/SavegameDef.h>
 #include <Utilities/Debug.h>
+#include <Utilities/GeneralUtils.h>
 #include <cstdlib>
 #include <ScenarioClass.h>
 #include <BuildingClass.h>
@@ -14,7 +14,7 @@
 #include <TriggerClass.h>
 #include <GeneralStructures.h>
 #include <Fundamentals.h>
-// #include <Ext/Techno/MyNew/DetectKiller.h>
+// #include <Ext/Techno/DetectKiller.h>
 
 #include <MyNew/ChoiceBox/Entities/Derived/WaypointChoiceBoxClass.h>
 #include <MyNew/ChoiceBox/Entities/Derived/ScreenChoiceBoxClass.h>
@@ -152,7 +152,7 @@ bool TEventExt::TechnoTypeOfHouseNearWaypoint(TEventClass* pThis, HouseClass* pH
 	{
 		if(pTechno && pTechno->Owner == pHouse)
 		{
-			if (IsTechnoNearCell(pTechno, cell, range))
+			if (GeneralUtils::IsTechnoNearCell(pTechno, cell, range))
 			{
 				return true;
 			}
@@ -186,7 +186,7 @@ bool TEventExt::TechnoTypeOfHouseExistsAtWaypoint(TEventClass* pThis, HouseClass
 				if (BuildingClass* pBuilding = abstract_cast<BuildingClass*>(pTechno))
 				{
 					// Debug::Log("[TEventExt] Checking building foundation.\n");
-					if (IsCellInBuildingFoundation(pBuilding, cell))
+					if (GeneralUtils::IsCellInBuildingFoundation(pBuilding, cell))
 					{
 						// Debug::Log("[TEventExt] TechnoTypeOfHouseExistsAtWaypoint: Found Building at waypoint.\n");
 						return true;

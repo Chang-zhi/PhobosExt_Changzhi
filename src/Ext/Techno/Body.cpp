@@ -6,9 +6,9 @@
 #include <JumpjetLocomotionClass.h>
 
 #include <Utilities/AresFunctions.h>
-#include <Ext/Techno/MyNew/TemporalAOE.h>
-#include <Ext/Techno/MyNew/BerzerkRestore.h>
-#include <Ext/Techno/MyNew/TemporalExclusive.h>
+#include <Ext/Techno/TemporalAOE.h>
+#include <Ext/Techno/BerzerkRestore.h>
+#include <Ext/Techno/TemporalExclusive.h>
 #include <TemporalClass.h>
 
 TechnoExt::ExtContainer TechnoExt::ExtMap;
