@@ -104,8 +104,6 @@ bool TActionExt::AddBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseClass* 
 	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
 	if (cell.X < 0 || cell.Y < 0) return false;
 
-	const char* buildTypeID = BuildingTypeClass::Array[buildTypeIndex]->get_ID();
-
 	BaseNodeClass newNode = { buildTypeIndex, cell, false, 0 };
 
 	// ===== 强制放到最前面 =====
@@ -118,8 +116,6 @@ bool TActionExt::AddBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseClass* 
 	    	if (!pBuilding->Factory
 	    		|| !pBuilding->Factory->Object
 	    		|| pBuilding->Factory->Object->WhatAmI() != AbstractType::Building) continue;
-
-	    	TechnoTypeClass* pFactObjType = pBuilding->Factory->Object->GetTechnoType();
 
 	    	pBuilding->Factory->AbandonProduction();
 	    	pBuilding->Factory->QueuedObjects.Clear();

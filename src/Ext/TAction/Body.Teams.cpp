@@ -58,7 +58,6 @@ bool TActionExt::CreateTeamConsideringLimits(TActionClass* pThis, HouseClass* pH
 	if(!pTeamType) return false;
 
 
-	auto const id = pTeamType->get_ID();
 	auto const cnt = pTeamType->cntInstances;
 	auto const max = pTeamType->Max;
 
@@ -81,11 +80,11 @@ bool TActionExt::CreateTeamConsideringLimits(TActionClass* pThis, HouseClass* pH
 
 			if(!pEnemy || pEnemy == pOwner)
 			{
-				for(HouseClass* const pHouse : HouseClass::Array)
+				for(HouseClass* const pCurHouse : HouseClass::Array)
 				{
-					if(pHouse && pHouse != pOwner && !pOwner->IsAlliedWith(pHouse))
+					if(pCurHouse && pCurHouse != pOwner && !pOwner->IsAlliedWith(pCurHouse))
 					{
-						pEnemy = pHouse;
+						pEnemy = pCurHouse;
 						break;
 					}
 				}

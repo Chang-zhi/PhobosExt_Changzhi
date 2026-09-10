@@ -335,12 +335,12 @@ static int testChangeVar(bool bGlobal, int index, int value)
 	{
 		if (bGlobal)
 		{
-			ScenarioClass::Instance->GlobalVariables[index].Value = value;
+			ScenarioClass::Instance->GlobalVariables[index].Value = (char)value;
 			Debug::LogAndMessage("[OtherDll] [testChangeVar] ScenarioClass Global[%d] := %d\n", index, value);
 		}
 		else
 		{
-			ScenarioClass::Instance->LocalVariables[index].Value = value;
+			ScenarioClass::Instance->LocalVariables[index].Value = (char)value;
 			Debug::LogAndMessage("[OtherDll] [testChangeVar] ScenarioClass Local[%d] := %d\n", index, value);
 		}
 	}

@@ -251,7 +251,7 @@ void ValidateGlobals()
 
 	// 递归防护：防止级联回调，每帧重置
 	static int s_RecursionGuard = 0;
-	static DWORD s_lastRecFrame = 0;
+	static int s_lastRecFrame = 0;
 	if (Unsorted::CurrentFrame != s_lastRecFrame)
 	{
 		s_lastRecFrame = Unsorted::CurrentFrame;
@@ -811,7 +811,7 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 	// 递归防护：防止级联回调导致无限递归
 	// 每帧重置的全局计数器，确保一帧内不会无限递归
 	static int s_RecursionGuard = 0;
-	static DWORD s_lastGuardFrame = 0;
+	static int s_lastGuardFrame = 0;
 	if (Unsorted::CurrentFrame != s_lastGuardFrame)
 	{
 		s_lastGuardFrame = Unsorted::CurrentFrame;
