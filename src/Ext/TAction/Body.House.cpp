@@ -11,6 +11,8 @@
 #include <UnitClass.h>
 #include <InfantryClass.h>
 #include <HouseClass.h>
+#include <BuildingClass.h>
+#include <FactoryClass.h>
 #include <Ext/House/Body.h>
 #include <New/FootPath/FootPathVisualizer.h>
 #include <Ext/Scenario/Body.h>
@@ -324,6 +326,48 @@ bool TActionExt::UpdateOwnerBuildingsAnimations(TActionClass* pThis, HouseClass*
 			pBuilding->DisableStuff();
 			pBuilding->EnableStuff();
 		}
+	}
+
+	return true;
+}
+
+// =============================
+// 687: Sell All Buildings Of House
+// 变卖指定所属方的全部建筑。
+
+bool TActionExt::SellAllBuildingsOfHouse(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	const int houseIndex = pThis->Param3;
+
+	HouseClass* pOwner = HouseClass::FindByCountryIndex(houseIndex);
+	if (!pOwner) return false;
+
+	std::vector<BuildingClass*> targets;
+	for (BuildingClass* pBuilding : BuildingClass::Array)
+	{
+		if (!pBuilding)
+			continue;
+		if (pBuilding->Owner != pOwner)
+			continue;
+		if (!pBuilding->IsAlive || !pBuilding->IsOnMap || pBuilding->InLimbo)
+			continue;
+		if (!pBuilding->Type || pBuilding->Type->Unsellable)
+			continue;
+
+		targets.push_back(pBuilding);
+	}
+
+	if (targets.empty())
+		return true;
+
+	for (BuildingClass* pBuilding : targets)
+	{
+		if (!pBuilding || !pBuilding->IsAlive || pBuilding->InLimbo)
+			continue;
+		if (pBuilding->Owner != pOwner)
+			continue;
+
+		pBuilding->Sell(1);
 	}
 
 	return true;

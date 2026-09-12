@@ -263,6 +263,9 @@ enum class PhobosTriggerAction : unsigned int
 	// 恢复存档
 	EnableSaveGame = 686,
 
+	// 变卖指定所属方的全部建筑...
+	SellAllBuildingsOfHouse = 687,
+
 	// 测试用
 	testAction = 1150,
 };
@@ -396,6 +399,9 @@ static bool name(TActionClass* pThis, HouseClass* pHouse, \
 	ACTION_FUNC(DisableSaveGame);
 	ACTION_FUNC(EnableLoadGame);
 	ACTION_FUNC(EnableSaveGame);
+
+	// 变卖指定所属方的全部建筑
+	ACTION_FUNC(SellAllBuildingsOfHouse);
 
 	// 测试用
 	ACTION_FUNC(testAction);

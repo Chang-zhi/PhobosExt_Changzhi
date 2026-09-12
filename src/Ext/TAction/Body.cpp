@@ -262,6 +262,9 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 	case PhobosTriggerAction::EnableSaveGame:
 		return TActionExt::EnableSaveGame(pThis, pHouse, pObject, pTrigger, location);
 
+	case PhobosTriggerAction::SellAllBuildingsOfHouse:
+		return TActionExt::SellAllBuildingsOfHouse(pThis, pHouse, pObject, pTrigger, location);
+
 	case PhobosTriggerAction::testAction:
 		return TActionExt::testAction(pThis, pHouse, pObject, pTrigger, location);
 
