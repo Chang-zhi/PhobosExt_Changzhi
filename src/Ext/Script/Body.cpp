@@ -11,6 +11,7 @@
 #include <HouseClass.h>
 #include <UnitClass.h>
 #include <InfantryClass.h>
+#include <InfantryTypeClass.h>
 #include <BuildingClass.h>
 #include <BuildingTypeClass.h>
 
@@ -372,6 +373,41 @@ void ScriptExt::LoadIntoTransportsDistributed(TeamClass* pTeam)
 }
 
 // =============================
+// 目标可攻击性判定（对齐原版索敌）
+//
+// 原版链路: Mission_Hunt -> GreatestThreat(0x6F8DF0) -> CanAutoTargetObject(0x6F7CA0)
+// 在 CanAutoTargetObject 中，引擎对每个候选目标执行:
+//     GetFireErrorWithoutRange(target, weaponIndex) == FireError::ILLEGAL(5) -> 剔除
+// GetFireErrorWithoutRange 即 GetFireError(..., ignoreRange) 的转发（vtbl 239/240，
+// UnitClass=0x740FD0 / InfantryClass=0x51C8B0），其内部（sub_6FC0B0）对目标做:
+//     目标 IsInAir() 且武器弹道无 AA 标志 -> ILLEGAL
+//     目标非 IsInAir() 且武器弹道无 AG 标志 -> ILLEGAL
+// 因此 ILLEGAL 精确表示"该单位无论如何都打不到此目标"（地对空/空对地弹道
+// 不匹配、非法目标类型、已部署等），而 AMMO/RANGE/FACING/BUSY 等属于瞬时
+// 状态，不应作为剔除依据。ignoreRange = true 表示忽略射程只判定合法性，
+// 与引擎一致：打不到才剔除，够不着仍然算有效目标（交由移动/寻路处理）。
+// =============================
+
+static bool CanEngageTarget(FootClass* pFoot, TechnoClass* pTarget)
+{
+	if (!pFoot || !pTarget)
+		return false;
+
+	// 与引擎一致：逐个武器槽判定；空武器槽不参与
+	for (int i = 0; i < 2; ++i)
+	{
+		const auto pWeapon = pFoot->GetWeapon(i);
+		if (!pWeapon || !pWeapon->WeaponType)
+			continue;
+
+		if (pFoot->GetFireError(pTarget, i, true) != FireError::ILLEGAL)
+			return true;
+	}
+
+	return false;
+}
+
+// =============================
 // Mission_ScatterAttack - 分散攻击
 // 进入本动作时一次性将小队成员按方位角排序后均分为若干组（分组结果
 // 保存在 ExtData，不再每帧重分），每组作为一个整体锁定同一个目标
@@ -380,8 +416,16 @@ void ScriptExt::LoadIntoTransportsDistributed(TeamClass* pTeam)
 // 感知范围为全图（无限）：当整个地图上不再存在任何敌对单位，
 // 或所有敌人的目标单元格均无法抵达（寻路失败，与 AutoHunt 判定
 // 一致）时，脚本完成并推进到下一条（同时清空分组，下次进入重新分组）。
-// 脚本参数 Argument：分组数（至少 1 组），0/无效值按 1 组处理，
-// 超过成员数时按成员数（每人一组）。
+//
+// 脚本参数 Argument 编码（对齐 fa2sp 的 N = 额外参数×65536 + 参数）：
+//   低 16 位 = 分组数（至少 1 组），0/无效值按 1 组处理，
+//              超过成员数时按成员数（每人一组）。
+//   高 16 位 = 攻击目标（额外参数）：
+//              0      -> 不限制目标类型（任意敌人，保持原有行为）
+//              1..37  -> EvaluateObjectWithMask 内置目标分类掩码
+// 目标选择复用移植自上游的 GreatestThreat / EvaluateObjectWithMask，
+// 索敌方式固定为 calcThreatMode = 0（威胁值/距离加权，越近威胁越高），
+// 与上游 Mission_Attack() 的默认调用一致。
 // =============================
 
 void ScriptExt::Mission_ScatterAttack(TeamClass* pTeam)
@@ -409,8 +453,8 @@ void ScriptExt::Mission_ScatterAttack(TeamClass* pTeam)
 	// 一次性分组：首次进入本动作（或读档后/完成一轮后）按方位角排序均分
 	if (pExt->ScatterAttackGroups.empty())
 	{
-		// 分组数：脚本参数（至少 1 组），超过成员数时按成员数（每人一组）
-		int groupCount = pTeam->CurrentScript->Type->ScriptActions[pTeam->CurrentScript->CurrentMission].Argument;
+		// 分组数：低 16 位（至少 1 组），超过成员数时按成员数（每人一组）
+		int groupCount = pTeam->CurrentScript->Type->ScriptActions[pTeam->CurrentScript->CurrentMission].Argument & 0xFFFF;
 		if (groupCount < 1) groupCount = 1;
 		if (groupCount > static_cast<int>(members.size()))
 			groupCount = static_cast<int>(members.size());
@@ -498,26 +542,10 @@ void ScriptExt::Mission_ScatterAttack(TeamClass* pTeam)
 		}
 	}
 
-	// 收集全图敌人（存活、在地图上、敌对阵营、未被运载）
-	std::vector<TechnoClass*> enemies;
-	for (auto pTechno : TechnoClass::Array)
-	{
-		if (!pTechno->IsAlive || pTechno->Health <= 0 || pTechno->InLimbo || !pTechno->IsOnMap)
-			continue;
-		if (pTechno->Transporter)
-			continue;
-		auto const pEnemyOwner = pTechno->Owner;
-		if (!pEnemyOwner || pEnemyOwner == pTeam->Owner || pEnemyOwner->IsAlliedWith(pTeam->Owner))
-			continue;
-		enemies.push_back(pTechno);
-	}
-
-	// 地图上不再有敌人 -> 任务完成，清空分组（下次进入重新分组），推进脚本
-	if (enemies.empty())
-	{
-		pExt->ScatterAttackGroups.clear();
-		return;
-	}
+	// 攻击目标参数（Argument 高 16 位 / 额外参数）：
+	//   0      -> 不限制目标类型（兼容旧地图）
+	//   1..37  -> [AITargetCategories] 内置分类掩码
+	const int targetMask = static_cast<unsigned>(pTeam->CurrentScript->Type->ScriptActions[pTeam->CurrentScript->CurrentMission].Argument) >> 16;
 
 	// 节流：每 60 帧才重新选择一次目标，避免频繁重选导致目标切换、炮管乱转
 	if (pExt->ScatterAttackSelectionTimer > 0)
@@ -528,75 +556,88 @@ void ScriptExt::Mission_ScatterAttack(TeamClass* pTeam)
 	}
 	pExt->ScatterAttackSelectionTimer = 60;
 
-	// 目标分配：每组作为一个整体锁定同一个目标，已被锁定的敌人不再
-	// 分配给其他组，使各组分散攻击不同的敌人
-	std::vector<TechnoClass*> assignedTargets;
-	assignedTargets.reserve(pExt->ScatterAttackGroups.size());
+	constexpr int threatMode = 0;
 
-	// 是否有组找到了可抵达的目标（全为否 -> 所有敌人均无法抵达 -> 完成）
+	std::vector<TechnoClass*> assignedTargets;
+
 	bool anyGroupActionable = false;
 
 	for (auto& group : pExt->ScatterAttackGroups)
 	{
-		// 组中心：组内成员坐标的平均值，作为本组选目标的基准点
-		double groupCenterX = 0.0;
-		double groupCenterY = 0.0;
+		std::vector<TechnoClass*> unreachableTargets;
+
+		FootClass* const pLeader = group.front();
+
+		CoordStruct groupCenter{ 0, 0, 0 };
+
 		for (auto pFoot : group)
 		{
 			const CoordStruct c = pFoot->GetCoords();
-			groupCenterX += c.X;
-			groupCenterY += c.Y;
+			groupCenter.X += c.X;
+			groupCenter.Y += c.Y;
+			groupCenter.Z += c.Z;
 		}
-		groupCenterX /= group.size();
-		groupCenterY /= group.size();
 
-		// 组内寻路代理：第一个成员
-		FootClass* const pPathAgent = group.front();
+		const int groupSize = static_cast<int>(group.size());
+		groupCenter.X /= groupSize;
+		groupCenter.Y /= groupSize;
+		groupCenter.Z /= groupSize;
 
-		// 选组目标：优先未锁定最近，其次任意最近；用寻路代理检查目标
-		// 单元格是否可抵达（与 AutoHunt 一致），不可抵达则剔除该目标后
-		// 重选，直到找到可抵达目标或候选耗尽。
+		// agentMode：组内有渗透特工或工程师时跳过部分武器/免疫判定（对齐上游）
+		bool agentMode = false;
+		for (auto pFoot : group)
+		{
+			if (pFoot->WhatAmI() == AbstractType::Infantry)
+			{
+				const auto pTypeInf = static_cast<InfantryTypeClass*>(pFoot->GetTechnoType());
+
+				if ((pTypeInf->Agent && pTypeInf->Infiltrate) || pTypeInf->Engineer)
+				{
+					agentMode = true;
+					break;
+				}
+			}
+		}
+
 		TechnoClass* pGroupTarget = nullptr;
-		std::vector<TechnoClass*> unreachableTargets; // 本帧已判定不可抵达的目标
 
 		while (!pGroupTarget)
 		{
-			TechnoClass* bestUnassigned = nullptr;
-			double bestUnassignedDist = 0.0;
-			TechnoClass* bestAny = nullptr;
-			double bestAnyDist = 0.0;
+			// 首选：排除"已分配给其他组"和"不可用"的目标
+			std::vector<TechnoClass*> excludedTargets = assignedTargets;
+			excludedTargets.insert(excludedTargets.end(), unreachableTargets.begin(), unreachableTargets.end());
 
-			for (auto pEnemy : enemies)
+			TechnoClass* candidate = ScriptExt::GreatestThreat(pLeader, targetMask, threatMode,
+				nullptr, agentMode, &excludedTargets, &group, &groupCenter);
+
+			// 目标数少于分组数时退化为允许共用目标（只排除不可用的），与原行为一致
+			if (!candidate && !assignedTargets.empty())
 			{
-				if (!pEnemy->IsAlive || pEnemy->Health <= 0 || pEnemy->InLimbo)
-					continue;
-				if (std::find(unreachableTargets.begin(), unreachableTargets.end(), pEnemy) != unreachableTargets.end())
-					continue; // 本帧已判定不可抵达
+				candidate = ScriptExt::GreatestThreat(pLeader, targetMask, threatMode,
+					nullptr, agentMode, &unreachableTargets, &group, &groupCenter);
+			}
 
-				const CoordStruct e = pEnemy->GetCoords();
-				const double dx = groupCenterX - e.X;
-				const double dy = groupCenterY - e.Y;
-				const double dist = dx * dx + dy * dy;
+			if (!candidate)
+				break; // 候选耗尽：没有可打的目标了
 
-				if (!bestAny || dist < bestAnyDist)
+			// 组内至少一名成员能实际攻击该目标，否则视为不可用目标剔除
+			// （对齐原版索敌 GetFireError != ILLEGAL：排除地对空/空对地弹道
+			//  不匹配等打不到的目标，避免把目标锁给打不到它的单位导致挂机）
+			bool hasShooter = false;
+			for (auto pFoot : group)
+			{
+				if (CanEngageTarget(pFoot, candidate))
 				{
-					bestAny = pEnemy;
-					bestAnyDist = dist;
-				}
-
-				if (std::find(assignedTargets.begin(), assignedTargets.end(), pEnemy) == assignedTargets.end())
-				{
-					if (!bestUnassigned || dist < bestUnassignedDist)
-					{
-						bestUnassigned = pEnemy;
-						bestUnassignedDist = dist;
-					}
+					hasShooter = true;
+					break;
 				}
 			}
 
-			TechnoClass* const candidate = bestUnassigned ? bestUnassigned : bestAny;
-			if (!candidate)
-				break; // 所有目标均已尝试且不可抵达
+			if (!hasShooter)
+			{
+				unreachableTargets.push_back(candidate); // 全组都打不到，剔除后重选
+				continue;
+			}
 
 			// 组内已有成员正在攻击该目标 -> 视为可抵达（正在交战中），无需寻路检查
 			bool alreadyEngaging = false;
@@ -609,7 +650,7 @@ void ScriptExt::Mission_ScatterAttack(TeamClass* pTeam)
 				}
 			}
 
-			if (alreadyEngaging || !pPathAgent || pPathAgent->UpdatePathfinding(candidate->GetMapCoords(), false, 0))
+			if (alreadyEngaging || pLeader->UpdatePathfinding(candidate->GetMapCoords(), false, 0))
 			{
 				pGroupTarget = candidate;
 				break;
@@ -626,8 +667,9 @@ void ScriptExt::Mission_ScatterAttack(TeamClass* pTeam)
 		// 组内所有成员锁定同一个目标
 		for (auto pFoot : group)
 		{
-			// 无武器的成员原地警戒
-			if (!pFoot->IsArmed())
+			// 无法攻击该目标的成员原地警戒，不锁定目标
+			// （CanEngageTarget 已覆盖主/副两个武器槽，无需再判 IsArmed）
+			if (!CanEngageTarget(pFoot, pGroupTarget))
 			{
 				if (pFoot->GetCurrentMission() != Mission::Guard)
 					pFoot->QueueMission(Mission::Guard, false);
@@ -642,6 +684,7 @@ void ScriptExt::Mission_ScatterAttack(TeamClass* pTeam)
 			pFoot->QueueMission(Mission::Attack, true);
 		}
 
+		// 本组已锁定该目标，后续分组优先不选它
 		assignedTargets.push_back(pGroupTarget);
 	}
 
@@ -703,7 +746,7 @@ namespace
 			if (!pBuilding || !pBuilding->IsAlive || pBuilding->InLimbo)
 				continue;
 			if (!pBuilding->Owner)
-				continue; 
+				continue;
 			if (pType && pBuilding->GetType() != static_cast<ObjectTypeClass*>(pType))
 				continue;
 

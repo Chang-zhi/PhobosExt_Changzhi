@@ -4,6 +4,10 @@
 #include <HouseClass.h>
 #include <ScenarioClass.h>
 #include <JumpjetLocomotionClass.h>
+#include <MapClass.h>
+#include <CellClass.h>
+#include <WeaponTypeClass.h>
+#include <TechnoTypeClass.h>
 
 #include <Utilities/AresFunctions.h>
 #include <Ext/Techno/TemporalAOE.h>
@@ -147,6 +151,81 @@ bool TechnoExt::SaveGlobals(PhobosStreamWriter& Stm)
 {
 	return Stm
 		.Success();
+}
+
+// =============================
+// 目标是否落在本单位可抵达的移动区域
+// zoneScanType 由 TechnoTypeExt::TargetZoneScanType 提供
+
+bool TechnoExt::AllowedTargetByZone(TechnoClass* pThis, TechnoClass* pTarget, TargetZoneScanType zoneScanType, WeaponTypeClass* pWeapon, bool useZone, int zone)
+{
+	if (!pThis || !pTarget)
+		return false;
+
+	if (pThis->WhatAmI() == AbstractType::Aircraft)
+		return true;
+
+	auto const pType = pThis->GetTechnoType();
+	auto const mZone = pType->MovementZone;
+	const int currentZone = useZone ? zone : MapClass::Instance.GetMovementZoneType(pThis->GetMapCoords(), mZone, pThis->OnBridge);
+
+	if (currentZone != -1)
+	{
+		if (zoneScanType == TargetZoneScanType::Any)
+			return true;
+
+		const int targetZone = MapClass::Instance.GetMovementZoneType(pTarget->GetMapCoords(), mZone, pTarget->OnBridge);
+
+		if (zoneScanType == TargetZoneScanType::Same)
+		{
+			if (currentZone != targetZone)
+				return false;
+		}
+		else
+		{
+			if (currentZone == targetZone)
+				return true;
+
+			auto const speedType = pType->SpeedType;
+			auto const cellStruct = MapClass::Instance.NearByLocation(CellClass::Coord2Cell(pTarget->Location),
+				speedType, -1, mZone, false, 1, 1, true,
+				false, false, speedType != SpeedType::Float, CellStruct::Empty, false, false);
+
+			if (cellStruct == CellStruct::Empty)
+				return false;
+
+			auto const pCell = MapClass::Instance.TryGetCellAt(cellStruct);
+
+			if (!pCell)
+				return false;
+
+			if (!pWeapon)
+			{
+				const int weaponIndex = pThis->SelectWeapon(pTarget);
+
+				if (weaponIndex < 0)
+					return false;
+
+				const auto pWeaponStruct = pThis->GetWeapon(weaponIndex);
+
+				if (!pWeaponStruct)
+					return false;
+
+				pWeapon = pWeaponStruct->WeaponType;
+
+				if (!pWeapon)
+					return false;
+			}
+
+			const double distanceSq = pCell->GetCoordsWithBridge().DistanceFromSquared(pTarget->GetCenterCoords());
+			const double range = (double)pWeapon->Range;
+
+			if (distanceSq > range * range)
+				return false;
+		}
+	}
+
+	return true;
 }
 
 // =============================

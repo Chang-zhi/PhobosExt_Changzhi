@@ -1408,7 +1408,7 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 yes — 单位文本�
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
 <tbody>
-<tr><td class="doc-table__td">5503</td><td class="doc-table__td">分散攻击</td><td class="doc-table__td">分组数（1~成员数，0 视为 1 组）。</td></tr>
+<tr><td class="doc-table__td">5503</td><td class="doc-table__td">分散攻击</td><td class="doc-table__td">分组数, 攻击目标类型(与Phobos对齐)</td></tr>
 </tbody>
 </table>
 </div>
@@ -1417,6 +1417,7 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 yes — 单位文本�
 <ul class="doc-list--content">
 <li><strong>分组：</strong>进入本动作时按成员相对小队中心的方位角将成员均分为指定组数，<strong>仅分组一次</strong>，此后不再重新分组。成员死亡自动从组中移除；新加入的成员并入成员最少的组。</li>
 <li><strong>目标选择：</strong>每组以组中心为基准选择最近的未锁定敌人，组内所有成员锁定同一个目标；不同组优先攻击不同目标。每 60 帧重新选择一次目标。</li>
+<li><strong>兼容性说明：</strong>一部分攻击目标类型需要有Phobos才能正常使用。</li>
 <li><strong>完成条件：</strong>当地图上不再存在任何敌对单位，或所有敌人的目标单元格均无法抵达时，脚本完成并推进到下一条。</li>
 </ul>
 

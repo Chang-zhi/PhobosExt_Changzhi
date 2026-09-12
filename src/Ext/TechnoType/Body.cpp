@@ -62,6 +62,10 @@ void TechnoTypeExt::ExtData::LoadFromINIFile(CCINIClass* const pINI)
 	this->AutoHunt.Read(exINI, pSection, "AutoHunt");
 	this->LegalTargetWhenAIOwner.Read(exINI, pSection, "LegalTargetWhenAIOwner");
 
+	this->TargetZoneScanType.Read(exINI, pSection, "TargetZoneScanType");
+	this->RadarJamRadius.Read(exINI, pSection, "RadarJamRadius");
+	this->InhibitorRange.Read(exINI, pSection, "InhibitorRange");
+
 }
 
 void TechnoTypeExt::ExtData::LoadFromINIByWhatAmI(INI_EX& exINI, const char* pSection, INI_EX& exArtINI, const char* pArtSection)
@@ -85,6 +89,9 @@ void TechnoTypeExt::ExtData::Serialize(T& Stm)
 	Stm
 		.Process(this->AutoHunt)
 		.Process(this->LegalTargetWhenAIOwner)
+		.Process(this->TargetZoneScanType)
+		.Process(this->RadarJamRadius)
+		.Process(this->InhibitorRange)
 		;
 }
 void TechnoTypeExt::ExtData::LoadFromStream(PhobosStreamReader& Stm)
