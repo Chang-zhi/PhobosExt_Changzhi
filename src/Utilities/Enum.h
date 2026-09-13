@@ -224,6 +224,14 @@ enum class TargetZoneScanType
 	InRange = 2
 };
 
+enum class SmartVHPScanType
+{
+	None = 0,
+	LowHealth = 1,
+	FullHealth = 2,
+	Count = 3,
+};
+
 enum class DamageDisplayType
 {
 	Regular = 0,

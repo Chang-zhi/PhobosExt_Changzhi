@@ -66,6 +66,15 @@ void TechnoTypeExt::ExtData::LoadFromINIFile(CCINIClass* const pINI)
 	this->RadarJamRadius.Read(exINI, pSection, "RadarJamRadius");
 	this->InhibitorRange.Read(exINI, pSection, "InhibitorRange");
 
+	// SmartVHPScan
+	this->SmartVHPScan.Read(exINI, pSection, "SmartVHPScan");
+	this->SmartVHPScan_Count.Read(exINI, pSection, "SmartVHPScan.Count");
+	this->SmartVHPScan_AllowOverflow.Read(exINI, pSection, "SmartVHPScan.AllowOverflow");
+	this->SmartVHPScan_Damage.Read(exINI, pSection, "SmartVHPScan.Damage");
+	this->SmartVHPScan_Bias.Read(exINI, pSection, "SmartVHPScan.Bias");
+	this->SmartVHPScan_UnknownFactor.Read(exINI, pSection, "SmartVHPScan.UnknownFactor");
+	this->SmartVHPScan_ExcludeFraction.Read(exINI, pSection, "SmartVHPScan.ExcludeFraction");
+
 }
 
 void TechnoTypeExt::ExtData::LoadFromINIByWhatAmI(INI_EX& exINI, const char* pSection, INI_EX& exArtINI, const char* pArtSection)
@@ -92,6 +101,13 @@ void TechnoTypeExt::ExtData::Serialize(T& Stm)
 		.Process(this->TargetZoneScanType)
 		.Process(this->RadarJamRadius)
 		.Process(this->InhibitorRange)
+		.Process(this->SmartVHPScan)
+		.Process(this->SmartVHPScan_Count)
+		.Process(this->SmartVHPScan_AllowOverflow)
+		.Process(this->SmartVHPScan_Damage)
+		.Process(this->SmartVHPScan_Bias)
+		.Process(this->SmartVHPScan_UnknownFactor)
+		.Process(this->SmartVHPScan_ExcludeFraction)
 		;
 }
 void TechnoTypeExt::ExtData::LoadFromStream(PhobosStreamReader& Stm)

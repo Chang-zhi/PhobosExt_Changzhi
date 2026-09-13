@@ -407,26 +407,7 @@ static bool CanEngageTarget(FootClass* pFoot, TechnoClass* pTarget)
 	return false;
 }
 
-// =============================
-// Mission_ScatterAttack - 分散攻击
-// 进入本动作时一次性将小队成员按方位角排序后均分为若干组（分组结果
-// 保存在 ExtData，不再每帧重分），每组作为一个整体锁定同一个目标
-// （组内所有成员攻击同一敌人），不同组锁定不同目标，使各组向不同
-// 方向分散攻击。此后每帧只检查组成员是否仍然有效，并移除失效成员。
-// 感知范围为全图（无限）：当整个地图上不再存在任何敌对单位，
-// 或所有敌人的目标单元格均无法抵达（寻路失败，与 AutoHunt 判定
-// 一致）时，脚本完成并推进到下一条（同时清空分组，下次进入重新分组）。
-//
-// 脚本参数 Argument 编码（对齐 fa2sp 的 N = 额外参数×65536 + 参数）：
-//   低 16 位 = 分组数（至少 1 组），0/无效值按 1 组处理，
-//              超过成员数时按成员数（每人一组）。
-//   高 16 位 = 攻击目标（额外参数）：
-//              0      -> 不限制目标类型（任意敌人，保持原有行为）
-//              1..37  -> EvaluateObjectWithMask 内置目标分类掩码
-// 目标选择复用移植自上游的 GreatestThreat / EvaluateObjectWithMask，
-// 索敌方式固定为 calcThreatMode = 0（威胁值/距离加权，越近威胁越高），
-// 与上游 Mission_Attack() 的默认调用一致。
-// =============================
+
 
 void ScriptExt::Mission_ScatterAttack(TeamClass* pTeam)
 {
@@ -547,28 +528,15 @@ void ScriptExt::Mission_ScatterAttack(TeamClass* pTeam)
 	//   1..37  -> [AITargetCategories] 内置分类掩码
 	const int targetMask = static_cast<unsigned>(pTeam->CurrentScript->Type->ScriptActions[pTeam->CurrentScript->CurrentMission].Argument) >> 16;
 
-	// 节流：每 60 帧才重新选择一次目标，避免频繁重选导致目标切换、炮管乱转
-	if (pExt->ScatterAttackSelectionTimer > 0)
-	{
-		pExt->ScatterAttackSelectionTimer--;
-		pTeam->StepCompleted = false;
-		return;
-	}
-	pExt->ScatterAttackSelectionTimer = 60;
-
 	constexpr int threatMode = 0;
 
+	// 本组已锁定的目标集合（不同组优先使用不同目标）
 	std::vector<TechnoClass*> assignedTargets;
 
-	bool anyGroupActionable = false;
-
-	for (auto& group : pExt->ScatterAttackGroups)
+	// 每组一份的索敌上下文：组中心 + 组内是否带渗透特工/工程师（对齐上游）
+	auto const computeGroupContext = [](const std::vector<FootClass*>& group, CoordStruct& groupCenter) -> bool
 	{
-		std::vector<TechnoClass*> unreachableTargets;
-
-		FootClass* const pLeader = group.front();
-
-		CoordStruct groupCenter{ 0, 0, 0 };
+		groupCenter = CoordStruct{ 0, 0, 0 };
 
 		for (auto pFoot : group)
 		{
@@ -584,7 +552,6 @@ void ScriptExt::Mission_ScatterAttack(TeamClass* pTeam)
 		groupCenter.Z /= groupSize;
 
 		// agentMode：组内有渗透特工或工程师时跳过部分武器/免疫判定（对齐上游）
-		bool agentMode = false;
 		for (auto pFoot : group)
 		{
 			if (pFoot->WhatAmI() == AbstractType::Infantry)
@@ -592,16 +559,20 @@ void ScriptExt::Mission_ScatterAttack(TeamClass* pTeam)
 				const auto pTypeInf = static_cast<InfantryTypeClass*>(pFoot->GetTechnoType());
 
 				if ((pTypeInf->Agent && pTypeInf->Infiltrate) || pTypeInf->Engineer)
-				{
-					agentMode = true;
-					break;
-				}
+					return true;
 			}
 		}
 
-		TechnoClass* pGroupTarget = nullptr;
+		return false;
+	};
 
-		while (!pGroupTarget)
+	// 本组索敌：GreatestThreat + 排除已分配/不可达目标 + 可达性寻路
+	auto const selectGroupTarget = [&](const std::vector<FootClass*>& group, FootClass* const pLeader,
+		const CoordStruct& groupCenter, bool agentMode) -> TechnoClass*
+	{
+		std::vector<TechnoClass*> unreachableTargets;
+
+		while (true)
 		{
 			// 首选：排除"已分配给其他组"和"不可用"的目标
 			std::vector<TechnoClass*> excludedTargets = assignedTargets;
@@ -651,12 +622,41 @@ void ScriptExt::Mission_ScatterAttack(TeamClass* pTeam)
 			}
 
 			if (alreadyEngaging || pLeader->UpdatePathfinding(candidate->GetMapCoords(), false, 0))
-			{
-				pGroupTarget = candidate;
-				break;
-			}
+				return candidate;
 
 			unreachableTargets.push_back(candidate); // 不可抵达，剔除后重选
+		}
+
+		return nullptr;
+	};
+
+	// 对齐原版行为：锁定一次后不再做周期性重锁，仅当组锁定目标
+	// 失效（死亡/离场/不再敌对）时才重新索敌，其余情况保持原有锁定不变。
+	bool anyGroupActionable = false;
+
+	for (auto& group : pExt->ScatterAttackGroups)
+	{
+		FootClass* const pLeader = group.front();
+
+		// 组目标沿用组员当前仍有效的锁定
+		TechnoClass* pGroupTarget = nullptr;
+		for (auto pFoot : group)
+		{
+			TechnoClass* const pCurrent = static_cast<TechnoClass*>(pFoot->Target);
+			if (pCurrent && pCurrent->Health > 0 && !pCurrent->InLimbo && pCurrent->IsOnMap
+				&& !pFoot->Owner->IsAlliedWith(pCurrent->Owner))
+			{
+				pGroupTarget = pCurrent;
+				break;
+			}
+		}
+
+		// 组锁定目标失效 -> 本组重新索敌
+		if (!pGroupTarget)
+		{
+			CoordStruct groupCenter;
+			const bool agentMode = computeGroupContext(group, groupCenter);
+			pGroupTarget = selectGroupTarget(group, pLeader, groupCenter, agentMode);
 		}
 
 		if (!pGroupTarget)
@@ -664,7 +664,7 @@ void ScriptExt::Mission_ScatterAttack(TeamClass* pTeam)
 
 		anyGroupActionable = true;
 
-		// 组内所有成员锁定同一个目标
+		// 组内所有成员锁定同一个目标（新入队/被打散成员在此补锁到组目标）
 		for (auto pFoot : group)
 		{
 			// 无法攻击该目标的成员原地警戒，不锁定目标

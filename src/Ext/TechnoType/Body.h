@@ -4,6 +4,7 @@
 #include <Helpers/Macro.h>
 #include <Utilities/Container.h>
 #include <Utilities/TemplateDef.h>
+#include <Utilities/Enum.h>
 
 class Matrix3D;
 class ParticleSystemTypeClass;
@@ -24,12 +25,30 @@ public:
 		Valueable<int> RadarJamRadius;
 		Nullable<int> InhibitorRange;
 
+		Valueable<SmartVHPScanType> SmartVHPScan;
+		Valueable<int> SmartVHPScan_Count;
+		Valueable<bool> SmartVHPScan_AllowOverflow;
+		// 自定义等效伤害: 填 0(默认)时自动取武器自带 Damage 参与打分;
+		// 填非 0 值则用该值(优先)。任何单位适用。
+		// 用途: 心控/超时空/EMP 等 Damage=0 的武器可借此指定等效伤害。
+		Valueable<int> SmartVHPScan_Damage;
+		Valueable<double> SmartVHPScan_Bias;
+		Valueable<double> SmartVHPScan_UnknownFactor;
+		Valueable<double> SmartVHPScan_ExcludeFraction;
+
 		ExtData(TechnoTypeClass* OwnerObject) : Extension<TechnoTypeClass>(OwnerObject)
 			, AutoHunt { false }
 			, LegalTargetWhenAIOwner { true }
 			, TargetZoneScanType { TargetZoneScanType::Same }
 			, RadarJamRadius { 0 }
 			, InhibitorRange { }
+			, SmartVHPScan { SmartVHPScanType::None }
+			, SmartVHPScan_Count { 1 }
+			, SmartVHPScan_AllowOverflow { false }
+			, SmartVHPScan_Damage { 0 }
+			, SmartVHPScan_Bias { 2.0 }
+			, SmartVHPScan_UnknownFactor { 1.0 }
+			, SmartVHPScan_ExcludeFraction { 0.0 }
 		{ }
 
 		virtual ~ExtData() = default;

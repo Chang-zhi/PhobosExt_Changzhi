@@ -41,7 +41,6 @@ public:
 	{
 	public:
 		ExtData(ScriptClass* OwnerObject) : Extension<ScriptClass>(OwnerObject)
-			, ScatterAttackSelectionTimer(0)
 			, LastProcessedMission(-1)
 		{ }
 
@@ -52,7 +51,6 @@ public:
 		virtual void LoadFromStream(PhobosStreamReader& Stm) override;
 		virtual void SaveToStream(PhobosStreamWriter& Stm) override;
 
-		int ScatterAttackSelectionTimer;
 		std::vector<std::vector<FootClass*>> ScatterAttackGroups;
 		int LastProcessedMission;
 	};
