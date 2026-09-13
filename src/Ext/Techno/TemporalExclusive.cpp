@@ -196,6 +196,9 @@ void UpdateTemporalExclusive()
 		if (!pInst || !pInst->Target)
 			continue;
 
+		if (pInst->Target->TemporalTargetingMe == pInst && pInst->NextTemporal)
+			pInst->Target->TemporalTargetingMe = pInst->NextTemporal;
+
 		Debug::Log("[TemporalExclusive] Releasing duplicate temporal: %s -> %s\n",
 			pInst->Owner ? pInst->Owner->GetTechnoType()->ID : "<none>",
 			pInst->Target->GetTechnoType()->ID);

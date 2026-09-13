@@ -14,18 +14,54 @@
 #include <MapClass.h>
 #include <set>
 #include <cmath>
+#include <cstdarg>
+#include <cstdio>
 
 #include <TemporalClass.h>
 #include <Ext/Techno/Body.h>
 #include <Ext/WarheadType/Body.h>
 #include <Utilities/Debug.h>
 
-// 文件日志辅助（Debug::Log 只输出到调试器，崩溃时丢失）
-#define FILELOG(fmt, ...) do { \
-	FILE* _fl = nullptr; \
-	fopen_s(&_fl, "PhobosExt_AOE.log", "a"); \
-	if (_fl) { fprintf(_fl, fmt, ##__VA_ARGS__); fflush(_fl); fclose(_fl); } \
-} while(0)
+
+
+#define AOE_LOG_MAX_BYTES (4 * 1024 * 1024)
+
+inline void AOELogWrite(const char* fmt, ...)
+{
+	static FILE* s_log = nullptr;
+	static long  s_written = 0;
+
+	// 超过上限：回绕重写，避免日志文件无限膨胀
+	if (s_log && s_written > AOE_LOG_MAX_BYTES)
+	{
+		s_written = 0;
+		fclose(s_log);
+		s_log = nullptr;
+		fopen_s(&s_log, "PhobosExt_AOE.log", "w");
+	}
+
+	if (!s_log)
+	{
+		fopen_s(&s_log, "PhobosExt_AOE.log", "a");
+		s_written = 0;
+	}
+
+	if (!s_log)
+		return;
+
+	va_list args;
+	va_start(args, fmt);
+	int written = vfprintf(s_log, fmt, args);
+	va_end(args);
+
+	if (written > 0)
+		s_written += written;
+
+	// 保留即时刷新：崩溃时日志不丢（这正是当初用文件日志的原因）
+	fflush(s_log);
+}
+
+#define FILELOG(fmt, ...) AOELogWrite(fmt, ##__VA_ARGS__)
 
 namespace TemporalAOE
 {
@@ -361,14 +397,29 @@ void ValidateGlobals()
 					auto pTemp = it->second.FakeTemporal;
 					if (pTemp)
 					{
-						pTarget->TemporalTargetingMe = nullptr;
-						pTarget->BeingWarpedOut = false;
-						ForceTechnoRedraw(pTarget);
+						if (pTarget)
+						{
+							pTarget->TemporalTargetingMe = nullptr;
+							pTarget->BeingWarpedOut = false;
+							ForceTechnoRedraw(pTarget);
+						}
 						pTemp->Target = nullptr;
 						pTemp->Owner = nullptr;
 						TemporalClass::Array.AddItem(pTemp);
 						GameDelete(pTemp);
 					}
+
+					if (auto* pAtk = it->second.Attacker)
+					{
+						auto setIt = SecondariesByAttacker.find(pAtk);
+						if (setIt != SecondariesByAttacker.end())
+						{
+							setIt->second.erase(pTarget);
+							if (setIt->second.empty())
+								SecondariesByAttacker.erase(setIt);
+						}
+					}
+
 					it = FakeTemporals.erase(it);
 				}
 				else
@@ -1230,6 +1281,9 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 				newTargets.push_back(pCandidate);
 			}
 
+			std::unordered_set<TechnoClass*> newTargetSet(newTargets.begin(), newTargets.end());
+			std::unordered_set<TechnoClass*> oldTargetSet(state.TargetsInRange.begin(), state.TargetsInRange.end());
+
 			//Debug::Log("[TemporalAOE] %s scan result: %d secondary targets around %s\n",
 			//	pThis->GetTechnoType()->ID, newTargets.size(), pTarget->GetTechnoType()->ID);
 
@@ -1246,11 +1300,7 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 				// 跳过正在被其他攻击者抹除的目标（悬垂指针不能调用 WhatAmI/GetTechnoType）
 				if (TemporalAOE::WarpingOutTargets.count(pOld))
 					continue;
-				bool stillInRange = false;
-				for (auto pNew : newTargets)
-				{
-					if (pOld == pNew) { stillInRange = true; break; }
-				}
+				bool stillInRange = newTargetSet.find(pOld) != newTargetSet.end();
 				if (!stillInRange)
 				{
 					targetsChanged = true;
@@ -1278,12 +1328,7 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 				// 跳过正在被其他攻击者抹除的目标
 				if (TemporalAOE::WarpingOutTargets.count(pNew))
 					continue;
-				bool isNew = true;
-				// 拷贝迭代，防并发修改
-				for (auto pOld : std::vector<TechnoClass*>(state.TargetsInRange))
-				{
-					if (pNew == pOld) { isNew = false; break; }
-				}
+				bool isNew = oldTargetSet.find(pNew) == oldTargetSet.end();
 				if (!isNew) continue;
 
 				targetsChanged = true;
@@ -1332,11 +1377,7 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 			for (auto pOld : std::vector<TechnoClass*>(state.TargetsInRange))
 			{
 				if (!pOld) continue;
-				bool stillExists = false;
-				for (auto pNew : newTargets)
-				{
-					if (pNew && pOld == pNew) { stillExists = true; break; }
-				}
+				bool stillExists = newTargetSet.find(pOld) != newTargetSet.end();
 				if (!stillExists)
 				{
 					TemporalAOE::SecondaryClaims.erase(pOld);
@@ -1489,15 +1530,22 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 			pThis->TemporalImUsing->WarpRemaining = 0x7FFFFFFF;
 		}
 
-		// 同步重置所有假 Temporal 的字段，防 Phobos GetWarpPerStep 遍历到它们
-		for (auto& ft : TemporalAOE::FakeTemporals)
+
 		{
-			if (ft.second.Attacker != pThis)
-				continue;
-			if (auto pFake = ft.second.FakeTemporal)
+			auto secIt = TemporalAOE::SecondariesByAttacker.find(pThis);
+			if (secIt != TemporalAOE::SecondariesByAttacker.end())
 			{
-				pFake->WarpRemaining = 0x7FFFFFFF;
-				pFake->WarpPerStep = 0;
+				for (auto pSec : secIt->second)
+				{
+					auto ftIt = TemporalAOE::FakeTemporals.find(pSec);
+					if (ftIt == TemporalAOE::FakeTemporals.end())
+						continue;
+					if (auto pFake = ftIt->second.FakeTemporal)
+					{
+						pFake->WarpRemaining = 0x7FFFFFFF;
+						pFake->WarpPerStep = 0;
+					}
+				}
 			}
 		}
 	}
