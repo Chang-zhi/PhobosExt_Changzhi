@@ -69,11 +69,15 @@ void TechnoTypeExt::ExtData::LoadFromINIFile(CCINIClass* const pINI)
 	// SmartVHPScan
 	this->SmartVHPScan.Read(exINI, pSection, "SmartVHPScan");
 	this->SmartVHPScan_Count.Read(exINI, pSection, "SmartVHPScan.Count");
-	this->SmartVHPScan_AllowOverflow.Read(exINI, pSection, "SmartVHPScan.AllowOverflow");
 	this->SmartVHPScan_Damage.Read(exINI, pSection, "SmartVHPScan.Damage");
 	this->SmartVHPScan_Bias.Read(exINI, pSection, "SmartVHPScan.Bias");
 	this->SmartVHPScan_UnknownFactor.Read(exINI, pSection, "SmartVHPScan.UnknownFactor");
 	this->SmartVHPScan_ExcludeFraction.Read(exINI, pSection, "SmartVHPScan.ExcludeFraction");
+
+	// 中央调度
+	this->SmartVHPScan_Overflow.Read(exINI, pSection, "SmartVHPScan.Overflow");
+	this->SmartVHPScan_SwitchThreshold.Read(exINI, pSection, "SmartVHPScan.SwitchThreshold");
+	this->SmartVHPScan_IncludeInflight.Read(exINI, pSection, "SmartVHPScan.IncludeInflight");
 
 }
 
@@ -103,11 +107,13 @@ void TechnoTypeExt::ExtData::Serialize(T& Stm)
 		.Process(this->InhibitorRange)
 		.Process(this->SmartVHPScan)
 		.Process(this->SmartVHPScan_Count)
-		.Process(this->SmartVHPScan_AllowOverflow)
 		.Process(this->SmartVHPScan_Damage)
 		.Process(this->SmartVHPScan_Bias)
 		.Process(this->SmartVHPScan_UnknownFactor)
 		.Process(this->SmartVHPScan_ExcludeFraction)
+		.Process(this->SmartVHPScan_Overflow)
+		.Process(this->SmartVHPScan_SwitchThreshold)
+		.Process(this->SmartVHPScan_IncludeInflight)
 		;
 }
 void TechnoTypeExt::ExtData::LoadFromStream(PhobosStreamReader& Stm)

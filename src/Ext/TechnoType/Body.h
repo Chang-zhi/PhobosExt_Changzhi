@@ -27,14 +27,15 @@ public:
 
 		Valueable<SmartVHPScanType> SmartVHPScan;
 		Valueable<int> SmartVHPScan_Count;
-		Valueable<bool> SmartVHPScan_AllowOverflow;
-		// 自定义等效伤害: 填 0(默认)时自动取武器自带 Damage 参与打分;
-		// 填非 0 值则用该值(优先)。任何单位适用。
-		// 用途: 心控/超时空/EMP 等 Damage=0 的武器可借此指定等效伤害。
 		Valueable<int> SmartVHPScan_Damage;
 		Valueable<double> SmartVHPScan_Bias;
 		Valueable<double> SmartVHPScan_UnknownFactor;
 		Valueable<double> SmartVHPScan_ExcludeFraction;
+
+		// ---- 中央调度 ----
+		Valueable<double> SmartVHPScan_Overflow;
+		Valueable<double> SmartVHPScan_SwitchThreshold;
+		Valueable<bool> SmartVHPScan_IncludeInflight;
 
 		ExtData(TechnoTypeClass* OwnerObject) : Extension<TechnoTypeClass>(OwnerObject)
 			, AutoHunt { false }
@@ -44,11 +45,13 @@ public:
 			, InhibitorRange { }
 			, SmartVHPScan { SmartVHPScanType::None }
 			, SmartVHPScan_Count { 1 }
-			, SmartVHPScan_AllowOverflow { false }
 			, SmartVHPScan_Damage { 0 }
 			, SmartVHPScan_Bias { 2.0 }
 			, SmartVHPScan_UnknownFactor { 1.0 }
 			, SmartVHPScan_ExcludeFraction { 0.0 }
+			, SmartVHPScan_Overflow { 0.25 }
+			, SmartVHPScan_SwitchThreshold { 1.25 }
+			, SmartVHPScan_IncludeInflight { true }
 		{ }
 
 		virtual ~ExtData() = default;

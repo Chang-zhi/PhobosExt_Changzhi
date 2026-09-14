@@ -12,7 +12,12 @@ class MissionControlClass
 {
 	public:
 		DEFINE_ARRAY_REFERENCE(MissionControlClass, [0x20], Array, 0xA8E3A8)
-		DEFINE_ARRAY_REFERENCE(const char*, [0x20], Names, 0xA8E3A8)
+		// 0x816CAC 才是真正的任务名表(const char*[0x20])。
+		// 由 MissionControlClass::GetName(0x5B3740) 实证：
+		//   mov eax, [ecx]        ; ArrayIndex
+		//   mov eax, off_816CAC[eax*4]  ; "Sleep"
+		// 旧值 0xA8E3A8 与 Array 同址，属错误定义，解引用会得到 ArrayIndex 而非指针。
+		DEFINE_ARRAY_REFERENCE(const char*, [0x20], Names, 0x816CAC)
 
 		static MissionControlClass* __fastcall Find(const char* pName)
 			{ JMP_STD(0x5B3910); }

@@ -681,6 +681,8 @@ Button.Text3=                 ; CSF标签  更多按钮以此类推  (默认无)
 </ol>
 </div>
 
+<hr class="sec-divider--double">
+
 <div id="gameplay_7">
 <h3 class="doc-heading--tertiary" style="margin-top:2em">7. 单人任务 Tab 快速打开任务简报</h3>
 <p>在 <code class="doc-code--inline">[General]</code> 中增加新变量，用于控制是否能在单人任务中按下 <code class="doc-code--inline">Tab</code> 打开任务简报界面。</p>
@@ -692,68 +694,120 @@ AllowTabBriefingInSinglePlayer=            ; boolean，默认 false</code></pre>
 
 <div id="gameplay_8">
 <h3 class="doc-heading--tertiary" style="margin-top:2em">8. SmartVHPScan 智能火力分配</h3>
-<P>名字沿用 <code class="doc-code--inline">VHPScan</code> 仅为习惯，其独立于原版逻辑, 实现更智能, 可操作性更强的的火力分配。<br>
-当原版 <code class="doc-code--inline">VHPScan=Normal|Strong</code> 时, 该逻辑不启用。</p>
+<p>名字沿用<code class="doc-code--inline">VHPScan</code>仅为习惯，其独立于原版逻辑，实现更智能、可操作性更强的火力分配。<br>
+与原版逻辑互斥，当<code class="doc-code--inline">VHPScan=Normal|Strong</code>时，该逻辑不启用。</p>
 
-
-
-<h4>8.1 配置键</h4>
 <pre class="doc-code--block"><code>[TechnoType]
-SmartVHPScan=                      ; 枚举字符串  None / LowHealth / FullHealth / Count (默认 None)
-SmartVHPScan.Count=                ; integer —— 集火数量（同一目标最多同时被几个本单位打, 仅 Count 模式有效）(默认 1)
-SmartVHPScan.AllowOverflow=        ; boolean —— 是否允许小量火力溢出（Count 模式上限+1）(默认 false)
-SmartVHPScan.Damage=               ; integer —— 自定义等效伤害(详见8.3 键值说明)(默认 0)
-SmartVHPScan.Bias=                 ; double —— 偏好强度(详见8.3 键值说明)(默认 2.0)
-SmartVHPScan.UnknownFactor=        ; double —— 目标血量未知(详见8.3 键值说明)(默认 1.0)
-SmartVHPScan.ExcludeFraction=      ; double —— 最低索敌阈值(详见8.3 键值说明)(默认 0.0)</code></pre>
+SmartVHPScan=                         ;枚举字符串 - 索敌模式：None/LowHealth/FullHealth/Count，默认None
+SmartVHPScan.Count=                   ;integer - Count 数量：同一目标最多几个单位同时打，默认1
+SmartVHPScan.Bias=                    ;double - 残血/满血的偏好强度，越大越执着，默认2.0
+SmartVHPScan.UnknownFactor=           ;double - 血量未知目标的分值倍数，1.0=一视同仁，默认1.0
+SmartVHPScan.ExcludeFraction=         ;double - 血量低于该比例的目标不打，0=关闭，默认0.0
+SmartVHPScan.Damage=                  ;integer - 等效伤害，0=用武器自身的 Damage，默认0
+SmartVHPScan.Overflow=                ;double - 允许多浪费多少火力，0=够杀就停，默认0.25
+SmartVHPScan.SwitchThreshold=         ;double - 换目标的门槛倍数，越大越不容易改主意，默认1.25
+SmartVHPScan.IncludeInflight=         ;boolean - 飞行中的弹药算不算已投入火力，默认true</code></pre>
 
-<h4>8.2 模式说明</h4>
-<table class="doc-table"><thead class="doc-table__thead"><tr>
-<th class="doc-table__th">模式</th>
-<th class="doc-table__th">行为</th>
-</tr></thead><tbody>
-<tr><td class="doc-table__td"><code>None</code></td><td class="doc-table__td">不启用，走引擎原逻辑</td></tr>
-<tr><td class="doc-table__td"><code>LowHealth</code></td><td class="doc-table__td">残血优先</td></tr>
-<tr><td class="doc-table__td"><code>FullHealth</code></td><td class="doc-table__td">满血优先</td></tr>
-<tr><td class="doc-table__td"><code>Count</code></td><td class="doc-table__td">数量模式：同类型单位对同一目标最多同时集火的个数由配置键指定（不考虑伤害）</td></tr>
-</tbody></table>
+<h4>索敌模式</h4>
+<table class="doc-table">
+<thead>
+<tr><th class="doc-table__th" style="width:140px">值</th><th class="doc-table__th">说明</th></tr>
+</thead>
+<tbody>
+<tr><td class="doc-table__td"><code>None</code></td><td class="doc-table__td">不启用。</td></tr>
+<tr><td class="doc-table__td"><code>LowHealth</code></td><td class="doc-table__td">残血优先，血越少越先打。</td></tr>
+<tr><td class="doc-table__td"><code>FullHealth</code></td><td class="doc-table__td">满血优先，血越多越先打。</td></tr>
+<tr><td class="doc-table__td"><code>Count</code></td><td class="doc-table__td">不看血量，只限制同一目标最多几个单位同时打（见下面的 <code>Count</code>）。</td></tr>
+</tbody>
+</table>
 
-<h4>8.3 键值说明</h4>
-<p>以下四个键是"行为调校"。摸不清效果时全部不写即可，用默认值。</p>
-<br>
-<p><strong><code class="doc-code--inline">SmartVHPScan.Damage</code> — 自定义等效伤害</strong><br>
-不填时自动使用<strong>武器自带的 Damage</strong> 参与打分；填一个非 0 值则改用该值（优先于武器自身）。<br>常用场景：心控/超时空 等游戏里 <code class="doc-code--inline">Damage</code> 有特殊含义的武器，给它们"等效伤害"免得打分时被当成没伤害；正常武器也能用它临时调"火力感"。</p>
-<pre class="doc-code--block"><code>; 让心控单位在打分时相当于 256 伤害的伤害
-[YURI]
-SmartVHPScan=FullHealth
-SmartVHPScan.Damage=256</code></pre>
+<h4>属性详解</h4>
+<table class="doc-table">
+<thead>
+<tr><th class="doc-table__th" style="width:180px">属性</th><th class="doc-table__th" style="width:175px">适用模式</th><th class="doc-table__th">说明</th></tr>
+</thead>
+<tbody>
+<tr>
+<td class="doc-table__td"><code>Count</code></td>
+<td class="doc-table__td"><code>Count</code></td>
+<td class="doc-table__td">
+同一目标最多几个单位同时打。<br>
+盟友在打这个目标的单位也算在内；填 <code>0</code> 或负数按 <code>1</code> 处理。
+</td>
+</tr>
+<tr>
+<td class="doc-table__td"><code>Bias</code></td>
+<td class="doc-table__td"><code>LowHealth</code> / <code>FullHealth</code></td>
+<td class="doc-table__td">
+偏好强度。越大越执着于残血 / 满血目标。
+</td>
+</tr>
+<tr>
+<td class="doc-table__td"><code>UnknownFactor</code></td>
+<td class="doc-table__td"><code>LowHealth</code> / <code>FullHealth</code></td>
+<td class="doc-table__td">
+刚出现、血量还没看清的目标怎么算分。<br>
+<code>1.0</code>=一视同仁，调低往后排，调高往前排。
+</td>
+</tr>
+<tr>
+<td class="doc-table__td"><code>ExcludeFraction</code></td>
+<td class="doc-table__td">全部模式</td>
+<td class="doc-table__td">
+残血到这个程度就别再浪费火力了。<code>0</code>=关闭，<code>0.05</code>=剩 5% 血以下不再打。<br>
+血量还没看清的目标不受影响。
+</td>
+</tr>
+<tr>
+<td class="doc-table__td"><code>Damage</code></td>
+<td class="doc-table__td">全部模式</td>
+<td class="doc-table__td">
+等效伤害, <code>0</code>=用武器自己的 <code>Damage</code>。<br>
+心控、超时空冻结这类 <code>Damage</code> 特殊含义的武器，最好手动填一个。
+</td>
+</tr>
+<tr>
+<td class="doc-table__td"><code>Overflow</code></td>
+<td class="doc-table__td">全部模式</td>
+<td class="doc-table__td">
+允许多浪费多少火力。<code>0</code>=够杀就停，<code>0.5</code>=最多多打一半。<br>
+一般填 <code>0</code> ~ <code>0.5</code>。
+</td>
+</tr>
+<tr>
+<td class="doc-table__td"><code>SwitchThreshold</code></td>
+<td class="doc-table__td">全部模式</td>
+<td class="doc-table__td">
+换目标的门槛。新目标要比当前这个好上这么多倍才换，免得单位来回改主意。<br>
+<code>1.0</code>=只要有更好的目标就立刻换。
+</td>
+</tr>
+<tr>
+<td class="doc-table__td"><code>IncludeInflight</code></td>
+<td class="doc-table__td">全部模式</td>
+<td class="doc-table__td">
+已经飞出去、还没落地的弹药，算不算「已经打出去的伤害」。<br>
+默认算，免得对已经被弹药覆盖的目标重复补刀。
+</td>
+</tr>
+</tbody>
+</table>
 
-<p><strong><code class="doc-code--inline">SmartVHPScan.Bias</code> — 偏好强度</strong><br>
-LowHealth 模式=残血加成倍率；FullHealth 模式=满血加成倍率。越大越"偏执", 只盯着残血/满血单位打。</p>
-<pre class="doc-code--block"><code>; 让灰熊坦克更执着地追杀残血
-[MTNK]
-SmartVHPScan=LowHealth
-SmartVHPScan.Bias=4</code></pre>
-
-<p><strong><code class="doc-code--inline">SmartVHPScan.UnknownFactor</code> — 血量未知目标的处理</strong><br>
-目标刚出现、无法确定血量时：1.0 一视同仁；调低让这类目标排后；调高反而偏爱打"新冒出来"的目标。</p>
-<pre class="doc-code--block"><code>; 无法确定血量的目标优先级减半
-[MTNK]
-SmartVHPScan=FullHealth
-SmartVHPScan.UnknownFactor=0.5</code></pre>
-
-<p><strong><code class="doc-code--inline">SmartVHPScan.ExcludeFraction</code> — 最低索敌阈值</strong><br>
-目标血量占比低于该值就直接不打。0=关闭；0.05=剩 5% 血以下不打了。</p>
-<pre class="doc-code--block"><code>; 剩 5% 血以下的目标不打了
-[MTNK]
-SmartVHPScan=FullHealth
-SmartVHPScan.ExcludeFraction=0.05</code></pre>
-
-<h4>8.5 示例</h4>
-<pre class="doc-code--block"><code>; 优先1对1冻结的超时空兵
+<h4>示例</h4>
+<pre class="doc-code--block"><code>;超时空兵：自动1对1冻结
 [CLEG]
 SmartVHPScan=Count
-SmartVHPScan.Count=1</code></pre>
+SmartVHPScan.Count=1
+
+;尤里：优先控制满血目标
+[YURI]
+SmartVHPScan=FullHealth
+SmartVHPScan.Damage=999
+
+;天启坦克：高效率击杀火箭飞行兵
+[APOC]
+SmartVHPScan=FullHealth</code></pre>
+
 </div>
 
 </section>
@@ -1285,7 +1339,7 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 yes — 单位文本�
 
 </div>
 
-<hr class="sec-divider">
+<hr class="sec-divider--double">
 
 <div id="actions_16">
 <h3 class="doc-heading--tertiary" style="margin-top:2em">16. 变卖所属方的全部建筑</h3>
@@ -1495,7 +1549,7 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 yes — 单位文本�
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
 <tbody>
 <tr><td class="doc-table__td">5503</td><td class="doc-table__td">分散攻击</td><td class="doc-table__td">分组数, 攻击目标类型(与Phobos对齐)</td></tr>
-<tr><td class="doc-table__td">5508</td><td class="doc-table__td">分散攻击(自定目标列表)</td><td class="doc-table__td">分组数, [AITargetTypes]列表索引</td></tr>
+<tr><td class="doc-table__td">5508</td><td class="doc-table__td">分散攻击(AITargetTypes)</td><td class="doc-table__td">分组数, [AITargetTypes]列表索引</td></tr>
 </tbody>
 </table>
 </div>
@@ -1505,7 +1559,7 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 yes — 单位文本�
 <li><strong>分组：</strong>进入本动作时按成员相对小队中心的方位角将成员均分为指定组数，<strong>仅分组一次</strong>，此后不再重新分组。成员死亡自动从组中移除；新加入的成员并入成员最少的组。</li>
 <li><strong>目标选择：</strong>每组以组中心为基准选择最近的未锁定敌人，组内所有成员锁定同一个目标；不同组优先攻击不同目标。每 60 帧重新选择一次目标。</li>
 <li><strong>兼容性说明：</strong>一部分攻击目标类型需要有Phobos才能正常使用。</li>
-<li><strong>5508 自定目标列表：</strong>行为与 5503 完全一致，唯一区别是目标只能从 <code class="doc-code--inline">[AITargetTypes]</code> 指定索引的列表中选取（列表内可混编任意载具/飞机/步兵/建筑类型）。参数低 16 位为分组数，高 16 位为列表索引；索引越界或列表不存在时该条脚本直接跳过。</li>
+<li><strong>5508 自定目标列表：</strong>行为与 5503 完全一致，唯一区别是目标只能从 <code class="doc-code--inline">[AITargetTypes]</code> 指定索引的列表中选取。</li>
 <li><strong>完成条件：</strong>当地图上不再存在任何敌对单位，或所有敌人的目标单元格均无法抵达时，脚本完成并推进到下一条。</li>
 </ul>
 
