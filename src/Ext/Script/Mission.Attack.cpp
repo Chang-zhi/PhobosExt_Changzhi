@@ -2,6 +2,7 @@
 
 #include <Ext/Techno/Body.h>
 #include <Ext/TechnoType/Body.h>
+#include <Ext/Rules/Body.h>
 
 #include <UnitTypeClass.h>
 #include <BuildingTypeClass.h>
@@ -18,25 +19,6 @@
 
 #include <algorithm>
 
-// ============================================================================
-// 本文件移植上游 src/Ext/Script/Mission.Attack.cpp 的索敌逻辑：
-//   ScriptExt::GreatestThreat / ScriptExt::EvaluateObjectWithMask
-// 及其依赖的辅助判定函数，供分散攻击(5503)等自定义脚本动作复用。
-//
-// 说明：本 fork 相对上游做了裁剪，以下上游扩展设施不存在，故做了等价替换
-// （在默认配置下行为一致，均已在各处以注释标注）：
-//   1) BulletTypeExt::AAOnly            -> 本地无 BulletTypeExt，默认 false，直接省略该条件
-//   2) WeaponTypeExt::GetRangeWithModifiers -> 本地无该扩展，改用 pWeapon->Range
-//   3) BuildingTypeExt::SuperWeapons    -> 本地无 BuildingTypeExt，改用引擎 SuperWeapon/SuperWeapon2
-//   4) TechnoExt::Fetch(p)->TypeExtData -> 本地改用 TechnoTypeExt::ExtMap.Find(p->GetTechnoType())
-//
-// 有意偏离上游两处（均只在调用方传入对应可选参数时生效）：
-//   1) 传入 pGroup 时，"攻击者能力门槛"（弹道对空/对地、弹头对该装甲的伤害、
-//      海军对陆、区域可达）改为按组判定 —— 组内任一成员通过即保留目标；
-//   2) 传入 pScoringOrigin 时，评分用的距离基准由 pTechno 改为该坐标（组中心），
-//      使同一组内无论谁是组长都得到一致的选敌结果。
-// 两个参数都不传时，行为与上游一致。
-// ============================================================================
 
 bool ScriptExt::IsUnitAvailable(TechnoClass* pTechno, bool checkIfInTransportOrAbsorbed)
 {
@@ -56,17 +38,11 @@ bool ScriptExt::IsMindControlledByEnemy(HouseClass* pHouse, TechnoClass* pTechno
 	return pTechno->IsMindControlled() && !pHouse->IsAlliedWith(pTechno->MindControlledBy);
 }
 
-// 攻击者侧门槛（与单位能力/属性相关；不含射程与瞬态状态）：
-// 无武器、弹头对该装甲伤害为 0、弹道对空/对地不匹配、海军对陆限制、
-// 潜艇对水下隐身目标的限制，以及区域(Zone)可达性 —— 任一不满足即打不到。
-// 分散攻击需要按"组"判定（组内任一成员能打即保留），故抽成以单个攻击者入参的形式。
 static bool CanEngageTargetByCapability(TechnoClass* pAttacker, TechnoClass* pTarget, TechnoTypeClass* pTargetType, bool agentMode)
 {
 	const auto pAttackerType = pAttacker->GetTechnoType();
 	WeaponTypeClass* pWeaponType = nullptr;
 
-	// 注：SelectWeapon 可能返回 -1（无可用武器 / 非法目标），
-	// 直接拿去索引 GetWeapon 会越界读（AllowedTargetByZone 里也有同样的守卫）
 	const int weaponIndex = pAttacker->SelectWeapon(pTarget);
 
 	if (weaponIndex >= 0)
@@ -119,7 +95,7 @@ static bool CanEngageTargetByCapability(TechnoClass* pAttacker, TechnoClass* pTa
 	return TechnoExt::AllowedTargetByZone(pAttacker, pTarget, zoneScanType, pWeaponType);
 }
 
-TechnoClass* ScriptExt::GreatestThreat(TechnoClass* pTechno, int method, int calcThreatMode, HouseClass* onlyTargetThisHouseEnemy, bool agentMode, const std::vector<TechnoClass*>* pExcludeTargets, const std::vector<FootClass*>* pGroup, const CoordStruct* pScoringOrigin)
+TechnoClass* ScriptExt::GreatestThreat(TechnoClass* pTechno, int method, int calcThreatMode, HouseClass* onlyTargetThisHouseEnemy, bool agentMode, const std::vector<TechnoClass*>* pExcludeTargets, const std::vector<FootClass*>* pGroup, const CoordStruct* pScoringOrigin, int attackAITargetType)
 {
 	TechnoClass* pBestObject = nullptr;
 	double bestVal = -1;
@@ -165,7 +141,7 @@ TechnoClass* ScriptExt::GreatestThreat(TechnoClass* pTechno, int method, int cal
 			continue;
 
 		// Exclude most of invalid target first
-		if (!ScriptExt::EvaluateObjectWithMask(pTarget, method, pTechno))
+		if (!ScriptExt::EvaluateObjectWithMask(pTarget, method, pTechno, attackAITargetType))
 			continue;
 
 		// OnlyTargetHouseEnemy forces targets of a specific (hated) house
@@ -330,9 +306,27 @@ TechnoClass* ScriptExt::GreatestThreat(TechnoClass* pTechno, int method, int cal
 	return pBestObject;
 }
 
-bool ScriptExt::EvaluateObjectWithMask(TechnoClass* pTechno, int mask, TechnoClass* pTeamLeader)
+bool ScriptExt::EvaluateObjectWithMask(TechnoClass* pTechno, int mask, TechnoClass* pTeamLeader, int attackAITargetType)
 {
 	const auto pTechnoType = pTechno->GetTechnoType();
+
+	// 特例：attackAITargetType >= 0 时校验目标是否属于 [AITargetTypes] 列表中索引对应的类型集合
+	// （对齐上游 Mission.Attack.cpp；索引越界时回退到 mask 判定）
+	if (attackAITargetType >= 0)
+	{
+		const auto& lists = RulesExt::Global()->AITargetTypesLists;
+
+		if (lists.size() > static_cast<size_t>(attackAITargetType))
+		{
+			for (const auto& item : lists[attackAITargetType])
+			{
+				if (pTechnoType == item)
+					return true;
+			}
+
+			return false;
+		}
+	}
 
 	switch (mask)
 	{

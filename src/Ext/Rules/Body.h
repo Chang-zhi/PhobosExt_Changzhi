@@ -11,6 +11,8 @@
 #include <Utilities/Debug.h>
 #include <Utilities/Anchor.h>
 
+#include <vector>
+
 class AnimTypeClass;
 class MouseCursor;
 class SuperWeaponTypeClass;
@@ -37,6 +39,8 @@ public:
 		Valueable<bool> BerzerkRestoreClearTarget;
 		Valueable<double> Command_RecruitRange;
 		Valueable<bool> AllowTabBriefingInSinglePlayer;
+
+		std::vector<std::vector<TechnoTypeClass*>> AITargetTypesLists;
 
 		ExtData(RulesClass* OwnerObject) : Extension<RulesClass>(OwnerObject)
 			, ShowTextBoxInShroud_Waypoint { true }

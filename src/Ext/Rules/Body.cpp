@@ -1,6 +1,9 @@
 #include "Body.h"
 #include <Windows.h>
+#include <string.h>
+#include <Phobos.h>
 #include <Utilities/TemplateDef.h>
+#include <Utilities/Parser.h>
 #include <FPSCounter.h>
 #include <GameOptionsClass.h>
 #include <Ext/TechnoType/Body.h>
@@ -77,6 +80,36 @@ void RulesExt::ExtData::LoadAfterTypeData(RulesClass* pThis, CCINIClass* pINI)
 {
 	INI_EX exINI(pINI);
 
+	// Section AITargetTypes : 自定义索敌类型列表（索引 -> TechnoType 列表），供 5508 等脚本动作使用
+	// 注意：本钩子整局会以不同 INI（纯 rules / 地图小节）调用多次，
+	// 只有当前 INI 真的含有该小节时才整体替换，否则保留之前解析的结果，
+	// 避免地图小节里没有该段时把 rules 解析好的列表清空。
+	if (pINI->GetSection("AITargetTypes"))
+	{
+		std::vector<std::vector<TechnoTypeClass*>> lists;
+
+		int itemsCount = pINI->GetKeyCount("AITargetTypes");
+		for (int i = 0; i < itemsCount; ++i)
+		{
+			std::vector<TechnoTypeClass*> objectsList;
+			char* context = nullptr;
+			pINI->ReadString("AITargetTypes", pINI->GetKeyName("AITargetTypes", i), "", Phobos::readBuffer);
+
+			for (char* cur = strtok_s(Phobos::readBuffer, Phobos::readDelims, &context); cur; cur = strtok_s(nullptr, Phobos::readDelims, &context))
+			{
+				TechnoTypeClass* buffer;
+				if (Parser<TechnoTypeClass*>::TryParse(cur, &buffer))
+					objectsList.emplace_back(buffer);
+				else
+					Debug::Log("[Developer warning] AITargetTypes (Count: %d): Error parsing [%s]\n", lists.size(), cur);
+			}
+
+			lists.emplace_back(std::move(objectsList));
+		}
+
+		this->AITargetTypesLists = std::move(lists);
+		Debug::Log("[PhobosExt] AITargetTypes: parsed %d lists\n", static_cast<int>(this->AITargetTypesLists.size()));
+	}
 }
 
 // this runs between the before and after type data loading methods for rules ini
@@ -97,6 +130,7 @@ template <typename T>
 void RulesExt::ExtData::Serialize(T& Stm)
 {
 	Stm
+		.Process(this->AITargetTypesLists)
 		.Process(this->ShowTextBoxInShroud_Waypoint)
 		.Process(this->ShowTextBoxInShroud_Techno)
 		.Process(this->BerzerkRestoreClearTarget)

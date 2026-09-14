@@ -1,6 +1,7 @@
 #include "Body.h"
 #include <New/FootPath/FootPathVisualizer.h>
 #include "PatrolService.h"
+#include <Ext/Rules/Body.h>
 
 #include <CellSpread.h>
 #include <Helpers/Cast.h>
@@ -77,7 +78,11 @@ void ScriptExt::ProcessAction(TeamClass* pTeam)
 		break;
 
 	case PhobosScripts::ScatterAttack:
-		ScriptExt::Mission_ScatterAttack(pTeam);
+		ScriptExt::Mission_ScatterAttack(pTeam, -1);
+		break;
+
+	case PhobosScripts::ScatterAttackByAITargetTypes:
+		ScriptExt::Mission_ScatterAttack(pTeam, static_cast<unsigned>(node.Argument) >> 16);
 		break;
 
 	case PhobosScripts::PatrolToEnemyBuildingNearby:
@@ -409,9 +414,19 @@ static bool CanEngageTarget(FootClass* pFoot, TechnoClass* pTarget)
 
 
 
-void ScriptExt::Mission_ScatterAttack(TeamClass* pTeam)
+void ScriptExt::Mission_ScatterAttack(TeamClass* pTeam, int attackAITargetType)
 {
 	auto const pExt = ExtMap.FindOrAllocate(pTeam->CurrentScript);
+
+	// [AITargetTypes] 索引越界：没有可用的自定义目标列表，直接推进脚本
+	if (attackAITargetType >= 0
+		&& attackAITargetType >= static_cast<int>(RulesExt::Global()->AITargetTypesLists.size()))
+	{
+		Debug::Log("[Developer warning] ScatterAttackByAITargetTypes: [AITargetTypes] index %d out of range (Count: %d)\n",
+			attackAITargetType, static_cast<int>(RulesExt::Global()->AITargetTypesLists.size()));
+		pExt->ScatterAttackGroups.clear();
+		return;
+	}
 
 	// 收集可用成员（存活、在地图上、未搭载）
 	std::vector<FootClass*> members;
@@ -523,9 +538,6 @@ void ScriptExt::Mission_ScatterAttack(TeamClass* pTeam)
 		}
 	}
 
-	// 攻击目标参数（Argument 高 16 位 / 额外参数）：
-	//   0      -> 不限制目标类型（兼容旧地图）
-	//   1..37  -> [AITargetCategories] 内置分类掩码
 	const int targetMask = static_cast<unsigned>(pTeam->CurrentScript->Type->ScriptActions[pTeam->CurrentScript->CurrentMission].Argument) >> 16;
 
 	constexpr int threatMode = 0;
@@ -579,13 +591,13 @@ void ScriptExt::Mission_ScatterAttack(TeamClass* pTeam)
 			excludedTargets.insert(excludedTargets.end(), unreachableTargets.begin(), unreachableTargets.end());
 
 			TechnoClass* candidate = ScriptExt::GreatestThreat(pLeader, targetMask, threatMode,
-				nullptr, agentMode, &excludedTargets, &group, &groupCenter);
+				nullptr, agentMode, &excludedTargets, &group, &groupCenter, attackAITargetType);
 
 			// 目标数少于分组数时退化为允许共用目标（只排除不可用的），与原行为一致
 			if (!candidate && !assignedTargets.empty())
 			{
 				candidate = ScriptExt::GreatestThreat(pLeader, targetMask, threatMode,
-					nullptr, agentMode, &unreachableTargets, &group, &groupCenter);
+					nullptr, agentMode, &unreachableTargets, &group, &groupCenter, attackAITargetType);
 			}
 
 			if (!candidate)
