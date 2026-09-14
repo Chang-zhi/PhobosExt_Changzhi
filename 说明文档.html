@@ -1495,6 +1495,7 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 yes — 单位文本�
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
 <tbody>
 <tr><td class="doc-table__td">5503</td><td class="doc-table__td">分散攻击</td><td class="doc-table__td">分组数, 攻击目标类型(与Phobos对齐)</td></tr>
+<tr><td class="doc-table__td">5508</td><td class="doc-table__td">分散攻击(自定目标列表)</td><td class="doc-table__td">分组数, [AITargetTypes]列表索引</td></tr>
 </tbody>
 </table>
 </div>
@@ -1504,6 +1505,7 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 yes — 单位文本�
 <li><strong>分组：</strong>进入本动作时按成员相对小队中心的方位角将成员均分为指定组数，<strong>仅分组一次</strong>，此后不再重新分组。成员死亡自动从组中移除；新加入的成员并入成员最少的组。</li>
 <li><strong>目标选择：</strong>每组以组中心为基准选择最近的未锁定敌人，组内所有成员锁定同一个目标；不同组优先攻击不同目标。每 60 帧重新选择一次目标。</li>
 <li><strong>兼容性说明：</strong>一部分攻击目标类型需要有Phobos才能正常使用。</li>
+<li><strong>5508 自定目标列表：</strong>行为与 5503 完全一致，唯一区别是目标只能从 <code class="doc-code--inline">[AITargetTypes]</code> 指定索引的列表中选取（列表内可混编任意载具/飞机/步兵/建筑类型）。参数低 16 位为分组数，高 16 位为列表索引；索引越界或列表不存在时该条脚本直接跳过。</li>
 <li><strong>完成条件：</strong>当地图上不再存在任何敌对单位，或所有敌人的目标单元格均无法抵达时，脚本完成并推进到下一条。</li>
 </ul>
 
