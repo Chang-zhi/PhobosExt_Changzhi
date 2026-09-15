@@ -3,6 +3,7 @@
 #include <Utilities/SavegameDef.h>
 #include <Utilities/Debug.h>
 #include <Utilities/GeneralUtils.h>
+#include <Helpers/Macro.h>
 #include <cstdlib>
 #include <ScenarioClass.h>
 #include <BuildingClass.h>
@@ -208,20 +209,23 @@ bool TEventExt::TechnoTypeOfHouseExistsAtWaypoint(TEventClass* pThis, HouseClass
 	return false;
 }
 
+namespace
+{
+	std::map<const TEventClass*, int> ElapsedTimeFrames_StartFrames;
+}
+
 bool TEventExt::ElapsedTimeFramesFunc(TEventClass* pThis)
 {
-	static std::map<const TEventClass*, int> StartFrames;
-
 	int waitFrames = pThis->Value;
 
-	auto it = StartFrames.find(pThis);
-	if (it == StartFrames.end())
+	auto it = ElapsedTimeFrames_StartFrames.find(pThis);
+	if (it == ElapsedTimeFrames_StartFrames.end())
 	{
-		StartFrames[pThis] = Unsorted::CurrentFrame;
+		ElapsedTimeFrames_StartFrames[pThis] = Unsorted::CurrentFrame;
 		// Debug::Log("[TEventExt] ElapsedTimeFrames: New trigger registered, start frame set to %d, waiting %d frames.\n", Unsorted::CurrentFrame, waitFrames);
 	}
 
-	int startFrame = StartFrames[pThis];
+	int startFrame = ElapsedTimeFrames_StartFrames[pThis];
 	int elapsed = Unsorted::CurrentFrame - startFrame;
 	bool result = elapsed >= waitFrames;
 
@@ -343,4 +347,10 @@ bool TEventExt::PowerHander(TEventClass* pThis, HouseClass* pHouse, PowerEventMo
 TEventExt::ExtContainer::ExtContainer() : Container("TEventClass") { }
 
 TEventExt::ExtContainer::~ExtContainer() = default;
+
+DEFINE_HOOK(0x685659, Scenario_ClearClasses_TEventStartFrames, 0xA)
+{
+	ElapsedTimeFrames_StartFrames.clear();
+	return 0;
+}
 

@@ -219,10 +219,11 @@ namespace SmartVHPScan
 				return false;
 			}
 
-			if (pAttackerType->LandTargeting == LandTargetingType::Land_Not_OK
-				&& pTarget->GetCell()->LandType != LandType::Water)
+			if (pAttackerType->LandTargeting == LandTargetingType::Land_Not_OK)
 			{
-				return false;
+				const auto pCell = pTarget->GetCell();
+				if (!pCell || pCell->LandType != LandType::Water)
+					return false;
 			}
 		}
 

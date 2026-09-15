@@ -13,7 +13,7 @@ namespace SmartVHPScan
 	int GetMaxWeaponRange(TechnoClass* pTechno);
 	bool IsValidTarget(TechnoClass* pTarget);
 	bool IsRetainableTarget(TechnoClass* pTarget);
-	bool AllowsTargetType(ThreatType threat, TechnoClass* pTarget);。
+	bool AllowsTargetType(ThreatType threat, TechnoClass* pTarget);
 	bool IsHostile(TechnoClass* pAttacker, TechnoClass* pTarget);
 	bool IsStillEngageable(TechnoClass* pAttacker, TechnoClass* pTarget,
 		TechnoTypeExt::ExtData const* pAttackerExt, int maxRange);
