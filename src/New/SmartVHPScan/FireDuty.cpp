@@ -238,14 +238,6 @@ namespace SmartVHPScan
 			return result;
 		OrderLedger::Instance().MarkScanPending(pAttacker);
 
-		// 类别掩码（threat 除低 2 位评分模式外的位）= 本次调用方可接受的目标类别。
-		// 引擎侧映射见 Scoring.h / AllowsTargetType。这里只拦"本调度无法表达"的两种：
-		//   ① onlyTargetHouseEnemy：要求"只打当前敌人"，这是逐单位语义，全局表给不出；
-		//   ② 掩码含 Air/Infantry/Vehicles/Buildings/Boats 之外的位（Tiberium/Civilians/
-		//      Capture/Fakes/Power/...）：本功能的候选池里根本没有这些类别的目标。
-		// 其余情况（含只勾单个类别的）不再整表让路 —— 我们的表能覆盖，改为在选出
-		// 目标之后按本次掩码复核（见下方 AllowsTargetType），这样既不违反调用方约束，
-		// 又能保住 Smart 的调度能力（原版此处同样只做类别过滤，不做整表作废）。
 		const unsigned categoryMask = static_cast<unsigned>(threat) & ~ScoringModeBits;
 
 		if (onlyTargetHouseEnemy)                                  // ①
@@ -266,19 +258,28 @@ namespace SmartVHPScan
 			return result; // 不在单位池内 → 由调用方回退
 
 		result.Handled = true;
-		result.Target = it->second;
+		result.Target = it->second.Target;
 
-		// 调用方类别复核：本表的候选池是攻击者无关的（每帧一张），同一张表可能被
-		// ThreatType 各异的调用方共用，因此选中目标必须按**本次调用**的掩码再过一道。
-		// 不匹配 → 本帧对调用方表现为"没找到目标"（与原版在该类别下扫不到目标的
-		// 结果一致），而不是把整表交给引擎 —— 引擎那边的候选同样会被这道过滤挡掉，
-		// 让路只会让它重复我们刚刚否定过的工作。
-		if (result.Target && !AllowsTargetType(threat, result.Target))
+		// ③ 只回答"此刻依然成立"的目标。
+		//
+		// 调用方的典型流程是「先把目标清空，再问 GreatestThreat 要一个」：
+		//   · TechnoClass::AI（0x6F9E50）：!IsCloseEnough(Target) → SetTarget(0)
+		//   · FootClass::UpdateAttackMove（slot 307 = 0x4DF3A0）：
+		//     !InAuxiliarySearchRange(Target) → Target = 0
+		// 若此时把它刚放弃的目标原样喂回去，单位就被永久钉在一个打不到的目标上 ——
+		// 目标既清不掉，也换不了别人。原版不会这样：GreatestThreat 经
+		// CanAutoTargetObject 只会返回当前仍然合格的目标。
+		//
+		// 判据与建边/保留时同一套（见 Scoring.cpp 的 IsStillEngageable）。
+		if (result.Target
+			&& (!AllowsTargetType(threat, result.Target)
+				|| !IsStillEngageable(pAttacker, result.Target,
+					TechnoTypeExt::ExtMap.Find(pAttacker->GetTechnoType()),
+					it->second.MaxRange)))
+		{
 			result.Target = nullptr;
+		}
 
-		// 本帧结论是"没有目标"时，调用方不会写回任何目标，"正在索敌"的戳若留着，
-		// 同帧稍后到达的外部指令（玩家强攻）会被 Observe 误判成索敌结果写回而不记账，
-		// 玩家指令就丢了 —— 这里立刻撤销。
 		if (!result.Target)
 			OrderLedger::Instance().CancelScanPending(pAttacker);
 
@@ -287,7 +288,7 @@ namespace SmartVHPScan
 
 	void FireDuty::Rebuild()
 	{
-		// 上一帧表让位给粘滞判定（_previous 只做指针比较，见 FireDuty.h）；
+		// 上一帧表让位给粘滞判定（_previous 只比 Target 指针，见 FireDuty.h）；
 		// swap 而不是拷贝：_plan 腾出的桶数组直接复用，避免每帧重新分配。
 		_previous.swap(_plan);
 		_plan.clear();
@@ -343,18 +344,6 @@ namespace SmartVHPScan
 
 			units.push_back(info);
 
-			// 已经持有目标的单位：一律保留，不由调度改派 —— 这就是"玩家指令优先"。
-			//
-			// 目标有两个来源（见 OrderLedger.h）：索敌系统自动挑的，和外部直接下达的
-			// （玩家强攻 / AI 脚本 / 小队命令）。两种情况都不该被调度改派。
-			//
-			// 依据（IDA 实证）：引擎自己在每次索敌前就用 Target(+0x2B4) != 0 跳过索敌
-			//（0x709920: mov eax,[esi+2B4h] / test eax,eax / jnz 跳过；只有该目标失效时
-			// 才先 SetTarget(0) 再重扫），所以正常路径下这类单位根本不会来查询本调度器。
-			// 显式化它有三个好处：① 玩家的强攻指令绝不会被本功能改掉（哪怕个别调用点
-			// 漏了那道守卫）；② 引擎把目标清掉时（例如"目标超出射程"被重置）能从账本里
-			// 把它取回来，让单位继续朝玩家指的目标走；③ 第 5 步能把它的火力记进目标需求，
-			// 避免别的单位对这个目标重复补刀。
 			auto pRetain = abstract_cast<TechnoClass*>(pTechno->Target);
 
 			if (!IsRetainableTarget(pRetain))
@@ -362,18 +351,28 @@ namespace SmartVHPScan
 
 			OrderLedger::Instance().MarkSeen(pTechno);
 
-			// HasTarget 是**分配层的唯一判据**：置位后不进候选边矩阵、不参与第 7 步，
-			// 否则同一份齐射会被记两次账（5.1 一次、7.1 再一次），预算虚高导致欠火。
-			units.back().HasTarget = IsRetainableTarget(pRetain);
-			committed.push_back(units.back().HasTarget ? pRetain : nullptr);
+			// 粘滞是有前提的：目标必须"现在还能打"。
+			//
+			// 原版在目标离开射程/不再可打时会主动放弃目标：
+			//   · TechnoClass::AI（0x6F9E50）：!IsCloseEnough(Target) → SetTarget(0)
+			//   · FootClass::UpdateAttackMove（slot 307 = 0x4DF3A0）：
+			//     !InAuxiliarySearchRange(Target) → Target = 0
+			// 我们照同一条规则判定：不满足就当作"没有目标"，本轮落回自由池重新分配
+			// （可能换一个够得着的目标，也可能暂时空手）。
+			//
+			// 否则会出两类错：旧目标被当成"已投入的火力"继续记账（压住别的单位不让打），
+			// 而且会被 Query 原样喂回引擎，让引擎的放弃动作失效。
+			const bool retainable = IsStillEngageable(pTechno, pRetain, pExt, maxRange);
 
-			// 池内单位一律由调度器给出结论（哪怕是 nullptr = 本帧没得打），
-			// 这样"没得打"不会被误判成"未覆盖"。已持有目标的单位的结论就是该目标。
-			_plan.emplace(pTechno, committed.back());
+			units.back().HasTarget = retainable;
+			committed.push_back(retainable ? pRetain : nullptr);
+
+			PlanEntry entry;
+			entry.Target = committed.back();
+			entry.MaxRange = maxRange;
+			_plan.emplace(pTechno, entry);
 		}
 
-		// 账本只留本帧仍在单位池里的记录：其余（单位已销毁 / 已不属于本单位池）立刻丢弃，
-		// 保证表里既没有悬垂键、也不会跨局残留。
 		OrderLedger::Instance().PruneExcept(Unsorted::CurrentFrame);
 
 		if (units.empty())
@@ -384,11 +383,6 @@ namespace SmartVHPScan
 		std::vector<TechnoClass*> targetPool;
 		targetPool.reserve(TechnoClass::Array.Count);
 
-		// 本帧在场的全部 TechnoClass，仅供第 5.2 步校验"在飞弹药的发射者是否还活着"。
-		// `BulletClass::Owner` 是裸指针：发射者被销毁后它**未必**会被引擎清空，而销毁的
-		// 地址可能已被对象池回收成别的单位 —— 直接解引用会把"别人的阵营"记进账页，
-		// 甚至读到已释放内存。与 OrderLedger 校验目标指针同源，只是那边是低频线性扫，
-		// 这里按弹体数每帧都要查，故用哈希集合。只做指针比较，不解引用。
 		std::unordered_set<TechnoClass*> liveTechnos;
 		liveTechnos.reserve(TechnoClass::Array.Count);
 
@@ -488,11 +482,7 @@ namespace SmartVHPScan
 				const double base = e.Occupancy ? 1.0 : e.Volley;
 				e.Quality = base / (1.0 + cells * DistanceWeight);
 
-				// 粘滞：上一帧执勤表里该单位的目标获得门槛加成，
-				// 于是替代者必须比它好 SwitchThreshold 倍才会被换掉。
-				// （引擎的 TechnoClass::Target 在这里是空的 —— 会来查询的单位
-				// 必然无目标，那个判据永远不成立，所以用上一帧的执勤表。）
-				if (prevIt != _previous.end() && prevIt->second == pTarget)
+				if (prevIt != _previous.end() && prevIt->second.Target == pTarget)
 					e.Quality *= U.SwitchThreshold;
 
 				const int ei = static_cast<int>(edges.size());
@@ -508,11 +498,6 @@ namespace SmartVHPScan
 		if (edges.empty())
 			return;
 
-		// ================= 4. 压实目标并重映射 =================
-		// 只保留"至少有一个自由单位能打到"的目标：
-		//   · 只有已持有目标单位在打的目标不参与任何决策（没人能被派过去），
-		//     为它记账纯属浪费 —— 它的第 5 步记账随压实一起跳过；
-		//   · 压实后排序与分配都无需再筛。
 		std::vector<int> remap(poolSize, -1);
 		std::vector<TargetInfo> targets;
 		targets.reserve(poolSize);
@@ -552,20 +537,11 @@ namespace SmartVHPScan
 				targets[remap[ti]].Edges = std::move(edgesOfTarget[ti]);
 		}
 
-		// ================= 5. 已投入火力（按阵营记账）=========================
-		// 两类火力要在派人之前就从目标需求里扣掉，否则会出现"重复补刀"：
-		//   5.1 已经锁定该目标的单位 —— 它们的下一轮齐射同样会落到这个目标上；
-		//   5.2 已经打出去、还在飞的炮弹。
-		// 两类都记进**发射方阵营**的账页；消费时由 ViewFor 按视角聚合（见 SideBook）。
 		{
 			std::unordered_map<TechnoClass*, int> indexOf;
 			for (int i = 0; i < static_cast<int>(targets.size()); ++i)
 				indexOf.emplace(targets[i].Techno, i);
 
-			// ---- 5.1 已锁定目标的单位（单边记账）----
-			// 含玩家手动强攻指定的单位：把它们的火力先记上，同阵营的别人才不会
-			// 对同一个目标重复补刀（这正是"尊重玩家指令"在分配层的体现）。
-			// 敌对阵营的火力只进敌方的账页，不影响我方视角 —— 见 SideBook 的说明。
 			for (int u = 0; u < static_cast<int>(units.size()); ++u)
 			{
 				const auto pExisting = committed[u];
@@ -597,23 +573,14 @@ namespace SmartVHPScan
 
 				const double volley = damage > 0 ? (damage * verses * burst) : 0.0;
 
-				// 占位型（心控 / 超时空 / EMP）不按伤害记账：它对该目标"只需一个持有者"，
-				// 而持有者已经存在 → 记 Occupied（与第 7 步口径一致），
-				// 否则会再派第二个心控单位去做同一件已经做完的事。
 				if (volley > 0.0)
 					book.Volley += volley;
 				else
 					book.Occupied = true;
-
-				// 数量模式的并发上限必须把"已经在打这个目标"的单位算进去，
-				// 否则上限只约束本帧新派的量，实际同时在打的单位会超编。
 				if (U.CountCap > 0)
 					book.Count++;
 			}
 
-			// ---- 5.2 在飞弹药 ----
-			// 只有存在"开启 IncludeInflight 的自由单位"才值得扫：
-			// 消费 Inflight 账页的只有它们（committed 单位不参与派单）。
 			if (std::any_of(units.begin(), units.end(),
 				[](const UnitInfo& u) { return !u.HasTarget && u.IncludeInflight; }))
 			{
@@ -708,7 +675,11 @@ namespace SmartVHPScan
 			auto& book = BookOf(T, units[pick.Unit].Techno->Owner);
 
 			assigned[pick.Unit] = true;
-			_plan[units[pick.Unit].Techno] = T.Techno;
+
+			auto& entry = _plan[units[pick.Unit].Techno];
+			entry.Target = T.Techno;
+			entry.MaxRange = units[pick.Unit].MaxRange;
+
 			book.Assigned++;
 
 			if (pick.CountCap > 0)
@@ -791,7 +762,9 @@ namespace SmartVHPScan
 					break;
 				}
 
-				_plan[U.Techno] = pPick;
+				auto& planEntry = _plan[U.Techno];
+				planEntry.Target = pPick;
+				planEntry.MaxRange = U.MaxRange;
 			}
 		}
 	}

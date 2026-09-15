@@ -18,6 +18,7 @@
 #include <MessageListClass.h>
 #include <ScenarioClass.h>
 #include <GameOptionsClass.h>
+#include <SessionClass.h>
 #include <DisplayClass.h>
 
 #include <Utilities/SavegameDef.h>
@@ -200,11 +201,21 @@ bool TActionExt::SetParTimeDifficult(TActionClass* pThis, HouseClass* pHouse, Ob
 
 bool TActionExt::SetGameSpeed(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {
+	const bool speedControl = *reinterpret_cast<bool*>(0xA8EDDC);
+
 	const int value = pThis->Param3;
 	if (value < 0 || value > 6) // 负数表示不修改;越界保护
+	{
 		return true;
+	}
 
 	GameOptionsClass::Instance.GameSpeed = 6 - value;
+
+	if (!speedControl)
+	{
+		*reinterpret_cast<bool*>(0xA8EDDC) = true;
+	}
+
 	return true;
 }
 
