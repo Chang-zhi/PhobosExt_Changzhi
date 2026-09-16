@@ -68,6 +68,7 @@
     <ClCompile Include="src\Ext\TEvent\Hooks.cpp" />
     <ClCompile Include="src\Misc\Hooks.Ares.cpp" />
     <ClCompile Include="src\Misc\Hooks.TextBox.cpp" />
+    <ClCompile Include="src\Ext\Tiberium\Hooks.MapOverride.cpp" />
     <ClCompile Include="src\New\TextBox\Entities\Base\MapTextBoxClass.cpp" />
     <ClCompile Include="src\New\TextBox\Entities\Derived\TechnoTextBoxClass.cpp" />
     <ClCompile Include="src\New\TextBox\Entities\Derived\WaypointTextBoxClass.cpp" />

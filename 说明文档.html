@@ -213,9 +213,40 @@ pre code { padding: 0; font-size: inherit; color: inherit; background: none; }
   .nav { width: 150px; }
   .search-panel { left: 150px; width: calc(100vw - 165px); }
 }
+/* ============================================================
+   10. 原版 Bug 修复（修复卡片）
+   ============================================================ */
+.doc-fix {
+  background: #fff; border: 1px solid #eed7d7; border-left: 4px solid #d92929;
+  border-radius: 6px; padding: 1rem 1.25rem 1.15rem; margin: 1.6rem 0;
+  box-shadow: 0 1px 4px rgba(217,41,41,.08);
+}
+.doc-fix > h3 {
+  margin: 0 0 .85rem; padding-bottom: .55rem; font-size: 1.12rem;
+  border-bottom: 1px dashed #f0c8c8;
+}
+.doc-fix__num {
+  display: inline-block; margin-right: .55rem; padding: .05rem .45rem;
+  font-family: 'Consolas','JetBrains Mono',monospace; font-size: .8rem;
+  font-weight: 700; line-height: 1.5; color: #fff; background: #d92929;
+  border-radius: 3px; vertical-align: 2px;
+}
+.doc-fix__row { display: flex; align-items: flex-start; gap: .75rem; margin: .55rem 0 0; }
+.doc-fix__tag {
+  flex: 0 0 auto; width: 3.9rem; text-align: center; margin-top: .16rem;
+  padding: .1rem 0; font-size: .72rem; font-weight: 600;
+  letter-spacing: .04em; border-radius: 3px;
+}
+.doc-fix__row--bug .doc-fix__tag { color: #a0641a; background: #fdf4e4; border: 1px solid #f0dcb6; }
+.doc-fix__row--fix .doc-fix__tag { color: #1d7a4e; background: #ebf8f1; border: 1px solid #c6e7d6; }
+.doc-fix__row p { margin: 0; font-size: .92rem; line-height: 1.75; }
+.doc-fix.flash { animation: flashfix 1.6s ease-out; }
+@keyframes flashfix { 0% { background: #fff1c2; } 100% { background: #fff; } }
+
 @media (max-width: 640px) {
-  .doc-container { margin: .5rem; padding: 1rem; }
-  .search-panel { left: 0; width: 100vw; max-width: 100vw; border-radius: 0; }
+  .doc-fix { padding: .9rem 1rem; }
+  .doc-fix__row { display: block; }
+  .doc-fix__tag { display: inline-block; width: auto; margin: 0 0 .3rem; padding: .1rem .5rem; }
 }
 </style>
 </head>
@@ -1308,10 +1339,28 @@ ShowTextBoxInShroud.Techno=      ; boolean - 单位文本框在黑幕中是否�
 <section id="sec_fixes">
 <h2 class="doc-heading--secondary">原版 Bug 修复</h2>
 
-<div id="fixes_1">
-<h3 class="doc-heading--tertiary">1. 跟随单位时视野移动行为失效</h3>
+<div id="fixes_1" class="doc-fix">
+<h3 class="doc-heading--tertiary"><span class="doc-fix__num">1.</span>跟随单位时视野移动行为失效</h3>
+<div class="doc-fix__row doc-fix__row--bug">
+<span class="doc-fix__tag">现象</span>
 <p>玩家处于「跟随单位视野」状态时，触发行为 <code>48</code>（移动视野到路径点）与 <code>112</code>（居中视野到路径点）会把视野每帧拉回被跟随的单位，看起来像没执行。</p>
-<p>现已修复：执行这两个行为时会自动解除跟随状态，视野正常移动到指定路径点。</p>
+</div>
+<div class="doc-fix__row doc-fix__row--fix">
+<span class="doc-fix__tag">修复后</span>
+<p>执行这两个行为时会自动解除跟随状态，视野正常移动到指定路径点。</p>
+</div>
+</div>
+
+<div id="fixes_2" class="doc-fix">
+<h3 class="doc-heading--tertiary"><span class="doc-fix__num">2.</span>地图小节里的矿石设置不生效</h3>
+<div class="doc-fix__row doc-fix__row--bug">
+<span class="doc-fix__tag">现象</span>
+<p>地图 ini 内没有声明 <code>[Tiberiums]</code> 注册表时，地图里的矿石小节（例如 <code>[Riparius]</code>、<code>[Cruentus]</code> 等）不生效。</p>
+</div>
+<div class="doc-fix__row doc-fix__row--fix">
+<span class="doc-fix__tag">修复后</span>
+<p>这些小节现已能正常生效。</p>
+</div>
 </div>
 </section>
 
