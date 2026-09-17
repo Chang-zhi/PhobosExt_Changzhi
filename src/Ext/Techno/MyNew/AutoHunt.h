@@ -1,5 +1,5 @@
 #pragma once
 
-class TechnoClass;
+class FootClass;
 
-void AutoHunt(TechnoClass* pThis);
+void UpdateAutoHunt(FootClass* pThis);

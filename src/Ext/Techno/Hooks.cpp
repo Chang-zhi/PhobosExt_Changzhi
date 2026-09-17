@@ -14,13 +14,24 @@ DEFINE_JUMP(VTABLE, 0x7F5CF4, 0x741490) // UnitClass_GetTechnoType -> UnitClass_
 DEFINE_HOOK(0x6F9E50, TechnoClass_AI, 0x5)
 {
 	GET(TechnoClass*, pThis, ECX);
-	// Debug::Log("[%s] TechnoClass_AI\n", pThis->GetType()->ID);
 
-	// AutoHunt
-    AutoHunt(pThis);
 
 	// Temporal exclusive
 	HandleTemporalExclusiveTargeting(pThis);
+
 	return 0;
 }
+
+// After TechnoClass_AI
+DEFINE_HOOK(0x4DA54E, FootClass_AI, 0x6)
+{
+	GET(FootClass*, pThis, ESI);
+
+	// auto const pExt = TechnoExt::ExtMap.Find(pThis);
+
+	// AutoHunt
+	UpdateAutoHunt(pThis);
+	return 0;
+}
+
 
