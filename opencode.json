@@ -1,0 +1,10 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "fa2sp": {
+      "type": "remote",
+      "url": "http://127.0.0.1:19198",
+      "enabled": true
+    }
+  }
+}
