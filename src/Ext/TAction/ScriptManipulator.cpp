@@ -292,7 +292,8 @@ void ScriptManipulator::ModifyScriptByLocalVar(TActionClass* pThis)
 	if (!pScript)
 		return;
 
-	int lineNum = pThis->Param3;
+	// 行号同样取自变量（局部变量），与 Param4~Param6 一致
+	int lineNum = ReadVar(false, pThis->Param3);
 	if (lineNum < 0 || lineNum >= 50)
 		return;
 
@@ -325,7 +326,8 @@ void ScriptManipulator::ModifyScriptByGlobalVar(TActionClass* pThis)
 	if (!pScript)
 		return;
 
-	int lineNum = pThis->Param3;
+	// 行号同样取自变量（全局变量），与 Param4~Param6 一致
+	int lineNum = ReadVar(true, pThis->Param3);
 	if (lineNum < 0 || lineNum >= 50)
 		return;
 

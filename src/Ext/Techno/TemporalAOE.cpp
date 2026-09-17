@@ -1469,14 +1469,8 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 		}
 	}
 
-	// ═══ 内部计时器：独立控制主目标生死 ═══
-	// ExtraWarpAdded 由扫描块累加（新目标进入时增加，离开/死亡不扣减）
-	// WarpTimer 同步展开（新目标加入时 +contribution），每帧自然衰减 -8
-	// 计时器永不自动回满，防止瞬杀
 	if (state.Active && pThis->TemporalImUsing)
 	{
-		// 首次激活时设初始值 = 主目标基值 + 累积贡献
-		// 之后自由倒计时，不再被顶回
 		{
 			int baseWarp = 0;
 			if (pThis->TemporalImUsing->Target && pThis->TemporalImUsing->Target->Health > 0)
@@ -1484,20 +1478,14 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 			if (state.WarpTimer == 0)
 			{
 				state.WarpTimer = baseWarp + state.ExtraWarpAdded;
-				//FILELOG("[TemporalAOE-TIME] 计时器初始化: 主目标基值=%d(10*%d) 累积=%d → 计时器=%d\n",
-				//	baseWarp,
-				//	pThis->TemporalImUsing->Target ? pThis->TemporalImUsing->Target->GetTechnoType()->Strength : 0,
-				//	state.ExtraWarpAdded,
-				//	state.WarpTimer);
-				//Debug::Log(L"[TemporalAOE-TIME] 计时器初始化: 基值=%d 累积=%d → %d\n",
-				//	baseWarp, state.ExtraWarpAdded, state.WarpTimer);
 			}
 		}
 
 		// 每帧扣减（自由倒计时，不再被顶满）
 		if (state.WarpTimer > 0)
 		{
-			state.WarpTimer -= 8;
+			const int drainPerFrame = state.WeaponDamage;
+			state.WarpTimer -= drainPerFrame;
 			if (state.WarpTimer < 0) state.WarpTimer = 0;
 		}
 

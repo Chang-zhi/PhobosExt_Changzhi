@@ -18,71 +18,33 @@ body {
    2. 侧边栏导航
    ============================================================ */
 .nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 180px;
-  height: 100vh;
-  background: #fff;
-  border-right: 1px solid #eee;
-  z-index: 100;
-  overflow-y: auto;
-  padding: 1rem 0;
-  transition: transform .25s ease;
+  position: fixed; top: 0; left: 0; width: 190px; height: 100vh;
+  background: #fff; border-right: 1px solid #eee; z-index: 100;
+  overflow-y: auto; padding: 1rem 0; transition: transform .25s ease;
 }
 .nav__title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #d92929;
-  padding: 0.5rem 1rem 0.8rem;
-  border-bottom: 2px solid #d92929;
-  margin: 0 0.8rem 0.5rem;
-  text-align: center;
-  position: relative;
-  padding-left: 1.4rem;
-  padding-right: 1.6rem;
+  font-size: 1rem; font-weight: 700; color: #d92929;
+  padding: 0.5rem 1rem 0.8rem; border-bottom: 2px solid #d92929;
+  margin: 0 0.8rem 0.5rem; text-align: center;
+  position: relative; padding-left: 1.4rem; padding-right: 1.6rem;
 }
 .nav__list { list-style: none; padding: 0; margin: 0; }
 .nav__item {
-  display: block;
-  padding: 0.45rem 1rem;
-  font-size: 0.82rem;
-  color: #555;
-  cursor: pointer;
-  transition: all .15s;
-  border-left: 3px solid transparent;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  display: block; padding: 0.45rem 1rem; font-size: 0.82rem; color: #555;
+  cursor: pointer; transition: all .15s; border-left: 3px solid transparent;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.nav__item:hover {
-  background: #fdf7f7;
-  color: #d92929;
-  border-left-color: #f0c8c8;
-}
+.nav__item:hover { background: #fdf7f7; color: #d92929; border-left-color: #f0c8c8; }
 .nav__item--active {
-  background: #fef0f0;
-  color: #d92929;
-  border-left-color: #d92929;
-  font-weight: 600;
+  background: #fef0f0; color: #d92929; border-left-color: #d92929; font-weight: 600;
 }
 
 /* 侧边栏折叠按钮（窄屏显示） */
 .nav-toggle {
-  display: block;
-  position: fixed;
-  top: .6rem;
-  left: .6rem;
-  z-index: 200;
-  background: #d92929;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  padding: .4rem .7rem;
-  font-size: 1.1rem;
-  cursor: pointer;
-  box-shadow: 0 1px 4px rgba(0,0,0,.15);
-  transition: left .25s ease;
+  display: block; position: fixed; top: .6rem; left: .6rem; z-index: 200;
+  background: #d92929; color: #fff; border: none; border-radius: 4px;
+  padding: .4rem .7rem; font-size: 1.1rem; cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,.15); transition: left .25s ease;
 }
 body:not(.nav-collapsed) .nav-toggle { display: none; }
 .nav-collapsed .nav { transform: translateX(-100%); }
@@ -90,29 +52,14 @@ body:not(.nav-collapsed) .nav { transform: translateX(0); }
 
 /* 侧边栏标题上的收起 / 锁定按钮 */
 .nav__close {
-  position: absolute;
-  left: 2%;
-  top: 45%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  color: #d92929;
-  font-size: .85rem;
-  padding: .25rem;
-  border-radius: 2px;
-  line-height: 1;
-  user-select: none;
+  position: absolute; left: 2%; top: 45%; transform: translateY(-50%);
+  cursor: pointer; color: #d92929; font-size: .85rem;
+  padding: .25rem; border-radius: 2px; line-height: 1; user-select: none;
 }
 .nav__close:hover { background: #fef0f0; }
 .nav__lock {
-  position: absolute;
-  right: 4px;
-  top: 45%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 3px;
-  line-height: 0;
-  user-select: none;
+  position: absolute; right: 4px; top: 45%; transform: translateY(-50%);
+  cursor: pointer; padding: 4px; border-radius: 3px; line-height: 0; user-select: none;
 }
 .nav__lock:hover { background: #fef0f0; }
 .lock-icon--unlocked { display: none; }
@@ -120,213 +67,155 @@ body:not(.nav-locked) .lock-icon--locked { display: none; }
 body:not(.nav-locked) .lock-icon--unlocked { display: inline; }
 
 /* ============================================================
-   3. 页面布局
+   3. 搜索
+   ============================================================ */
+.nav__search { padding: 0 .8rem .6rem; }
+.nav__search input {
+  width: 100%; padding: .42rem .55rem; font-size: .8rem;
+  border: 1px solid #e2caca; border-radius: 4px; outline: none;
+  font-family: inherit; background: #fffdfd; color: #222;
+}
+.nav__search input:focus { border-color: #d92929; background: #fff; }
+.nav__search-hint { font-size: .68rem; color: #aaa; padding: .3rem .1rem 0; }
+
+.search-panel {
+  position: fixed; top: 0; left: 190px; width: 420px; max-width: calc(100vw - 200px);
+  max-height: 70vh; overflow-y: auto; background: #fff;
+  border: 1px solid #e6d5d5; border-radius: 0 0 8px 0;
+  box-shadow: 0 6px 20px rgba(0,0,0,.08); z-index: 300; display: none;
+}
+.search-panel.open { display: block; }
+.search-panel__empty { padding: .8rem 1rem; font-size: .82rem; color: #888; }
+.sr {
+  padding: .5rem .9rem; cursor: pointer; border-bottom: 1px solid #f6eded;
+  font-size: .82rem; line-height: 1.45;
+}
+.sr:last-child { border-bottom: none; }
+.sr:hover, .sr--sel { background: #fdf3f3; }
+.sr__id {
+  display: inline-block; min-width: 2.9rem; margin-right: .35rem;
+  color: #b81c1c; font-weight: 600;
+  font-family: 'Consolas','JetBrains Mono',monospace;
+}
+.sr__page { color: #999; font-size: .74rem; margin-left: .35rem; }
+.sr__sub { color: #777; font-size: .76rem; }
+
+/* ============================================================
+   4. 页面布局
    ============================================================ */
 .doc-container {
-  max-width: 960px;
-  margin: 2rem auto;
-  background: #fff;
-  border: 1px solid #eee;
-  border-radius: 15px;
-  padding: 2rem 2.2rem 3rem;
+  max-width: 960px; margin: 2rem auto; background: #fff;
+  border: 1px solid #eee; border-radius: 15px; padding: 2rem 2.2rem 3rem;
 }
 section { display: none; }
 section.active { display: block; }
 
 /* ============================================================
-   4. 标题
+   5. 标题
    ============================================================ */
-h1, h2, h3, h4 {
-  font-weight: 600;
-  margin-top: 1.8em;
-  margin-bottom: 0.6em;
-  line-height: 1.35;
-}
+h1, h2, h3, h4 { font-weight: 600; margin-top: 1.8em; margin-bottom: 0.6em; line-height: 1.35; }
 .doc-title {
-  font-size: 2rem;
-  color: #d92929;
-  border-bottom: 2px solid #d92929;
-  display: inline-block;
-  padding-bottom: .3em;
-  margin-top: .2em;
-  margin-bottom: 1em;
+  font-size: 2rem; color: #d92929; border-bottom: 2px solid #d92929;
+  display: inline-block; padding-bottom: .3em; margin-top: .2em; margin-bottom: 1em;
 }
 .doc-title__sub {
-  font-size: .9rem;
-  font-weight: normal;
-  background: #f8f0f0;
-  color: #d92929;
-  padding: .2rem .6rem;
-  border-radius: 2px;
-  margin-left: .8rem;
-  vertical-align: middle;
+  font-size: .9rem; font-weight: normal; background: #f8f0f0; color: #d92929;
+  padding: .2rem .6rem; border-radius: 2px; margin-left: .8rem; vertical-align: middle;
 }
 .doc-heading--secondary {
-  font-size: 1.6rem;
-  border-left: 4px solid #d92929;
-  padding-left: 12px;
-  background: #fdf7f7;
+  font-size: 1.6rem; border-left: 4px solid #d92929; padding-left: 12px; background: #fdf7f7;
 }
 .doc-heading--tertiary {
-  font-size: 1.3rem;
-  color: #b81c1c;
-  border-bottom: 1px solid #f0c8c8;
-  padding-bottom: .2em;
+  font-size: 1.3rem; color: #b81c1c; border-bottom: 1px solid #f0c8c8;
+  padding-bottom: .2em; margin-top: 2em;
 }
+h4 { font-size: 1rem; color: #444; margin-top: 1.3em; }
 
 /* ============================================================
-   5. 链接
+   6. 链接 / 代码
    ============================================================ */
-.doc-link {
-  color: #d92929;
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
-  transition: .2s;
-}
+.doc-link { color: #d92929; text-decoration: none; border-bottom: 1px solid transparent; transition: .2s; }
 .doc-link:hover { border-bottom-color: #d92929; }
+.doc-link--plain, .doc-link--plain:hover { border-bottom-color: transparent; }
 
-/* ============================================================
-   6. 代码
-   ============================================================ */
-code, pre {
-  font-family: 'Consolas','JetBrains Mono',monospace;
-  border-radius: 3px;
-}
-.doc-code--inline {
-  padding: .15rem .4rem;
-  font-size: .9em;
-  color: #d92929;
-  background: #fff1f1;
-}
-.doc-code--inline--deepColor {
-  padding: .15rem .4rem;
-  font-size: .9em;
-  color: #d92929;
-  background: #f7dfdf;
-}
+code, pre { font-family: 'Consolas','JetBrains Mono',monospace; border-radius: 3px; }
+/* 正文中的 code 标签统一显示为淡红底代码样式；pre 内部的 code 保持原样 */
+code { padding: .15rem .4rem; font-size: .9em; color: #d92929; background: #fff1f1; }
+pre code { padding: 0; font-size: inherit; color: inherit; background: none; }
+.doc-link code { color: #c81f1f; }
 .doc-code--block {
-  padding: 1rem;
-  overflow-x: auto;
-  background: #2b2b2b;
-  color: #e6e6e6;
-  margin: 1rem 0;
-  font-size: .85rem;
+  padding: 1rem; overflow-x: auto; background: #2b2b2b; color: #e6e6e6;
+  margin: 1rem 0; font-size: .85rem; line-height: 1.6;
 }
 
 /* ============================================================
    7. 表格
    ============================================================ */
-.doc-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1.2rem 0;
-  font-size: .9rem;
-}
+.doc-table { width: 100%; border-collapse: collapse; margin: 1.2rem 0; font-size: .9rem; }
 .doc-table__th, .doc-table__td {
-  border: 1px solid #ddd;
-  padding: 9px 12px;
-  text-align: left;
-  vertical-align: top;
+  border: 1px solid #ddd; padding: 9px 12px; text-align: left; vertical-align: top;
 }
-.doc-table__th {
-  background: #f8f0f0;
-  color: #b81c1c;
-  font-weight: 600;
+.doc-table__th { background: #f8f0f0; color: #b81c1c; font-weight: 600; }
+.doc-table--action .doc-table__th:first-child,
+.doc-table--action .doc-table__td:first-child {
+  width: 72px; text-align: center; white-space: nowrap;
+  font-family: 'Consolas','JetBrains Mono',monospace;
 }
+.doc-table--action .doc-table__td:first-child { font-weight: 600; color: #b81c1c; }
 
 /* ============================================================
-   8. 提示框 / 列表
+   8. 提示 / 列表 / 分割线
    ============================================================ */
-.doc-notice--warning {
-  background: #fef0f0;
-  border-left: 4px solid #d92929;
-  padding: .8rem 1rem;
-  margin: 1rem 0;
-  border-radius: 2px;
+.doc-note {
+  background: #fdf7f7; border-left: 4px solid #d92929;
+  padding: .7rem 1rem; margin: 1rem 0; border-radius: 2px; font-size: .9rem;
 }
-.doc-list--content { margin: 0 4%; line-height: 1.8; }
+.doc-note__title { color: #b81c1c; font-weight: 600; }
+.doc-note ul, .doc-note ol { margin: .3rem 0 0 1.1rem; line-height: 1.75; }
+.doc-note p { margin: .3rem 0 0; }
+.doc-list { margin: 0 4%; line-height: 1.8; }
+.sec-toc {
+  background: #fdf7f7; border-radius: 3px; padding: 14px 20px;
+  margin: 1.2rem 0; border-left: 3px solid #d92929;
+}
+.sec-toc__title { color: #d92929; font-size: 1.05rem; font-weight: 600; margin: 0 0 8px 0; }
+.sec-toc__list { list-style: none; padding: 0; margin: 0; line-height: 1.8; }
+.sec-toc__item { margin: 4px 0; font-size: .9rem; }
+.sec-toc__link { color: #333; text-decoration: none; padding: 2px 6px; border-radius: 2px; transition: background .2s; }
+.sec-toc__link:hover { background: #f8e8e8; color: #d92929; }
+.sec-toc__id { color: #aaa; font-size: .8rem; font-family: 'Consolas',monospace; }
 
-/* ============================================================
-   9. 分割线
-   ============================================================ */
-.sec-divider {
-  margin: 2rem -2.2rem;
-  border: none;
-  height: 1px;
-  background: #e0b0b0;
-}
+.sec-divider { margin: 2rem -2.2rem; border: none; height: 1px; background: #e0b0b0; }
 .sec-divider--double {
-  margin: 2rem -2.2rem;
-  height: 5px;
-  border: none;
-  border-top: 1px solid #e0b0b0;
-  border-bottom: 1px solid #e0b0b0;
+  margin: 2rem -2.2rem; height: 5px; border: none;
+  border-top: 1px solid #e0b0b0; border-bottom: 1px solid #e0b0b0;
 }
-.doc-hr {
-  margin: 2rem 0;
-  border: none;
-  height: 1px;
-  background: #f0c8c8;
+.doc-hr { margin: 1.5rem 0; border: none; height: 1px; background: #f0c8c8; }
+.doc-text--gray { color: #767474; margin: 1% 0; }
+.doc-paragraph--gap { margin-top: 1.5rem; }
+
+/* 定位高亮 */
+.flash { animation: flashbg 1.6s ease-out; }
+@keyframes flashbg {
+  0% { background: rgba(255,235,150,.75); }
+  100% { background: transparent; }
 }
 
 /* ============================================================
-   10. 段落 / 文字 工具类
-   ============================================================ */
-.doc-paragraph--only-vertical { margin: 1% 0; }
-.doc-paragraph--wrapped { margin: 2% 2%; }
-.doc-text--gray { color: #767474; margin: 2% 0; }
-
-/* ============================================================
-   11. 页脚
+   9. 页脚 / 响应式
    ============================================================ */
 .doc-footer {
-  margin-top: 3rem;
-  padding-top: 1.2rem;
-  text-align: center;
-  border-top: 1px solid #eee;
-  font-size: .85rem;
-  color: #777;
+  margin-top: 3rem; padding-top: 1.2rem; text-align: center;
+  border-top: 1px solid #eee; font-size: .85rem; color: #777;
 }
-
-/* ============================================================
-   12. 章节内目录
-   ============================================================ */
-.sec-toc {
-  background: #fdf7f7;
-  border-radius: 3px;
-  padding: 16px 20px;
-  margin: 1.2rem 0;
-  border-left: 3px solid #d92929;
-}
-.sec-toc__title {
-  color: #d92929;
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin: 0 0 10px 0;
-  padding: 0;
-}
-.sec-toc__list { list-style: none; padding: 0; margin: 0; line-height: 1.8; }
-.sec-toc__item { margin: 6px 0; }
-.sec-toc__link {
-  color: #333;
-  text-decoration: none;
-  padding: 2px 6px;
-  border-radius: 2px;
-  transition: background .2s;
-}
-.sec-toc__link:hover { background: #f8e8e8; color: #d92929; }
-
-/* ============================================================
-   13. 响应式
-   ============================================================ */
-@media (max-width: 1170px) {
-  .doc-container { margin-right: .5rem; }
-}
+@media (max-width: 1170px) { .doc-container { margin-right: .5rem; } }
 @media (max-width: 800px) {
-  .nav { width: 130px; }
+  .nav { width: 150px; }
+  .search-panel { left: 150px; width: calc(100vw - 165px); }
 }
 @media (max-width: 640px) {
   .doc-container { margin: .5rem; padding: 1rem; }
+  .search-panel { left: 0; width: 100vw; max-width: 100vw; border-radius: 0; }
 }
 </style>
 </head>
@@ -337,15 +226,18 @@ code, pre {
 <!----------------->
 
 <button class="nav-toggle" id="navToggle" onclick="toggleNav()">☰</button>
-<nav class="nav" id="mainNav"><div class="nav__title"><span class="nav__close" onclick="toggleNav()">◀</span>PhobosExt<span class="nav__lock" onclick="toggleLock()"><svg class="lock-icon lock-icon--locked" viewBox="0 0 24 24" width="17" height="17" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="11" width="16" height="11" rx="2.5" fill="#d92929"/><path d="M7 11V7a5 5 0 0 1 10 0v4" fill="none" stroke="#d92929" stroke-width="2.5" stroke-linecap="round"/></svg><svg class="lock-icon lock-icon--unlocked" viewBox="0 0 24 24" width="17" height="17" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="11" width="16" height="11" rx="2.5" fill="#d92929"/><path d="M7 11V7a5 5 0 0 1 10 0" fill="none" stroke="#d92929" stroke-width="2.5" stroke-linecap="round"/></svg></span></div><ul class="nav__list">
+<nav class="nav" id="mainNav"><div class="nav__title"><span class="nav__close" onclick="toggleNav()">◀</span>PhobosExt<span class="nav__lock" onclick="toggleLock()"><svg class="lock-icon lock-icon--locked" viewBox="0 0 24 24" width="17" height="17" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="11" width="16" height="11" rx="2.5" fill="#d92929"/><path d="M7 11V7a5 5 0 0 1 10 0v4" fill="none" stroke="#d92929" stroke-width="2.5" stroke-linecap="round"/></svg><svg class="lock-icon lock-icon--unlocked" viewBox="0 0 24 24" width="17" height="17" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="11" width="16" height="11" rx="2.5" fill="#d92929"/><path d="M7 11V7a5 5 0 0 1 10 0" fill="none" stroke="#d92929" stroke-width="2.5" stroke-linecap="round"/></svg></span></div>
+<div class="nav__search"><input id="searchInput" type="search" placeholder="搜索功能 / 编号 / 键名" autocomplete="off"><div class="nav__search-hint">按 / 或 Ctrl+K 定位搜索框</div></div>
+<ul class="nav__list">
 <li class="nav__item nav__item--active" page="home">首页</li>
 <li class="nav__item" page="gameplay">新增游戏机制</li>
 <li class="nav__item" page="commands">新增按键命令</li>
 <li class="nav__item" page="actions">新增触发行为</li>
 <li class="nav__item" page="events">新增触发事件</li>
-<li class="nav__item" page="scripts">新增动作脚本</li>
-<li class="nav__item" page="fixes">原版Bug修复</li>
+<li class="nav__item" page="scripts">新增脚本动作</li>
+<li class="nav__item" page="fixes">原版 Bug 修复</li>
 </ul></nav>
+<div class="search-panel" id="searchPanel"></div>
 
 <div class="doc-container">
 
@@ -354,50 +246,42 @@ code, pre {
 <!----------------->
 
 <section id="sec_home" class="active">
-<h1 class="doc-title"><a href="https://github.com/Chang-zhi/PhobosExt_Changzhi" target="_blank" class="doc-link" style="border-bottom:none">PhobosExt</a> <span class="doc-title__sub">扩展 DLL</span></h1>
+<h1 class="doc-title"><a href="https://github.com/Chang-zhi/PhobosExt_Changzhi" target="_blank" class="doc-link doc-link--plain">PhobosExt</a> <span class="doc-title__sub">扩展 DLL</span></h1>
 
-<p>一个扩展《红色警戒2：尤里的复仇》游戏功能的 DLL，基于 Phobos 开发，作者<a href="https://space.bilibili.com/423792550" target="_blank" class="doc-link"><strong>Chang_zhi</strong></a>。</p>
-<p>主要面向 任务/地图 作者，可以自由的将其用于任务包或模组制作。</p>
-<p><strong>尽管叫 PhobosExt , 但仅部分功能需要依赖 Phobos，也可独立运行。推荐和其一同使用。</strong><br>
-<p>说是基于 Phobos，其实只是删了删代码 ( <span class="doc-title--gray;">低创作品，大佬轻喷</span> )</p>
-<p style="margin-top:1.5rem">← 左侧导航栏点击查看各功能详情</p>
+<p>为《红色警戒2：尤里的复仇》扩展游戏功能的 DLL，面向任务与地图作者，可自由用于任务包与模组。<br>
+  作者 <a href="https://space.bilibili.com/423792550" target="_blank" class="doc-link"><strong>Chang_zhi</strong></a>。</p>
+<p>仅部分功能依赖 <strong>Phobos</strong>：不安装 Phobos 也可独立使用，推荐与 Phobos 一同使用。</p>
+<p class="doc-text--gray">左侧导航栏查看各功能详情；顶部搜索框可直接搜功能名、编号或键名。</p>
 
-<h2 class="doc-heading--secondary">兼容性说明</h2>
-<p>需保证游戏版本为 YR 1.001。</p>
-<p><strong>不依赖 Ares 或 Phobos，可单独使用。</strong> </p>
-<p>部分功能（如触发行为 653、654）依赖 Phobos ，详见对应章节。</p>
-<p>本 DLL 已避免使用 <code class="doc-code--inline">ExtPointerOffset</code> ，改用独立 <code class="doc-code--inline">unordered_map</code> 存储扩展数据，不会与 Ares 或 Phobos 的原生扩展数据冲突。(严格来说可能变慢, 但对现代cpu的影响应该可以忽略不计)</p>
+<h2 class="doc-heading--secondary">兼容性</h2>
+<ul class="doc-list">
+<li>需游戏版本 <strong>YR 1.001</strong>。</li>
+<li>不依赖 Ares 或 Phobos，可单独使用；与 Ares、Phobos 共存不会冲突。</li>
+<li>依赖 Phobos 的功能：触发行为 <code>653</code>、<code>654</code>（需 Phobos v0.5-alpha 及以上）。<br>
+  <a href="javascript:switchPage('actions');setTimeout(function(){scrollToFeature('actions_8')},100)" class="doc-link">→ 查看对应的触发行为（653／654）</a></li>
+</ul>
 
 <h2 class="doc-heading--secondary">已知问题</h2>
-<p>1. 当单位当前正在使用带有 <code class="doc-code--inline">Temporal=yes</code> 和 <code class="doc-code--inline">Temporal.Exclusive=yes</code> 弹头的武器时, 会强制改变单位的索敌逻辑, 可能会产生bug。</p>
-<p>2. 当科技类型的 <code class="doc-code--inline">LegalTargetWhenAIOwner=no</code> 且不由人类玩家控制时, 会强制改变其他单位的索敌逻辑, 可能会产生bug。</p>
-<p>3. 基地节点跨所属方判定：开启后不要让 AI 造围墙，与触发行为 30 不兼容。详见<a href="javascript:switchPage('gameplay');setTimeout(function(){scrollToFeature('gameplay_4')},100)" class="doc-link">对应章节</a>。</p>
-<br>
-<p><strong>如果遇到bug或兼容性问题可以我发私信, 我会尽量解决。</strong></p>
-<p>我的 <a href="https://space.bilibili.com/423792550" target="_blank" class="doc-link">@B站主页</a></p>
-<p>我的 QQ邮箱: 3071564490@qq.com</p>
+<ol class="doc-list">
+<li>使用 <code>Temporal=yes</code> + <code>Temporal.Exclusive=yes</code> 的武器会改变单位的选敌逻辑，可能出现异常。</li>
+<li><code>LegalTargetWhenAIOwner=no</code> 的 AI 单位会改变其他单位的选敌逻辑，可能出现异常。</li>
+<li>基地节点跨所属方判定开启后：与触发行为 <code>30</code>（自动建设基地）不兼容，且不要让 AI 造围墙。<br>
+  <a href="javascript:switchPage('gameplay');setTimeout(function(){scrollToFeature('gameplay_4')},100)" class="doc-link">→ 查看基地节点跨所属方判定</a></li>
+</ol>
+
+<h2 class="doc-heading--secondary">反馈</h2>
+<p>遇到 bug 或兼容性问题欢迎反馈：<a href="https://space.bilibili.com/423792550" target="_blank" class="doc-link">B站私信</a> ｜ 邮箱 3071564490@qq.com</p>
 
 <h2 class="doc-heading--secondary">致谢</h2>
-<ul class="doc-list--content">
-<li><a href="https://github.com/Ares-Developers/Ares" target="_blank" class="doc-link">Ares</a> 项目组</li>
-<li><a href="https://github.com/Phobos-developers/Phobos" target="_blank" class="doc-link">Phobos</a> 项目组</li>
-<li><a href="https://github.com/Phobos-developers/YRpp" target="_blank" class="doc-link">YRpp</a> 项目组</li>
-<li>韩大妈 <a href="https://space.bilibili.com/2229647" target="_blank" class="doc-link">@B站主页</a></li>
-<li>九千天华 <a href="https://space.bilibili.com/362533219" target="_blank" class="doc-link">@B站主页</a></li>
-<li>偏微whyffu <a href="https://space.bilibili.com/41073096" target="_blank" class="doc-link">@B站主页</a></li>
-<li>妖妖酱 <a href="https://github.com/yaoyaojiang" target="_blank" class="doc-link">@GitHub</a></li>
+<ul class="doc-list">
+<li><a href="https://github.com/Ares-Developers/Ares" target="_blank" class="doc-link">Ares</a>、<a href="https://github.com/Phobos-developers/Phobos" target="_blank" class="doc-link">Phobos</a>、<a href="https://github.com/Phobos-developers/YRpp" target="_blank" class="doc-link">YRpp</a> 项目组</li>
+<li>韩大妈、九千天华、偏微whyffu、妖妖酱</li>
 </ul>
-<p style="text-align:left;color:#666;margin-top:12px">排名不分先后</p>
+<p class="doc-text--gray">排名不分先后</p>
 
 <h2 class="doc-heading--secondary">许可</h2>
-<p>Github 仓库: <a href="https://github.com/Chang-zhi/PhobosExt_Changzhi" target="_blank" class="doc-link"><strong>PhobosExt_Changzhi</strong></a></p>
-<p>本项目代码采用与 Phobos 相同的 <code class="doc-code--inline">GPL-3.0 license</code> 许可证。<br>
-《红色警戒2：尤里的复仇》及其相关素材归 Electronic Arts 所有。</p>
-
-<h2 class="doc-heading--secondary">触发编辑器配置</h2>
-<p>为了在触发编辑器中使用新的触发行为，您需要复制压缩包里面的 <code class="doc-code--inline">FAData_Customized.ini</code> 到地编的根目录下。</p><br>
-<p>仅支持 <a href="https://github.com/handama/FA2sp" target="_blank" class="doc-link">FA2SP_HDM_Edition</a>(韩大妈版本)<br>其他版本请自行移植。</p>
-
+<p>仓库：<a href="https://github.com/Chang-zhi/PhobosExt_Changzhi" target="_blank" class="doc-link"><strong>PhobosExt_Changzhi</strong></a>｜代码采用与 Phobos 相同的 <code>GPL-3.0</code> 许可。</p>
+<p>《红色警戒2：尤里的复仇》及其相关素材归 Electronic Arts 所有。</p>
 </section>
 
 <!----------------->
@@ -406,408 +290,287 @@ code, pre {
 
 <section id="sec_gameplay">
 <h2 class="doc-heading--secondary">新增游戏机制</h2>
+<p>以下功能全部通过 <code>rulesmd.ini</code>（或地图小节）中的标签启用，均为可选。</p>
 <div class="sec-toc">
-<p class="sec-toc__title">目录：</p>
+<p class="sec-toc__title">目录</p>
 <ul class="sec-toc__list">
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_1')" class="sec-toc__link">1. 超时空武器扩展</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_2')" class="sec-toc__link">2. 自动游猎</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_3')" class="sec-toc__link">3. AI单位是否可被选为常规攻击目标</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_3')" class="sec-toc__link">3. AI 单位能否被选为攻击目标</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_4')" class="sec-toc__link">4. 基地节点跨所属方判定</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_5')" class="sec-toc__link">5. 混乱机制扩展</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_6')" class="sec-toc__link">6. 选择框系统</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_7')" class="sec-toc__link">7. 单人任务 Tab 快速打开任务简报</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_8')" class="sec-toc__link">8. SmartVHPScan 智能火力分配</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_6')" class="sec-toc__link">6. 选择框样式</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_7')" class="sec-toc__link">7. 单人任务 Tab 打开任务简报</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_8')" class="sec-toc__link">8. <code>SmartVHPScan</code> 智能火力分配</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_9')" class="sec-toc__link">9. AI 目标类型列表 <code>[AITargetTypes]</code></a></li>
 </ul>
 </div>
 
 <hr class="sec-divider">
 
 <div id="gameplay_1">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">1. 超时空武器扩展</h3>
-<p>为 <code class="doc-code--inline">Temporal=yes</code> 的弹头增加互斥锁定和范围冻结机制。</p>
-<pre class="doc-code--block"><code>[WarheadType]
-; ─── 互斥锁定 ───
-Temporal.Exclusive=                        ; boolean，默认 false — 启用后无法攻击已被其他超时空锁定的单位
+<h3 class="doc-heading--tertiary">1. 超时空武器扩展</h3>
+<p>给超时空武器（<code>Temporal=yes</code> 的弹头）增加两种能力：同一目标只被一个武器锁定、攻击时连周围单位一起冻结。</p>
 
-; ─── 范围冻结 ───
-TemporalAOE.Enable=                        ; boolean，默认 false — 启用范围冻结
-TemporalAOE.CellSpread=                    ; double，默认 2.0 — AOE 半径
-TemporalAOE.SecondaryWeight=               ; double，默认 1.0 — 副目标冻结时间贡献权重（可填负值）
-TemporalAOE.AffectsAllies=                 ; boolean，默认 false — 是否影响友军</code></pre>
-<h4>1.1 互斥锁定 (<code class="doc-code--inline">Temporal.Exclusive</code>)</h4>
-<p>当弹头同时设置 <code class="doc-code--inline">Temporal=yes</code> 和 <code class="doc-code--inline">Temporal.Exclusive=yes</code> 时，该武器无法瞄准已被其他 <code class="doc-code--inline">TemporalClass</code> 实例锁定的单位。</p>
-<ul class="doc-list--content">
-<li>普通的超时空武器（<code class="doc-code--inline">Temporal=yes</code> 但未设置 <code class="doc-code--inline">Temporal.Exclusive</code>）仍可以攻击已被互斥武器锁定的单位。</li>
-<li>互斥武器不能攻击被普通超时空武器冻结的目标。</li>
+<pre class="doc-code--block"><code>[WarheadType]
+; 互斥锁定
+Temporal.Exclusive=              ; boolean - 同一目标只被一个单位锁定 - (默认 false)
+; 范围冻结
+TemporalAOE.Enable=              ; boolean - 启用范围冻结 - (默认 false)
+TemporalAOE.CellSpread=          ; double - 冻结范围半径（格） - (默认 2.0)
+TemporalAOE.SecondaryWeight=     ; double - 副目标冻结时间权重，可填负值 - (默认 1.0)
+TemporalAOE.AffectsAllies=       ; boolean - 是否连友军一起冻结 - (默认 false)</code></pre>
+
+<h4>1.1 互斥锁定：<code>Temporal.Exclusive</code></h4>
+<p>启用后，同一目标只会被一个单位锁定：正被其他单位超时空冻结的目标不会被选为攻击对象，对方用的是不是互斥武器都一样。<br>
+  若多个单位已同时锁定同一目标，只保留一个，其余自动放弃。</p>
+<div class="doc-note">
+<span class="doc-note__title">注意</span>
+<ul>
+<li>只在弹头<strong>同时</strong>写了 <code>Temporal=yes</code> 与 <code>Temporal.Exclusive=yes</code> 时生效。</li>
+<li>限制是<strong>单向</strong>的：互斥武器不能攻击正被其他单位冻结的目标；而普通超时空武器不受约束，仍可攻击已被互斥武器锁定的目标。</li>
+<li>该机制会改变单位的选敌逻辑（见首页「已知问题」）。</li>
 </ul>
-<h4>1.2 范围冻结 (<code class="doc-code--inline">TemporalAOE.Enable</code>)</h4>
-<p>当弹头同时设置 <code class="doc-code--inline">Temporal=yes</code> 和 <code class="doc-code--inline">TemporalAOE.Enable=yes</code> 时，超时空武器攻击主目标的同时，会冻结主目标周围一定范围内的所有敌方单位，并与主目标同时被抹除。</p>
-<ul class="doc-list--content">
-<li><strong>时间计算公式</strong>：<code class="doc-code--inline">额外冻结帧数 = (10 × 副目标HP × SecondaryWeight) ÷ 武器Damage</code>。每个副目标的贡献独立累加。
-<br>例如：副目标 <code class="doc-code--inline">HP=200</code>，<code class="doc-code--inline">SecondaryWeight=1.0</code>，<code class="doc-code--inline">Damage=100</code>，<br>则每个副目标增加 <code class="doc-code--inline">(10×200×1.0)÷100 = 20</code> 帧。
-<code class="doc-code--inline">SecondaryWeight</code> 可填负值，此时副目标越多冻结时间就会少。</li>
-<li><strong>进出范围</strong>：单位进入范围时累加冻结时间，<strong>离开/死亡时不扣减</strong>（防止主目标瞬秒）。</li>
-<li><strong>要塞兼容</strong>：支持 OpenTopped 开放式载具（如要塞）内乘员使用 AOE。击杀经验归载具。</li>
-<li><strong>攻击者免冻</strong>：正在使用超时空武器的单位不会被选为副目标，防止多个 AOE 攻击者之间互相冻结。</li>
-<li><strong>超时空武器拦截</strong>：所有 <code class="doc-code--inline">Temporal=yes</code> 的超时空武器（无论是否设置 Exclusive/AOE）均无法将已被 AOE 锁定的<strong>主目标和副目标</strong>选为攻击对象。(防止bug)</li>
+</div>
+
+<h4>1.2 范围冻结：<code>TemporalAOE.Enable</code></h4>
+<p><strong>抹除倒计时</strong>：<br>
+  抹除主目标自身需要 <code>10 × 生命值上限 ÷ 武器 Damage</code> 帧，<br>
+  每个副目标再增加 <code>10 × 生命值上限 × SecondaryWeight ÷ 武器 Damage</code> 帧。<br>
+  副目标越多、生命值上限越高，抹除越慢；<code>SecondaryWeight</code> 填负值则更快。</p>
+<p>例：<code>Damage=100</code>、副目标生命值上限 <code>200</code>、<code>SecondaryWeight=1.0</code> → 每个副目标多撑 <code>20</code> 帧。</p>
+<div class="doc-note">
+<span class="doc-note__title">注意</span>
+<ul>
+<li>同一个副目标只累加一次；离开范围/死亡后解除冻结，但<strong>已累加的时间不会扣回</strong>，这是为了防止主目标被瞬间抹除。</li>
+<li>主目标与副目标都被该单位独占：其他超时空武器<strong>无法对其开火</strong>，所以不会出现多个单位给同一目标叠加时间的情况(为了防止bug)。</li>
+<li>正在使用超时空武器的单位不会被选为副目标，避免多个超时空武器互相冻结。</li>
 </ul>
+</div>
 </div>
 
 <hr class="sec-divider--double">
 
 <div id="gameplay_2">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">2. 自动游猎</h3>
+<h3 class="doc-heading--tertiary">2. 自动游猎</h3>
 <pre class="doc-code--block"><code>[TechnoType]
-AutoHunt=                       ; boolean，默认 false</code></pre>
-<p>当科技类型设置 <code class="doc-code--inline">AutoHunt=yes</code> 时，该类型的所有单位(仅限 AI 控制)会自动强制进入 <code class="doc-code--inline">Hunt</code> 状态，主动搜索并攻击敌方目标。</p>
-<ul class="doc-list--content">
-<li><strong>仅限 AI：</strong>人类玩家控制的单位不会受此影响。</li>
-<li><strong>小队优先：</strong>如果单位在某个小队里，则不会启用逻辑。</li>
-<li><strong>检查间隔：</strong>每个 <code class="doc-code--inline">AutoHunt=yes</code> 的单位每 <code class="doc-code--inline">15</code> 帧执行一次逻辑检查。</li>
-<li><strong>载具内无效：</strong>如果单位位于载具内，<code class="doc-code--inline">AutoHunt</code> 逻辑不会生效(离开载具后自动生效)。</li>
-<li><strong>自动解除部署：</strong>如果单位当前处于部署状态，会先尝试解除部署功能。</li>
-<li><strong>目标可达性检查：</strong>当单位的攻击目标所在单元格不可达时，跳过本次逻辑。</li>
-<li><strong>禁止招募：</strong>单位的 <code class="doc-code--inline">RecruitableA</code> 和 <code class="doc-code--inline">RecruitableB</code> 会强制被设置为<code class="doc-code--inline">false</code>。</li>
-<li><strong>禁止攻击地面：</strong>如果单位当前攻击目标是单元格(强制攻击地面)，会自动清除该目标。</li>
+AutoHunt=                        ; boolean - AI 单位自动进入游猎状态 - (默认 false)</code></pre>
+<p>该类型的所有 <strong>AI 单位</strong>自动进入 <code>Hunt</code> 状态，主动搜索并攻击敌方目标。</p>
+<div class="doc-note">
+<span class="doc-note__title">注意</span>
+<ul>
+<li>仅对 AI 控制的单位生效，人类玩家控制的单位不受影响。</li>
+<li>已在作战小队中的单位不生效。</li>
+<li>位于载具内的单位不生效，离开载具后自动生效。</li>
+<li>单位处于部署状态时会先解除部署。</li>
+<li>当前攻击目标是地面（强制攻击地面）时，目标会被清除并重新索敌。</li>
+<li>目标所在格不可抵达时，本次不执行索敌。</li>
+<li>该类型单位会被强制设为<strong>不可招募</strong>。</li>
 </ul>
+</div>
 </div>
 
 <hr class="sec-divider--double">
 
 <div id="gameplay_3">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">3. AI单位是否可被选为常规攻击目标</h3>
+<h3 class="doc-heading--tertiary">3. AI 单位能否被选为攻击目标</h3>
 <pre class="doc-code--block"><code>[TechnoType]
-LegalTargetWhenAIOwner=             ; boolean，默认 true</code></pre>
-<p>当科技类型的 <code class="doc-code--inline">LegalTargetWhenAIOwner=no</code> 且不由人类玩家控制时，该科技类型不会被其他单位选为普通武器攻击对象。<br>
-(但仍可被 C4 爆破、受到伤害反馈等)</p>
+LegalTargetWhenAIOwner=          ; boolean - AI 控制时能否被其他单位选为攻击目标 - (默认 true)</code></pre>
+<p>设为 <code>no</code> 后，该类型在由 AI 控制时不会被其他单位选为普通武器的攻击目标。</p>
+<div class="doc-note">
+<span class="doc-note__title">注意</span>
+<ul>
+<li>不影响人类玩家控制的该类型单位。</li>
+<li>仍可被 C4 爆破、受伤害反馈等非伤害手段命中。</li>
+</ul>
+</div>
 </div>
 
 <hr class="sec-divider--double">
 
 <div id="gameplay_4">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">4. 基地节点跨所属方判定</h3>
+<h3 class="doc-heading--tertiary">4. 基地节点跨所属方判定</h3>
 <pre class="doc-code--block"><code>[Country House]
-BaseNodeCrossOwners=                  ; boolean，默认 false</code></pre>
-<p>启用后，AI 在评估基地节点状态时，会将<strong>全局所有所属方的建筑</strong>纳入计算，而非仅限于 AI 自身的建筑。</p>
-<p><strong>用途：</strong></p>
-<ul class="doc-list--content">
-<li><strong>让 AI 给玩家造建筑</strong>——玩家获得 AI 的建筑后，AI 认为该节点"已完成"，不再尝试重建。</li>
-<p>(就是为了这碟醋包的这盘饺子.jpg)</p>
+BaseNodeCrossOwners=             ; boolean - AI 评估基地节点时是否计入所有所属方建筑 - (默认 false)</code></pre>
+<p>启用后，AI 判断某个基地节点是否已经建好时，会把<strong>场上所有所属方</strong>的建筑都算进来，而不是只看自己的建筑。</p>
+<p><strong>典型用途</strong>：让 AI 给玩家造建筑——玩家拿到 AI 的建筑后，AI 认为该节点已完成，不再重建。</p>
+<p>节点由本 DLL 按记录顺序控制建造，不会出现原版那种节点自动移位。</p>
+<div class="doc-note">
+<span class="doc-note__title">注意</span>
+<ul>
+<li>与触发行为 <code>30</code>（自动建设基地）<strong>不兼容</strong>：本功能接管了 AI 的节点建造顺序，开启行为 <code>30</code> 也不会更换建筑位置。</li>
+<li>开启后<strong>不要让 AI 造围墙</strong>，会打乱节点队列导致建造卡住。</li>
+<li>触发行为 <code>560</code> 的「立即建造」参数在此模式下会把节点插到队列最前面，AI 下一帧优先建造它。</li>
+<li>触发行为 <code>560</code>／<code>561</code>／<code>562</code> 增删节点时，本功能记录的数据会同步更新。</li>
 </ul>
-<hr class="doc-hr">
-<h4>注册表机制说明</h4>
-<p>本功能维护了一个独立于游戏引擎的<strong>内部节点注册表</strong>，用于追踪哪些基地节点是"合法"的。</p>
-<p>完全手动操控 AI 的基地节点，因此不会有原版的节点自动移位。</p>
-<p><strong>捕获时机：</strong></p>
-<ul class="doc-list--content">
-<li>首次进入本逻辑时，自动将游戏内所有有效节点捕获到注册表。此捕获<strong>仅执行一次</strong>。</li>
-<li>后续通过 <strong>本dll的</strong> 触发行为添加/移除的节点会同步更新注册表。</li>
-</ul>
-<p><strong>与触发行为的联动：</strong></p>
-<ul class="doc-list--content">
-<li><code class="doc-code--inline">560</code>(添加基地节点)：添加节点到游戏中的同时加入注册表。</li>
-<li><code class="doc-code--inline">561</code>(移除路径点上的节点)：从游戏中删除的同时从注册表删除。</li>
-<li><code class="doc-code--inline">562</code>(移除指定类型的节点)：从游戏中删除的同时从注册表删除。</li>
-<li>所有通过触发行为添加的节点都会被注册表追踪，不会被 AI 自动生成逻辑覆盖。</li>
-</ul>
-<div class="doc-notice--warning">
-<strong>兼容性说明：</strong>
-<ol style="margin:4px 0 0 18px;line-height:1.8">
-<li><strong>与触发行为 <code class="doc-code--inline--deepColor">30(自动建设基地)</code>不兼容：</strong><br>本功能接管了 AI 的基地节点建造逻辑，强制按注册表顺序和数据依次建造。即使开启自动建设基地模式 AI 也不会更换建筑位置。</li>
-<li><strong>开启时不要让 AI 造围墙：</strong><br>围墙会扰乱控制，可能导致节点队列卡死。请确保 AI 的基地节点中不包含围墙类型。</li>
-<li><strong>行为 <code class="doc-code--inline--deepColor">560</code> 的立即建造参数：</strong><br>当 <code class="doc-code--inline--deepColor">BaseNodeCrossOwners=yes</code> 时，使用 <code class="doc-code--inline--deepColor">立即建造</code> 会将节点插入注册表头部，确保 AI 在下帧优先建造该节点。</li>
-</ol>
 </div>
 </div>
 
 <hr class="sec-divider--double">
 
 <div id="gameplay_5">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">5. 混乱机制扩展</h3>
-<h4 style="margin-top:1.2em">5.1 混乱恢复设置</h4>
+<h3 class="doc-heading--tertiary">5. 混乱机制扩展</h3>
+<h4>5.1 混乱恢复后清除目标</h4>
 <pre class="doc-code--block"><code>[General]
-BerzerkRestoreClearTarget=               ; boolean，默认 false</code></pre>
-<p>启用时，当单位从混乱状态恢复会自动清除当前攻击目标，停止移动，切换至 <code class="doc-code--inline">Guard</code> 状态，用于防止单位乱跑。</p>
-<h4 style="margin-top:1.2em">5.2 弹头混乱缩减</h4>
+BerzerkRestoreClearTarget=       ; boolean - 混乱恢复后是否清除当前攻击目标 - (默认 false)</code></pre>
+<p>启用后，单位从混乱状态恢复时会清除当前攻击目标、停止移动并转入 <code>Guard</code> 状态，避免恢复后乱跑。</p>
+<h4>5.2 弹头缩减混乱时间</h4>
 <pre class="doc-code--block"><code>[WarheadType]
-BerserkReduce=                           ; integer，默认 0</code></pre>
-<p>当单位受到带有此标签的弹头攻击时（无论是否造成伤害），减少目标的混乱持续时间。</p>
-<ul class="doc-list--content">
-<li><strong>正值</strong>：减少对应帧数的混乱时间（加速清醒）。</li>
-<li><strong>负值</strong>：延长对应帧数的混乱时间。</li>
-<li>如果减少后的剩余时间 ≤ 0，则<strong>立即清除混乱状态</strong>，单位强制停止移动、进入 <code class="doc-code--inline">Guard</code> 模式并清除攻击目标，防止乱跑。</li>
+BerserkReduce=                   ; integer - 缩短混乱时间的帧数，负值则延长 - (默认 0)</code></pre>
+<p>单位被带此标签的弹头命中时（无论是否造成伤害），混乱时间减少对应帧数。</p>
+<ul class="doc-list">
+<li>正值 = 缩短混乱时间；负值 = 延长混乱时间。</li>
+<li>减到 0 以下时立即解除混乱，并清除攻击目标、进入 <code>Guard</code> 状态。</li>
 </ul>
 </div>
 
 <hr class="sec-divider--double">
 
 <div id="gameplay_6">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">6. 选择框系统</h3>
-<p>在 <code class="doc-code--inline">rulesmd.ini</code> 的 <code class="doc-code--inline">[ChoiceBoxTypes]</code> 段中定义选择框的样式和按钮配置，可按需添加任意多个类型。</p>
-<p><a href="javascript:switchPage('actions');setTimeout(function(){scrollToFeature('actions_11')},100)" class="doc-link">→ 查看对应的触发行为</a> <a href="javascript:switchPage('events');setTimeout(function(){scrollToFeature('events_4')},100)" class="doc-link">→ 查看对应的触发事件</a></p>
+<h3 class="doc-heading--tertiary">6. 选择框样式</h3>
+<p>选择框样式在 <code>rulesmd.ini</code> 的 <code>[ChoiceBoxTypes]</code> 中定义。</p>
+<p><a href="javascript:switchPage('actions');setTimeout(function(){scrollToFeature('actions_11')},100)" class="doc-link">→ 查看对应的触发行为（590–593）</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:switchPage('events');setTimeout(function(){scrollToFeature('events_4')},100)" class="doc-link">→ 查看对应的触发事件（557–559）</a></p>
+
 <pre class="doc-code--block"><code>[ChoiceBoxTypes]
 0=MyChoiceBox
 ...
 
 [MyChoiceBox]
-; ─── 基本属性 ───
-MaxWidth=                     ; integer  选择框最大像素宽度  (默认250)
-BackgroundOpacity=            ; integer  选择框背景不透明度（0~100） (默认75)
-Color=                        ; integer,integer,integer  选择框文字和边框颜色（R,G,B） (默认255,215,0)
-Duration=                     ; integer  选择框显示帧数, -1=无限 (默认-1)
+; 基本属性
+MaxWidth=                        ; integer - 最大像素宽度 - (默认 250)
+BackgroundOpacity=               ; integer - 背景不透明度 0~100 - (默认 75)
+Color=                           ; integer,integer,integer - 文字与边框颜色 - (默认 255,215,0)
+Duration=                        ; integer - 显示帧数，-1=无限 - (默认 -1)
 
-; ─── 文本内容 ───
-Title=                        ; CSF标签  标题文案（可选）  (默认无)
-Title.Center=                 ; boolean  标题是否居中 yes/no（可选） (默认no)
-Description=                  ; CSF标签  描述文案（可选）  (默认无)
+; 文本内容（可填 CSF 标签或直接写文字，可选）
+Title=                           ; CSF标签 - 标题 - (默认 无)
+Title.Center=                    ; boolean - 标题是否居中 - (默认 no)
+Description=                     ; CSF标签 - 描述 - (默认 无)
 
-; ─── 按钮相关 ───
-; 基本配置
-Button.Count=                 ; integer  按钮数量
-Button.Layout=                ; string   排列方向: Horizontal(横) / Vertical(纵) (默认Horizontal)
-Button.Mode=                  ; string   按钮模式: Normal(点完消失) / Bounce(回弹) (默认Normal)
-Button.Width=                 ; integer  按钮固定宽度, 0=自动适配文字  (默认0)
-Button.Height=                ; integer  按钮固定高度, 0=自动适配文字  (默认0)
-; 文本
-Button.Text1=                 ; CSF标签  按钮1的文字 (默认无)
-Button.Text2=                 ; CSF标签  按钮2的文字 (默认无)
-Button.Text3=                 ; CSF标签  更多按钮以此类推  (默认无)
+; 按钮
+Button.Count=                    ; integer - 按钮数量 - (默认 0)
+Button.Layout=                   ; 枚举字符串 - Horizontal / Vertical - (默认 Horizontal)
+Button.Mode=                     ; 枚举字符串 - Normal / Bounce - (默认 Normal)
+Button.Width=                    ; integer - 固定宽度，0=自适应 - (默认 0)
+Button.Height=                   ; integer - 固定高度，0=自适应 - (默认 0)
+Button.Text1=                    ; CSF标签 - 按钮 1 的文字 - (默认 无)
+Button.Text2=                    ; CSF标签 - 按钮 2 的文字 - (默认 无)
 ...</code></pre>
 
-<h4>属性详解</h4>
-
 <table class="doc-table">
-<thead>
-<tr><th class="doc-table__th">属性</th><th class="doc-table__th">说明</th></tr>
-</thead>
+<thead><tr><th class="doc-table__th" style="width:170px">属性</th><th class="doc-table__th">说明</th></tr></thead>
 <tbody>
-<tr>
-<td class="doc-table__td"><code>MaxWidth</code></td>
-<td class="doc-table__td">
-选择框的最大宽度（像素）。标题、描述和按钮文本超出该宽度时会自动换行。<br>
-设置为 <code>0</code> 时默认使用 250 像素。
-</td>
-</tr>
-<tr>
-<td class="doc-table__td"><code>BackgroundOpacity</code></td>
-<td class="doc-table__td">
-选择框的半透明黑色背景的不透明度。值越大背景越深。<br>
-<code>0</code>=完全透明，<code>100</code>=全黑。
-</td>
-</tr>
-<tr>
-<td class="doc-table__td"><code>Color</code></td>
-<td class="doc-table__td">
-选择框的文字颜色和边框颜色，RGB 格式。<br>
-悬停时颜色会加亮，选中时变为红色。
-</td>
-</tr>
-<tr>
-<td class="doc-table__td"><code>Duration</code></td>
-<td class="doc-table__td">
-选择框自动消失的帧数。4速下每秒30帧, 5速下每秒60帧<br>
-<code>-1</code> = 无限显示，需通过触发行为手动清除。
-</td>
-</tr>
-<tr>
-<td class="doc-table__td"><code>Title</code></td>
-<td class="doc-table__td">
-选择框的标题文字，CSF 标签。<br>
-不设置则不显示标题。
-</td>
-</tr>
-<tr>
-<td class="doc-table__td"><code>Title.Center</code></td>
-<td class="doc-table__td">
-标题文字是否在水平方向居中。默认为左对齐。
-</td>
-</tr>
-<tr>
-<td class="doc-table__td"><code>Description</code></td>
-<td class="doc-table__td">
-选择框的描述文字，CSF 标签。显示在标题下方，按钮上方。<br>
-不设置则不显示描述。
-</td>
-</tr>
-<tr>
-<td class="doc-table__td"><code>Button.Count</code></td>
-<td class="doc-table__td">
-按钮的个数。有多少个按钮就需要写多少个 <code>Button.TextN</code>。(N是数字)
-</td>
-</tr>
-<tr>
-<td class="doc-table__td"><code>Button.Layout</code></td>
-<td class="doc-table__td">
-按钮的排列方向。<br>
-<code>Horizontal</code> = 横向排列，一行放不下时自动折行。<br>
-<code>Vertical</code> = 纵向排列，始终单列。
-</td>
-</tr>
-<tr>
-<td class="doc-table__td"><code>Button.Mode</code></td>
-<td class="doc-table__td">
-按钮的交互模式。<br>
-<code>Normal</code> = 普通模式：玩家点击按钮后选择框会消失（无需依赖 <code>Duration</code>，点击即自动隐藏并清理）。<br>
-<code>Bounce</code> = 回弹模式：玩家点击按钮后会回弹，适合需要多次点击的场景（建议配合 <code>Duration=-1</code> 使用）。
-</td>
-</tr>
-<tr>
-<td class="doc-table__td"><code>Button.Width</code></td>
-<td class="doc-table__td">
-按钮的固定宽度（像素）。<br>
-设置后按钮内的文字会自动换行适配。<br>
-<code>0</code> = 自动宽度，以最长的按钮文字为准。
-</td>
-</tr>
-<tr>
-<td class="doc-table__td"><code>Button.Height</code></td>
-<td class="doc-table__td">
-按钮的固定高度（像素）。<br>
-设置后超出部分的文字会被截断不显示。<br>
-<code>0</code> = 自动高度，根据文字行数自适应。
-</td>
-</tr>
-<tr>
-<td class="doc-table__td"><code>Button.TextN</code></td>
-<td class="doc-table__td">
-第 N 个按钮上显示的文字。CSF 标签。<br>
-序号从 1 开始写到 <code>Button.Count</code> 为止，中间跳过会显示空白按钮。<br>
-写了 <code>Button.Count</code> 以外的不会被读取。
-</td>
-</tr>
+<tr><td class="doc-table__td"><code>MaxWidth</code></td><td class="doc-table__td">最大宽度（像素），超出该宽度的文字自动换行；填 <code>0</code> 或负数按 <code>250</code> 处理。</td></tr>
+<tr><td class="doc-table__td"><code>BackgroundOpacity</code></td><td class="doc-table__td">黑色背景的不透明度，值越大背景越深：<code>0</code>=全透明，<code>100</code>=全黑。</td></tr>
+<tr><td class="doc-table__td"><code>Color</code></td><td class="doc-table__td">文字与边框颜色。鼠标悬停时加亮，选中时变红。</td></tr>
+<tr><td class="doc-table__td"><code>Duration</code></td><td class="doc-table__td">自动消失的帧数。<code>-1</code>=一直显示，需用触发行为清除；归零时若玩家没点过按钮，会触发「超时未选」事件。</td></tr>
+<tr><td class="doc-table__td"><code>Title</code>／<code>Description</code></td><td class="doc-table__td">标题显示在最上方，描述显示在标题下、按钮上；不填则不显示。</td></tr>
+<tr><td class="doc-table__td"><code>Title.Center</code></td><td class="doc-table__td">标题是否水平居中，默认左对齐。</td></tr>
+<tr><td class="doc-table__td"><code>Button.Count</code></td><td class="doc-table__td">按钮数量。有几个按钮就要写几个 <code>Button.TextN</code>。</td></tr>
+<tr><td class="doc-table__td"><code>Button.Layout</code></td><td class="doc-table__td">按钮排列：<code>Horizontal</code>=横向，一行放不下自动折行；<code>Vertical</code>=纵向单列。</td></tr>
+<tr><td class="doc-table__td"><code>Button.Mode</code></td><td class="doc-table__td"><code>Normal</code>=点击后选择框立即消失并清理；<code>Bounce</code>=点击后回弹，可反复点击（建议配合 <code>Duration=-1</code>）。</td></tr>
+<tr><td class="doc-table__td"><code>Button.Width</code></td><td class="doc-table__td">固定宽度（像素），文字自动换行；<code>0</code>=按最长按钮文字自适应。</td></tr>
+<tr><td class="doc-table__td"><code>Button.Height</code></td><td class="doc-table__td">固定高度（像素），超出部分不显示；<code>0</code>=按文字行数自适应。</td></tr>
+<tr><td class="doc-table__td"><code>Button.TextN</code></td><td class="doc-table__td">第 N 个按钮的文字，序号从 1 连续写到 <code>Button.Count</code>；中间跳过会显示空白按钮，超出数量的不会被读取。</td></tr>
 </tbody>
 </table>
-
-</ol>
 </div>
 
 <hr class="sec-divider--double">
 
 <div id="gameplay_7">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">7. 单人任务 Tab 快速打开任务简报</h3>
-<p>在 <code class="doc-code--inline">[General]</code> 中增加新变量，用于控制是否能在单人任务中按下 <code class="doc-code--inline">Tab</code> 打开任务简报界面。</p>
+<h3 class="doc-heading--tertiary">7. 单人任务 Tab 打开任务简报</h3>
+<p>原版单人任务中 <code>Tab</code> 无法重新打开任务简报，本项用于放开该限制。</p>
 <pre class="doc-code--block"><code>[General]
-AllowTabBriefingInSinglePlayer=            ; boolean，默认 false</code></pre>
+AllowTabBriefingInSinglePlayer=  ; boolean - 单人任务中能否用 Tab 打开任务简报 - (默认 false)</code></pre>
+<p>设为 <code>yes</code> 后，单人任务中可随时按 <code>Tab</code> 打开任务简报；简报内容可用触发行为 <code>664</code> 动态修改。</p>
 </div>
 
 <hr class="sec-divider--double">
 
 <div id="gameplay_8">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">8. SmartVHPScan 智能火力分配</h3>
-<p>名字沿用<code class="doc-code--inline">VHPScan</code>仅为习惯，其独立于原版逻辑，实现更智能、可操作性更强的火力分配。<br>
-与原版逻辑互斥，当<code class="doc-code--inline">VHPScan=Normal|Strong</code>时，该逻辑不启用。</p>
+<h3 class="doc-heading--tertiary">8. <code>SmartVHPScan</code> 智能火力分配</h3>
+<p>名字沿用<code>VHPScan</code>仅为习惯，其独立于原版逻辑，实现更智能、可操作性更强的火力分配。</p>
 
 <pre class="doc-code--block"><code>[TechnoType]
-SmartVHPScan=                         ;枚举字符串 - 索敌模式：None/LowHealth/FullHealth/Count，默认None
-SmartVHPScan.Count=                   ;integer - Count 数量：同一目标最多几个单位同时打，默认1
-SmartVHPScan.Bias=                    ;double - 残血/满血的偏好强度，越大越执着，默认2.0
-SmartVHPScan.UnknownFactor=           ;double - 血量未知目标的分值倍数，1.0=一视同仁，默认1.0
-SmartVHPScan.ExcludeFraction=         ;double - 血量低于该比例的目标不打，0=关闭，默认0.0
-SmartVHPScan.Damage=                  ;integer - 等效伤害，0=用武器自身的 Damage，默认0
-SmartVHPScan.Overflow=                ;double - 允许多浪费多少火力，0=够杀就停，默认0.25
-SmartVHPScan.SwitchThreshold=         ;double - 换目标的门槛倍数，越大越不容易改主意，默认1.25
-SmartVHPScan.IncludeInflight=         ;boolean - 飞行中的弹药算不算已投入火力，默认true</code></pre>
+SmartVHPScan=                    ; 枚举字符串 - 索敌模式 None/LowHealth/FullHealth/Count - (默认 None)
+SmartVHPScan.Count=              ; integer - 同一目标最多几个单位同时打 - (默认 1)
+SmartVHPScan.Bias=               ; double - 偏好强度，越大越执着 - (默认 2.0)
+SmartVHPScan.UnknownFactor=      ; double - 血量未知目标的分值倍数 - (默认 1.0)
+SmartVHPScan.ExcludeFraction=    ; double - 低于该血量比例的目标不打，0=关闭 - (默认 0.0)
+SmartVHPScan.Damage=             ; integer - 等效伤害，0=用武器自身 Damage - (默认 0)
+SmartVHPScan.Overflow=           ; double - 允许多浪费多少火力，0=够杀就停 - (默认 0.25)
+SmartVHPScan.SwitchThreshold=    ; double - 换目标的门槛倍数，越大越不易改目标 - (默认 1.25)
+SmartVHPScan.IncludeInflight=    ; boolean - 飞行中的弹药算不算已投入火力 - (默认 true)</code></pre>
+
+<div class="doc-note">
+<span class="doc-note__title">注意</span>
+<ul>
+<li>与原版互斥：单位自身的 <code>VHPScan</code> 为 <code>Normal</code> 或 <code>Strong</code> 时，本功能不生效。</li>
+<li><code>Damage</code> 用于估算「几发能打死」。心控、超时空冻结这类 <code>Damage</code> 有特殊含义的武器，建议手动填一个等效值。</li>
+</ul>
+</div>
 
 <h4>索敌模式</h4>
 <table class="doc-table">
-<thead>
-<tr><th class="doc-table__th" style="width:140px">值</th><th class="doc-table__th">说明</th></tr>
-</thead>
+<thead><tr><th class="doc-table__th" style="width:130px">值</th><th class="doc-table__th">说明</th></tr></thead>
 <tbody>
 <tr><td class="doc-table__td"><code>None</code></td><td class="doc-table__td">不启用。</td></tr>
 <tr><td class="doc-table__td"><code>LowHealth</code></td><td class="doc-table__td">残血优先，血越少越先打。</td></tr>
 <tr><td class="doc-table__td"><code>FullHealth</code></td><td class="doc-table__td">满血优先，血越多越先打。</td></tr>
-<tr><td class="doc-table__td"><code>Count</code></td><td class="doc-table__td">不看血量，只限制同一目标最多几个单位同时打（见下面的 <code>Count</code>）。</td></tr>
+<tr><td class="doc-table__td"><code>Count</code></td><td class="doc-table__td">不看血量，只限制同一目标的攻击人数。</td></tr>
 </tbody>
 </table>
 
-<h4>属性详解</h4>
+<h4>属性说明</h4>
 <table class="doc-table">
-<thead>
-<tr><th class="doc-table__th" style="width:180px">属性</th><th class="doc-table__th" style="width:175px">适用模式</th><th class="doc-table__th">说明</th></tr>
-</thead>
+<thead><tr><th class="doc-table__th" style="width:170px">属性</th><th class="doc-table__th" style="width:150px">适用模式</th><th class="doc-table__th">说明</th></tr></thead>
 <tbody>
-<tr>
-<td class="doc-table__td"><code>Count</code></td>
-<td class="doc-table__td"><code>Count</code></td>
-<td class="doc-table__td">
-同一目标最多几个单位同时打。<br>
-盟友在打这个目标的单位也算在内；填 <code>0</code> 或负数按 <code>1</code> 处理。
-</td>
-</tr>
-<tr>
-<td class="doc-table__td"><code>Bias</code></td>
-<td class="doc-table__td"><code>LowHealth</code> / <code>FullHealth</code></td>
-<td class="doc-table__td">
-偏好强度。越大越执着于残血 / 满血目标。
-</td>
-</tr>
-<tr>
-<td class="doc-table__td"><code>UnknownFactor</code></td>
-<td class="doc-table__td"><code>LowHealth</code> / <code>FullHealth</code></td>
-<td class="doc-table__td">
-刚出现、血量还没看清的目标怎么算分。<br>
-<code>1.0</code>=一视同仁，调低往后排，调高往前排。
-</td>
-</tr>
-<tr>
-<td class="doc-table__td"><code>ExcludeFraction</code></td>
-<td class="doc-table__td">全部模式</td>
-<td class="doc-table__td">
-残血到这个程度就别再浪费火力了。<code>0</code>=关闭，<code>0.05</code>=剩 5% 血以下不再打。<br>
-血量还没看清的目标不受影响。
-</td>
-</tr>
-<tr>
-<td class="doc-table__td"><code>Damage</code></td>
-<td class="doc-table__td">全部模式</td>
-<td class="doc-table__td">
-等效伤害, <code>0</code>=用武器自己的 <code>Damage</code>。<br>
-心控、超时空冻结这类 <code>Damage</code> 特殊含义的武器，最好手动填一个。
-</td>
-</tr>
-<tr>
-<td class="doc-table__td"><code>Overflow</code></td>
-<td class="doc-table__td">全部模式</td>
-<td class="doc-table__td">
-允许多浪费多少火力。<code>0</code>=够杀就停，<code>0.5</code>=最多多打一半。<br>
-一般填 <code>0</code> ~ <code>0.5</code>。
-</td>
-</tr>
-<tr>
-<td class="doc-table__td"><code>SwitchThreshold</code></td>
-<td class="doc-table__td">全部模式</td>
-<td class="doc-table__td">
-换目标的门槛。新目标要比当前这个好上这么多倍才换，免得单位来回改主意。<br>
-<code>1.0</code>=只要有更好的目标就立刻换。
-</td>
-</tr>
-<tr>
-<td class="doc-table__td"><code>IncludeInflight</code></td>
-<td class="doc-table__td">全部模式</td>
-<td class="doc-table__td">
-已经飞出去、还没落地的弹药，算不算「已经打出去的伤害」。<br>
-默认算，免得对已经被弹药覆盖的目标重复补刀。
-</td>
-</tr>
+<tr><td class="doc-table__td"><code>Count</code></td><td class="doc-table__td"><code>Count</code></td><td class="doc-table__td">同一目标同时开火的上限，盟友的单位也计入；填 0 或负数按 <code>1</code> 处理。</td></tr>
+<tr><td class="doc-table__td"><code>Bias</code></td><td class="doc-table__td"><code>LowHealth</code>／<code>FullHealth</code></td><td class="doc-table__td">偏好强度，越大越执着于残血／满血目标。</td></tr>
+<tr><td class="doc-table__td"><code>UnknownFactor</code></td><td class="doc-table__td"><code>LowHealth</code>／<code>FullHealth</code></td><td class="doc-table__td">刚出现、血量未知的目标的分值倍数：<code>1.0</code>=一视同仁，调低靠后，调高靠前。</td></tr>
+<tr><td class="doc-table__td"><code>ExcludeFraction</code></td><td class="doc-table__td">全部</td><td class="doc-table__td">血量低于该比例的目标不再攻击，<code>0</code>=关闭（如 <code>0.05</code> 表示剩 5% 血以下不打）；血量未知的目标不受影响。</td></tr>
+<tr><td class="doc-table__td"><code>Damage</code></td><td class="doc-table__td">全部</td><td class="doc-table__td">等效伤害，<code>0</code>=使用武器自身的 <code>Damage</code>。</td></tr>
+<tr><td class="doc-table__td"><code>Overflow</code></td><td class="doc-table__td">全部</td><td class="doc-table__td">允许多浪费的火力比例：<code>0</code>=够杀就停，<code>0.5</code>=最多多打一半。一般取 0 ~ 0.5。</td></tr>
+<tr><td class="doc-table__td"><code>SwitchThreshold</code></td><td class="doc-table__td">全部</td><td class="doc-table__td">换目标门槛：新目标要好上这么多倍才换，避免来回改目标；<code>1.0</code>=只要更好就立刻换。</td></tr>
+<tr><td class="doc-table__td"><code>IncludeInflight</code></td><td class="doc-table__td">全部</td><td class="doc-table__td">已发射、尚未落地的弹药是否算作已投入火力。</td></tr>
 </tbody>
 </table>
 
 <h4>示例</h4>
-<pre class="doc-code--block"><code>;超时空兵：自动1对1冻结
+<pre class="doc-code--block"><code>; 超时空兵：一个目标只派一个人
 [CLEG]
 SmartVHPScan=Count
 SmartVHPScan.Count=1
 
-;尤里：优先控制满血目标
+; 尤里：优先控制满血目标
 [YURI]
 SmartVHPScan=FullHealth
 SmartVHPScan.Damage=999
 
-;天启坦克：高效率击杀火箭飞行兵
+; 天启坦克：优先处理满血目标
 [APOC]
 SmartVHPScan=FullHealth</code></pre>
+</div>
 
+<hr class="sec-divider--double">
+
+<div id="gameplay_9">
+<h3 class="doc-heading--tertiary">9. AI 目标类型列表 <code>[AITargetTypes]</code></h3>
+<p>自定义若干「目标类型清单」，供脚本动作 <code>5508</code> 按索引选用。<br>
+  可在 <code>rulesmd.ini</code> 或地图小节中定义，每一行写一个清单。</p>
+<p><a href="javascript:switchPage('scripts');setTimeout(function(){scrollToFeature('scripts_3')},100)" class="doc-link">→ 查看对应的脚本动作（5508）</a></p>
+<pre class="doc-code--block"><code>[AITargetTypes]
+0=MTNK,FV             ; 索引 - 科技类型 ID 列表，逗号分隔 - (默认 无)
+1=APOC,HTNK           ; 索引 - 科技类型 ID 列表，逗号分隔 - (默认 无)
+...</code></pre>
+<div class="doc-note">
+<span class="doc-note__title">注意</span>
+<ul>
+<li>索引从 0 开始，脚本动作 <code>5508</code> 填的就是这里的键名。</li>
+<li>清单内容填科技类型 ID（INI 中的段名，如 <code>MTNK</code>）。</li>
+</ul>
+</div>
 </div>
 
 </section>
@@ -818,11 +581,10 @@ SmartVHPScan=FullHealth</code></pre>
 
 <section id="sec_commands">
 <h2 class="doc-heading--secondary">新增按键命令</h2>
-<p>新增自定义按键命令，可在游戏按键设置中绑定快捷键。<br>
-所有命令的名称均可在 CSF 文件中自定义，以便本地化。</p>
+<p>新增的按键命令可在游戏「按键设置」中绑定快捷键，名称与描述都可在 CSF 文件中自定义。</p>
 
 <div class="sec-toc">
-<p class="sec-toc__title">目录：</p>
+<p class="sec-toc__title">目录</p>
 <ul class="sec-toc__list">
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('commands_csf')" class="sec-toc__link">CSF 自定义名称</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('commands_1')" class="sec-toc__link">1. 自动装载</a></li>
@@ -832,14 +594,13 @@ SmartVHPScan=FullHealth</code></pre>
 <hr class="sec-divider">
 
 <div id="commands_csf">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">CSF 自定义名称</h3>
-<p>可在 CSF 文件中添加以下标签，自定义新增按键在游戏设置界面中显示的文本：</p>
+<h3 class="doc-heading--tertiary">CSF 自定义名称</h3>
 <table class="doc-table">
-<thead><tr><th class="doc-table__th" style="width:260px">CSF 标签</th><th class="doc-table__th" style="width:100px">说明</th><th class="doc-table__th">默认值</th></tr></thead>
+<thead><tr><th class="doc-table__th" style="width:250px">CSF 标签</th><th class="doc-table__th" style="width:80px">用途</th><th class="doc-table__th">默认文本</th></tr></thead>
 <tbody>
-<tr><td class="doc-table__td"><code>CMND:UICATEGORY_PHOBOSEXT</code></td><td class="doc-table__td">所属类别</td><td class="doc-table__td">PhobosExt</td></tr>
-<tr><td class="doc-table__td"><code>CMND:UINAME_AUTOLOAD</code></td><td class="doc-table__td">按键名称</td><td class="doc-table__td">自动装载 Auto passengers load</td></tr>
-<tr><td class="doc-table__td"><code>CMND:UIDESCR_AUTOLOAD</code></td><td class="doc-table__td">描述文本</td><td class="doc-table__td">选中空载具按指定按键，自动招募附近单位上车<br>Recruit nearby units to board selected empty transports</td></tr>
+<tr><td class="doc-table__td"><code>CMND:UICATEGORY_PHOBOSEXT</code></td><td class="doc-table__td">分类</td><td class="doc-table__td">PhobosExt</td></tr>
+<tr><td class="doc-table__td"><code>CMND:UINAME_AUTOLOAD</code></td><td class="doc-table__td">名称</td><td class="doc-table__td">自动装载 Auto passengers load</td></tr>
+<tr><td class="doc-table__td"><code>CMND:UIDESCR_AUTOLOAD</code></td><td class="doc-table__td">描述</td><td class="doc-table__td">选中空载具按指定按键，自动招募附近单位上车</td></tr>
 </tbody>
 </table>
 </div>
@@ -847,34 +608,25 @@ SmartVHPScan=FullHealth</code></pre>
 <hr class="sec-divider--double">
 
 <div id="commands_1">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">1. 自动装载</h3>
-<p>选中空载具按指定按键，自动招募附近单位上车。</p>
-<p>可在 <code class="doc-code--inline">rulemd.ini</code> 里面自定义招募半径。</p>
+<h3 class="doc-heading--tertiary">1. 自动装载</h3>
+<p>选中空载具后按快捷键，自动招募附近单位上车。招募半径可自定义：</p>
 <pre class="doc-code--block"><code>[General]
-Command.RecruitRange=             ; double，默认 10.0</code></pre>
-<p><strong>招募顺序：</strong></p>
-<ol class="doc-list--content">
-<li><strong>第 1 轮 — 选中的单位优先：</strong>当前选中的非载具单位<strong>不限距离</strong>全部上车，按就近原则分配到各载具。</li>
-<li><strong>第 2 轮 — 附近单位补位：</strong>仅在 <code class="doc-code--inline">Command.RecruitRange</code> 范围内招满剩余座位，同样就近分配。</li>
-<li><strong>第 3 轮 — 载具互上：</strong>非载具成员匹配完毕后，匹配不到人的载具可上其他载具。</li>
+Command.RecruitRange=            ; double - 自动装载的招募半径 - (默认 10.0)</code></pre>
+
+<p><strong>招募顺序</strong>（三轮依次进行）：</p>
+<ol class="doc-list">
+<li><strong>选中的单位优先</strong>：当前选中的非载具单位<strong>不限距离</strong>，全部就近分配到各载具。</li>
+<li><strong>附近单位补位</strong>：在 <code>Command.RecruitRange</code> 范围内，招满剩余座位。</li>
+<li><strong>载具互上</strong>：前两轮没招到人的载具，可以把自己当作乘客登上其他载具。</li>
 </ol>
 
-<p><strong>分配算法：</strong></p>
-<ul class="doc-list--content">
-<li><strong>SizeLimit 排序：</strong>按 SizeLimit 从小到大排序，小车先挑。</li>
-<li><strong>分组轮询：</strong>相同 SizeLimit 的载具一组，组内轮询。一组满了才轮到下一组。</li>
-<li><strong>同距离选小单位：</strong>距离相同时优先选 Size 更小的单位。</li>
-<li><strong>满员载具可当乘客：</strong>装满/未匹配成功的载具可登上其他载具。</li>
-</ul>
+<p><strong>分配规则</strong>：容量小的载具先挑（按 <code>SizeLimit</code> 从小到大），同容量的轮流分配，一组装满才轮到下一组；<br>
+  距离相同时优先选体积更小的单位；<br>
+  满员或没匹配到人的载具仍可作为乘客上车。</p>
 
-<p><strong>特殊处理：</strong></p>
-<ul class="doc-list--content">
-<li>自动跳过飞行器、已在天上的单位、以及部署后解除部署功能会飞行的单位。</li>
-<li>部署状态的单位会自动解除部署功能后再上车。</li>
-<li>与载具在同一格的单位会先散开再上车。</li>
-<li>已在去载具路上的单位会被跳过，避免重复分配。</li>
-<li>同一格有多个己方单位时自动散开，避免互相阻挡。</li>
-</ul>
+<p><strong>自动跳过</strong>：飞行器、已在天上的单位、部署后解除部署会飞行的单位、正在前往其他载具途中的单位。</p>
+<p>部署状态的单位会先解除部署再上车；<br>
+  与载具同格的单位会先散开，避免互相阻挡。</p>
 </div>
 
 </section>
@@ -885,351 +637,327 @@ Command.RecruitRange=             ; double，默认 10.0</code></pre>
 
 <section id="sec_actions">
 <h2 class="doc-heading--secondary">新增触发行为</h2>
+<p>通过把 <code>FAData_Customized.ini</code> 复制到地图编辑器目录下来使用，目前仅支持HDM Edition。</p>
+
 <div class="sec-toc">
-<p class="sec-toc__title">目录：</p>
+<p class="sec-toc__title">目录</p>
 <ul class="sec-toc__list">
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_1')" class="sec-toc__link">1. 文本框系统</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_2')" class="sec-toc__link">2. 动态标签绑定功能</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_3')" class="sec-toc__link">3. 金钱操作功能</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_4')" class="sec-toc__link">4. 基地节点操作功能</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_5')" class="sec-toc__link">5. 单位可招募属性设置</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_6')" class="sec-toc__link">6. 更新建筑动画功能</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_7')" class="sec-toc__link">7. 作战小队操作</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_8')" class="sec-toc__link">8. 脚本操作功能</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_9')" class="sec-toc__link">9. 特遣部队操作功能</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_10')" class="sec-toc__link">10. 解除部署功能</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_11')" class="sec-toc__link">11. 选择框系统</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_12')" class="sec-toc__link">12. 小队路径可视化</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_13')" class="sec-toc__link">13. 任务信息/通关时间修改</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_14')" class="sec-toc__link">14. 游戏速度修改</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_15')" class="sec-toc__link">15. 暂停菜单存读档按钮禁用</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_16')" class="sec-toc__link">16. 变卖所属方的全部建筑</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_1')" class="sec-toc__link">1. 文本框系统</a> <span class="sec-toc__id">549–552、579–589</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_2')" class="sec-toc__link">2. 动态标签绑定</a> <span class="sec-toc__id">553–573</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_3')" class="sec-toc__link">3. 金钱操作</a> <span class="sec-toc__id">557–559</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_4')" class="sec-toc__link">4. 基地节点操作</a> <span class="sec-toc__id">560–562</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_5')" class="sec-toc__link">5. 单位可招募属性</a> <span class="sec-toc__id">571</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_6')" class="sec-toc__link">6. 更新建筑动画</a> <span class="sec-toc__id">574–576</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_7')" class="sec-toc__link">7. 作战小队操作</a> <span class="sec-toc__id">577、578、661、678</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_8')" class="sec-toc__link">8. 脚本操作</a> <span class="sec-toc__id">650–660</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_9')" class="sec-toc__link">9. 特遣部队操作</a> <span class="sec-toc__id">670–677</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_10')" class="sec-toc__link">10. 解除部署</a> <span class="sec-toc__id">679</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_11')" class="sec-toc__link">11. 选择框系统</a> <span class="sec-toc__id">590–593</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_12')" class="sec-toc__link">12. 小队路径可视化</a> <span class="sec-toc__id">662、663</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_13')" class="sec-toc__link">13. 任务简报与通关时间</a> <span class="sec-toc__id">664–669、680、681</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_14')" class="sec-toc__link">14. 游戏速度</a> <span class="sec-toc__id">682</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_15')" class="sec-toc__link">15. 禁止存档 / 读档</a> <span class="sec-toc__id">683–686</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_16')" class="sec-toc__link">16. 变卖所属方的全部建筑</a> <span class="sec-toc__id">687</span></li>
 </ul>
 </div>
 
 <hr class="sec-divider">
 
 <div id="actions_1">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">1. 文本框系统</h3>
-<p>在地图路径点或科技类型上绘制自定义文本框，支持预定义样式(TextBoxType)或直接指定参数。</p>
-<p class="doc-paragraph--only-vertical"><strong>特性：</strong></p>
-<ul class="doc-list--content">
-<li>鼠标移动到文本框上时，文本会暂时停止绘制(避免遮挡操作)。</li>
-<li>单位进入载具(limbo状态)时，文本框会暂时停止绘制，离开载具后自动恢复。</li>
-<li>单位标签支持所有科技类型。小队相关行为限制为FootClass。</li>
-</ul>
+<h3 class="doc-heading--tertiary">1. 文本框系统</h3>
+<p>在地图路径点或单位上绘制自定义文本框，样式可用 <code>[TextBoxTypes]</code> 预定义，也可在行为中直接指定。</p>
 
-<h4>文本框类型</h4>
-<p>在 <code class="doc-code--inline">rulesmd.ini</code> 的 <code class="doc-code--inline">[TextBoxTypes]</code> 段中定义文本框样式，可按需添加任意多个。</p>
+<h4>文本框样式</h4>
+<p>在 <code>rulesmd.ini</code> 的 <code>[TextBoxTypes]</code> 中定义，可定义任意多个。</p>
 <pre class="doc-code--block"><code>[TextBoxTypes]
 0=FirstBoxType
 1=YourBoxType
 ...
 
 [YourBoxType]
-MaxWidth=                   ;integer - 最大像素宽度(1-1000)，文本超出自动换行，默认250
-BackgroundOpacity=          ;integer - 背景不透明度百分比(0-100)。默认75
-Color=                      ;integer,integer,integer - 文本和边框颜色，RGB格式。默认255,215,0(金色)
-Duration=                   ;integer - 自动移除帧数。默认-1(无限显示)
-</code></pre>
+MaxWidth=                        ; integer - 最大像素宽度 1-1000，超出自动换行 - (默认 250)
+BackgroundOpacity=               ; integer - 背景不透明度 0~100 - (默认 75)
+Color=                           ; integer,integer,integer - 文字与边框颜色 - (默认 255,215,0)
+Duration=                        ; integer - 自动移除帧数，-1=无限 - (默认 -1)</code></pre>
 
 <h4>路径点文本框</h4>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
 <tbody>
-<tr><td class="doc-table__td">549</td><td class="doc-table__td">在指定路径点绘制文本框(根据类型)</td><td class="doc-table__td">路径点，TextBoxType</td></tr>
-<tr><td class="doc-table__td">550</td><td class="doc-table__td">在指定路径点绘制文本框(根据数据)</td><td class="doc-table__td">路径点，文本内容，像素宽度，不透明度百分比，文本颜色</td></tr>
-<tr><td class="doc-table__td">551</td><td class="doc-table__td">清除指定路径点的文本框</td><td class="doc-table__td">路径点索引</td></tr>
+<tr><td class="doc-table__td">549</td><td class="doc-table__td">在指定路径点绘制文本框(根据类型)</td><td class="doc-table__td">文本，路径点，文本框类型</td></tr>
+<tr><td class="doc-table__td">550</td><td class="doc-table__td">在指定路径点绘制文本框(根据数据)</td><td class="doc-table__td">文本，路径点，像素宽度，不透明度，文本颜色(下拉选择)</td></tr>
+<tr><td class="doc-table__td">551</td><td class="doc-table__td">清除指定路径点的文本框</td><td class="doc-table__td">路径点</td></tr>
 <tr><td class="doc-table__td">552</td><td class="doc-table__td">清除所有路径点文本框</td><td class="doc-table__td">无参数</td></tr>
 </tbody>
 </table>
 </div>
 
 <h4>单位文本框</h4>
-<p><strong>触发行为说明：</strong></p>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
 <tbody>
-<tr> <td class="doc-table__td">579</td> <td class="doc-table__td">在关联单位上绘制文本框(根据类型)...</td>      <td class="doc-table__td">CSF标签，文本框类型</td></tr>
-<tr> <td class="doc-table__td">580</td> <td class="doc-table__td">在关联单位上绘制文本框(根据数据)...</td>      <td class="doc-table__td">CSF标签，宽度，不透明度，颜色</td></tr>
-<tr> <td class="doc-table__td">581</td> <td class="doc-table__td">在作战小队成员上绘制文本框(根据类型)...</td>  <td class="doc-table__td">CSF标签，小队索引，文本框类型</td></tr>
-<tr> <td class="doc-table__td">582</td> <td class="doc-table__td">在作战小队成员上绘制文本框(根据数据)...</td>  <td class="doc-table__td">CSF标签，小队索引，宽度，不透明度，颜色</td></tr>
-<tr> <td class="doc-table__td">583</td> <td class="doc-table__td">清除单位文本框(根据类型)...</td>             <td class="doc-table__td">文本框类型</td></tr>
-<tr> <td class="doc-table__td">584</td> <td class="doc-table__td">清除关联单位文本框...</td>                   <td class="doc-table__td">无参数</td></tr>
-<tr> <td class="doc-table__td">585</td> <td class="doc-table__td">清除单位文本框(根据科技类型)...</td>         <td class="doc-table__td">科技类型ID</td></tr>
-<tr> <td class="doc-table__td">586</td> <td class="doc-table__td">清除单位文本框(根据所属方和科技类型)...</td>  <td class="doc-table__td">科技类型ID，国家索引</td></tr>
-<tr> <td class="doc-table__td">587</td> <td class="doc-table__td">清除单位文本框(根据作战小队)...</td>         <td class="doc-table__td">小队索引</td></tr>
-<tr> <td class="doc-table__td">588</td> <td class="doc-table__td">清除所有单位文本框...</td>                  <td class="doc-table__td">无参数</td></tr>
-<tr> <td class="doc-table__td">589</td> <td class="doc-table__td">清除所有文本框...</td>                      <td class="doc-table__td">无参数(含路径点)</td></tr>
+<tr><td class="doc-table__td">579</td><td class="doc-table__td">在关联单位上绘制文本框(根据类型)</td><td class="doc-table__td">文本，文本框类型</td></tr>
+<tr><td class="doc-table__td">580</td><td class="doc-table__td">在关联单位上绘制文本框(根据数据)</td><td class="doc-table__td">文本，像素宽度，不透明度，文本颜色(下拉选择)</td></tr>
+<tr><td class="doc-table__td">581</td><td class="doc-table__td">在作战小队成员上绘制文本框(根据类型)</td><td class="doc-table__td">文本，小队索引，文本框类型</td></tr>
+<tr><td class="doc-table__td">582</td><td class="doc-table__td">在作战小队成员上绘制文本框(根据数据)</td><td class="doc-table__td">文本，小队索引，像素宽度，不透明度，文本颜色(下拉选择)</td></tr>
+<tr><td class="doc-table__td">583</td><td class="doc-table__td">清除单位文本框(根据类型)</td><td class="doc-table__td">文本框类型</td></tr>
+<tr><td class="doc-table__td">584</td><td class="doc-table__td">清除关联单位文本框</td><td class="doc-table__td">无参数</td></tr>
+<tr><td class="doc-table__td">585</td><td class="doc-table__td">清除单位文本框(根据科技类型)</td><td class="doc-table__td">科技类型</td></tr>
+<tr><td class="doc-table__td">586</td><td class="doc-table__td">清除单位文本框(根据所属方和科技类型)</td><td class="doc-table__td">科技类型，所属方</td></tr>
+<tr><td class="doc-table__td">587</td><td class="doc-table__td">清除单位文本框(根据作战小队)</td><td class="doc-table__td">小队索引</td></tr>
+<tr><td class="doc-table__td">588</td><td class="doc-table__td">清除所有单位文本框</td><td class="doc-table__td">无参数</td></tr>
+<tr><td class="doc-table__td">589</td><td class="doc-table__td">清除所有文本框(含路径点)</td><td class="doc-table__td">无参数</td></tr>
 </tbody>
 </table>
 </div>
 
-<p>在 <code class="doc-code--inline">[General]</code> 中增加新变量，用来控制文本框在黑幕中是否绘制。</p>
+<p>文本框在黑幕中的显示由 <code>[General]</code> 的两个标签控制：</p>
 <pre class="doc-code--block"><code>[General]
-ShowTextBoxInShroud.Waypoint=           ; boolean，默认 yes — 路径点文本框在黑幕中是否显示
-ShowTextBoxInShroud.Techno=             ; boolean，默认 yes — 单位文本框在黑幕中是否显示</code></pre>
-<p><strong>注:</strong> 仅检测路径点格子或单位所在单元格是否被黑幕遮挡, 不检测整个文本框区域。</p>
-<br>
-<p><strong>关于文本框持续时长：</strong></p>
-<ul class="doc-list--content">
-<li>在 <code class="doc-code--inline">[TextBoxTypes]</code> 中设置 <code class="doc-code--inline">Duration=</code> 可控制文本框自动移除的帧数。</li>
-<li><code class="doc-code--inline">Duration=-1</code>（默认）表示无限显示，需通过触发行为手动清除。</li>
-<li>仅通过类型创建时有效；通过数据创建时需由用户手动控制。</li>
+ShowTextBoxInShroud.Waypoint=    ; boolean - 路径点文本框在黑幕中是否显示 - (默认 yes)
+ShowTextBoxInShroud.Techno=      ; boolean - 单位文本框在黑幕中是否显示 - (默认 yes)</code></pre>
+
+<div class="doc-note">
+<span class="doc-note__title">注意</span>
+<ul>
+<li>鼠标移到文本框上时文本会暂停绘制，避免遮挡点击；单位进入载具期间文本框暂停绘制，离开后自动恢复。</li>
+<li>黑幕判定只看路径点所在格、单位所在格是否被遮挡，不检测整个文本框区域。</li>
+<li>「根据类型」创建时，<code>[TextBoxTypes]</code> 的 <code>Duration</code> 才会生效；「根据数据」创建时不会自动消失，需要用行为清除。</li>
+<li><code>MaxWidth</code> 请填 1-1000 内的值：填 0 或负数时文本框不会绘制。</li>
+<li>「作战小队」相关行为只作用于可移动单位。</li>
 </ul>
+</div>
 </div>
 
 <hr class="sec-divider--double">
 
 <div id="actions_2">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">2. 动态标签绑定功能</h3>
-<div class="doc-notice--warning">
-<strong>注意!</strong> 触发系统事实上很复杂，需读者了解其组成和运行机制。<br>
-这里默认读者已经具备了相关知识，可以阅读 <code class="doc-code--inline--deepColor">Handama</code> 的 <code class="doc-code--inline--deepColor">触发系统.docx</code> 以了解相关知识。</div>
-<p>允许将游戏中的科技类型实例与标签动态关联，便于后续通过触发器执行逻辑。<br>
-若标签不存在/已销毁，则会创建一个新标签(会实例化触发)，确保目标会与标签关联。</p>
-<p class="doc-text--gray">事实上，触发也会在小队创建时实例化，因此行为 <code class="doc-code--inline">553</code> 和 <code class="doc-code--inline">554</code> 实际上可能并没有必要，
-只需要在 <code class="doc-code--inline">作战小队</code> 的 <code class="doc-code--inline">挂载标签</code> 上挂载所需标签即可以实现与该行为类似的效果，但仍保留以备不时之需。<br>
-(写都写了.jpg，不过确实有所不同)</p>
-<h4>触发行为说明</h4>
+<h3 class="doc-heading--tertiary">2. 动态标签绑定</h3>
+<p>把游戏中的单位、建筑动态关联到某个标签。</p>
+<p class="doc-text--gray">使用前请先了解标签与触发系统的基本机制（可参考韩大妈的《触发系统.docx》）。</p>
+
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
 <tbody>
-<tr> <td class="doc-table__td">553</td> <td class="doc-table__td">将指定小队全部成员关联到指定标签...</td><td class="doc-table__td">小队索引，标签索引，强制新建标签</td></tr>
-<tr> <td class="doc-table__td">554</td> <td class="doc-table__td">将指定所属方的指定小队全部成员关联到指定标签...</td><td class="doc-table__td">小队索引，标签索引，所属方国家索引，强制新建标签</td></tr>
-<tr> <td class="doc-table__td">555</td> <td class="doc-table__td">将特定科技类型全部关联到指定标签...</td><td class="doc-table__td">科技类型ID，标签索引，强制新建标签</td></tr>
-<tr> <td class="doc-table__td">556</td> <td class="doc-table__td">将指定所属方的特定科技类型全部关联到指定标签...</td><td class="doc-table__td">科技类型ID，标签索引，所属方国家索引，强制新建标签</td></tr>
-<tr> <td class="doc-table__td">563</td> <td class="doc-table__td">安全地销毁指定标签类型的所有实例...</td><td class="doc-table__td">标签索引</td></tr>
-<tr> <td class="doc-table__td">564</td> <td class="doc-table__td">为路径点上的指定科技类型绑定标签...</td><td class="doc-table__td">路径点索引，科技类型ID，标签索引，强制新建标签</td></tr>
-<tr> <td class="doc-table__td">565</td> <td class="doc-table__td">为路径点上指定所属方的指定科技类型绑定标签...</td><td class="doc-table__td">路径点索引，科技类型ID，标签索引，所属方国家索引，强制新建标签</td></tr>
-<tr> <td class="doc-table__td">566</td> <td class="doc-table__td">为路径点范围内的指定科技类型绑定标签...</td><td class="doc-table__td">路径点索引，科技类型ID，标签索引，范围，强制新建标签</td></tr>
-<tr> <td class="doc-table__td">567</td> <td class="doc-table__td">为路径点范围内触发所属方的指定科技类型绑定标签...</td><td class="doc-table__td">路径点索引，科技类型ID，标签索引，范围，强制新建标签</td></tr>
-<tr> <td class="doc-table__td">568</td> <td class="doc-table__td">为路径点范围内的所有科技类型绑定标签...</td><td class="doc-table__td">路径点索引，标签索引，范围，强制新建标签</td></tr>
-<tr> <td class="doc-table__td">569</td> <td class="doc-table__td">为路径点范围内指定所属方的所有科技类型绑定标签...</td><td class="doc-table__td">路径点索引，所属方国家索引，标签索引，范围，强制新建标签</td></tr>
-<tr> <td class="doc-table__td">570</td> <td class="doc-table__td">统一指定标签类型的所有实例...</td><td class="doc-table__td">标签索引</td></tr>
-<tr> <td class="doc-table__td">572</td> <td class="doc-table__td">将路径点范围内除指定类型外的所有科技类型关联到指定标签...</td><td class="doc-table__td">路径点索引，科技类型ID，标签索引，范围，强制新建标签</td></tr>
-<tr> <td class="doc-table__td">573</td> <td class="doc-table__td">将路径点范围内触发所属方的除指定类型外的所有科技类型关联到指定标签...</td><td class="doc-table__td">路径点索引，科技类型ID，标签索引，范围，强制新建标签</td></tr>
+<tr><td class="doc-table__td">553</td><td class="doc-table__td">将指定小队全部成员关联到指定标签</td><td class="doc-table__td">小队索引，标签索引，强制新建标签</td></tr>
+<tr><td class="doc-table__td">554</td><td class="doc-table__td">将指定所属方的指定小队全部成员关联到指定标签</td><td class="doc-table__td">小队索引，标签索引，所属方，强制新建标签</td></tr>
+<tr><td class="doc-table__td">555</td><td class="doc-table__td">将特定科技类型全部关联到指定标签</td><td class="doc-table__td">科技类型，标签索引，强制新建标签</td></tr>
+<tr><td class="doc-table__td">556</td><td class="doc-table__td">将指定所属方的特定科技类型全部关联到指定标签</td><td class="doc-table__td">科技类型，标签索引，所属方，强制新建标签</td></tr>
+<tr><td class="doc-table__td">563</td><td class="doc-table__td">安全销毁指定标签类型的所有实例</td><td class="doc-table__td">标签索引</td></tr>
+<tr><td class="doc-table__td">564</td><td class="doc-table__td">为路径点上的指定科技类型绑定标签</td><td class="doc-table__td">路径点，科技类型，标签索引，强制新建标签</td></tr>
+<tr><td class="doc-table__td">565</td><td class="doc-table__td">为路径点上指定所属方的指定科技类型绑定标签</td><td class="doc-table__td">路径点，科技类型，标签索引，所属方，强制新建标签</td></tr>
+<tr><td class="doc-table__td">566</td><td class="doc-table__td">为路径点范围内的指定科技类型绑定标签</td><td class="doc-table__td">路径点，科技类型，标签索引，范围，强制新建标签</td></tr>
+<tr><td class="doc-table__td">567</td><td class="doc-table__td">为路径点范围内触发所属方的指定科技类型绑定标签</td><td class="doc-table__td">路径点，科技类型，标签索引，范围，强制新建标签</td></tr>
+<tr><td class="doc-table__td">568</td><td class="doc-table__td">为路径点范围内的所有科技类型绑定标签</td><td class="doc-table__td">路径点，标签索引，范围，强制新建标签</td></tr>
+<tr><td class="doc-table__td">569</td><td class="doc-table__td">为路径点范围内指定所属方的所有科技类型绑定标签</td><td class="doc-table__td">路径点，所属方，标签索引，范围，强制新建标签</td></tr>
+<tr><td class="doc-table__td">570</td><td class="doc-table__td">统一指定标签类型的所有实例</td><td class="doc-table__td">标签索引</td></tr>
+<tr><td class="doc-table__td">572</td><td class="doc-table__td">将路径点范围内除指定类型外的所有科技类型关联到指定标签</td><td class="doc-table__td">路径点，科技类型，标签索引，范围，强制新建标签</td></tr>
+<tr><td class="doc-table__td">573</td><td class="doc-table__td">将路径点范围内触发所属方的除指定类型外的所有科技类型关联到指定标签</td><td class="doc-table__td">路径点，科技类型，标签索引，范围，强制新建标签</td></tr>
 </tbody>
 </table>
 </div>
-<p><strong>范围</strong>：整数，以单元格为单位的圆形半径 。<br>
-<strong>强制新建标签</strong>：<code class="doc-code--inline">0</code>=使用已有实例，<code class="doc-code--inline">1</code>=强制创建新实例。见下文注意事项第9条。</p>
 
-<h4>注意事项</h4>
-<ol class="doc-list--content">
-<li>使用本组触发时，会更新指定标签的 <code class="doc-code--inline">InstanceCount</code>(引用计数，详见 <code class="doc-code--inline">触发系统.docx</code>)。</li>
-<li>由本组触发创建的标签可以被原版行为 <code class="doc-code--inline">70</code>(摧毁标签... )安全销毁而不会弹框。</li>
-<li>即使想要绑定的科技类型<strong>正在建造中</strong>，也会被关联到指定标签，但是建筑造出来之前触发不起作用。</li>
-<li>通过本组触发给小队成员关联的标签，在小队解散后标签不会自动消失。</li>
-<li>对于行为 <code class="doc-code--inline">564</code>、<code class="doc-code--inline">565</code>，若科技类型为建筑，则<strong>每一格都会检测，支持 Ares 自定义建筑地基。</strong></li>
-<li>当指定对象已经拥有标签时，新标签会<strong>覆盖</strong>原有标签，并且原有标签的 <code class="doc-code--inline">InstanceCount</code> 会相应更新。</li>
-<li>与常规销毁(行为 <code class="doc-code--inline">70</code>)不同，行为 <code class="doc-code--inline">563</code> <strong>不会导致由小队创建的标签被销毁时弹框崩溃</strong>，因此可安全用于标签的批量清理。</li>
-<li>行为 <code class="doc-code--inline">570</code> 的原理：该行为会强制创建一个<strong>全新</strong>的标签实例，然后将当前所有已经绑定了该标签类型(TagType)的科技对象<strong>全部重新指向</strong>这个新标签，最后销毁原有的所有标签实例。</li>
-<li><strong>强制新建标签参数</strong>：
-<ul class="doc-list--content">
-<li>若为 <code class="doc-code--inline">1</code>(真)，则无论当前是否存在相同标签类型的实例，都会创建一个<strong>全新的标签实例</strong>。(新实例与同类型其他实例独立存在，引擎允许多实例)</li>
-<li>若为 <code class="doc-code--inline">0</code>(假)，则优先寻找游戏内已存在的该标签类型实例，找到则直接使用，找不到才会创建新标签。</li>
-<li>注意：当使用 <code class="doc-code--inline">0</code> 时，若存在多个同类型标签实例，实际绑定到哪一个<strong>不确定</strong>(取决于遍历顺序)，建议在需要明确控制实例时使用 <code class="doc-code--inline">1</code>。</li>
+<p><strong>范围</strong>＝以格为单位的圆形半径。<br>
+<strong>强制新建标签</strong>＝<code>0</code> 优先复用已存在的同类型标签实例，<code>1</code> 强制创建一个全新实例（同一标签类型允许同时存在多个实例）。</p>
+
+<div class="doc-note">
+<span class="doc-note__title">注意</span>
+<ul>
+<li>对象已有标签时会被<strong>覆盖</strong>，原标签的引用计数同步更新（与手动挂标签的规则一致）。</li>
+<li>正在建造中的建筑也会被关联，但建成之前触发不会生效。</li>
+<li>挂到小队成员上的标签，在小队解散后<strong>不会</strong>自动消失。</li>
+<li>行为 <code>564</code>／<code>565</code> 的科技类型为建筑时，每一格都会检测，支持 Ares 自定义地基。</li>
+<li>行为 <code>563</code> 可安全批量清理标签（不会像原版行为 <code>70</code>（摧毁标签）那样因小队创建的标签而报错）。</li>
+<li>行为 <code>570</code> 会把当前所有绑定了该标签类型的对象，统一指向一个<strong>全新</strong>的标签实例，并销毁原有的所有实例。</li>
+<li>强制新建标签填 <code>0</code> 时，若场上存在多个同类型标签实例，绑定到哪一个不确定；需要精确控制时请填 <code>1</code>。</li>
 </ul>
-</li>
-</ol>
+</div>
 </div>
 
 <hr class="sec-divider--double">
 
 <div id="actions_3">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">3. 金钱操作功能</h3>
-<p>允许动态调整指定所属方的资金数额。</p>
+<h3 class="doc-heading--tertiary">3. 金钱操作</h3>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
 <tbody>
-<tr><td class="doc-table__td">557</td><td class="doc-table__td">为指定所属方添加金钱数额</td><td class="doc-table__td">所属方国家索引，金额数额</td></tr>
-<tr><td class="doc-table__td">558</td><td class="doc-table__td">为指定所属方扣除金钱数额</td><td class="doc-table__td">所属方国家索引，金额数额</td></tr>
-<tr><td class="doc-table__td">559</td><td class="doc-table__td">设置指定所属方的金钱数额</td><td class="doc-table__td">所属方国家索引，金额数额</td></tr>
+<tr><td class="doc-table__td">557</td><td class="doc-table__td">为指定所属方添加金钱</td><td class="doc-table__td">所属方，金额</td></tr>
+<tr><td class="doc-table__td">558</td><td class="doc-table__td">为指定所属方扣除金钱</td><td class="doc-table__td">所属方，金额</td></tr>
+<tr><td class="doc-table__td">559</td><td class="doc-table__td">设置指定所属方的金钱</td><td class="doc-table__td">所属方，金额</td></tr>
 </tbody>
 </table>
+</div>
+<div class="doc-note">
+<span class="doc-note__title">注意</span>
+<ul>
+<li>金额填负数时不生效（不会反向加减）。</li>
+<li>行为 <code>558</code> 最多扣到 0：余额不足时扣光当前余额，不会出现负钱。</li>
+</ul>
 </div>
 </div>
 
 <hr class="sec-divider--double">
 
 <div id="actions_4">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">4. 基地节点操作功能</h3>
-<p>允许动态添加或移除指定所属方的AI基地节点。</p>
+<h3 class="doc-heading--tertiary">4. 基地节点操作</h3>
+<p>动态增删指定所属方 AI 的基地节点。</p>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
 <tbody>
-<tr><td class="doc-table__td">560</td><td class="doc-table__td">在指定路径点添加基地节点</td><td class="doc-table__td">所属方国家索引，路径点编号，建筑类型索引，立即建造</td></tr>
-<tr><td class="doc-table__td">561</td><td class="doc-table__td">移除指定路径点上的所有基地节点</td><td class="doc-table__td">所属方国家索引，路径点编号</td></tr>
-<tr><td class="doc-table__td">562</td><td class="doc-table__td">移除特定所属方所有指定建筑类型的基地节点</td><td class="doc-table__td">所属方国家索引，建筑类型索引</td></tr>
+<tr><td class="doc-table__td">560</td><td class="doc-table__td">在指定路径点添加基地节点</td><td class="doc-table__td">所属方，路径点，建筑类型，立即建造</td></tr>
+<tr><td class="doc-table__td">561</td><td class="doc-table__td">移除指定路径点上的所有基地节点</td><td class="doc-table__td">所属方，路径点</td></tr>
+<tr><td class="doc-table__td">562</td><td class="doc-table__td">移除指定所属方的指定建筑类型的所有基地节点</td><td class="doc-table__td">所属方，建筑类型</td></tr>
 </tbody>
 </table>
 </div>
-<h4>注意事项</h4>
-<ol class="doc-list--content">
-<li>对于行为 <code class="doc-code--inline">560</code>，立即建造：<code class="doc-code--inline">0</code>=仅添加到建造队列，<code class="doc-code--inline">1</code>=立即开始建造。为真时AI会立即开始建造指定建筑并清空建筑生产序列。</li>
-<li>对于行为 <code class="doc-code--inline">561</code>,<code class="doc-code--inline">562</code>, 会重置 ai 的建造序列, 如果基地正在建造需要移除的基地节点, 则会强制中断建造。</li>
-</ol>
+<div class="doc-note">
+<span class="doc-note__title">注意</span>
+<ul>
+<li><code>560</code> 的「立即建造」填 <code>1</code> 时，会清空该所属方当前的建筑生产序列并立刻开始建造该建筑；填 <code>0</code> 则只加入建造队列。</li>
+<li><code>561</code>／<code>562</code> 会重置 AI 的建造序列，正在建造的目标会被强制中断。</li>
+</ul>
+</div>
 </div>
 
 <hr class="sec-divider--double">
 
 <div id="actions_5">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">5. 单位可招募属性设置</h3>
+<h3 class="doc-heading--tertiary">5. 单位可招募属性</h3>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
 <tbody>
-<tr><td class="doc-table__td">571</td><td class="doc-table__td">设置关联单位的可招募属性</td><td class="doc-table__td">RecruitableA，RecruitableB</td></tr>
+<tr><td class="doc-table__td">571</td><td class="doc-table__td">设置关联单位的可招募属性</td><td class="doc-table__td"><code>RecruitableA</code>，<code>RecruitableB</code></td></tr>
 </tbody>
 </table>
 </div>
+<p>两个参数分别对应单位的 <code>RecruitableA</code>／<code>RecruitableB</code>，填 <code>0</code> 或 <code>1</code>。<br>
+只作用于可移动单位，建筑不会被修改。</p>
 </div>
 
 <hr class="sec-divider--double">
 
 <div id="actions_6">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">6. AI 更新建筑动画功能</h3>
-<p>更新建筑的动画，用于处理建筑改变所属后动画会停止播放的问题。</p>
-<p>(但遥控坦克的状态仍然不会更新)</p>
+<h3 class="doc-heading--tertiary">6. 更新建筑动画</h3>
+<p>用于处理建筑改变所属后动画停止播放的问题。</p>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
 <tbody>
 <tr><td class="doc-table__td">574</td><td class="doc-table__td">更新所有建筑的动画</td><td class="doc-table__td">无参数</td></tr>
 <tr><td class="doc-table__td">575</td><td class="doc-table__td">更新关联建筑的动画</td><td class="doc-table__td">无参数</td></tr>
-<tr><td class="doc-table__td">576</td><td class="doc-table__td">更新指定所属方所有建筑的动画</td><td class="doc-table__td">所属方国家索引</td></tr>
+<tr><td class="doc-table__td">576</td><td class="doc-table__td">更新指定所属方所有建筑的动画</td><td class="doc-table__td">所属方</td></tr>
 </tbody>
 </table>
 </div>
+<p>遥控坦克的状态不会随之更新。</p>
 </div>
 
 <hr class="sec-divider--double">
 
 <div id="actions_7">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">7. 作战小队操作</h3>
+<h3 class="doc-heading--tertiary">7. 作战小队操作</h3>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
 <tbody>
-<tr><td class="doc-table__td">577</td><td class="doc-table__td">建立作战小队(考虑限制)</td><td class="doc-table__td">小队索引，上限限制开关，区域检查开关，连通模式</td></tr>
+<tr><td class="doc-table__td">577</td><td class="doc-table__td">建立作战小队(考虑限制)</td><td class="doc-table__td">小队索引，上限限制，区域检查，连通模式</td></tr>
 <tr><td class="doc-table__td">578</td><td class="doc-table__td">将路径点范围内可招募单位加入已存在的作战小队</td><td class="doc-table__td">小队索引，路径点，范围，仅招募可招募单位</td></tr>
-<tr><td class="doc-table__td">661</td><td class="doc-table__td">设置作战小队Max值</td><td class="doc-table__td">作战小队类型，新的Max值</td></tr>
-<tr><td class="doc-table__td">678</td><td class="doc-table__td">将指定分组的单位加入小队</td><td class="doc-table__td">分组号(0-9,-1=不限)，所属方国家索引，小队索引</td></tr>
+<tr><td class="doc-table__td">661</td><td class="doc-table__td">设置作战小队 <code>Max</code> 值</td><td class="doc-table__td">作战小队类型，新的 <code>Max</code> 值</td></tr>
+<tr><td class="doc-table__td">678</td><td class="doc-table__td">将指定分组的单位加入小队</td><td class="doc-table__td">分组号(0-9，-1=不限)，所属方，小队索引</td></tr>
 </tbody>
 </table>
 </div>
-<br>
-<p><strong>行为 577 (建立作战小队)：</strong></p>
-<ul class="doc-list--content">
-<li><strong>上限限制(参数2)：</strong><code class="doc-code--inline">0</code>=无限制，<code class="doc-code--inline">1</code>=启用上限。若当前实例数已达到"作战小队"里的"最大"值，则不创建。</li>
-<li><strong>区域检查(参数3)：</strong><code class="doc-code--inline">0</code>=不检查，<code class="doc-code--inline">1</code>=启用检查。检测所属方与敌对方之间是否存在区域连通路径，无连接则跳过。</li>
-<li><strong>连通模式(参数4)：</strong>仅在区域检查启用时生效。
-<ul class="doc-list--content">
-<li><code class="doc-code--inline">0</code>：小队内任一兵种可以抵达目的地即可。</li>
-<li><code class="doc-code--inline">1</code>：小队内全部兵种都需要可以抵达目的地才行。</li>
-</ul></li>
+
+<p><strong><code>577</code> 建立作战小队</strong></p>
+<ul class="doc-list">
+<li>上限限制：<code>0</code>=不检查，<code>1</code>=当该小队的实例数已达到自身的 <code>Max</code> 值时不再创建。</li>
+<li>区域检查：<code>0</code>=不检查，<code>1</code>=只在所属方与敌方之间存在连通路径时才创建。</li>
+<li>连通模式（仅区域检查开启时有效）：<code>0</code>=队内任一兵种能抵达即可，<code>1</code>=队内全部兵种都能抵达才创建。</li>
 </ul>
-<br>
-<p><strong>行为 578 (招募单位到已有小队)：</strong></p>
-<ul class="doc-list--content">
-<li>将指定路径点指定范围内的所有可招募单位加入一个已存在的作战小队实例。</li>
-<li>如果没有该类型的已有小队实例，则无行为。</li>
-<li>只会招募满足以下条件的单位：属于该小队所属方、未加入其他小队、在路径点指定范围内。</li>
-<li><strong>仅招募可招募单位(参数4)：</strong><code class="doc-code--inline">0</code>=不检查可招募属性，反之亦然</li>
+<p><strong><code>578</code> 招募到已有小队</strong></p>
+<ul class="doc-list">
+<li>只会招募<strong>该小队所属方</strong>、未加入其他小队、位于路径点范围内的单位；所属方由小队自身决定，无需指定。</li>
+<li>场上没有该类型的已有小队实例时，什么都不做。</li>
+<li>「仅招募可招募单位」填 <code>1</code> 时只招募可招募属性为真的单位，填 <code>0</code> 则不检查该属性。</li>
 </ul>
-<br>
-<p><strong>行为 661 (设置作战小队Max值)：</strong></p>
-<ul class="doc-list--content">
-<li>修改指定作战小队类型(TeamType)的 <code class="doc-code--inline">Max</code> 属性。</li>
-<li>配合行为 <code class="doc-code--inline">577</code>(建立作战小队(考虑限制)) 的上限限制开关使用，可以实现灵活的小队创建控制。</li>
-</ul>
-<br>
-<p><strong>行为 678 (将指定分组的单位加入小队)：</strong></p>
-<ul class="doc-list--content">
-<li>将指定分组(Group)和所属方的所有地面单位加入一个已存在的作战小队实例。</li>
-<li>如果没有该类型的已有实例，则无行为。</li>
-<li>分组号为 <code class="doc-code--inline">-1</code> 时不限制分组（即招募该所属方的所有可用单位）。</li>
-</ul>
+<p><strong><code>661</code> 设置小队 <code>Max</code> 值</strong>：修改作战小队类型的 <code>Max</code>，常与 <code>577</code> 的上限限制配合，实现按需开闸。</p>
+<p><strong><code>678</code> 编组单位加入小队</strong>：把指定分组、指定所属方的所有地面单位加入一个已存在的小队实例；分组号填 <code>-1</code> 表示不限分组。<br>
+  同样要求场上已有该小队的实例。</p>
 </div>
 
 <hr class="sec-divider--double">
 
 <div id="actions_8">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">8. 脚本操作功能</h3>
-
+<h3 class="doc-heading--tertiary">8. 脚本操作</h3>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
 <tbody>
-<tr> <td class="doc-table__td">650</td> <td class="doc-table__td">清空指定脚本内容...</td><td class="doc-table__td">脚本类型</td></tr>
-<tr> <td class="doc-table__td">651</td> <td class="doc-table__td">复制脚本内容...</td><td class="doc-table__td">源脚本类型，目标脚本类型</td></tr>
-<tr> <td class="doc-table__td">652</td> <td class="doc-table__td">以参数修改脚本行...</td><td class="doc-table__td">脚本类型，行号，行为类型，参数，额外参数</td></tr>
-<tr> <td class="doc-table__td">653</td> <td class="doc-table__td">以局部变量修改脚本行... <em></em></td><td class="doc-table__td">脚本类型，行号，行为类型(变量索引)，参数(变量索引)，额外参数(变量索引)</td></tr>
-<tr> <td class="doc-table__td">654</td> <td class="doc-table__td">以全局变量修改脚本行... <em></em></td><td class="doc-table__td">脚本类型，行号，行为类型(变量索引)，参数(变量索引)，额外参数(变量索引)</td></tr>
-<tr> <td class="doc-table__td">655</td> <td class="doc-table__td">重新指定小队脚本索引...</td><td class="doc-table__td">作战小队类型，目标脚本类型</td></tr>
-<tr> <td class="doc-table__td">656</td> <td class="doc-table__td">恢复小队脚本索引...</td><td class="doc-table__td">作战小队类型</td></tr>
-<tr> <td class="doc-table__td">657</td> <td class="doc-table__td">恢复所有小队脚本索引...</td><td class="doc-table__td">无参数</td></tr>
-<tr> <td class="doc-table__td">658</td> <td class="doc-table__td">恢复脚本内容...</td><td class="doc-table__td">脚本类型</td></tr>
-<tr> <td class="doc-table__td">659</td> <td class="doc-table__td">恢复所有脚本内容...</td><td class="doc-table__td">无参数</td></tr>
-<tr> <td class="doc-table__td">660</td> <td class="doc-table__td">将小队脚本执行行号跳转至...</td><td class="doc-table__td">作战小队类型，目标行号(0-based)</td></tr>
+<tr><td class="doc-table__td">650</td><td class="doc-table__td">清空指定脚本内容</td><td class="doc-table__td">脚本类型</td></tr>
+<tr><td class="doc-table__td">651</td><td class="doc-table__td">复制脚本内容</td><td class="doc-table__td">源脚本类型，目标脚本类型</td></tr>
+<tr><td class="doc-table__td">652</td><td class="doc-table__td">以参数修改脚本行</td><td class="doc-table__td">脚本类型，行号，行为类型，参数，额外参数</td></tr>
+<tr><td class="doc-table__td">653</td><td class="doc-table__td">以局部变量修改脚本行</td><td class="doc-table__td">脚本类型，行号(变量索引)，行为类型(变量索引)，参数(变量索引)，额外参数(变量索引)</td></tr>
+<tr><td class="doc-table__td">654</td><td class="doc-table__td">以全局变量修改脚本行</td><td class="doc-table__td">脚本类型，行号(变量索引)，行为类型(变量索引)，参数(变量索引)，额外参数(变量索引)</td></tr>
+<tr><td class="doc-table__td">655</td><td class="doc-table__td">重新指定小队脚本索引</td><td class="doc-table__td">作战小队类型，目标脚本类型</td></tr>
+<tr><td class="doc-table__td">656</td><td class="doc-table__td">恢复小队脚本索引</td><td class="doc-table__td">作战小队类型</td></tr>
+<tr><td class="doc-table__td">657</td><td class="doc-table__td">恢复所有小队脚本索引</td><td class="doc-table__td">无参数</td></tr>
+<tr><td class="doc-table__td">658</td><td class="doc-table__td">恢复脚本内容</td><td class="doc-table__td">脚本类型</td></tr>
+<tr><td class="doc-table__td">659</td><td class="doc-table__td">恢复所有脚本内容</td><td class="doc-table__td">无参数</td></tr>
+<tr><td class="doc-table__td">660</td><td class="doc-table__td">将小队脚本执行行号跳转至</td><td class="doc-table__td">作战小队类型，目标行号(从 0 开始)</td></tr>
 </tbody>
 </table>
 </div>
-
-<p class="doc-paragraph--only-vertical"><strong>说明：</strong></p>
-<ul class="doc-list--content">
-<li>行为 650-654 在游戏运行时动态修改脚本类型(ScriptType)的行为内容（即该脚本的各行具体指令）。</li>
-<li>行为 655-657 改变作战小队类型(TeamType)引用的脚本类型索引（即该小队执行的脚本是哪个），不对脚本内容本身做任何修改。</li>
-<li>行为 658-659 将之前通过 650-654 修改过的脚本内容恢复到 INI 定义的原始状态，不影响小队绑定索引。</li>
-<li>行为 660 将指定作战小队类型的所有实例的脚本执行行号跳转到指定位置(0-based)，不会修改脚本内容或小队绑定。</li>
-<li>以上所有行为执行后(660除外)，使用该脚本的作战小队会立即重置到第 0 行执行。</li>
-<li><strong>注意：行为 653、654 无法单独使用，需配合 Phobos v0.5-alpha+ 使用。</strong></li>
+<ul class="doc-list">
+<li><code>650</code>–<code>654</code> 改「脚本内容」：即某个脚本类型里每一行具体做什么；<code>655</code>–<code>657</code> 改「绑定关系」：即某支小队用哪个脚本类型，不动脚本内容；<code>658</code>–<code>659</code> 把脚本内容恢复成 INI 中的原始定义，不影响绑定关系。</li>
+<li>除 <code>660</code> 外，上述行为执行后，正在使用该脚本的小队会立即从第 0 行重新开始执行；<code>660</code> 只把执行行号跳到指定位置，不改内容与绑定。</li>
 </ul>
+<div class="doc-note">
+<span class="doc-note__title">注意</span>
+<ul>
+<li>行为 <code>653</code>、<code>654</code> 需要配合 <strong>Phobos v0.5-alpha 及以上</strong>才能使用，单独安装本 DLL 时不可用。</li>
+</ul>
+</div>
 </div>
 
 <hr class="sec-divider--double">
 
 <div id="actions_9">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">9. 特遣部队操作功能</h3>
-
+<h3 class="doc-heading--tertiary">9. 特遣部队操作</h3>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
 <tbody>
-<tr> <td class="doc-table__td">670</td> <td class="doc-table__td">清空特遣部队内容...</td><td class="doc-table__td">特遣部队</td></tr>
-<tr> <td class="doc-table__td">671</td> <td class="doc-table__td">复制特遣部队内容...</td><td class="doc-table__td">源特遣部队，目标特遣部队</td></tr>
-<tr> <td class="doc-table__td">672</td> <td class="doc-table__td">修改特遣部队条目...</td><td class="doc-table__td">科技类型，特遣部队，条目索引(0-5)，数量</td></tr>
-<tr> <td class="doc-table__td">673</td> <td class="doc-table__td">重新指定小队特遣部队...</td><td class="doc-table__td">作战小队类型，目标特遣部队</td></tr>
-<tr> <td class="doc-table__td">674</td> <td class="doc-table__td">恢复特遣部队内容...</td><td class="doc-table__td">特遣部队</td></tr>
-<tr> <td class="doc-table__td">675</td> <td class="doc-table__td">恢复所有特遣部队内容...</td><td class="doc-table__td">无参数</td></tr>
-<tr> <td class="doc-table__td">676</td> <td class="doc-table__td">恢复小队特遣部队索引...</td><td class="doc-table__td">作战小队类型</td></tr>
-<tr> <td class="doc-table__td">677</td> <td class="doc-table__td">恢复所有小队特遣部队索引...</td><td class="doc-table__td">无参数</td></tr>
+<tr><td class="doc-table__td">670</td><td class="doc-table__td">清空特遣部队内容</td><td class="doc-table__td">特遣部队</td></tr>
+<tr><td class="doc-table__td">671</td><td class="doc-table__td">复制特遣部队内容</td><td class="doc-table__td">源特遣部队，目标特遣部队</td></tr>
+<tr><td class="doc-table__td">672</td><td class="doc-table__td">修改特遣部队条目</td><td class="doc-table__td">科技类型，特遣部队，条目索引(0-5)，数量</td></tr>
+<tr><td class="doc-table__td">673</td><td class="doc-table__td">重新指定小队特遣部队</td><td class="doc-table__td">作战小队类型，目标特遣部队</td></tr>
+<tr><td class="doc-table__td">674</td><td class="doc-table__td">恢复特遣部队内容</td><td class="doc-table__td">特遣部队</td></tr>
+<tr><td class="doc-table__td">675</td><td class="doc-table__td">恢复所有特遣部队内容</td><td class="doc-table__td">无参数</td></tr>
+<tr><td class="doc-table__td">676</td><td class="doc-table__td">恢复小队特遣部队索引</td><td class="doc-table__td">作战小队类型</td></tr>
+<tr><td class="doc-table__td">677</td><td class="doc-table__td">恢复所有小队特遣部队索引</td><td class="doc-table__td">无参数</td></tr>
 </tbody>
 </table>
 </div>
-
-<p class="doc-paragraph--only-vertical"><strong>说明：</strong></p>
-<ul class="doc-list--content">
-<li><strong>内容</strong>指特遣部队的编制条目；<strong>索引</strong>指作战小队类型绑定了哪个特遣部队。</li>
-<li>所有行为执行后自动刷新活跃小队（重新统计成员、释放超额、更新满编/缺编状态）。</li>
+<ul class="doc-list">
+<li>「内容」指特遣部队的编制条目，「索引」指某支小队绑定了哪个特遣部队。</li>
+<li>所有行为执行后会自动刷新场上的活跃小队（重新统计成员、释放超额成员、更新满编/缺编状态）。</li>
 </ul>
 </div>
 
 <hr class="sec-divider--double">
 
 <div id="actions_10">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">10. 解除部署功能</h3>
+<h3 class="doc-heading--tertiary">10. 解除部署</h3>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
 <tbody>
-<tr><td class="doc-table__td">679</td><td class="doc-table__td">解除所属方单位部署</td><td class="doc-table__td">所属方国家索引</td></tr>
+<tr><td class="doc-table__td">679</td><td class="doc-table__td">解除所属方单位部署</td><td class="doc-table__td">所属方</td></tr>
 </tbody>
 </table>
 </div>
@@ -1238,36 +966,35 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 yes — 单位文本�
 <hr class="sec-divider--double">
 
 <div id="actions_11">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">11. 选择框系统</h3>
-<p>在地图路径点或屏幕上创建交互式选择框，支持标题、描述和多个可点击按钮。
-玩家点击按钮后，可通过触发事件检测结果并执行后续行为。</p>
-<p><a href="javascript:switchPage('events');setTimeout(function(){scrollToFeature('events_4')},100)" class="doc-link">→ 查看对应的触发事件</a> <a href="javascript:switchPage('gameplay');setTimeout(function(){scrollToFeature('gameplay_6')},100)" class="doc-link">→ 查看 ini 配置说明</a></p>
-
+<h3 class="doc-heading--tertiary">11. 选择框系统</h3>
+<p>在路径点或屏幕上创建带按钮的交互式选择框。</p>
+<p><a href="javascript:switchPage('events');setTimeout(function(){scrollToFeature('events_4')},100)" class="doc-link">→ 查看对应的触发事件（557–559）</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:switchPage('gameplay');setTimeout(function(){scrollToFeature('gameplay_6')},100)" class="doc-link">→ 查看选择框样式（[ChoiceBoxTypes]）</a></p>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
 <tbody>
-  <tr><td class="doc-table__td">590</td><td class="doc-table__td">在路径点创建选择框</td><td class="doc-table__td">选择框编号, 路径点, 选择框类型索引</td></tr>
-  <tr><td class="doc-table__td">591</td><td class="doc-table__td">在屏幕坐标创建选择框</td><td class="doc-table__td">选择框编号, 屏幕水平位置, 屏幕垂直位置, 选择框类型索引</td></tr>
-  <tr><td class="doc-table__td">592</td><td class="doc-table__td">清除指定编号的选择框</td><td class="doc-table__td">选择框编号</td></tr>
-  <tr><td class="doc-table__td">593</td><td class="doc-table__td">清除所有选择框</td><td class="doc-table__td">无参数</td></tr>
+<tr><td class="doc-table__td">590</td><td class="doc-table__td">在路径点创建选择框</td><td class="doc-table__td">选择框编号，路径点，选择框类型索引</td></tr>
+<tr><td class="doc-table__td">591</td><td class="doc-table__td">在屏幕坐标创建选择框</td><td class="doc-table__td">选择框编号，屏幕水平位置，屏幕垂直位置，选择框类型索引</td></tr>
+<tr><td class="doc-table__td">592</td><td class="doc-table__td">清除指定编号的选择框</td><td class="doc-table__td">选择框编号</td></tr>
+<tr><td class="doc-table__td">593</td><td class="doc-table__td">清除所有选择框</td><td class="doc-table__td">无参数</td></tr>
 </tbody>
 </table>
 </div>
-
-<h4>注意事项</h4>
-<ol class="doc-list--content">
-<li><strong>选择框编号：</strong>由用户自定义的整数，不同编号可同时显示多个选择框。同编号创建时自动覆盖旧的。</li>
-<li><strong>屏幕坐标：</strong>百分比制（0~100），如 X=50, Y=50 表示屏幕正中央。选择框会自动保持在屏幕视野内。</li>
+<div class="doc-note">
+<span class="doc-note__title">注意</span>
+<ul>
+<li><strong>选择框编号</strong>由作者自定义，不同编号可以同时存在；用同一编号再次创建会覆盖旧的选择框。</li>
+<li><strong>屏幕坐标</strong>为百分比（0~100），如 <code>50,50</code> 即屏幕正中；选择框会自动保持在屏幕可见范围内。</li>
+</ul>
+</div>
 </div>
 
 <hr class="sec-divider--double">
 
 <div id="actions_12">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">12. 小队路径可视化</h3>
-<p>将关联单位寻路路径以虚线形式实时绘制在地图上，颜色与所属方相同。</p>
-<p><a href="javascript:switchPage('scripts');setTimeout(function(){scrollToFeature('scripts_2')},100)" class="doc-link">→ 查看对应的脚本动作</a></p>
-
+<h3 class="doc-heading--tertiary">12. 小队路径可视化</h3>
+<p>把关联单位的移动路径以虚线实时绘制在地图上，颜色与所属方一致。</p>
+<p><a href="javascript:switchPage('scripts');setTimeout(function(){scrollToFeature('scripts_2')},100)" class="doc-link">→ 查看对应的脚本动作（5501／5502）</a></p>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
@@ -1277,87 +1004,82 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 yes — 单位文本�
 </tbody>
 </table>
 </div>
-
 </div>
 
 <hr class="sec-divider--double">
 
 <div id="actions_13">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">13. 任务信息/通关时间修改</h3>
-<p>动态修改任务结算时的超时/按时标题与信息、任务简报文本，以及各难度的最佳通关时间。</p>
+<h3 class="doc-heading--tertiary">13. 任务简报与通关时间</h3>
+<p>动态修改任务简报文本、结算界面的标题/信息，以及各难度的最佳通关时间。</p>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
 <tbody>
-<tr><td class="doc-table__td">664</td><td class="doc-table__td">设置任务简报</td><td class="doc-table__td">文本/CSF标签</td></tr>
-<tr><td class="doc-table__td">665</td><td class="doc-table__td">设置超时标题</td><td class="doc-table__td">文本/CSF标签</td></tr>
-<tr><td class="doc-table__td">666</td><td class="doc-table__td">设置超时信息</td><td class="doc-table__td">文本/CSF标签</td></tr>
-<tr><td class="doc-table__td">667</td><td class="doc-table__td">设置按时标题</td><td class="doc-table__td">文本/CSF标签</td></tr>
-<tr><td class="doc-table__td">668</td><td class="doc-table__td">设置按时信息</td><td class="doc-table__td">文本/CSF标签</td></tr>
-<tr><td class="doc-table__td">669</td><td class="doc-table__td">设置简单难度最佳时间</td><td class="doc-table__td">整数(秒), &lt;0 不修改</td></tr>
-<tr><td class="doc-table__td">680</td><td class="doc-table__td">设置普通难度最佳时间</td><td class="doc-table__td">整数(秒), &lt;0 不修改</td></tr>
-<tr><td class="doc-table__td">681</td><td class="doc-table__td">设置困难难度最佳时间</td><td class="doc-table__td">整数(秒), &lt;0 不修改</td></tr>
+<tr><td class="doc-table__td">664</td><td class="doc-table__td">设置任务简报</td><td class="doc-table__td">文本或 CSF 标签</td></tr>
+<tr><td class="doc-table__td">665</td><td class="doc-table__td">设置超时标题</td><td class="doc-table__td">文本或 CSF 标签</td></tr>
+<tr><td class="doc-table__td">666</td><td class="doc-table__td">设置超时信息</td><td class="doc-table__td">文本或 CSF 标签</td></tr>
+<tr><td class="doc-table__td">667</td><td class="doc-table__td">设置按时标题</td><td class="doc-table__td">文本或 CSF 标签</td></tr>
+<tr><td class="doc-table__td">668</td><td class="doc-table__td">设置按时信息</td><td class="doc-table__td">文本或 CSF 标签</td></tr>
+<tr><td class="doc-table__td">669</td><td class="doc-table__td">设置简单难度最佳时间</td><td class="doc-table__td">整数（秒），负数不修改</td></tr>
+<tr><td class="doc-table__td">680</td><td class="doc-table__td">设置普通难度最佳时间</td><td class="doc-table__td">整数（秒），负数不修改</td></tr>
+<tr><td class="doc-table__td">681</td><td class="doc-table__td">设置困难难度最佳时间</td><td class="doc-table__td">整数（秒），负数不修改</td></tr>
 </tbody>
 </table>
 </div>
-
 </div>
 
 <hr class="sec-divider--double">
 
 <div id="actions_14">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">14. 游戏速度修改</h3>
-<p>修改当前游戏速度。</p>
-
+<h3 class="doc-heading--tertiary">14. 游戏速度</h3>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
 <tbody>
-<tr><td class="doc-table__td">682</td><td class="doc-table__td">修改游戏速度</td><td class="doc-table__td">整数(0~6, 0=最慢~6=最快)。</td></tr>
+<tr><td class="doc-table__td">682</td><td class="doc-table__td">修改游戏速度</td><td class="doc-table__td">整数 0~6（0=最慢，6=最快）</td></tr>
 </tbody>
 </table>
 </div>
-
-<h4>注意事项</h4>
-<ol class="doc-list--content">
-<li>会同时强制开启speedcontrol选项(单人游戏可调速)。</li>
-</ol>
-
+<div class="doc-note">
+<span class="doc-note__title">注意</span>
+<ul>
+<li>执行后会<strong>同时开启单人游戏的调速选项</strong>，玩家可在设置里自行改游戏速度。</li>
+<li>参数超出 0~6 时不生效。</li>
+</ul>
+</div>
 </div>
 
 <hr class="sec-divider--double">
 
 <div id="actions_15">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">15. Esc菜单存读档按钮禁用</h3>
-<p>禁用/恢复Esc菜单右侧的「读取游戏」和「储存游戏」按钮，被禁用时按钮会变灰且无法点击。</p>
+<h3 class="doc-heading--tertiary">15. 禁止存档 / 读档</h3>
+<p>禁用或恢复 Esc 菜单右侧的「读取游戏」「储存游戏」按钮，被禁用时按钮变灰且无法点击。</p>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
 <tbody>
-<tr><td class="doc-table__td">683</td><td class="doc-table__td">禁止读档</td><td class="doc-table__td">无参数。</td></tr>
-<tr><td class="doc-table__td">684</td><td class="doc-table__td">禁止存档</td><td class="doc-table__td">无参数。</td></tr>
-<tr><td class="doc-table__td">685</td><td class="doc-table__td">恢复读档</td><td class="doc-table__td">无参数。</td></tr>
-<tr><td class="doc-table__td">686</td><td class="doc-table__td">恢复存档</td><td class="doc-table__td">无参数。</td></tr>
+<tr><td class="doc-table__td">683</td><td class="doc-table__td">禁止读档</td><td class="doc-table__td">无参数</td></tr>
+<tr><td class="doc-table__td">684</td><td class="doc-table__td">禁止存档</td><td class="doc-table__td">无参数</td></tr>
+<tr><td class="doc-table__td">685</td><td class="doc-table__td">恢复读档</td><td class="doc-table__td">无参数</td></tr>
+<tr><td class="doc-table__td">686</td><td class="doc-table__td">恢复存档</td><td class="doc-table__td">无参数</td></tr>
 </tbody>
 </table>
 </div>
-
 </div>
 
 <hr class="sec-divider--double">
 
 <div id="actions_16">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">16. 变卖所属方的全部建筑</h3>
-<p>变卖指定所属方的全部建筑，不可变卖的科技类型会被跳过。</p>
+<h3 class="doc-heading--tertiary">16. 变卖所属方的全部建筑</h3>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
 <tbody>
-<tr><td class="doc-table__td">687</td><td class="doc-table__td">变卖所属方的全部建筑</td><td class="doc-table__td">参数：所属方</td></tr>
+<tr><td class="doc-table__td">687</td><td class="doc-table__td">变卖所属方的全部建筑</td><td class="doc-table__td">所属方</td></tr>
 </tbody>
 </table>
 </div>
-
+<p>变卖指定所属方的全部建筑，不可变卖的科技类型会被跳过。</p>
 </div>
 
 </section>
@@ -1369,41 +1091,43 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 yes — 单位文本�
 
 <section id="sec_events">
 <h2 class="doc-heading--secondary">新增触发事件</h2>
+<p>通过把 <code>FAData_Customized.ini</code> 复制到地图编辑器目录下来使用，目前仅支持HDM Edition。</p>
+
 <div class="sec-toc">
-<p class="sec-toc__title">目录：</p>
+<p class="sec-toc__title">目录</p>
 <ul class="sec-toc__list">
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('events_1')" class="sec-toc__link">1. 科技类型坐标检测功能</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('events_2')" class="sec-toc__link">2. 流逝时间(帧)</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('events_3')" class="sec-toc__link">3. 任务计时器检测功能</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('events_4')" class="sec-toc__link">4. 选择框系统</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('events_5')" class="sec-toc__link">5. 电力状态检测</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('events_1')" class="sec-toc__link">1. 科技类型坐标检测</a> <span class="sec-toc__id">550–553</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('events_2')" class="sec-toc__link">2. 流逝时间(帧)</a> <span class="sec-toc__id">554</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('events_3')" class="sec-toc__link">3. 任务计时器检测</a> <span class="sec-toc__id">555、556</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('events_4')" class="sec-toc__link">4. 选择框系统</a> <span class="sec-toc__id">557–559</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('events_5')" class="sec-toc__link">5. 电力状态检测</a> <span class="sec-toc__id">560–565</span></li>
 </ul>
 </div>
 
 <hr class="sec-divider">
 
 <div id="events_1">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">1. 科技类型坐标检测功能</h3>
-<p>在指定路径点上或附近距离，检测是否存在触发所属方的科技类型。</p>
+<h3 class="doc-heading--tertiary">1. 科技类型坐标检测</h3>
+<p>检测指定路径点上、或路径点附近，是否存在<strong>触发所属方</strong>的科技类型。</p>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
 <tbody>
-<tr><td class="doc-table__td">550</td><td class="doc-table__td">路径点附近存在所属方的科技类型</td><td class="doc-table__td">距离，路径点索引</td></tr>
-<tr><td class="doc-table__td">551</td><td class="doc-table__td">路径点附近不存在所属方的科技类型</td><td class="doc-table__td">距离，路径点索引</td></tr>
-<tr><td class="doc-table__td">552</td><td class="doc-table__td">路径点上存在所属方的指定科技类型</td><td class="doc-table__td">路径点索引，科技类型</td></tr>
-<tr><td class="doc-table__td">553</td><td class="doc-table__td">路径点上不存在所属方的指定科技类型</td><td class="doc-table__td">路径点索引，科技类型</td></tr>
+<tr><td class="doc-table__td">550</td><td class="doc-table__td">路径点附近存在所属方的科技类型</td><td class="doc-table__td">距离，路径点</td></tr>
+<tr><td class="doc-table__td">551</td><td class="doc-table__td">路径点附近不存在所属方的科技类型</td><td class="doc-table__td">距离，路径点</td></tr>
+<tr><td class="doc-table__td">552</td><td class="doc-table__td">路径点上存在所属方的指定科技类型</td><td class="doc-table__td">路径点，科技类型</td></tr>
+<tr><td class="doc-table__td">553</td><td class="doc-table__td">路径点上不存在所属方的指定科技类型</td><td class="doc-table__td">路径点，科技类型</td></tr>
 </tbody>
 </table>
 </div>
-<p class="doc-paragraph--wrapped"><strong>注意事项：</strong> 对于事件 <code class="doc-code--inline">552</code>,<code class="doc-code--inline">553</code>, 若科技类型为建筑，则<strong>每一格都会检测，支持ares的自定义Foundation。</strong></p>
+<p><code>552</code>／<code>553</code> 的科技类型为建筑时，每一格都会检测，支持 Ares 自定义地基。</p>
 </div>
 
 <hr class="sec-divider--double">
 
 <div id="events_2">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">2. 流逝时间(帧)</h3>
-<p>从触发器激活时开始计时，当流逝帧数达到指定值时触发。</p>
+<h3 class="doc-heading--tertiary">2. 流逝时间(帧)</h3>
+<p>触发器激活后开始计时，流逝帧数达到指定值时事件成立。</p>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
@@ -1417,8 +1141,8 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 yes — 单位文本�
 <hr class="sec-divider--double">
 
 <div id="events_3">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">3. 任务计时器检测功能</h3>
-<p>比较任务计时器剩余时间与指定秒数。</p>
+<h3 class="doc-heading--tertiary">3. 任务计时器检测</h3>
+<p>比较任务计时器的剩余时间与指定秒数。</p>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
@@ -1433,33 +1157,33 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 yes — 单位文本�
 <hr class="sec-divider--double">
 
 <div id="events_4">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">4. 选择框系统</h3>
-<p>当选择框中的按钮被点击或超时未选时触发，需要配合触发行为 590-593 使用。</p>
-<p><a href="javascript:switchPage('actions');setTimeout(function(){scrollToFeature('actions_11')},100)" class="doc-link">→ 查看对应的触发行为</a> <a href="javascript:switchPage('gameplay');setTimeout(function(){scrollToFeature('gameplay_6')},100)" class="doc-link">→ 查看 ini 配置说明</a></p>
-
+<h3 class="doc-heading--tertiary">4. 选择框系统</h3>
+<p>检测选择框的按钮点击与超时，需配合触发行为使用。</p>
+<p><a href="javascript:switchPage('actions');setTimeout(function(){scrollToFeature('actions_11')},100)" class="doc-link">→ 查看对应的触发行为（590–593）</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:switchPage('gameplay');setTimeout(function(){scrollToFeature('gameplay_6')},100)" class="doc-link">→ 查看选择框样式（[ChoiceBoxTypes]）</a></p>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
 <tbody>
-  <tr><td class="doc-table__td">557</td><td class="doc-table__td">选择框指定按钮被点击</td><td class="doc-table__td">按钮序号(从1开始), 选择框编号</td></tr>
-  <tr><td class="doc-table__td">558</td><td class="doc-table__td">选择框任意按钮被点击</td><td class="doc-table__td">选择框编号</td></tr>
-  <tr><td class="doc-table__td">559</td><td class="doc-table__td">选择框超时未选</td><td class="doc-table__td">选择框编号</td></tr>
+<tr><td class="doc-table__td">557</td><td class="doc-table__td">选择框指定按钮被点击</td><td class="doc-table__td">按钮序号(从 1 开始)，选择框编号</td></tr>
+<tr><td class="doc-table__td">558</td><td class="doc-table__td">选择框任意按钮被点击</td><td class="doc-table__td">选择框编号</td></tr>
+<tr><td class="doc-table__td">559</td><td class="doc-table__td">选择框超时未选</td><td class="doc-table__td">选择框编号</td></tr>
 </tbody>
 </table>
 </div>
-
-<h4>注意事项</h4>
-<ol class="doc-list--content">
-<li><strong>超时：</strong>当选择框的 Duration 耗尽且玩家未点击任何按钮时，事件 559 触发。</li>
-<li><strong>回弹模式：</strong>使用 <code class="doc-code--inline">Bounce</code>（回弹模式）时，每次点击都会触发事件，推荐同时用 Duration=-1 防止选择框自动消失。</li>
-</ol>
+<div class="doc-note">
+<span class="doc-note__title">注意</span>
+<ul>
+<li><code>559</code> 只在 <code>Duration</code> 归零、且玩家没有点过任何按钮时触发。</li>
+<li>用 <code>Bounce</code>（回弹）模式时每次点击都会触发一次事件。</li>
+</ul>
+</div>
 </div>
 
 <hr class="sec-divider--double">
 
 <div id="events_5">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">5. 电力状态检测</h3>
-<p>检测触发所属方的电力状态。</p>
+<h3 class="doc-heading--tertiary">5. 电力状态检测</h3>
+<p>检测触发所属方的电力输出、负载与盈余。</p>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
@@ -1473,11 +1197,7 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 yes — 单位文本�
 </tbody>
 </table>
 </div>
-
-<h4>注意事项</h4>
-<ol class="doc-list--content">
-<li>不会因游戏第一帧AI的电力状态还没有被计算而错误触发。</li>
-</ol>
+<p>本触发不会由于游戏第一帧 AI 的电力尚未计算完成而误触。</p>
 </div>
 
 </section>
@@ -1488,123 +1208,106 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 yes — 单位文本�
 <!----------------->
 
 <section id="sec_scripts">
-<h2 class="doc-heading--secondary">新增 AI 脚本行为</h2>
+<h2 class="doc-heading--secondary">新增脚本动作</h2>
+<p>通过把 <code>FAData_Customized.ini</code> 复制到地图编辑器目录下来使用，目前仅支持HDM Edition。</p>
+
 <div class="sec-toc">
-<p class="sec-toc__title">目录：</p>
+<p class="sec-toc__title">目录</p>
 <ul class="sec-toc__list">
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('scripts_1')" class="sec-toc__link">1. 分布式装载</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('scripts_2')" class="sec-toc__link">2. 小队路径可视化</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('scripts_3')" class="sec-toc__link">3. 分散攻击</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('scripts_4')" class="sec-toc__link">4. 巡逻系(巡逻到指定建筑/集结点)</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('scripts_1')" class="sec-toc__link">1. 分布式装载</a> <span class="sec-toc__id">5500</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('scripts_2')" class="sec-toc__link">2. 小队路径可视化</a> <span class="sec-toc__id">5501、5502</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('scripts_3')" class="sec-toc__link">3. 分散攻击</a> <span class="sec-toc__id">5503、5508</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('scripts_4')" class="sec-toc__link">4. 巡逻系</a> <span class="sec-toc__id">5504–5507</span></li>
 </ul>
 </div>
 
 <hr class="sec-divider">
 
 <div id="scripts_1">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">1. 分布式装载</h3>
-<p>将小队成员分配到各运输载具中，优先装载距离最近的队员。</p>
-
+<h3 class="doc-heading--tertiary">1. 分布式装载</h3>
+<p>把小队成员按距离就近分配到各运输载具，全员上车后继续执行下一条脚本。</p>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
 <tbody>
-<tr><td class="doc-table__td">5500</td><td class="doc-table__td">分布式装载入运输载具</td><td class="doc-table__td">无参数。</td></tr>
+<tr><td class="doc-table__td">5500</td><td class="doc-table__td">分布式装载入运输载具</td><td class="doc-table__td">无参数</td></tr>
 </tbody>
 </table>
 </div>
-
-<h4>说明</h4>
-<ul class="doc-list--content">
-<li>将小队成员按距离分配到各载具，全员上车后继续执行下一条脚本。</li>
-<li>不会出现原版脚本 14 的问题：<strong>不会</strong>只认最后一个载具、<strong>不会</strong>不考虑 <code class="doc-code--inline">SizeLimit</code>、<strong>不会</strong>不考虑剩余空间导致卡死。</li>
-</ul>
-
+<p>相比原版脚本 <code>14</code>，不会只认最后一个载具，不会忽略 <code>SizeLimit</code> 与剩余空间，因此不会因为装不下而卡住。</p>
 </div>
 
 <hr class="sec-divider--double">
 
 <div id="scripts_2">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">2. 小队路径可视化</h3>
-<p>将小队单位的移动路径以虚线形式实时绘制在地图上, 颜色与所属方相同。</p>
-<p><a href="javascript:switchPage('actions');setTimeout(function(){scrollToFeature('actions_12')},100)" class="doc-link">→ 查看对应的触发行为</a></p>
-
+<h3 class="doc-heading--tertiary">2. 小队路径可视化</h3>
+<p>把小队成员的移动路径以虚线实时绘制在地图上，颜色与所属方一致。</p>
+<p><a href="javascript:switchPage('actions');setTimeout(function(){scrollToFeature('actions_12')},100)" class="doc-link">→ 查看对应的触发行为（662／663）</a></p>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
 <tbody>
-<tr><td class="doc-table__td">5501</td><td class="doc-table__td">绘制小队移动路径</td><td class="doc-table__td">无</td></tr>
-<tr><td class="doc-table__td">5502</td><td class="doc-table__td">停止绘制小队移动路径</td><td class="doc-table__td">无</td></tr>
+<tr><td class="doc-table__td">5501</td><td class="doc-table__td">绘制小队移动路径</td><td class="doc-table__td">无参数</td></tr>
+<tr><td class="doc-table__td">5502</td><td class="doc-table__td">停止绘制小队移动路径</td><td class="doc-table__td">无参数</td></tr>
 </tbody>
 </table>
 </div>
-
-</ul>
-
 </div>
 
 <hr class="sec-divider--double">
 
 <div id="scripts_3">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">3. 分散攻击</h3>
-<p>将小队成员均分为若干组，每组作为一个整体锁定同一个目标协同攻击，不同组攻击不同目标，使小队向不同方向分散作战。</p>
-
+<h3 class="doc-heading--tertiary">3. 分散攻击</h3>
+<p>把小队成员均分为若干组，每组锁定同一个目标协同攻击、不同组打不同目标，从而向多个方向分散作战。</p>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
 <tbody>
-<tr><td class="doc-table__td">5503</td><td class="doc-table__td">分散攻击</td><td class="doc-table__td">分组数, 攻击目标类型(与Phobos对齐)</td></tr>
-<tr><td class="doc-table__td">5508</td><td class="doc-table__td">分散攻击(AITargetTypes)</td><td class="doc-table__td">分组数, [AITargetTypes]列表索引</td></tr>
+<tr><td class="doc-table__td">5503</td><td class="doc-table__td">分散攻击</td><td class="doc-table__td">分组数，攻击目标类型</td></tr>
+<tr><td class="doc-table__td">5508</td><td class="doc-table__td">分散攻击(AITargetTypes)</td><td class="doc-table__td">分组数，<code>[AITargetTypes]</code> 列表索引</td></tr>
 </tbody>
 </table>
 </div>
-
-<h4>说明</h4>
-<ul class="doc-list--content">
-<li><strong>分组：</strong>进入本动作时按成员相对小队中心的方位角将成员均分为指定组数，<strong>仅分组一次</strong>，此后不再重新分组。成员死亡自动从组中移除；新加入的成员并入成员最少的组。</li>
-<li><strong>目标选择：</strong>每组以组中心为基准选择最近的未锁定敌人，组内所有成员锁定同一个目标；不同组优先攻击不同目标。每 60 帧重新选择一次目标。</li>
-<li><strong>5508 自定目标列表：</strong>行为与 5503 完全一致，唯一区别是目标只能从 <code class="doc-code--inline">[AITargetTypes]</code> 指定索引的列表中选取。</li>
-<li><strong>完成条件：</strong>当地图上不再存在任何敌对单位，或所有敌人的目标单元格均无法抵达时，脚本完成并推进到下一条。</li>
+<ul class="doc-list">
+<li><strong>分组</strong>：进入本动作时按成员相对小队中心的方位角排序均分，<strong>只分一次</strong>；成员死亡或离场自动从组内移除，新加入的成员并入人数最少的组。</li>
+<li><strong>完成条件</strong>：所有组都找不到可抵达的目标时完成，执行下一条脚本；只要还有一组能打，脚本就停在本动作。</li>
 </ul>
-
 </div>
 
 <hr class="sec-divider--double">
 
 <div id="scripts_4">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">4. 巡逻系(巡逻到指定建筑/集结点)</h3>
-<p>让小队巡逻(移动)到指定阵营的建筑附近或基地集结点。底层为原版脚本动作 16 - 巡逻至路径点。</p>
-
+<h3 class="doc-heading--tertiary">4. 巡逻系</h3>
+<p>让小队巡逻（移动）到指定阵营的建筑附近或基地集结点，<br>
+  行为与原版脚本动作 <code>16</code>（巡逻至路径点）相同，只是目标换成建筑或集结点。</p>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
 <tbody>
-<tr><td class="doc-table__td">5504</td><td class="doc-table__td">巡逻到敌方指定建筑物附近</td><td class="doc-table__td">建筑类型索引 + 索敌方式</td></tr>
+<tr><td class="doc-table__td">5504</td><td class="doc-table__td">巡逻到敌方指定建筑物附近</td><td class="doc-table__td">建筑类型索引，索敌方式</td></tr>
 <tr><td class="doc-table__td">5505</td><td class="doc-table__td">巡逻到敌方基地集结点</td><td class="doc-table__td">无参数</td></tr>
-<tr><td class="doc-table__td">5506</td><td class="doc-table__td">巡逻到己方指定建筑物附近</td><td class="doc-table__td">建筑类型索引 + 索敌方式</td></tr>
+<tr><td class="doc-table__td">5506</td><td class="doc-table__td">巡逻到己方指定建筑物附近</td><td class="doc-table__td">建筑类型索引，索敌方式</td></tr>
 <tr><td class="doc-table__td">5507</td><td class="doc-table__td">巡逻到己方基地集结点</td><td class="doc-table__td">无参数</td></tr>
 </tbody>
 </table>
 </div>
-
-</ul>
-
 </div>
 
 </section>
 
 
 <!----------------->
-<!---- 原版Bug修复 --->
+<!---- 原版 Bug 修复 --->
 <!----------------->
 
 <section id="sec_fixes">
-<h2 class="doc-heading--secondary">原版Bug修复</h2>
-<p>以下针对原版引擎已存在的问题做了修复。</p>
+<h2 class="doc-heading--secondary">原版 Bug 修复</h2>
 
-<h3 class="doc-heading--tertiary" style="margin-top:1.5em">1. 跟随单位时触发行为 48 / 112 失效</h3>
-<p>当玩家通过 Follow 按键正跟随某个单位时，执行触发行为 <code class="doc-code--inline">48=移动视野到路径点</code> 或 <code class="doc-code--inline">112=居中视野到路径点</code>，视野会一直被每帧强制拉回被跟随的单位，导致这两个行为看起来“不执行”。</p>
-<p>现已修复为：执行这两个行为时会自动取消当前“跟随单位”状态，确保视野能移动到指定的路径点。</p>
+<div id="fixes_1">
+<h3 class="doc-heading--tertiary">1. 跟随单位时视野移动行为失效</h3>
+<p>玩家处于「跟随单位视野」状态时，触发行为 <code>48</code>（移动视野到路径点）与 <code>112</code>（居中视野到路径点）会把视野每帧拉回被跟随的单位，看起来像没执行。</p>
+<p>现已修复：执行这两个行为时会自动解除跟随状态，视野正常移动到指定路径点。</p>
+</div>
 </section>
 
 
@@ -1618,6 +1321,7 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 yes — 单位文本�
 <p>《红色警戒2：尤里的复仇》及其相关素材归 Electronic Arts 所有。</p>
 </footer>
 </div>
+
 
 <script>
 /* ============================================================
@@ -1658,40 +1362,216 @@ function toggleLock()
 }
 
 /* ============================================================
-   滚动到章节内条目并闪烁高亮
+   滚动到条目并闪烁高亮
    ============================================================ */
-function scrollToFeature(id)
+function scrollToFeature(id, rowIndex)
 {
   var el = document.getElementById(id);
   if(!el)
     return;
 
   var rect = el.getBoundingClientRect();
-  var targetY = rect.top + window.scrollY - window.innerHeight * 0.25;
+  var targetY = rect.top + window.scrollY - window.innerHeight * 0.2;
   window.scrollTo({ top: targetY, behavior: 'smooth' });
 
-  setTimeout(function()
+  var flashTarget = el;
+  if(rowIndex !== null && rowIndex !== undefined)
   {
-    var o = document.createElement('div');
-    o.id = 'hl_' + id;
-    o.style.cssText = 'position:absolute;top:0;left:0;right:0;bottom:0;'
-      + 'background:rgba(255,235,150,0.25);border-radius:20px;pointer-events:none;'
-      + 'z-index:1;opacity:0;transition:opacity .5s ease';
-    el.style.position = 'relative';
-    el.appendChild(o);
+    var rows = el.querySelectorAll('tbody tr');
+    if(rows[rowIndex])
+      flashTarget = rows[rowIndex];
+  }
 
-    requestAnimationFrame(function()
+  flashTarget.classList.remove('flash');
+  void flashTarget.offsetWidth;
+  flashTarget.classList.add('flash');
+  setTimeout(function(){ flashTarget.classList.remove('flash'); }, 1800);
+}
+
+/* ============================================================
+   全站搜索：功能块 + 触发/事件/脚本编号
+   ============================================================ */
+var INDEX = [];      // 索引表
+var SEL = -1;        // 当前选中项
+
+function buildIndex()
+{
+  var sections = document.querySelectorAll('section');
+
+  for(var s = 0; s < sections.length; s++)
+  {
+    var sec = sections[s];
+    var page = sec.id.replace('sec_', '');
+    var navItem = document.querySelector('.nav__item[page="' + page + '"]');
+    var label = navItem ? navItem.textContent.trim() : page;
+    var blocks = sec.children;
+
+    for(var b = 0; b < blocks.length; b++)
     {
-      o.style.opacity = '1';
-      setTimeout(function(){ o.style.opacity = '0';
-        setTimeout(function(){ o.style.opacity = '1';
-          setTimeout(function(){ o.style.opacity = '0';
-            setTimeout(function(){ if(o.parentNode) o.parentNode.removeChild(o); }, 300);
-          }, 300);
-        }, 300);
-      }, 300);
+      var block = blocks[b];
+      var isHeading = block.tagName === 'H3';
+      if(!isHeading && !block.id)
+        continue;
+
+      var host = isHeading ? block.parentNode : block;
+      var h3 = block.querySelector('h3') || (isHeading ? block : null);
+      if(!h3)
+        continue;
+
+      var title = h3.textContent.trim().replace(/^\d+\.\s*/, '');
+      var blockId = isHeading ? null : block.id;
+
+      if(blockId)
+      {
+        INDEX.push({
+          type: 'feature', id: blockId, num: '',
+          title: title, sub: '', page: page, label: label,
+          hay: (title + ' ' + block.textContent).toLowerCase().replace(/\s+/g, ' ')
+        });
+      }
+
+      var rows = host.querySelectorAll('tbody tr');
+      for(var r = 0; r < rows.length; r++)
+      {
+        var cells = rows[r].children;
+        if(cells.length < 2)
+          continue;
+        var first = cells[0].textContent.trim();
+        if(!/^\d+$/.test(first))
+          continue;
+        var params = cells.length > 2 ? cells[2].textContent.trim() : '';
+        INDEX.push({
+          type: 'id', id: blockId, num: first,
+          title: cells[1].textContent.trim().replace(/\.\.\.$/, ''),
+          sub: params, page: page, label: label,
+          hay: (first + ' ' + cells[1].textContent + ' ' + params).toLowerCase()
+        });
+      }
+    }
+  }
+}
+
+function escapeHtml(str)
+{
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function renderResults(list, query)
+{
+  var panel = document.getElementById('searchPanel');
+  var html = '';
+
+  if(!list.length)
+  {
+    html = '<div class="search-panel__empty">没有匹配「' + escapeHtml(query) + '」的功能</div>';
+  }
+  else
+  {
+    for(var i = 0; i < list.length; i++)
+    {
+      var e = list[i];
+      var num = e.num ? '<span class="sr__id">' + escapeHtml(e.num) + '</span>'
+                      : '<span class="sr__id">·</span>';
+      var sub = (e.type === 'id' && e.sub)
+        ? '<div class="sr__sub">参数：' + escapeHtml(e.sub) + '</div>' : '';
+      html += '<div class="sr" data-i="' + i + '">' + num + escapeHtml(e.title)
+            + '<span class="sr__page">' + escapeHtml(e.label) + '</span>' + sub + '</div>';
+    }
+  }
+
+  panel.innerHTML = html;
+  panel.classList.add('open');
+  SEL = -1;
+
+  var items = panel.querySelectorAll('.sr');
+  for(var k = 0; k < items.length; k++)
+  {
+    items[k].addEventListener('mousedown', function(ev)
+    {
+      ev.preventDefault();
+      openResult(list[parseInt(this.getAttribute('data-i'), 10)]);
     });
-  }, 500);
+  }
+}
+
+function openResult(e)
+{
+  if(!e)
+    return;
+
+  var rowIndex = null;
+  if(e.type === 'id' && e.id)
+  {
+    var host = document.getElementById(e.id);
+    if(host)
+    {
+      var rows = host.querySelectorAll('tbody tr');
+      for(var i = 0; i < rows.length; i++)
+      {
+        if(rows[i].children[0].textContent.trim() === e.num)
+        {
+          rowIndex = i;
+          break;
+        }
+      }
+    }
+  }
+
+  switchPage(e.page);
+  closeSearch();
+  setTimeout(function(){ scrollToFeature(e.id, rowIndex); }, 40);
+}
+
+function closeSearch()
+{
+  document.getElementById('searchPanel').classList.remove('open');
+  SEL = -1;
+}
+
+function doSearch()
+{
+  var input = document.getElementById('searchInput');
+  var raw = input.value.trim();
+  var q = raw.toLowerCase();
+
+  if(!q)
+  {
+    closeSearch();
+    return;
+  }
+
+  var isNum = /^\d+$/.test(q);
+  var exact = [], starts = [], contains = [];
+
+  for(var i = 0; i < INDEX.length; i++)
+  {
+    var e = INDEX[i];
+    var titleHit = e.title.toLowerCase().indexOf(q) >= 0;
+
+    if(isNum && e.num === q)
+      exact.push(e);
+    else if(isNum && e.num.indexOf(q) === 0)
+      starts.push(e);
+    else if(titleHit || e.hay.indexOf(q) >= 0)
+      contains.push(e);
+  }
+
+  renderResults(exact.concat(starts, contains).slice(0, 30), raw);
+}
+
+function moveSel(delta)
+{
+  var items = document.querySelectorAll('#searchPanel .sr');
+  if(!items.length)
+    return;
+
+  SEL += delta;
+  if(SEL < 0) SEL = items.length - 1;
+  if(SEL >= items.length) SEL = 0;
+
+  for(var i = 0; i < items.length; i++)
+    items[i].classList.toggle('sr--sel', i === SEL);
+  items[SEL].scrollIntoView({ block: 'nearest' });
 }
 
 /* ============================================================
@@ -1699,6 +1579,8 @@ function scrollToFeature(id)
    ============================================================ */
 document.addEventListener('DOMContentLoaded', function()
 {
+  buildIndex();
+
   // 点击侧边栏条目切换页面
   var navItems = document.querySelectorAll('.nav__item');
   for(var i = 0; i < navItems.length; i++)
@@ -1713,6 +1595,55 @@ document.addEventListener('DOMContentLoaded', function()
       });
     })(navItems[i]);
   }
+
+  // 搜索框
+  var input = document.getElementById('searchInput');
+  input.addEventListener('input', doSearch);
+  input.addEventListener('focus', doSearch);
+  input.addEventListener('keydown', function(ev)
+  {
+    if(ev.key === 'ArrowDown') { ev.preventDefault(); moveSel(1); }
+    else if(ev.key === 'ArrowUp') { ev.preventDefault(); moveSel(-1); }
+    else if(ev.key === 'Enter')
+    {
+      var items = document.querySelectorAll('#searchPanel .sr');
+      if(items.length)
+        items[SEL < 0 ? 0 : SEL].dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    }
+    else if(ev.key === 'Escape')
+    {
+      input.value = '';
+      closeSearch();
+      input.blur();
+    }
+  });
+
+  // 快捷键：/ 或 Ctrl+K 聚焦搜索
+  document.addEventListener('keydown', function(ev)
+  {
+    var tag = (ev.target.tagName || '').toLowerCase();
+    if(tag === 'input' || tag === 'textarea')
+      return;
+
+    if(ev.key === '/' || (ev.key.toLowerCase() === 'k' && (ev.ctrlKey || ev.metaKey)))
+    {
+      ev.preventDefault();
+      document.body.classList.remove('nav-collapsed');
+      input.focus();
+    }
+    else if(ev.key === 'Escape')
+    {
+      closeSearch();
+    }
+  });
+
+  // 点击空白处关闭搜索结果
+  document.addEventListener('mousedown', function(ev)
+  {
+    var panel = document.getElementById('searchPanel');
+    if(!panel.contains(ev.target) && ev.target.id !== 'searchInput')
+      closeSearch();
+  });
 
   // 窄屏默认折叠侧边栏，并默认锁定（不随点击外部收起）
   if(window.innerWidth <= 640)
