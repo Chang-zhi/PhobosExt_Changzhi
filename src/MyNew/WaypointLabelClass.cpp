@@ -1,343 +1,304 @@
 // ======================================================================
-//					Custom Waypoint Label Display
-//					Class: WaypointLabelClass
-//					Author: Chang_zhi
+//						自定义路径点文本显示
+//						类: WaypointLabelClass
+//						作者: Chang_zhi
 // ======================================================================
 
-#include <MyNew/WaypointLabelClass.h>
+#include "WaypointLabelClass.h"
 
 #include <StringTable.h>
 #include <Surface.h>
 #include <Drawing.h>
 #include <TacticalClass.h>
-#include <ScenarioClass.h> 
+#include <ScenarioClass.h>
 #include <CellClass.h>
 #include <RulesClass.h>
 #include <SessionClass.h>
 #include <WWMouseClass.h>
 
+#include <Ext/Rules/Body.h>
+
 #include <Utilities/Debug.h>
-#include <Utilities/Stream.h> 
+#include <Utilities/Stream.h>
 
 #include <vector>
 #include <algorithm>
+#include <memory>
 
-// Constants pixels count
-constexpr static const int PADDINGX = 6;
-constexpr static const int PADDINGY = 4;
-constexpr static const int LINE_HEIGHT = 18;
-// Debug: Bottom safe area to prevent drawing on bottom UI
-constexpr static const int BOTTOM_SAFE_HEIGHT = 0;
+// ===== 常量定义 =====
+constexpr static const int PADDINGX = 6;          // 文字左右内边距
+constexpr static const int PADDINGY = 4;          // 文字上下内边距
+constexpr static const int LINE_HEIGHT = 18;      // 每行文字高度（像素）
+// bugfix: 会错误绘制到下UI上, 添加裁剪功能
+// 默认底部安全区域为0, 如果需要可以调整该值
+constexpr static const int BOTTOM_SAFE_HEIGHT = 0; // 底部安全区域
 
+// 全局数组实例化
 std::vector<std::unique_ptr<WaypointLabelClass>> WaypointLabelClass::Array;
 
-// Constructor
-WaypointLabelClass::WaypointLabelClass(int wpIndex, const char* csfLabel, int maxWidth, int opacityPercent, WaypointLabel::Color color)
-    : WaypointIndex(wpIndex)
-    , CurrentLabel(csfLabel ? csfLabel : "")
-    , MaxLineWidth(maxWidth > 0 ? maxWidth : 250)
-    , BackgroundOpacity(std::clamp(opacityPercent, 0, 100))
-    , Color(color)
-{}
-
-// First Interface: Action 550
-void WaypointLabelClass::SetLabel(int wpIndex, const char* csfLabel, int maxWidth, int opacityPercent, WaypointLabel::Color color)
+// ===== 内部缓存结构体定义 =====
+struct WaypointLabelClass::Cache
 {
-    if (wpIndex < 0) return;
-    if (!RulesClass::Instance) return;  // Safety check, but may be unnecessary
+	bool IsLayoutDirty { true };                 // 布局是否需要重新计算
+	std::vector<std::wstring> CachedLines;       // 分行后的文本（宽字符）
+	int CachedBgWidth { 0 };                     // 背景宽度（像素）
+	int CachedBgHeight { 0 };                    // 背景高度（像素）
+	const wchar_t* CachedTextPtr { nullptr };    // 从 CSF 获取的文本指针（不拥有）
+};
 
-	// get iterator
-    auto it = std::find_if(Array.begin(), Array.end(),
-        [wpIndex](const std::unique_ptr<WaypointLabelClass>& pLabel) -> bool {
-            return (pLabel->WaypointIndex) == wpIndex;
-        });
+// ===== 辅助函数 =====
 
-    if (!(csfLabel && csfLabel[0])) // If csf is empty, delete it
-    {
-        Array.erase(it);
-        return;
-    }
-
-	// Safety check, but may be unnecessary
-    int actualOpacity = std::clamp(opacityPercent, 0, 100);
-	int actualMaxWidth = (maxWidth > 0 || maxWidth <= 1000) ? maxWidth : 250;
-
-    if (it != Array.end()) // Exist
-    {
-        auto& pLabel = *it;
-        pLabel->CurrentLabel = csfLabel;
-        pLabel->MaxLineWidth = actualMaxWidth;
-        pLabel->BackgroundOpacity = actualOpacity; 
-        pLabel->Color = color;
-        
-        // Inmidately update layout
-        // pLabel->IsLayoutDirty = true; 
-        pLabel->UpdateLayout();
-    }
-	else // it == Array.end()
-    {
-        auto newLabel = std::make_unique<WaypointLabelClass>(wpIndex, csfLabel, actualMaxWidth, actualOpacity, color);
-		// Inmidately update layout
-        newLabel->UpdateLayout();
-        Array.push_back(std::move(newLabel));
-    }
-}
-
-// No.2 Interface: Action 551
-void WaypointLabelClass::ClearLabel(int wpIndex)
+// 将颜色枚举转换为 ColorStruct
+static ColorStruct GetColorStructByEnum(const WaypointLabel::Color& intColor)
 {
-    auto it = std::find_if(Array.begin(), Array.end(), 
-        [wpIndex](const std::unique_ptr<WaypointLabelClass>& pLabel) -> bool {
-            return pLabel->WaypointIndex == wpIndex;
-        });
-
-    if (it != Array.end())
-    {
-        Array.erase(it);
-    }
+	switch (intColor)
+	{
+	case WaypointLabel::Color::gold:		return ColorStruct(255, 215, 0);
+	case WaypointLabel::Color::white:		return ColorStruct(255, 255, 255);
+	case WaypointLabel::Color::red:			return ColorStruct(255, 0, 0);
+	case WaypointLabel::Color::blue:		return ColorStruct(0, 0, 255);
+	case WaypointLabel::Color::green:		return ColorStruct(0, 128, 0);
+	case WaypointLabel::Color::yellow:		return ColorStruct(255, 255, 0);
+	case WaypointLabel::Color::purple:		return ColorStruct(128, 0, 128);
+	case WaypointLabel::Color::pink:		return ColorStruct(255, 192, 203);
+	case WaypointLabel::Color::lightblue:	return ColorStruct(173, 216, 230);
+	default:								return ColorStruct(255, 215, 0); // 默认金色
+	}
 }
 
-// No.3 Interface: Action 552
-void WaypointLabelClass::ClearAll()
-{
-    Array.clear();
-}
-
-// Helper function: convert enum to ColorStruct
-static ColorStruct GetColorStructByEnum(const WaypointLabel::Color& intColor) {
-    switch (intColor)
-    {
-        case WaypointLabel::Color::gold:
-            return ColorStruct(255, 215, 0);
-        case WaypointLabel::Color::white:
-            return ColorStruct(255, 255, 255);
-        case WaypointLabel::Color::red:
-            return ColorStruct(255, 0, 0);
-        case WaypointLabel::Color::blue:
-            return ColorStruct(0, 0, 255);
-        case WaypointLabel::Color::green:
-            return ColorStruct(0, 128, 0);
-        case WaypointLabel::Color::yellow:
-            return ColorStruct(255, 255, 0);
-        case WaypointLabel::Color::purple:
-            return ColorStruct(128, 0, 128);
-        case WaypointLabel::Color::pink:
-            return ColorStruct(255, 192, 203);
-        case WaypointLabel::Color::lightblue:
-            return ColorStruct(173, 216, 230);
-        default: 
-            return ColorStruct(255, 215, 0);
-    }
-}
-
-// Helper: wrap text by max width (pixels), return vector of each lines
+// 文本换行：根据最大宽度（像素）将宽字符串拆分为多行
 static std::vector<std::wstring> WrapText(const wchar_t* text, int maxWidth)
 {
-	if (!text || wcslen(text) == 0 || maxWidth <= 0) return {};
+	if (!text || wcslen(text) == 0 || maxWidth <= 0)
+		return {};
 
-    std::vector<std::wstring> lines; // Result
-    std::wstring wStr(text);		 // Original text
-    std::wstring currentLine;
+	std::vector<std::wstring> lines;
+	std::wstring wStr(text);
+	std::wstring currentLine;
 
-    // Iterate over each character
-    for (size_t i = 0; i < wStr.length(); ++i)
-    {
-		// current character
-        wchar_t ch = wStr[i];
+	for (size_t i = 0; i < wStr.length(); ++i)
+	{
+		wchar_t ch = wStr[i];
 
-		// 1. Handle explicit line breaks (\n or \r\n)
-        if (ch == L'\n' || ch == L'\r')
-        {
-			// Save current line if it has content
-            if (!currentLine.empty())
-            {
-                lines.push_back(currentLine);
-                currentLine.clear();
-            }
-			// Skip the following \n if this is \r\n
-            if (ch == L'\r' && i + 1 < wStr.length() && wStr[i + 1] == L'\n')
-            {
-                ++i;
-            }
-            continue;
-        }
+		// 处理显式换行符
+		if (ch == L'\n' || ch == L'\r')
+		{
+			if (!currentLine.empty())
+			{
+				lines.push_back(currentLine);
+				currentLine.clear();
+			}
+			if (ch == L'\r' && i + 1 < wStr.length() && wStr[i + 1] == L'\n')
+				++i; // 跳过 \r\n 中的 \n
+			continue;
+		}
 
-		// Ignore invisible control characters (except '\t') to prevent layout issues
-        if (ch < 0x20 && ch != L'\t')
-        {
-            continue;
-        }
+		// 忽略不可见控制字符（制表符除外）
+		if (ch < 0x20 && ch != L'\t')
+			continue;
 
-		// 3. Try appending current character to the current line
-		std::wstring testLine = currentLine + ch;   // Test line with current character
+		// 尝试加入当前字符
+		std::wstring testLine = currentLine + ch;
 		RectangleStruct dims = Drawing::GetTextDimensions(testLine.c_str(), { 0,0 }, 0, 2, 0);
 
-		// If width exceeds max limit after adding
 		if (dims.Width > maxWidth)
 		{
-			// If current line is empty, force add the character (should only happen if max width is extremely small)
 			if (currentLine.empty())
 			{
+				// 单个字符就超过宽度，强制加入（通常不会发生）
 				lines.push_back(testLine);
 			}
 			else
 			{
-				// Save the current completed line
 				lines.push_back(currentLine);
-				// Start new line with current character
 				currentLine = ch;
 			}
 		}
 		else
 		{
-			// Within width limit, append to current line
 			currentLine = testLine;
 		}
-    }
+	}
 
-	// 4. Process the final line
-    if (!currentLine.empty())
-    {
-        lines.push_back(currentLine);
-    }
+	if (!currentLine.empty())
+		lines.push_back(currentLine);
 
-    return lines;
+	return lines;
 }
 
-// Lazy load to improve performance
+// ===== 构造函数 =====
+WaypointLabelClass::WaypointLabelClass(int wpIndex, const char* csfLabel,
+									   int maxWidth, int opacityPercent,
+									   WaypointLabel::Color color)
+	: WaypointIndex(wpIndex)
+	, CurrentLabel(csfLabel ? csfLabel : "")
+	, MaxLineWidth(maxWidth > 0 ? maxWidth : 250)
+	, BackgroundOpacity(std::clamp(opacityPercent, 0, 100))
+	, Color(color)
+	, m_cache(std::make_unique<Cache>())   // 创建缓存对象
+{}
+
+// ===== 触发动作接口实现 =====
+
+void WaypointLabelClass::SetLabel(int wpIndex, const char* csfLabel,
+								  int maxWidth, int opacityPercent,
+								  WaypointLabel::Color color)
+{
+	if (wpIndex < 0) return;
+	if (!RulesClass::Instance) return; // 安全检测
+
+	// 查找是否已存在该路径点的标签
+	auto it = std::find_if(Array.begin(), Array.end(),
+		[wpIndex](const std::unique_ptr<WaypointLabelClass>& pLabel) {
+			return pLabel->WaypointIndex == wpIndex;	});
+
+	// 如果文本为空，则删除该标签
+	if (!(csfLabel && csfLabel[0]))
+	{
+		if (it != Array.end())
+			Array.erase(it);
+		return;
+	}
+
+	int actualOpacity = std::clamp(opacityPercent, 0, 100);
+	int actualMaxWidth = (maxWidth > 0 && maxWidth <= 1000) ? maxWidth : 250;
+
+	if (it != Array.end())
+	{
+		// 更新已有标签
+		auto& pLabel = *it;
+		pLabel->CurrentLabel = csfLabel;
+		pLabel->MaxLineWidth = actualMaxWidth;
+		pLabel->BackgroundOpacity = actualOpacity;
+		pLabel->Color = color;
+		pLabel->UpdateLayout();   // 立即更新布局
+	}
+	else
+	{
+		// 创建新标签
+		auto newLabel = std::make_unique<WaypointLabelClass>(
+			wpIndex, csfLabel, actualMaxWidth, actualOpacity, color);
+		newLabel->UpdateLayout();
+		Array.push_back(std::move(newLabel));
+	}
+}
+
+void WaypointLabelClass::ClearLabel(int wpIndex)
+{
+	auto it = std::find_if(Array.begin(), Array.end(),
+		[wpIndex](const std::unique_ptr<WaypointLabelClass>& pLabel) {
+			return pLabel->WaypointIndex == wpIndex;	});
+	if (it != Array.end())
+		Array.erase(it);
+}
+
+void WaypointLabelClass::ClearAll()
+{
+	Array.clear();
+}
+
+// ===== 布局更新 =====
 void WaypointLabelClass::UpdateLayout()
 {
-	// 1. Get and cache text pointer
-	this->CachedTextPtr = StringTable::TryFetchString(this->CurrentLabel.c_str());
+	if (!m_cache) m_cache = std::make_unique<Cache>();
 
-	// Clear cache if text is invalid or empty
-	if (!this->CachedTextPtr || wcslen(this->CachedTextPtr) == 0)
+	// 获取实际显示的文本
+	m_cache->CachedTextPtr = StringTable::TryFetchString(this->CurrentLabel.c_str());
+
+	// 无效文本时清空缓存
+	if (!m_cache->CachedTextPtr || wcslen(m_cache->CachedTextPtr) == 0)
 	{
-		this->CachedLines.clear();
-		this->CachedBgWidth = 0;
-		this->CachedBgHeight = 0;
-		this->IsLayoutDirty = false;
+		m_cache->CachedLines.clear();
+		m_cache->CachedBgWidth = 0;
+		m_cache->CachedBgHeight = 0;
+		m_cache->IsLayoutDirty = false;
 		return;
 	}
 
-	// 2. Perform text wrapping
-	this->CachedLines = WrapText(this->CachedTextPtr, this->MaxLineWidth);
-
-	if (this->CachedLines.empty())
+	// 执行换行计算
+	m_cache->CachedLines = WrapText(m_cache->CachedTextPtr, this->MaxLineWidth);
+	if (m_cache->CachedLines.empty())
 	{
-		this->CachedBgWidth = 0;
-		this->CachedBgHeight = 0;
-		this->IsLayoutDirty = false;
+		m_cache->CachedBgWidth = 0;
+		m_cache->CachedBgHeight = 0;
+		m_cache->IsLayoutDirty = false;
 		return;
 	}
 
-	// 3. Calculate maximum line width and total height
+	// 计算最大行宽和总高度
 	int maxLineW = 0;
-	for (const auto& line : this->CachedLines)
+	for (const auto& line : m_cache->CachedLines)
 	{
 		RectangleStruct dims = Drawing::GetTextDimensions(line.c_str(), { 0,0 }, 0, 2, 0);
-		if (dims.Width > maxLineW) maxLineW = dims.Width;
+		if (dims.Width > maxLineW)
+			maxLineW = dims.Width;
 	}
 
-	this->CachedBgWidth = maxLineW + (PADDINGX * 2);
-	this->CachedBgHeight = (static_cast<int>(this->CachedLines.size()) * LINE_HEIGHT) + (PADDINGY * 2);
-
-	// 4. Mark layout as up to date
-	this->IsLayoutDirty = false;
+	m_cache->CachedBgWidth = maxLineW + (PADDINGX * 2);
+	m_cache->CachedBgHeight = (static_cast<int>(m_cache->CachedLines.size()) * LINE_HEIGHT) + (PADDINGY * 2);
+	m_cache->IsLayoutDirty = false;
 }
 
+// ===== 绘制 =====
 void WaypointLabelClass::Draw()
 {
+	// ----- 安全检测 -----
+	if (this->WaypointIndex < 0) return;
+	if (!ScenarioClass::Instance->IsDefinedWaypoint(this->WaypointIndex)) return;
+	if (!TacticalClass::Instance || !DSurface::Composite ||
+		!RulesClass::Instance || !ScenarioClass::Instance) return;
 
-	// ===== 1. Safety checks =====
-	if (this->WaypointIndex < 0)
-		return;
-	if (!ScenarioClass::Instance->IsDefinedWaypoint(this->WaypointIndex))
-		return;
-	// I am not familiar with memory addresses, so I add this check to avoid wrong hook positions
-	if (!TacticalClass::Instance || !DSurface::Composite || !RulesClass::Instance || !ScenarioClass::Instance)
-		return;
+	// 确保缓存存在且布局不是脏的
+	if (!m_cache) m_cache = std::make_unique<Cache>();
+	if (m_cache->IsLayoutDirty) UpdateLayout();
 
-	// ===== 1.5 Update layout cache if dirty =====
-	if (this->IsLayoutDirty)
-	{
-		this->UpdateLayout();
-	}
-
-	// Skip drawing if cache is invalid
-	if (this->CachedLines.empty() || this->CachedBgWidth <= 0 || this->CachedBgHeight <= 0)
+	// 缓存无效则跳过绘制
+	if (m_cache->CachedLines.empty() || m_cache->CachedBgWidth <= 0 || m_cache->CachedBgHeight <= 0)
 		return;
 
-	// ===== 2. Get waypoint position and validate =====
+	// ----- 获取路径点屏幕坐标 -----
 	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(this->WaypointIndex);
-	if (cell.X < 0 && cell.Y < 0)
-		return;
+	if (cell.X < 0 && cell.Y < 0) return;
 
 	CoordStruct coords = CellClass::Cell2Coord(cell);
 	Point2D screenPos;
 	if (!TacticalClass::Instance->CoordsToClient(&coords, &screenPos))
 		return;
 
-	int bgWidth = this->CachedBgWidth;
-	int bgHeight = this->CachedBgHeight;
+	int bgWidth = m_cache->CachedBgWidth;
+	int bgHeight = m_cache->CachedBgHeight;
 
-	// Calculate label top-left position
+	// 计算标签左上角位置（居中，位于路径点上方）
 	Point2D topLeft = {
 		screenPos.X - (bgWidth / 2),
 		screenPos.Y - bgHeight - 10
 	};
 
-	int viewWidth = DSurface::ViewBounds.Width; // may be not useful
 	int viewHeight = DSurface::ViewBounds.Height;
-
-	// Calculate clipping boundary (prevent drawing over UI)
 	int clipBottomY = viewHeight - BOTTOM_SAFE_HEIGHT;
 
-	// Skip if label is entirely below safe area
+	// 完全超出底部安全区域则跳过
 	if (topLeft.Y >= clipBottomY)
-	{
 		return;
-	}
 
-	// Calculate draw height with clipping
+	// 处理底部裁剪
 	int drawHeight = bgHeight;
 	bool isClipped = false;
-
-	// Clip if label exceeds bottom safe area
 	if (topLeft.Y + bgHeight > clipBottomY)
 	{
 		drawHeight = clipBottomY - topLeft.Y;
 		isClipped = true;
-
-		// Skip if clipped height is too small to render text
 		if (drawHeight < LINE_HEIGHT)
-		{
-			return;
-		}
+			return; // 剩余高度不足以显示一行文字
 	}
 
-	// Sanity check: prevent drawing labels too far from waypoint
-	// Dynamic snapping code was removed, so this check is unnecessary
-	// 
-	//int labelCenterX = topLeft.X + bgWidth / 2;
-	//int labelCenterY = topLeft.Y + drawHeight / 2;
-	//int distX = std::abs(labelCenterX - screenPos.X);
-	//int distY = std::abs(labelCenterY - screenPos.Y);
-
-	//if (distX > bgWidth * 2 || distY > bgHeight * 2)
-	//{
-	//	return;
-	//}
-
-	// Skip if label is outside viewport
+	// 超出屏幕左右边界则跳过
 	if (topLeft.X + bgWidth < 0 || topLeft.Y + drawHeight < 0)
-	{
 		return;
-	}
 
 	RectangleStruct bgRect = { topLeft.X, topLeft.Y, bgWidth, drawHeight };
 
-	// Mouse hover check (use full unclipped bounds)
+	// 鼠标悬停检测（完整矩形）
 	Point2D mousePos = WWMouseClass::Instance->XY1;
 	RectangleStruct fullBgRect = { topLeft.X, topLeft.Y, bgWidth, bgHeight };
 	if (mousePos.X >= fullBgRect.X &&
@@ -345,66 +306,56 @@ void WaypointLabelClass::Draw()
 		mousePos.Y >= fullBgRect.Y &&
 		mousePos.Y <= fullBgRect.Y + fullBgRect.Height)
 	{
-		return;
+		return; // 鼠标悬浮时隐藏标签
 	}
 
-	// ===== 4. Draw semi-transparent background =====
+	// ----- 绘制半透明背景 -----
 	ColorStruct bgColor = { 0, 0, 0 };
 	DSurface::Composite->FillRectTrans(&bgRect, &bgColor, this->BackgroundOpacity);
 
-	// ===== 5. Draw border with clipping support =====
-	int ColorInt = Drawing::RGB_To_Int(GetColorStructByEnum(this->Color));
+	// ----- 绘制边框（注意裁剪）-----
+	int colorInt = Drawing::RGB_To_Int(GetColorStructByEnum(this->Color));
 	Point2D p1, p2;
 
-	// draw each border line individually	_:(´□`」 ∠):_
-	// Top border
+	// 上边框
 	p1 = { topLeft.X, topLeft.Y };
 	p2 = { topLeft.X + bgWidth - 1, topLeft.Y };
-	DSurface::Composite->DrawLine(&p1, &p2, ColorInt);
+	DSurface::Composite->DrawLine(&p1, &p2, colorInt);
 
-	// Left border (clipped)
+	// 左边框（裁剪）
 	p1 = { topLeft.X, topLeft.Y };
 	p2 = { topLeft.X, topLeft.Y + drawHeight - 1 };
-	DSurface::Composite->DrawLine(&p1, &p2, ColorInt);
+	DSurface::Composite->DrawLine(&p1, &p2, colorInt);
 
-	// Right border (clipped)
+	// 右边框（裁剪）
 	p1 = { topLeft.X + bgWidth - 1, topLeft.Y };
 	p2 = { topLeft.X + bgWidth - 1, topLeft.Y + drawHeight - 1 };
-	DSurface::Composite->DrawLine(&p1, &p2, ColorInt);
+	DSurface::Composite->DrawLine(&p1, &p2, colorInt);
 
-	// Bottom border (only if not clipped)
+	// 下边框（仅当未裁剪时绘制）
 	if (!isClipped)
 	{
 		p1 = { topLeft.X, topLeft.Y + bgHeight - 1 };
 		p2 = { topLeft.X + bgWidth - 1, topLeft.Y + bgHeight - 1 };
-		DSurface::Composite->DrawLine(&p1, &p2, ColorInt);
+		DSurface::Composite->DrawLine(&p1, &p2, colorInt);
 	}
 
-	// ===== 6. Draw text lines with clipping =====
+	// ----- 绘制文字 -----
 	RectangleStruct bounds = DSurface::ViewBounds;
 	int currentY = topLeft.Y + PADDINGY;
-
-	for (const auto& line : this->CachedLines)
+	for (const std::wstring& line : m_cache->CachedLines)
 	{
-		// Stop drawing if line exceeds clipped area
 		if (currentY + LINE_HEIGHT > topLeft.Y + drawHeight + PADDINGY)
-		{
-			break;
-		}
+			break; // 超出裁剪区域
 
-		Point2D textPos = {
-			topLeft.X + PADDINGX,
-			currentY
-		};
-
+		Point2D textPos = { topLeft.X + PADDINGX, currentY };
 		DSurface::Composite->DrawText(
 			line.c_str(),
 			&bounds,
 			&textPos,
-			ColorInt,
+			colorInt,
 			0,
-			TextPrintType::Metal12 | TextPrintType::BrightColor
-		);
+			TextPrintType::Metal12 | TextPrintType::BrightColor);
 
 		currentY += LINE_HEIGHT;
 	}
@@ -412,61 +363,71 @@ void WaypointLabelClass::Draw()
 
 void WaypointLabelClass::DrawAll()
 {
-	for (const auto& pLabel : WaypointLabelClass::Array)
+	for (const std::unique_ptr<WaypointLabelClass>& pLabel : Array)
 	{
-		if (pLabel) pLabel->Draw();
+		if (!pLabel) continue;
+
+		// 如果路径点被迷雾遮挡则跳过绘制
+		if(RulesExt::Global()->ShowWaypointLabelInShroud)
+		{
+			CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(pLabel->WaypointIndex);
+			char isShrouded = TacticalClass::Instance->GetOcclusion(cell, false);
+			if (static_cast<int>(isShrouded) == -2)
+			{
+				Debug::Log("[WaypointLabelClass]: Index \"%d\", isShrouded is \"%d\".\n", pLabel->WaypointIndex, isShrouded);
+				continue;
+			}
+		}
+
+		pLabel->Draw();
 	}
-	return;
 }
 
-// ============================================================
-//             Interfaces for Phobos.Ext.cpp
-// ============================================================
-
+// ===== 序列化实现 =====
 template <typename T>
 bool WaypointLabelClass::Serialize(T& Stm)
 {
-    return Stm
-        .Process(this->WaypointIndex)
-        .Process(this->CurrentLabel)
-        .Process(this->MaxLineWidth)
-        .Process(this->BackgroundOpacity)
-        .Process(this->Color)
-        .Success();
+	// 只序列化持久化成员，忽略 m_cache
+	return Stm
+		.Process(this->WaypointIndex)
+		.Process(this->CurrentLabel)
+		.Process(this->MaxLineWidth)
+		.Process(this->BackgroundOpacity)
+		.Process(this->Color)
+		.Success();
 }
 
 bool WaypointLabelClass::Load(PhobosStreamReader& Stm, bool RegisterForChange)
 {
-    return Serialize(Stm);
+	return Serialize(Stm);
 }
 
 bool WaypointLabelClass::Save(PhobosStreamWriter& Stm) const
 {
-    return const_cast<WaypointLabelClass*>(this)->Serialize(Stm);
+	return const_cast<WaypointLabelClass*>(this)->Serialize(Stm);
 }
 
 bool WaypointLabelClass::SaveGlobals(PhobosStreamWriter& Stm)
 {
-    return Stm.Process(Array).Success();
+	return Stm.Process(Array).Success();
 }
 
 bool WaypointLabelClass::LoadGlobals(PhobosStreamReader& Stm)
 {
-    Array.clear();
-    bool result = Stm.Process(Array).Success();
+	Array.clear();
+	bool result = Stm.Process(Array).Success();
 
-    if (result)
-    {
-        for (auto& pLabel : Array)
-        {
-            if (pLabel)
-            {
-                pLabel->IsLayoutDirty = true;
-                pLabel->CachedTextPtr = nullptr;
-                pLabel->CachedLines.clear();
-            }
-        }
-    }
-
-    return result;
+	if (result)
+	{
+		// 读档后为每个标签重建缓存，并标记为脏
+		for (auto& pLabel : Array)
+		{
+			if (pLabel)
+			{
+				pLabel->m_cache = std::make_unique<Cache>();
+				pLabel->m_cache->IsLayoutDirty = true;  // 下次绘制时自动重新计算布局
+			}
+		}
+	}
+	return result;
 }

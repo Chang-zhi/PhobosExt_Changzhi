@@ -509,7 +509,7 @@ bool TActionExt::DestroyAllTagByTagTypeSafely(TActionClass* pThis, HouseClass* p
 
 	for (auto pTag : tagsToDestroy)
 	{
-		pTag->Destroy();
+		if(pTag && !pTag->Destroyed) pTag->Destroy();
 	}
 
 	return true;
