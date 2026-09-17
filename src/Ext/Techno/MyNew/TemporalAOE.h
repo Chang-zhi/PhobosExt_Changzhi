@@ -30,6 +30,9 @@ extern std::unordered_set<TechnoClass* /*正在被抹除的目标*/> WarpingOutT
 // ── 3. 主目标→攻击者映射 ───────────────────────────────────────
 extern std::unordered_map<TechnoClass* /*主目标*/, TechnoClass* /*攻击者*/> CachedMainOwners;
 
+// ── 4. 攻击者 → 副目标集合（逆向映射，用于快速销毁） ───────────
+extern std::unordered_map<TechnoClass* /*攻击者*/, std::unordered_set<TechnoClass* /*副目标*/>> SecondariesByAttacker;
+
 // ── 假 Temporal 管理 ────────────────────────────────────────────
 void CreateFakeTemporal(TechnoClass* pAttacker, TechnoClass* pTarget);
 void DestroyFakeTemporal(TechnoClass* pTarget);

@@ -57,21 +57,11 @@ void TechnoExt::ExtData::Serialize(T& Stm)
 		.Process(this->AOEState.WarpingOut)
 		.Process(this->AOEState.ScanInterval)
 		.Process(this->AOEState.ScanCounter)
-		.Process(this->AOEState.ContributedTargets)
 		;
 
-	// 读档时：完全重置 AOEState（存档中的标记位不可信，下次更新自动重建）
+	// 读档时：完全重置 AOEState，ContributedTargets 指针不可序列化
 	if constexpr (std::is_same_v<T, PhobosStreamReader>)
 	{
-		// 全部重置为默认值，消除状态不一致风险
-		this->AOEState.Active = false;
-		this->AOEState.CachedMain = nullptr;
-		this->AOEState.TargetsInRange.clear();
-		this->AOEState.BuildingsDisabled.clear();
-		this->AOEState.CachedMainDead = false;
-		this->AOEState.WarpingOut = false;
-		// ContributedTargets 指针在存档中无效，全部重置
-		// 下一帧重新扫描时会重新累加 ExtraWarpAdded
 		this->AOEState.Active = false;
 		this->AOEState.CachedMain = nullptr;
 		this->AOEState.TargetsInRange.clear();
@@ -116,7 +106,10 @@ void TechnoExt::ExtData::InvalidatePointer(void* ptr, bool bRemoved)
 			++it;
 	}
 
-	// 假 Temporal 条目的清理由 InvalidateAOESecondaryClaims 统一处理（见 TemporalAOE.cpp）
+	// 已贡献副目标列表（指针失效时移除）
+	state.ContributedTargets.erase(static_cast<TechnoClass*>(ptr));
+
+	// 假 Temporal 条目的清理由 TemporalAOE::InvalidatePtr 统一处理（见 TemporalAOE.cpp）
 }
 
 void TechnoExt::ExtData::LoadFromStream(PhobosStreamReader& Stm)

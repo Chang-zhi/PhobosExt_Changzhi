@@ -331,8 +331,8 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本
 <tr><td class="doc-table__td">650</td><td class="doc-table__td">清空指定脚本内容...</td><td class="doc-table__td">脚本类型</td></tr>
 <tr><td class="doc-table__td">651</td><td class="doc-table__td">复制脚本内容...</td><td class="doc-table__td">源脚本类型，目标脚本类型</td></tr>
 <tr><td class="doc-table__td">652</td><td class="doc-table__td">以参数修改脚本行...</td><td class="doc-table__td">脚本类型，行号，动作类型，参数，额外参数</td></tr>
-<tr><td class="doc-table__td">653</td><td class="doc-table__td">以局部变量修改脚本行... <em>(暂不可用)</em></td><td class="doc-table__td">脚本类型，行号，动作类型(变量索引)，参数(变量索引)，额外参数(变量索引)</td></tr>
-<tr><td class="doc-table__td">654</td><td class="doc-table__td">以全局变量修改脚本行... <em>(暂不可用)</em></td><td class="doc-table__td">脚本类型，行号，动作类型(变量索引)，参数(变量索引)，额外参数(变量索引)</td></tr>
+<tr><td class="doc-table__td">653</td><td class="doc-table__td">以局部变量修改脚本行... <em></em></td><td class="doc-table__td">脚本类型，行号，动作类型(变量索引)，参数(变量索引)，额外参数(变量索引)</td></tr>
+<tr><td class="doc-table__td">654</td><td class="doc-table__td">以全局变量修改脚本行... <em></em></td><td class="doc-table__td">脚本类型，行号，动作类型(变量索引)，参数(变量索引)，额外参数(变量索引)</td></tr>
 <tr><td class="doc-table__td">655</td><td class="doc-table__td">重新指定小队脚本索引...</td><td class="doc-table__td">作战小队类型，目标脚本类型</td></tr>
 <tr><td class="doc-table__td">656</td><td class="doc-table__td">恢复小队脚本索引...</td><td class="doc-table__td">作战小队类型</td></tr>
 <tr><td class="doc-table__td">657</td><td class="doc-table__td">恢复所有小队脚本索引...</td><td class="doc-table__td">无参数</td></tr>
@@ -350,7 +350,7 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本
 <li>动作 658-659 将之前通过 650-654 修改过的脚本内容恢复到 INI 定义的原始状态，不影响小队绑定索引。</li>
 <li>动作 660 将指定作战小队类型的所有实例的脚本执行行号跳转到指定位置(0-based)，不会修改脚本内容或小队绑定。</li>
 <li>以上所有动作执行后，使用该脚本的作战小队会立即重置到第 0 行执行。</li>
-<li><strong>注意：动作 653、654 暂不可用</strong>，需等待 Phobos PR#2256 通过，且必须与 Phobos 配合使用。</li>
+<li><strong>注意：动作 653、654 无法单独使用，需配合 Phobos B49+ 使用。</strong></li>
 </ul>
 </div>
 
