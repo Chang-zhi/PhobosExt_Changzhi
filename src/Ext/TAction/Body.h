@@ -74,6 +74,8 @@ enum class PhobosTriggerAction : unsigned int
 	// 统一指定标签类型的所有实例
 	UnifyAllInstancesOfSameTagType = 570,
 
+	// 设置关联单位单位的可招募属性... 
+	SetRecruitableForFoot = 571,
 
 	// 清除指定所属方尝试次数超过指定数值的基地节点...
 	//RemoveBaseNodesExceedingAttemptCountForHouse = 570,
@@ -81,7 +83,6 @@ enum class PhobosTriggerAction : unsigned int
 	// SetObjectRecruitable = 566,
 
 	// 测试用
-	testAction = 1150,
 };
 
 class TActionExt
@@ -138,12 +139,12 @@ public:
 	ACTION_FUNC(BindTagToAllTechnoTypesWithinWaypointRange);
 	ACTION_FUNC(BindTagToAllTechnoTypesOfSpecificOwnerWithinWaypointRange);
 	ACTION_FUNC(UnifyAllInstancesOfSameTagType);
+	ACTION_FUNC(SetRecruitableForFoot);
 
 
 	// ACTION_FUNC(RemoveBaseNodesExceedingAttemptCountForHouse);
 	// ACTION_FUNC(SetObjectRecruitable);
 
-	ACTION_FUNC(testAction);
 
 #undef ACTION_FUNC
 #pragma pop_macro("ACTION_FUNC")
