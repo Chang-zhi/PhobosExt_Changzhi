@@ -1,5 +1,6 @@
 #pragma once
 
-class TagClass;
+#include <TagClass.h>
 
 TagClass* GetTagClassByIndex(int Index);
+

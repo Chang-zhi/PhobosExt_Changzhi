@@ -10,9 +10,9 @@
 #include <Utilities/SavegameDef.h>
 #include <Utilities/SpawnerHelper.h>
 
-#include <Ext/TAction/MyNew/Helper.h>
 #include <MyNew/WaypointLabelClass.h>
 
+#include "MyNew/Helper.h"
 #include <vector>
 #include <string>
 
