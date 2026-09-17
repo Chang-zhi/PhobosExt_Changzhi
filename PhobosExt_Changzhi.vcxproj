@@ -23,6 +23,8 @@
     <ClCompile Include="src\Ext\House\AIBaseNode.cpp" />
     <ClCompile Include="src\Ext\House\Body.cpp" />
     <ClCompile Include="src\Ext\Rules\Body.cpp" />
+    <ClCompile Include="src\Ext\Script\Body.cpp" />
+    <ClCompile Include="src\Ext\Script\Hooks.cpp" />
     <ClCompile Include="src\Ext\TAction\Body.cpp" />
     <ClCompile Include="src\Ext\TAction\Hooks.cpp" />
     <ClCompile Include="src\Ext\TAction\MyNew\Helper.cpp" />
@@ -87,6 +89,7 @@
     <ClInclude Include="src\Ext\TaskForce\Body.h" />
     <ClInclude Include="src\Ext\TeamType\Body.h" />
     <ClInclude Include="src\Ext\ScriptType\Body.h" />
+    <ClInclude Include="src\Ext\Script\Body.h" />
     <ClInclude Include="src\Ext\TechnoType\Body.h" />
     <ClInclude Include="src\Ext\Techno\MyNew\AutoHunt.h" />
     <ClInclude Include="src\Ext\Techno\MyNew\BerzerkRestore.h" />

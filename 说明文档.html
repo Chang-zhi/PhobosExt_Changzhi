@@ -17,6 +17,7 @@
 <li class="nav__item nav__item--active" page="home">首页</li>
 <li class="nav__item" page="actions">触发器新动作</li>
 <li class="nav__item" page="events">触发器新事件</li>
+<li class="nav__item" page="scripts">新增脚本</li>
 <li class="nav__item" page="gameplay">游戏扩展机制</li>
 </ul></nav>
 <div class="doc-container">
@@ -505,6 +506,42 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本
 
 </section>
 
+
+
+<!-- 新增脚本 -->
+
+<section id="sec_scripts">
+<h2 class="doc-heading--secondary">新增 AI 脚本动作</h2>
+<div class="sec-toc">
+<p class="sec-toc__title">目录：</p>
+<ul class="sec-toc__list">
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('scripts_1')" class="sec-toc__link">1. 分布式装载</a></li>
+</ul>
+</div>
+
+<hr class="sec-divider">
+
+<div id="scripts_1">
+<h3 class="doc-heading--tertiary" style="margin-top:2em">1. 分布式装载</h3>
+<p>将小队成员分配到各运输载具中，优先装载距离最近的队员。</p>
+
+<div class="doc-table--action">
+<table class="doc-table">
+<thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
+<tbody>
+<tr><td class="doc-table__td">5500</td><td class="doc-table__td">分布式装载入运输载具</td><td class="doc-table__td">无参数。</td></tr>
+</tbody>
+</table>
+</div>
+
+<h4>说明</h4>
+<ul class="doc-list--content">
+<li>将<strong>合法的</strong>小队成员按距离分配到各载具，全员上车后继续执行下一条脚本。</li>
+<li>不会出现原版脚本 14 的问题：<strong>不会</strong>只认最后一个载具、<strong>不会</strong>不考虑 <code class="doc-code--inline">SizeLimit</code>、<strong>不会</strong>不考虑剩余空间导致卡死。</li>
+</ul>
+</div>
+
+</section>
 
 
 <!-- 游戏扩展机制 -->
