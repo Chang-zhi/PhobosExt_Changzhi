@@ -42,7 +42,32 @@ enum PhobosTriggerEvent
 	// 指定标签的选择框超时未选...
 	ChoiceBoxTimedOut = 559,
 
+	// 电力输出大于...
+	HousePowerOutputMuch = 560,
+
+	// 电力输出小于...
+	HousePowerOutputLess = 561,
+
+	// 电力负载大于...
+	HousePowerDrainMuch = 562,
+
+	// 电力负载小于...
+	HousePowerDrainLess = 563,
+
+	// 电力盈余大于...
+	HousePowerSurplusMuch = 564,
+
+	// 电力盈余小于...
+	HousePowerSurplusLess = 565,
+
 	_DummyMaximum,
+};
+
+enum PowerEventMode
+{
+	Output = 0,
+	Drain = 1,
+	Surplus = 2
 };
 
 class TEventExt
@@ -87,6 +112,8 @@ public:
 	static bool ChoiceBoxButtonClickedFunc(TEventClass* pThis, HouseClass* pHouse);
 	static bool ChoiceBoxAnyButtonClickedFunc(TEventClass* pThis, HouseClass* pHouse);
 	static bool ChoiceBoxTimedOutFunc(TEventClass* pThis, HouseClass* pHouse);
+
+	static bool PowerHander(TEventClass* pThis, HouseClass* pHouse, PowerEventMode mode, bool isMuch);
 
 	class ExtContainer final : public Container<TEventExt>
 	{
