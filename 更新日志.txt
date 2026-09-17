@@ -4,7 +4,7 @@
 3,更新README.md和说明文档.html同步新内容.
 4,添加新动作
 - 577=建立作战小队(考虑限制)...
-5,新增 [Country House] → ConsiderAllOwnersForBaseNode=      ;boolean 默认false
+5,新增 [Country House] → BaseNodeCrossOwners=      ;boolean 默认false
 6,添加新事件
 - 554=流逝时间(帧)...
 (具体细节请见说明文档.html)

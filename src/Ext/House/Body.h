@@ -37,7 +37,7 @@ public:
 	class ExtData final : public Extension<HouseClass>
 	{
 	public:
-		Valueable<bool> ConsiderAllOwnersForBaseNode;
+		Valueable<bool> BaseNodeCrossOwners;
 
 		// 授权节点是否已初始化捕获（持久化标志）
 		bool AuthorizedNodesCaptured;
@@ -54,7 +54,7 @@ public:
 		std::vector<DeferredNodeInfo> DeferredNodeList;
 
 		ExtData(HouseClass* OwnerObject) : Extension<HouseClass>(OwnerObject)
-			, ConsiderAllOwnersForBaseNode { false }
+			, BaseNodeCrossOwners { false }
 			, AuthorizedNodesCaptured { false }
 			, LastTargetType { -1 }
 			, LastTargetX { -1 }

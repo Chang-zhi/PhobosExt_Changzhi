@@ -88,7 +88,7 @@ void HouseExt::ExtData::LoadFromINIFile(CCINIClass* const pINI)
 	const char* pSection = this->OwnerObject()->PlainName;
 	INI_EX exINI(pINI);
 
-	this->ConsiderAllOwnersForBaseNode.Read(exINI, pSection, "ConsiderAllOwnersForBaseNode");
+	this->BaseNodeCrossOwners.Read(exINI, pSection, "BaseNodeCrossOwners");
 }
 
 // =============================
@@ -98,7 +98,7 @@ template <typename T>
 void HouseExt::ExtData::Serialize(T& Stm)
 {
 	Stm
-		.Process(this->ConsiderAllOwnersForBaseNode)
+		.Process(this->BaseNodeCrossOwners)
 		.Process(this->AuthorizedNodesCaptured)
 		.Process(this->LastTargetType)
 		.Process(this->LastTargetX)
