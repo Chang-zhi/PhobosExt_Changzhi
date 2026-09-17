@@ -349,17 +349,59 @@ bool TActionExt::AddBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseClass* 
 	const int houseIndex = pThis->Param3;
 	const int waypointIndex = pThis->Param4;
 	const int buildTypeIndex = pThis->Param5;
+	const int forceAtFront = pThis->Param6;
 
+	// ===== 基础信息 ===== 
 	HouseClass* pOwner = HouseClass::FindByCountryIndex(houseIndex);
 	if (!pOwner) return false;
 
 	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
 	if (cell.X < 0 || cell.Y < 0) return false;
 
-	if (pOwner->Base.BaseNodes.AddItem({ buildTypeIndex, cell, false, 0 }))
+	const char* buildTypeID = BuildingTypeClass::Array[buildTypeIndex]->get_ID();
+
+	BaseNodeClass newNode = { buildTypeIndex, cell, false, 0 };
+
+	// ===== 强制放到最前面 ===== 
+	if (forceAtFront)
 	{
-		Debug::Log("Added a base node for house %d at waypoint %d with building type index %d.", houseIndex, waypointIndex, buildTypeIndex);
+	    // 1.清除工厂序列
+	    for (BuildingClass* pBuilding : BuildingClass::Array)
+	    {
+	    	if (!pBuilding || pBuilding->Owner != pOwner) continue;
+	    	if (!pBuilding->Factory
+	    		|| !pBuilding->Factory->Object
+	    		|| pBuilding->Factory->Object->WhatAmI() != AbstractType::Building) continue;
+	    
+	    	TechnoTypeClass* pFactObjType = pBuilding->Factory->Object->GetTechnoType();
+
+	    	pBuilding->Factory->AbandonProduction();
+	    	pBuilding->Factory->QueuedObjects.Clear();
+	    }
+
+		// 2.强制插入到最前面
+		DynamicVectorClass<BaseNodeClass>& nodes = pOwner->Base.BaseNodes;
+
+		// 扩容
+		if (nodes.Count >= nodes.Capacity)
+		{
+			if (nodes.CapacityIncrement <= 0) return false;
+			if (!nodes.SetCapacity(nodes.Capacity + nodes.CapacityIncrement, nullptr))
+				return false;
+		}
+
+		// 直接拷贝赋值后移
+		for (int i = nodes.Count; i > 0; --i)
+		{
+			nodes.Items[i] = nodes.Items[i - 1];
+		}
+
+		nodes.Items[0] = newNode;
+		++nodes.Count;
 	}
+	// ===== 直接加就行, 不管他什么时候造 =====
+	else
+		pOwner->Base.BaseNodes.AddItem(newNode);
 
 	return true;
 }
