@@ -529,11 +529,12 @@ bool TActionExt::BindTagToTechnoTypeAtWaypoint(TActionClass* pThis, HouseClass* 
 	if (cell.X < 0 || cell.Y < 0) return false;
 
 	// 遍历 TechnoClass, 尝试把 TagClass 绑定到 TechnoClass 上
-	for (auto const pTechno : TechnoClass::Array)
+	for (TechnoClass* const pTechno : TechnoClass::Array)
 	{
 		if (pTechno && pTechno->get_ID() == std::string(techno))
 		{
-			if (BuildingClass* pBuilding = abstract_cast<BuildingClass*>(pTechno))
+			BuildingClass* pBuilding = abstract_cast<BuildingClass*>(pTechno);
+			if (pBuilding && pTechno->WhatAmI() == AbstractType::Building)
 			{
 				if(IsCellInBuildingFoundation(pBuilding, cell))
 				{
@@ -545,8 +546,8 @@ bool TActionExt::BindTagToTechnoTypeAtWaypoint(TActionClass* pThis, HouseClass* 
 			{
 				if (CellClass::Coord2Cell(pTechno->GetCoords()) == cell) // 不是建筑类型, 直接判断坐标即可
 				{
-					if (pBuilding->AttachedTag) pBuilding->ReplaceTag(pTagClass);
-					else pBuilding->AttachTrigger(pTagClass);
+					if (pTechno->AttachedTag) pTechno->ReplaceTag(pTagClass);
+					else pTechno->AttachTrigger(pTagClass);
 				}
 			}
 		}
@@ -579,7 +580,8 @@ bool TActionExt::BindTagToTechnoTypeOfHouseAtWaypoint(TActionClass* pThis, House
 			&& pTechno->Owner == pOwner
 			&& pTechno->get_ID() == std::string(techno))
 		{
-			if (BuildingClass* pBuilding = abstract_cast<BuildingClass*>(pTechno))
+			BuildingClass* pBuilding = abstract_cast<BuildingClass*>(pTechno);
+			if (pBuilding && pTechno->WhatAmI() == AbstractType::Building)
 			{
 				if (IsCellInBuildingFoundation(pBuilding, cell))
 				{
@@ -591,8 +593,8 @@ bool TActionExt::BindTagToTechnoTypeOfHouseAtWaypoint(TActionClass* pThis, House
 			{
 				if (CellClass::Coord2Cell(pTechno->GetCoords()) == cell) // 不是建筑类型, 直接判断坐标即可
 				{
-					if (pBuilding->AttachedTag) pBuilding->ReplaceTag(pTagClass);
-					else pBuilding->AttachTrigger(pTagClass);
+					if (pTechno->AttachedTag) pTechno->ReplaceTag(pTagClass);
+					else pTechno->AttachTrigger(pTagClass);
 				}
 			}
 		}
