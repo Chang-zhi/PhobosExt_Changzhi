@@ -82,6 +82,54 @@ CellClass* HouseExt::GetEnemyBaseGatherCell(HouseClass* pTargetHouse, HouseClass
 	return MapClass::Instance.TryGetCellAt(cellStruct);
 }
 
+// 移除指定坐标的所有授权节点
+void HouseExt::RemoveAuthorizedNodeByCoord(HouseClass* pHouse, short x, short y)
+{
+	auto pExt = HouseExt::ExtMap.Find(pHouse);
+	if (!pExt) return;
+
+	auto it = pExt->AuthorizedNodeKeys.begin();
+	while (it != pExt->AuthorizedNodeKeys.end())
+	{
+		if (it->X == x && it->Y == y)
+			it = pExt->AuthorizedNodeKeys.erase(it);
+		else
+			++it;
+	}
+
+	// 如果当前目标就是这个坐标，清除记录
+	if (pExt->LastFrameTargetX == x && pExt->LastFrameTargetY == y)
+	{
+		pExt->LastFrameTargetType = -1;
+		pExt->LastFrameTargetX = -1;
+		pExt->LastFrameTargetY = -1;
+	}
+
+}
+
+// 移除指定类型的所有授权节点
+void HouseExt::RemoveAuthorizedNodeByType(HouseClass* pHouse, int buildingTypeIndex)
+{
+	auto pExt = HouseExt::ExtMap.Find(pHouse);
+	if (!pExt) return;
+
+	auto it = pExt->AuthorizedNodeKeys.begin();
+	while (it != pExt->AuthorizedNodeKeys.end())
+	{
+		if (it->BuildingTypeIndex == buildingTypeIndex)
+			it = pExt->AuthorizedNodeKeys.erase(it);
+		else
+			++it;
+	}
+
+	// 如果当前目标就是这个类型，清除记录
+	if (pExt->LastFrameTargetType == buildingTypeIndex)
+	{
+		pExt->LastFrameTargetType = -1;
+		pExt->LastFrameTargetX = -1;
+		pExt->LastFrameTargetY = -1;
+	}
+}
 
 void HouseExt::ExtData::LoadFromINIFile(CCINIClass* const pINI)
 {
@@ -100,9 +148,9 @@ void HouseExt::ExtData::Serialize(T& Stm)
 	Stm
 		.Process(this->BaseNodeCrossOwners)
 		.Process(this->AuthorizedNodesCaptured)
-		.Process(this->LastTargetType)
-		.Process(this->LastTargetX)
-		.Process(this->LastTargetY)
+		.Process(this->LastFrameTargetType)
+		.Process(this->LastFrameTargetX)
+		.Process(this->LastFrameTargetY)
 		;
 
 	// === 序列化 AuthorizedNodeKeys ===

@@ -415,7 +415,8 @@ bool TActionExt::AddBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseClass* 
 		pOwner->Base.BaseNodes.AddItem(newNode);
 
 	// 将此节点加入授权列表，防止被自动清理
-	HouseExt::AuthorizeBaseNode(pOwner, buildTypeIndex, cell.X, cell.Y);
+	// forceAtFront 时插入到授权列表头部，确保优先建造
+	HouseExt::AuthorizeBaseNode(pOwner, buildTypeIndex, cell.X, cell.Y, forceAtFront);
 
 	return true;
 }
