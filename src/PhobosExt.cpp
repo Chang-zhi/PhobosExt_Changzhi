@@ -1,5 +1,5 @@
-#include "Phobos.h"
-#include <Interop/PhobosInterop.h>
+#include "PhobosExt.h"
+#include <Interop/PhobosExtInterop.h>
 
 #include <Drawing.h>
 #include <SessionClass.h>
@@ -11,17 +11,17 @@
 #include "Utilities/AresHelper.h"
 #include "Utilities/Parser.h"
 
-HANDLE Phobos::hInstance = 0;
+HANDLE PhobosExt::hInstance = 0;
 
-char Phobos::readBuffer[Phobos::readLength];
-wchar_t Phobos::wideBuffer[Phobos::readLength];
-const char* Phobos::AppIconPath = nullptr;
+char PhobosExt::readBuffer[PhobosExt::readLength];
+wchar_t PhobosExt::wideBuffer[PhobosExt::readLength];
+const char* PhobosExt::AppIconPath = nullptr;
 
-bool Phobos::DisplayDamageNumbers = false;
+bool PhobosExt::DisplayDamageNumbers = false;
 
-const wchar_t* Phobos::VersionDescription = L"Chang_zhi Custom Phobos Extension build #" _STR(BUILD_NUMBER) L". Please test the build before shipping.";
+const wchar_t* PhobosExt::VersionDescription = L"Chang_zhi Custom PhobosExt build #" _STR(BUILD_NUMBER) L". Please test the build before shipping.";
 
-void Phobos::ExeTerminate()
+void PhobosExt::ExeTerminate()
 {
 	Console::Release();
 }
@@ -30,12 +30,12 @@ bool __stdcall DllMain(HANDLE hInstance, DWORD dwReason, LPVOID v)
 {
 	if (dwReason == DLL_PROCESS_ATTACH)
 	{
-		Phobos::hInstance = hInstance;
+		PhobosExt::hInstance = hInstance;
 	}
 	return true;
 }
 
-void Phobos::ExeRun()
+void PhobosExt::ExeRun()
 {
 	Patch::ApplyStatic();
 
@@ -43,7 +43,7 @@ void Phobos::ExeRun()
 
 #ifndef IS_RELEASE_VER
 
-	if (Phobos::DetachFromDebugger())
+	if (PhobosExt::DetachFromDebugger())
 	{
 		MessageBoxW(NULL,
 		L"You can now attach a debugger.\n\n"
@@ -79,7 +79,7 @@ void Phobos::ExeRun()
 #endif
 }
 
-void Phobos::CmdLineParse(char** ppArgs, int nNumArgs)
+void PhobosExt::CmdLineParse(char** ppArgs, int nNumArgs)
 {
 	bool foundInheritance = false;
 	bool foundInclude = false;
@@ -99,7 +99,7 @@ void Phobos::CmdLineParse(char** ppArgs, int nNumArgs)
 
 		if (_stricmp(pArg, "-Icon") == 0)
 		{
-			Phobos::AppIconPath = ppArgs[++i];
+			PhobosExt::AppIconPath = ppArgs[++i];
 		}
 		if (_stricmp(pArg, "-Inheritance") == 0)
 		{
@@ -166,7 +166,7 @@ void Phobos::CmdLineParse(char** ppArgs, int nNumArgs)
 
 DEFINE_HOOK(0x7CD810, ExeRun, 0x9)
 {
-	Phobos::ExeRun();
+	PhobosExt::ExeRun();
 
 	return 0;
 }
@@ -180,7 +180,7 @@ DEFINE_NAKED_HOOK(0x7CD8EA, _ExeTerminate)
 	CALL(EAX);
 	PUSH_REG(EAX);
 
-	__asm {call Phobos::ExeTerminate};
+	__asm {call PhobosExt::ExeTerminate};
 
 	// Jump back
 	POP_REG(EAX);
@@ -194,8 +194,8 @@ DEFINE_HOOK(0x52F639, _YR_CmdLineParse, 0x5)
 	GET(char**, ppArgs, ESI);
 	GET(int, nNumArgs, EDI);
 
-	Phobos::CmdLineParse(ppArgs, nNumArgs);
-	PhobosInterop::Init();
+	PhobosExt::CmdLineParse(ppArgs, nNumArgs);
+	PhobosExtInterop::Init();
 	Debug::LogDeferredFinalize();
 	return 0;
 }
@@ -208,7 +208,7 @@ DEFINE_HOOK(0x52F639, _YR_CmdLineParse, 0x5)
 #include <Dbghelp.h>
 #include <tlhelp32.h>
 
-bool Phobos::DetachFromDebugger()
+bool PhobosExt::DetachFromDebugger()
 {
 	auto GetDebuggerProcessId = [](DWORD dwSelfProcessId) -> DWORD
 		{

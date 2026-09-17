@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Phobos.h>
+#include <PhobosExt.h>
 #include <GeneralStructures.h>
 #include <Utilities/SavegameDef.h>
 #include <Utilities/Template.h>
@@ -11,8 +11,8 @@
 #include <vector>
 #include <memory>
 
-class PhobosStreamWriter;
-class PhobosStreamReader;
+class PhobosExtStreamWriter;
+class PhobosExtStreamReader;
 
 class TextBoxTypeClass final : public Enumerable<TextBoxTypeClass>
 {
@@ -36,8 +36,8 @@ public:
 
 	// ===== 加载/保存 =====
 	virtual void LoadFromINI(CCINIClass* pINI);                         // 从 INI 读取
-	virtual void LoadFromStream(PhobosStreamReader& stm);               // 从存档流加载
-	virtual void SaveToStream(PhobosStreamWriter& stm);                 // 保存到存档流
+	virtual void LoadFromStream(PhobosExtStreamReader& stm);               // 从存档流加载
+	virtual void SaveToStream(PhobosExtStreamWriter& stm);                 // 保存到存档流
 
 private:
 	template <typename T>

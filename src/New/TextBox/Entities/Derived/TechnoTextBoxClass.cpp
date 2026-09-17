@@ -372,14 +372,14 @@ bool TechnoTextBoxClass::Serialize(T& Stm)
 		.Success();
 }
 
-bool TechnoTextBoxClass::Save(PhobosStreamWriter& Stm) const
+bool TechnoTextBoxClass::Save(PhobosExtStreamWriter& Stm) const
 {
 	DWORD uid = this->Target ? this->Target->UniqueID : 0;
 	Stm.Process(uid);
 	return const_cast<TechnoTextBoxClass*>(this)->Serialize(Stm);
 }
 
-bool TechnoTextBoxClass::Load(PhobosStreamReader& Stm, bool RegisterForChange)
+bool TechnoTextBoxClass::Load(PhobosExtStreamReader& Stm, bool RegisterForChange)
 {
 	Stm.Process(this->SavedTargetUID);
 	this->Target = ResolveTargetByUID(this->SavedTargetUID);

@@ -25,7 +25,7 @@ private:
 public:
 	static HMODULE AresDllHmodule;
 	static uintptr_t AresBaseAddress;
-	static uintptr_t PhobosBaseAddress;
+	static uintptr_t PhobosExtBaseAddress;
 
 	// numeric id of currently used version, zero-indexed, -1 is unknown or missing
 	static Version AresVersion;

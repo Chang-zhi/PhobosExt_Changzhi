@@ -19,7 +19,7 @@ void ScenarioExt::Remove(ScenarioClass* pThis)
 
 void ScenarioExt::Clear()
 {
-	// Reset the custom briefing for a new scenario. Called via PhobosTypeRegistry
+	// Reset the custom briefing for a new scenario. Called via PhobosExtTypeRegistry
 	// on Scenario_ClearClasses so a fresh scenario doesn't inherit stale data.
 	if (ScenarioClass::Instance)
 		Allocate(ScenarioClass::Instance);
@@ -39,13 +39,13 @@ void ScenarioExt::ExtData::Serialize(T& Stm)
 		;
 }
 
-void ScenarioExt::ExtData::LoadFromStream(PhobosStreamReader& Stm)
+void ScenarioExt::ExtData::LoadFromStream(PhobosExtStreamReader& Stm)
 {
 	Extension<ScenarioClass>::LoadFromStream(Stm);
 	this->Serialize(Stm);
 }
 
-void ScenarioExt::ExtData::SaveToStream(PhobosStreamWriter& Stm)
+void ScenarioExt::ExtData::SaveToStream(PhobosExtStreamWriter& Stm)
 {
 	Extension<ScenarioClass>::SaveToStream(Stm);
 	this->Serialize(Stm);
@@ -80,10 +80,10 @@ DEFINE_HOOK(0x689669, ScenarioClass_Load_Suffix, 0x6)
 {
 	auto Ext = ScenarioExt::Global();
 
-	PhobosByteStream Stm(0);
+	PhobosExtByteStream Stm(0);
 	if (Stm.ReadBlockFromStream(ScenarioExt::g_pStm))
 	{
-		PhobosStreamReader Reader(Stm);
+		PhobosExtStreamReader Reader(Stm);
 		if (Reader.Expect(ScenarioExt::Canary) && Reader.RegisterChange(Ext))
 			Ext->LoadFromStream(Reader);
 	}
@@ -95,8 +95,8 @@ DEFINE_HOOK(0x68945B, ScenarioClass_Save_Suffix, 0x8)
 {
 	auto Ext = ScenarioExt::Global();
 
-	PhobosByteStream saver(sizeof(*Ext));
-	PhobosStreamWriter writer(saver);
+	PhobosExtByteStream saver(sizeof(*Ext));
+	PhobosExtStreamWriter writer(saver);
 
 	writer.Expect(ScenarioExt::Canary);
 	writer.RegisterChange(Ext);

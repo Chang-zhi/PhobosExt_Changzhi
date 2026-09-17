@@ -177,14 +177,14 @@ bool WaypointChoiceBoxClass::Serialize(T& Stm)
 		.Success();
 }
 
-bool WaypointChoiceBoxClass::Load(PhobosStreamReader& Stm, bool RegisterForChange)
+bool WaypointChoiceBoxClass::Load(PhobosExtStreamReader& Stm, bool RegisterForChange)
 {
 	if (!this->MapChoiceBoxClass::Load(Stm, RegisterForChange))
 		return false;
 	return Serialize(Stm);
 }
 
-bool WaypointChoiceBoxClass::Save(PhobosStreamWriter& Stm) const
+bool WaypointChoiceBoxClass::Save(PhobosExtStreamWriter& Stm) const
 {
 	if (!this->MapChoiceBoxClass::Save(Stm))
 		return false;

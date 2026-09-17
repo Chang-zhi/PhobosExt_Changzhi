@@ -6,19 +6,19 @@
 
 struct IStream;
 
-class PhobosStreamReader;
-class PhobosStreamWriter;
+class PhobosExtStreamReader;
+class PhobosExtStreamWriter;
 
 namespace Savegame
 {
 	template <typename T>
-	bool ReadPhobosStream(PhobosStreamReader& Stm, T& Value, bool RegisterForChange);
+	bool ReadPhobosExtStream(PhobosExtStreamReader& Stm, T& Value, bool RegisterForChange);
 
 	template <typename T>
-	bool WritePhobosStream(PhobosStreamWriter& Stm, const T& Value);
+	bool WritePhobosExtStream(PhobosExtStreamWriter& Stm, const T& Value);
 }
 
-class PhobosByteStream
+class PhobosExtByteStream
 {
 public:
 	using data_t = unsigned char;
@@ -28,8 +28,8 @@ protected:
 	size_t CurrentOffset;
 
 public:
-	PhobosByteStream(size_t Reserve = 0x1000);
-	~PhobosByteStream();
+	PhobosExtByteStream(size_t Reserve = 0x1000);
+	~PhobosExtByteStream();
 
 	size_t Size() const
 	{
@@ -101,17 +101,17 @@ public:
 	};
 };
 
-class PhobosStreamWorkerBase
+class PhobosExtStreamWorkerBase
 {
 public:
-	explicit PhobosStreamWorkerBase(PhobosByteStream& Stream) :
+	explicit PhobosExtStreamWorkerBase(PhobosExtByteStream& Stream) :
 		stream(&Stream),
 		success(true)
 	{ }
 
-	PhobosStreamWorkerBase(const PhobosStreamWorkerBase&) = delete;
+	PhobosExtStreamWorkerBase(const PhobosExtStreamWorkerBase&) = delete;
 
-	PhobosStreamWorkerBase& operator = (const PhobosStreamWorkerBase&) = delete;
+	PhobosExtStreamWorkerBase& operator = (const PhobosExtStreamWorkerBase&) = delete;
 
 	bool Success() const
 	{
@@ -138,23 +138,23 @@ protected:
 		return true;
 	}
 
-	PhobosByteStream* stream;
+	PhobosExtByteStream* stream;
 	bool success;
 };
 
-class PhobosStreamReader : public PhobosStreamWorkerBase
+class PhobosExtStreamReader : public PhobosExtStreamWorkerBase
 {
 public:
-	explicit PhobosStreamReader(PhobosByteStream& Stream) : PhobosStreamWorkerBase(Stream) { }
-	PhobosStreamReader(const PhobosStreamReader&) = delete;
+	explicit PhobosExtStreamReader(PhobosExtByteStream& Stream) : PhobosExtStreamWorkerBase(Stream) { }
+	PhobosExtStreamReader(const PhobosExtStreamReader&) = delete;
 
-	PhobosStreamReader& operator = (const PhobosStreamReader&) = delete;
+	PhobosExtStreamReader& operator = (const PhobosExtStreamReader&) = delete;
 
 	template <typename T>
-	PhobosStreamReader& Process(T& value, bool RegisterForChange = true)
+	PhobosExtStreamReader& Process(T& value, bool RegisterForChange = true)
 	{
 		if (this->IsValid(stream_debugging_t()))
-			this->success &= Savegame::ReadPhobosStream(*this, value, RegisterForChange);
+			this->success &= Savegame::ReadPhobosExtStream(*this, value, RegisterForChange);
 		return *this;
 	}
 
@@ -183,7 +183,7 @@ public:
 		return true;
 	}
 
-	bool Read(PhobosByteStream::data_t* Value, size_t Size)
+	bool Read(PhobosExtByteStream::data_t* Value, size_t Size)
 	{
 		if (!this->stream->Read(Value, Size))
 		{
@@ -223,19 +223,19 @@ private:
 	void EmitSwizzleWarning(long id, void* pointer, std::false_type) const { }
 };
 
-class PhobosStreamWriter : public PhobosStreamWorkerBase
+class PhobosExtStreamWriter : public PhobosExtStreamWorkerBase
 {
 public:
-	explicit PhobosStreamWriter(PhobosByteStream& Stream) : PhobosStreamWorkerBase(Stream) { }
-	PhobosStreamWriter(const PhobosStreamWriter&) = delete;
+	explicit PhobosExtStreamWriter(PhobosExtByteStream& Stream) : PhobosExtStreamWorkerBase(Stream) { }
+	PhobosExtStreamWriter(const PhobosExtStreamWriter&) = delete;
 
-	PhobosStreamWriter& operator = (const PhobosStreamWriter&) = delete;
+	PhobosExtStreamWriter& operator = (const PhobosExtStreamWriter&) = delete;
 
 	template <typename T>
-	PhobosStreamWriter& Process(T& value, bool RegisterForChange = true)
+	PhobosExtStreamWriter& Process(T& value, bool RegisterForChange = true)
 	{
 		if (this->IsValid(stream_debugging_t()))
-			this->success &= Savegame::WritePhobosStream(*this, value);
+			this->success &= Savegame::WritePhobosExtStream(*this, value);
 
 		return *this;
 	}
@@ -248,7 +248,7 @@ public:
 		this->stream->Save(buffer);
 	}
 
-	void Write(const PhobosByteStream::data_t* Value, size_t Size)
+	void Write(const PhobosExtByteStream::data_t* Value, size_t Size)
 	{
 		this->stream->Write(Value, Size);
 	}

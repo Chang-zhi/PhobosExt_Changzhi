@@ -43,8 +43,8 @@ public:
 		virtual ~ExtData() = default;
 		virtual void LoadFromINIFile(CCINIClass* pINI) override;
 		virtual void InvalidatePointer(void* ptr, bool bRemoved) override { }
-		virtual void LoadFromStream(PhobosStreamReader& Stm) override;
-		virtual void SaveToStream(PhobosStreamWriter& Stm) override;
+		virtual void LoadFromStream(PhobosExtStreamReader& Stm) override;
+		virtual void SaveToStream(PhobosExtStreamWriter& Stm) override;
 
 	private:
 		template <typename T>
@@ -59,6 +59,6 @@ public:
 	};
 
 	static ExtContainer ExtMap;
-	static bool LoadGlobals(PhobosStreamReader& Stm);
-	static bool SaveGlobals(PhobosStreamWriter& Stm);
+	static bool LoadGlobals(PhobosExtStreamReader& Stm);
+	static bool SaveGlobals(PhobosExtStreamWriter& Stm);
 };

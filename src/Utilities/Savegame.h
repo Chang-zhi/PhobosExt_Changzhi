@@ -8,28 +8,28 @@
 namespace Savegame
 {
 	template <typename T>
-	bool ReadPhobosStream(PhobosStreamReader& Stm, T& Value, bool RegisterForChange = true);
+	bool ReadPhobosExtStream(PhobosExtStreamReader& Stm, T& Value, bool RegisterForChange = true);
 
 	template <typename T>
-	bool WritePhobosStream(PhobosStreamWriter& Stm, const T& Value);
+	bool WritePhobosExtStream(PhobosExtStreamWriter& Stm, const T& Value);
 
 	template <typename T>
-	T* RestoreObject(PhobosStreamReader& Stm, bool RegisterForChange = true);
+	T* RestoreObject(PhobosExtStreamReader& Stm, bool RegisterForChange = true);
 
 	template <typename T>
-	bool PersistObject(PhobosStreamWriter& Stm, const T* pValue);
+	bool PersistObject(PhobosExtStreamWriter& Stm, const T* pValue);
 
 	template <typename T>
-	struct PhobosStreamObject
+	struct PhobosExtStreamObject
 	{
-		bool ReadFromStream(PhobosStreamReader& Stm, T& Value, bool RegisterForChange) const;
-		bool WriteToStream(PhobosStreamWriter& Stm, const T& Value) const;
+		bool ReadFromStream(PhobosExtStreamReader& Stm, T& Value, bool RegisterForChange) const;
+		bool WriteToStream(PhobosExtStreamWriter& Stm, const T& Value) const;
 	};
 
 	template <typename T>
 	struct ObjectFactory
 	{
-		std::unique_ptr<T> operator() (PhobosStreamReader& Stm) const
+		std::unique_ptr<T> operator() (PhobosExtStreamReader& Stm) const
 		{
 			return std::make_unique<T>();
 		}

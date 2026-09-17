@@ -64,7 +64,7 @@ void TechnoExt::ExtData::Serialize(T& Stm)
 		;
 
 	// 读档时：完全重置 AOEState，ContributedTargets 指针不可序列化
-	if constexpr (std::is_same_v<T, PhobosStreamReader>)
+	if constexpr (std::is_same_v<T, PhobosExtStreamReader>)
 	{
 		this->AOEState.Active = false;
 		this->AOEState.CachedMain = nullptr;
@@ -116,19 +116,19 @@ void TechnoExt::ExtData::InvalidatePointer(void* ptr, bool bRemoved)
 	// 假 Temporal 条目的清理由 TemporalAOE::InvalidatePtr 统一处理（见 TemporalAOE.cpp）
 }
 
-void TechnoExt::ExtData::LoadFromStream(PhobosStreamReader& Stm)
+void TechnoExt::ExtData::LoadFromStream(PhobosExtStreamReader& Stm)
 {
 	Extension<TechnoClass>::LoadFromStream(Stm);
 	this->Serialize(Stm);
 }
 
-void TechnoExt::ExtData::SaveToStream(PhobosStreamWriter& Stm)
+void TechnoExt::ExtData::SaveToStream(PhobosExtStreamWriter& Stm)
 {
 	Extension<TechnoClass>::SaveToStream(Stm);
 	this->Serialize(Stm);
 }
 
-bool TechnoExt::LoadGlobals(PhobosStreamReader& Stm)
+bool TechnoExt::LoadGlobals(PhobosExtStreamReader& Stm)
 {
 	// ⚠ 此时引擎指针修复尚未完成，不能访问任何游戏对象指针
 
@@ -151,7 +151,7 @@ bool TechnoExt::LoadGlobals(PhobosStreamReader& Stm)
 		.Success();
 }
 
-bool TechnoExt::SaveGlobals(PhobosStreamWriter& Stm)
+bool TechnoExt::SaveGlobals(PhobosExtStreamWriter& Stm)
 {
 	return Stm
 		.Success();

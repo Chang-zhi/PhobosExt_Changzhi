@@ -68,8 +68,8 @@ public:
 		{
 		}
 
-		virtual void LoadFromStream(PhobosStreamReader& Stm) override;
-		virtual void SaveToStream(PhobosStreamWriter& Stm) override;
+		virtual void LoadFromStream(PhobosExtStreamReader& Stm) override;
+		virtual void SaveToStream(PhobosExtStreamWriter& Stm) override;
 
 	private:
 		template <typename T>
@@ -98,8 +98,8 @@ public:
 
 	static ExtContainer ExtMap;
 
-	static bool LoadGlobals(PhobosStreamReader& Stm);
-	static bool SaveGlobals(PhobosStreamWriter& Stm);
+	static bool LoadGlobals(PhobosExtStreamReader& Stm);
+	static bool SaveGlobals(PhobosExtStreamWriter& Stm);
 
 	// 将触发动作添加的基地节点加入授权列表（供 TAction 调用）
 	// insertAtFront = true 时插入到列表头部，用于 forceAtFront 优先建造

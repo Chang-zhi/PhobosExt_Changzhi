@@ -10,18 +10,33 @@ html { scroll-behavior: smooth; }
 body {
   background-color: #f5f5f5;
   font-family: 'Microsoft Yahei','Segoe UI',Roboto,system-ui,sans-serif;
-  line-height: 1.65;
-  color: #222;
+  line-height: 1.75;
+  color: #333;
+  -webkit-font-smoothing: antialiased;
 }
+::selection { background: #fbdada; color: #333; }
+
+/* 正文段落 */
+section p { margin: .75em 0 .55em; }
+.doc-container ul, .doc-container ol { padding-left: 1.4em; }
+.doc-container li { margin: .18em 0; }
+.doc-note ul, .doc-note ol { margin: .3rem 0 0; padding-left: 1.35em; }
 
 /* ============================================================
    2. 侧边栏导航
    ============================================================ */
 .nav {
-  position: fixed; top: 0; left: 0; width: 190px; height: 100vh;
+  position: fixed; top: 0; left: 0; width: 210px; height: 100vh;
   background: #fff; border-right: 1px solid #eee; z-index: 100;
-  overflow-y: auto; padding: 1rem 0; transition: transform .25s ease;
+  overflow-y: auto; overflow-x: hidden; padding: 1rem 0; transition: transform .25s ease;
+  /* 常驻预留滚动条槽位，避免展开时宽度跳动 */
+  scrollbar-gutter: stable;
 }
+/* 细滚动条 */
+.nav::-webkit-scrollbar { width: 6px; }
+.nav::-webkit-scrollbar-track { background: transparent; }
+.nav::-webkit-scrollbar-thumb { background: #e8dede; border-radius: 3px; }
+.nav::-webkit-scrollbar-thumb:hover { background: #dcc3c3; }
 .nav__title {
   font-size: 1rem; font-weight: 700; color: #d92929;
   padding: 0.5rem 1rem 0.8rem; border-bottom: 2px solid #d92929;
@@ -38,6 +53,40 @@ body {
 .nav__item--active {
   background: #fef0f0; color: #d92929; border-left-color: #d92929; font-weight: 600;
 }
+
+/* ── 子目录（折叠树） ── */
+.nav__group { display: block; }
+.nav__item--parent { position: relative; padding-right: 1.9rem; }
+
+/* 展开三角：独立点击区，不切换页面 */
+.nav__caret {
+  position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+  cursor: pointer; padding: 4px; border-radius: 3px; line-height: 0;
+  user-select: none; display: inline-flex; align-items: center; justify-content: center;
+}
+.nav__caret:hover { background: #fef0f0; }
+.nav__caret svg { display: block; transition: transform .2s ease; }
+.nav__caret svg polygon { fill: #bfbcbc; }
+.nav__caret:hover svg polygon { fill: #d92929; }
+.nav__group--open > .nav__item--parent .nav__caret svg { transform: rotate(90deg); }
+.nav__group--open > .nav__item--parent .nav__caret svg polygon { fill: #d92929; }
+
+.nav__sub { list-style: none; padding: 0; margin: 0 0 .3rem; display: none; }
+.nav__group--open > .nav__sub { display: block; }
+/* 子项：过长换行，序号悬挂在外 */
+.nav__subitem {
+  display: block; padding: .3rem .7rem .3rem 2.8rem;
+  text-indent: -1.15rem;
+  font-size: .755rem; line-height: 1.5; color: #7a7676; cursor: pointer;
+  border-left: 3px solid transparent;
+  word-break: break-word; overflow-wrap: anywhere;
+  transition: background .15s, color .15s, border-left-color .15s;
+}
+.nav__subitem:hover { background: #fdf7f7; color: #d92929; }
+.nav__subitem--active {
+  background: #fef5f5; color: #d92929; border-left-color: #e8b4b4; font-weight: 600;
+}
+.nav__subitem--active:hover { background: #fdeeee; }
 
 /* 侧边栏折叠按钮（窄屏显示） */
 .nav-toggle {
@@ -70,16 +119,29 @@ body:not(.nav-locked) .lock-icon--unlocked { display: inline; }
    3. 搜索
    ============================================================ */
 .nav__search { padding: 0 .8rem .6rem; }
+.nav__search-box { position: relative; }
 .nav__search input {
   width: 100%; padding: .42rem .55rem; font-size: .8rem;
   border: 1px solid #e2caca; border-radius: 4px; outline: none;
   font-family: inherit; background: #fffdfd; color: #222;
 }
 .nav__search input:focus { border-color: #d92929; background: #fff; }
+.nav__search.has-text input { padding-right: 1.9rem; }
+/* 隐藏原生清除按钮，改用自绘红线叉 */
+.nav__search input::-webkit-search-cancel-button,
+.nav__search input::-webkit-search-clear-button { -webkit-appearance: none; appearance: none; display: none; }
+.search-clear {
+  position: absolute; right: 5px; top: 50%; transform: translateY(-50%);
+  width: 17px; height: 17px; padding: 0; border: none; background: none;
+  border-radius: 50%; cursor: pointer; line-height: 0; display: none;
+  align-items: center; justify-content: center;
+}
+.nav__search-box.has-text .search-clear { display: flex; }
+.search-clear:hover { background: #fef0f0; }
 .nav__search-hint { font-size: .68rem; color: #aaa; padding: .3rem .1rem 0; }
 
 .search-panel {
-  position: fixed; top: 0; left: 190px; width: 420px; max-width: calc(100vw - 200px);
+  position: fixed; top: 0; left: 210px; width: 420px; max-width: calc(100vw - 220px);
   max-height: 70vh; overflow-y: auto; background: #fff;
   border: 1px solid #e6d5d5; border-radius: 0 0 8px 0;
   box-shadow: 0 6px 20px rgba(0,0,0,.08); z-index: 300; display: none;
@@ -92,6 +154,16 @@ body:not(.nav-locked) .lock-icon--unlocked { display: inline; }
 }
 .sr:last-child { border-bottom: none; }
 .sr:hover, .sr--sel { background: #fdf3f3; }
+.sr__group {
+  position: sticky; top: 0; z-index: 1;
+  padding: .42rem .9rem; font-size: .74rem; font-weight: 600;
+  color: #b81c1c; background: #fdf9f9; border-bottom: 1px solid #f6eaea;
+  letter-spacing: .04em;
+}
+.sr__group-count {
+  float: right; color: #cba6a6; font-weight: normal;
+  font-family: 'Consolas',monospace; font-size: .7rem; line-height: 1.5;
+}
 .sr__id {
   display: inline-block; min-width: 2.9rem; margin-right: .35rem;
   color: #b81c1c; font-weight: 600;
@@ -104,32 +176,38 @@ body:not(.nav-locked) .lock-icon--unlocked { display: inline; }
    4. 页面布局
    ============================================================ */
 .doc-container {
-  max-width: 960px; margin: 2rem auto; background: #fff;
-  border: 1px solid #eee; border-radius: 15px; padding: 2rem 2.2rem 3rem;
+  max-width: 980px; margin: 2rem auto; background: #fff;
+  border: 1px solid #ecebeb; border-radius: 16px; padding: 2.4rem 2.6rem 3.2rem;
+  box-shadow: 0 2px 16px rgba(0,0,0,.045);
 }
 section { display: none; }
-section.active { display: block; }
+section.active { display: block; animation: fadeIn .22s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 
 /* ============================================================
    5. 标题
    ============================================================ */
-h1, h2, h3, h4 { font-weight: 600; margin-top: 1.8em; margin-bottom: 0.6em; line-height: 1.35; }
+h1, h2, h3, h4 { font-weight: 600; margin-top: 1.9em; margin-bottom: .65em; line-height: 1.4; }
+section > h2:first-child { margin-top: .1em; }
 .doc-title {
-  font-size: 2rem; color: #d92929; border-bottom: 2px solid #d92929;
-  display: inline-block; padding-bottom: .3em; margin-top: .2em; margin-bottom: 1em;
+  font-size: 2.05rem; color: #d92929; border-bottom: 2px solid #d92929;
+  display: inline-block; padding-bottom: .28em; margin-top: .2em; margin-bottom: .9em;
+  letter-spacing: .5px;
 }
 .doc-title__sub {
-  font-size: .9rem; font-weight: normal; background: #f8f0f0; color: #d92929;
-  padding: .2rem .6rem; border-radius: 2px; margin-left: .8rem; vertical-align: middle;
+  font-size: .82rem; font-weight: normal; background: #faf1f1; color: #c2352f;
+  padding: .22rem .65rem; border-radius: 999px; margin-left: .7rem; vertical-align: middle;
 }
 .doc-heading--secondary {
-  font-size: 1.6rem; border-left: 4px solid #d92929; padding-left: 12px; background: #fdf7f7;
+  font-size: 1.55rem; color: #2f2f2f; border-left: 4px solid #d92929;
+  padding: .4rem .85rem; border-radius: 0 4px 4px 0;
+  background: linear-gradient(90deg, #fdf5f5 0%, #fff 72%);
 }
 .doc-heading--tertiary {
-  font-size: 1.3rem; color: #b81c1c; border-bottom: 1px solid #f0c8c8;
-  padding-bottom: .2em; margin-top: 2em;
+  font-size: 1.22rem; color: #c0392b; border-bottom: 1px solid #f2e2e2;
+  padding-bottom: .35em; margin-top: 2.2em;
 }
-h4 { font-size: 1rem; color: #444; margin-top: 1.3em; }
+h4 { font-size: 1rem; color: #3d3d3d; margin-top: 1.6em; }
 
 /* ============================================================
    6. 链接 / 代码
@@ -140,22 +218,32 @@ h4 { font-size: 1rem; color: #444; margin-top: 1.3em; }
 
 code, pre { font-family: 'Consolas','JetBrains Mono',monospace; border-radius: 3px; }
 /* 正文中的 code 标签统一显示为淡红底代码样式；pre 内部的 code 保持原样 */
-code { padding: .15rem .4rem; font-size: .9em; color: #d92929; background: #fff1f1; }
-pre code { padding: 0; font-size: inherit; color: inherit; background: none; }
-.doc-link code { color: #c81f1f; }
+code { padding: .12rem .4rem; font-size: .87em; color: #c0392b; background: #fbf4f4; border: 1px solid #f6e9e9; }
+pre code { padding: 0; font-size: inherit; color: inherit; background: none; border: none; }
+.doc-link code { color: #c0392b; }
 .doc-code--block {
-  padding: 1rem; overflow-x: auto; background: #2b2b2b; color: #e6e6e6;
-  margin: 1rem 0; font-size: .85rem; line-height: 1.6;
+  padding: 1rem 1.15rem; overflow-x: auto; background: #2d2b2b; color: #e8e6e3;
+  margin: 1.15rem 0; font-size: .84rem; line-height: 1.7; border-radius: 8px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.05);
 }
+.doc-code--block::-webkit-scrollbar { height: 8px; }
+.doc-code--block::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
 
 /* ============================================================
    7. 表格
    ============================================================ */
-.doc-table { width: 100%; border-collapse: collapse; margin: 1.2rem 0; font-size: .9rem; }
-.doc-table__th, .doc-table__td {
-  border: 1px solid #ddd; padding: 9px 12px; text-align: left; vertical-align: top;
+.doc-table {
+  width: 100%; border-collapse: separate; border-spacing: 0; margin: 1.3rem 0;
+  font-size: .88rem; border: 1px solid #eceaea; border-radius: 8px; overflow: hidden;
 }
-.doc-table__th { background: #f8f0f0; color: #b81c1c; font-weight: 600; }
+.doc-table__th, .doc-table__td {
+  border-bottom: 1px solid #f0eeee; border-right: 1px solid #f0eeee;
+  padding: 10px 14px; text-align: left; vertical-align: top;
+}
+.doc-table__th:last-child, .doc-table__td:last-child { border-right: none; }
+.doc-table tr:last-child .doc-table__td { border-bottom: none; }
+.doc-table__th { background: #fbf4f4; color: #b81c1c; font-weight: 600; }
+.doc-table tbody tr:hover { background: #fcfbfb; }
 .doc-table--action .doc-table__th:first-child,
 .doc-table--action .doc-table__td:first-child {
   width: 72px; text-align: center; white-space: nowrap;
@@ -167,30 +255,47 @@ pre code { padding: 0; font-size: inherit; color: inherit; background: none; }
    8. 提示 / 列表 / 分割线
    ============================================================ */
 .doc-note {
-  background: #fdf7f7; border-left: 4px solid #d92929;
-  padding: .7rem 1rem; margin: 1rem 0; border-radius: 2px; font-size: .9rem;
+  background: #fdf8f8; border-left: 4px solid #d92929;
+  padding: .8rem 1.15rem; margin: 1.15rem 0; border-radius: 0 6px 6px 0; font-size: .9rem;
 }
-.doc-note__title { color: #b81c1c; font-weight: 600; }
+.doc-note__title { color: #b81c1c; font-weight: 600; display: block; margin-bottom: .2rem; }
 .doc-note ul, .doc-note ol { margin: .3rem 0 0 1.1rem; line-height: 1.75; }
 .doc-note p { margin: .3rem 0 0; }
-.doc-list { margin: 0 4%; line-height: 1.8; }
-.sec-toc {
-  background: #fdf7f7; border-radius: 3px; padding: 14px 20px;
-  margin: 1.2rem 0; border-left: 3px solid #d92929;
+.doc-note--identity {
+  background: #faf9f9; border: 1px solid #eee; border-left: 4px solid #d92929;
+  color: #555; font-size: .88rem; padding: .65rem 1rem;
 }
-.sec-toc__title { color: #d92929; font-size: 1.05rem; font-weight: 600; margin: 0 0 8px 0; }
-.sec-toc__list { list-style: none; padding: 0; margin: 0; line-height: 1.8; }
-.sec-toc__item { margin: 4px 0; font-size: .9rem; }
-.sec-toc__link { color: #333; text-decoration: none; padding: 2px 6px; border-radius: 2px; transition: background .2s; }
-.sec-toc__link:hover { background: #f8e8e8; color: #d92929; }
+.doc-note--identity .doc-note__title { color: #444; display: inline-flex; align-items: center; gap: .4rem; }
+.doc-note--identity p { margin: .3rem 0 0; line-height: 1.75; }
+.doc-note--identity strong { color: #3d3d3d; }
+.doc-note--identity code { background: none; padding: 0; border: none; }
+.doc-note__icon { flex: none; }
+.doc-list { margin: 0 2%; line-height: 1.85; }
+.sec-toc {
+  background: #fcf8f8; border-radius: 8px; padding: 16px 22px;
+  margin: 1.4rem 0; border-left: 3px solid #d92929;
+}
+.sec-toc__title { color: #d92929; font-size: 1rem; font-weight: 600; margin: 0 0 8px 0; }
+.sec-toc__item { margin: 3px 0; font-size: .9rem; display: flex; align-items: baseline; gap: .8rem; }
+.sec-toc__item > .sec-toc__link { flex: 1 1 auto; display: flex; align-items: baseline; gap: .9rem; }
+.sec-toc__name { flex: none; }
+.sec-toc__key {
+  margin-left: auto; text-align: right;
+  font-family: 'Consolas',monospace; font-size: .76rem; color: #c08c8c;
+  background: none; border: none; padding: 0;
+}
+.sec-toc__item > .sec-toc__id { flex: none; }
+.sec-toc__list { list-style: none; padding: 0; margin: 0; line-height: 1.9; }
+.sec-toc__link { color: #3a3a3a; text-decoration: none; padding: 2px 7px; border-radius: 4px; transition: background .2s, color .2s; }
+.sec-toc__link:hover { background: #fbecec; color: #d92929; }
 .sec-toc__id { color: #aaa; font-size: .8rem; font-family: 'Consolas',monospace; }
 
-.sec-divider { margin: 2rem -2.2rem; border: none; height: 1px; background: #e0b0b0; }
+.sec-divider { margin: 2.2rem -2.6rem; border: none; height: 1px; background: #efdede; }
 .sec-divider--double {
-  margin: 2rem -2.2rem; height: 5px; border: none;
-  border-top: 1px solid #e0b0b0; border-bottom: 1px solid #e0b0b0;
+  margin: 2.2rem -2.6rem; height: 5px; border: none;
+  border-top: 1px solid #efdede; border-bottom: 1px solid #efdede;
 }
-.doc-hr { margin: 1.5rem 0; border: none; height: 1px; background: #f0c8c8; }
+.doc-hr { margin: 1.6rem 0; border: none; height: 1px; background: #f4e6e6; }
 .doc-text--gray { color: #767474; margin: 1% 0; }
 .doc-paragraph--gap { margin-top: 1.5rem; }
 
@@ -205,22 +310,47 @@ pre code { padding: 0; font-size: inherit; color: inherit; background: none; }
    9. 页脚 / 响应式
    ============================================================ */
 .doc-footer {
-  margin-top: 3rem; padding-top: 1.2rem; text-align: center;
-  border-top: 1px solid #eee; font-size: .85rem; color: #777;
+  margin-top: 3.2rem; padding-top: 1.3rem; text-align: center;
+  border-top: 1px solid #f0f0f0; font-size: .85rem; color: #888;
 }
-@media (max-width: 1170px) { .doc-container { margin-right: .5rem; } }
+.doc-footer p { margin: .35em 0; }
+
+/* 返回顶部 */
+.to-top {
+  position: fixed; right: 1.4rem; bottom: 1.6rem; z-index: 150;
+  width: 38px; height: 38px; border: 1px solid #f0e0e0; border-radius: 50%;
+  background: #fff; color: #d92929; font-size: 1rem; line-height: 1;
+  cursor: pointer; opacity: 0; visibility: hidden; transform: translateY(6px);
+  box-shadow: 0 2px 8px rgba(0,0,0,.08); transition: all .2s ease;
+}
+.to-top.show { opacity: 1; visibility: visible; transform: none; }
+.to-top:hover { background: #d92929; color: #fff; border-color: #d92929; }
+/* 正文不被固定侧边栏遮住 */
+@media (max-width: 1500px) {
+  .doc-container { margin-left: 232px; margin-right: 1.6rem; }
+  body.nav-collapsed .doc-container { margin-left: auto; margin-right: auto; }
+}
 @media (max-width: 800px) {
   .nav { width: 150px; }
   .search-panel { left: 150px; width: calc(100vw - 165px); }
+  .doc-container {
+    margin-left: 166px; margin-right: .9rem;
+    padding: 1.6rem 1.5rem 2.2rem; border-radius: 12px;
+  }
+  .sec-divider, .sec-divider--double { margin-left: -1.5rem; margin-right: -1.5rem; }
+  .doc-title { font-size: 1.7rem; }
+  .doc-heading--secondary { font-size: 1.35rem; }
 }
 /* ============================================================
    10. 原版 Bug 修复（修复卡片）
    ============================================================ */
 .doc-fix {
-  background: #fff; border: 1px solid #eed7d7; border-left: 4px solid #d92929;
-  border-radius: 6px; padding: 1rem 1.25rem 1.15rem; margin: 1.6rem 0;
-  box-shadow: 0 1px 4px rgba(217,41,41,.08);
+  background: #fff; border: 1px solid #f0e2e2; border-left: 4px solid #d92929;
+  border-radius: 8px; padding: 1.1rem 1.35rem 1.2rem; margin: 1.7rem 0;
+  box-shadow: 0 1px 4px rgba(217,41,41,.07);
+  transition: box-shadow .2s ease;
 }
+.doc-fix:hover { box-shadow: 0 3px 12px rgba(217,41,41,.12); }
 .doc-fix > h3 {
   margin: 0 0 .85rem; padding-bottom: .55rem; font-size: 1.12rem;
   border-bottom: 1px dashed #f0c8c8;
@@ -247,6 +377,10 @@ pre code { padding: 0; font-size: inherit; color: inherit; background: none; }
   .doc-fix { padding: .9rem 1rem; }
   .doc-fix__row { display: block; }
   .doc-fix__tag { display: inline-block; width: auto; margin: 0 0 .3rem; padding: .1rem .5rem; }
+  /* 窄屏：目录键名换行到名称下方 */
+  .sec-toc__item { flex-wrap: wrap; }
+  .sec-toc__item > .sec-toc__link { flex-wrap: wrap; gap: .1rem 0; }
+  .sec-toc__key { flex-basis: 100%; text-align: left; }
 }
 </style>
 </head>
@@ -258,15 +392,83 @@ pre code { padding: 0; font-size: inherit; color: inherit; background: none; }
 
 <button class="nav-toggle" id="navToggle" onclick="toggleNav()">☰</button>
 <nav class="nav" id="mainNav"><div class="nav__title"><span class="nav__close" onclick="toggleNav()">◀</span>PhobosExt<span class="nav__lock" onclick="toggleLock()"><svg class="lock-icon lock-icon--locked" viewBox="0 0 24 24" width="17" height="17" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="11" width="16" height="11" rx="2.5" fill="#d92929"/><path d="M7 11V7a5 5 0 0 1 10 0v4" fill="none" stroke="#d92929" stroke-width="2.5" stroke-linecap="round"/></svg><svg class="lock-icon lock-icon--unlocked" viewBox="0 0 24 24" width="17" height="17" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="11" width="16" height="11" rx="2.5" fill="#d92929"/><path d="M7 11V7a5 5 0 0 1 10 0" fill="none" stroke="#d92929" stroke-width="2.5" stroke-linecap="round"/></svg></span></div>
-<div class="nav__search"><input id="searchInput" type="search" placeholder="搜索功能 / 编号 / 键名" autocomplete="off"><div class="nav__search-hint">按 / 或 Ctrl+K 定位搜索框</div></div>
+<div class="nav__search"><div class="nav__search-box"><input id="searchInput" type="search" placeholder="搜索功能 / 编号 / 键名" autocomplete="off"><button class="search-clear" id="searchClear" title="清空搜索" aria-label="清空搜索"><svg viewBox="0 0 24 24" width="11" height="11" xmlns="http://www.w3.org/2000/svg"><line x1="5" y1="5" x2="19" y2="19" stroke="#d92929" stroke-width="2.5" stroke-linecap="round"/><line x1="19" y1="5" x2="5" y2="19" stroke="#d92929" stroke-width="2.5" stroke-linecap="round"/></svg></button></div><div class="nav__search-hint">按 / 或 Ctrl+K 定位搜索框</div></div>
 <ul class="nav__list">
 <li class="nav__item nav__item--active" page="home">首页</li>
-<li class="nav__item" page="gameplay">新增游戏机制</li>
-<li class="nav__item" page="commands">新增按键命令</li>
-<li class="nav__item" page="actions">新增触发行为</li>
-<li class="nav__item" page="events">新增触发事件</li>
-<li class="nav__item" page="scripts">新增脚本动作</li>
-<li class="nav__item" page="fixes">原版 Bug 修复</li>
+
+<li class="nav__group">
+  <div class="nav__item nav__item--parent" page="gameplay">新增游戏机制<span class="nav__caret" title="展开 / 收起子目录（不切换页面）"><svg viewBox="0 0 24 24" width="14" height="14" xmlns="http://www.w3.org/2000/svg"><polygon points="9,5 18,12 9,19"/></svg></span></div>
+  <ul class="nav__sub">
+    <li class="nav__subitem" data-target="gameplay_1" data-page="gameplay" title="超时空武器扩展 · Temporal.Exclusive / TemporalAOE">1. 超时空武器扩展</li>
+    <li class="nav__subitem" data-target="gameplay_2" data-page="gameplay" title="自动游猎 · AutoHunt">2. 自动游猎</li>
+    <li class="nav__subitem" data-target="gameplay_3" data-page="gameplay" title="AI 单位可否被选为攻击目标 · LegalTargetWhenAIOwner">3. AI 单位可否被选为攻击目标</li>
+    <li class="nav__subitem" data-target="gameplay_4" data-page="gameplay" title="基地节点跨所属方判定 · BaseNodeCrossOwners">4. 基地节点跨所属方判定</li>
+    <li class="nav__subitem" data-target="gameplay_5" data-page="gameplay" title="混乱机制扩展 · BerzerkRestoreClearTarget / BerserkReduce">5. 混乱机制扩展</li>
+    <li class="nav__subitem" data-target="gameplay_6" data-page="gameplay" title="选择框样式 · [ChoiceBoxTypes]">6. 选择框样式</li>
+    <li class="nav__subitem" data-target="gameplay_7" data-page="gameplay" title="单人任务打开任务简报 · AllowTabBriefingInSinglePlayer">7. 单人任务打开任务简报</li>
+    <li class="nav__subitem" data-target="gameplay_8" data-page="gameplay" title="智能火力分配 · SmartVHPScan">8. 智能火力分配</li>
+    <li class="nav__subitem" data-target="gameplay_9" data-page="gameplay" title="AI 目标类型列表 · [AITargetTypes]">9. AI 目标类型列表</li>
+  </ul>
+</li>
+
+<li class="nav__group">
+  <div class="nav__item nav__item--parent" page="commands">新增按键命令<span class="nav__caret" title="展开 / 收起子目录（不切换页面）"><svg viewBox="0 0 24 24" width="14" height="14" xmlns="http://www.w3.org/2000/svg"><polygon points="9,5 18,12 9,19"/></svg></span></div>
+  <ul class="nav__sub">
+    <li class="nav__subitem" data-target="commands_csf" data-page="commands" title="按键文本自定义（CSF）">按键文本自定义（CSF）</li>
+    <li class="nav__subitem" data-target="commands_1" data-page="commands" title="自动装载">1. 自动装载</li>
+  </ul>
+</li>
+
+<li class="nav__group">
+  <div class="nav__item nav__item--parent" page="actions">新增触发行为<span class="nav__caret" title="展开 / 收起子目录（不切换页面）"><svg viewBox="0 0 24 24" width="14" height="14" xmlns="http://www.w3.org/2000/svg"><polygon points="9,5 18,12 9,19"/></svg></span></div>
+  <ul class="nav__sub">
+    <li class="nav__subitem" data-target="actions_1" data-page="actions" title="文本框系统 · 549–552、579–589">1. 文本框系统</li>
+    <li class="nav__subitem" data-target="actions_2" data-page="actions" title="动态标签绑定 · 553–573">2. 动态标签绑定</li>
+    <li class="nav__subitem" data-target="actions_3" data-page="actions" title="金钱操作 · 557–559">3. 金钱操作</li>
+    <li class="nav__subitem" data-target="actions_4" data-page="actions" title="基地节点操作 · 560–562">4. 基地节点操作</li>
+    <li class="nav__subitem" data-target="actions_5" data-page="actions" title="单位可招募属性 · 571">5. 单位可招募属性</li>
+    <li class="nav__subitem" data-target="actions_6" data-page="actions" title="更新建筑动画 · 574–576">6. 更新建筑动画</li>
+    <li class="nav__subitem" data-target="actions_7" data-page="actions" title="作战小队操作 · 577、578、661、678">7. 作战小队操作</li>
+    <li class="nav__subitem" data-target="actions_8" data-page="actions" title="脚本操作 · 650–660">8. 脚本操作</li>
+    <li class="nav__subitem" data-target="actions_9" data-page="actions" title="特遣部队操作 · 670–677">9. 特遣部队操作</li>
+    <li class="nav__subitem" data-target="actions_10" data-page="actions" title="解除部署 · 679">10. 解除部署</li>
+    <li class="nav__subitem" data-target="actions_11" data-page="actions" title="选择框系统 · 590–593">11. 选择框系统</li>
+    <li class="nav__subitem" data-target="actions_12" data-page="actions" title="作战小队路径可视化 · 662、663">12. 作战小队路径可视化</li>
+    <li class="nav__subitem" data-target="actions_13" data-page="actions" title="任务简报与通关时间 · 664–669、680、681">13. 任务简报与通关时间</li>
+    <li class="nav__subitem" data-target="actions_14" data-page="actions" title="游戏速度 · 682">14. 游戏速度</li>
+    <li class="nav__subitem" data-target="actions_15" data-page="actions" title="禁止存档与读档 · 683–686">15. 禁止存档与读档</li>
+    <li class="nav__subitem" data-target="actions_16" data-page="actions" title="变卖所属方全部建筑 · 687">16. 变卖所属方全部建筑</li>
+  </ul>
+</li>
+
+<li class="nav__group">
+  <div class="nav__item nav__item--parent" page="events">新增触发事件<span class="nav__caret" title="展开 / 收起子目录（不切换页面）"><svg viewBox="0 0 24 24" width="14" height="14" xmlns="http://www.w3.org/2000/svg"><polygon points="9,5 18,12 9,19"/></svg></span></div>
+  <ul class="nav__sub">
+    <li class="nav__subitem" data-target="events_1" data-page="events" title="科技类型坐标检测 · 550–553">1. 科技类型坐标检测</li>
+    <li class="nav__subitem" data-target="events_2" data-page="events" title="流逝时间（帧） · 554">2. 流逝时间（帧）</li>
+    <li class="nav__subitem" data-target="events_3" data-page="events" title="任务计时器检测 · 555、556">3. 任务计时器检测</li>
+    <li class="nav__subitem" data-target="events_4" data-page="events" title="选择框系统 · 557–559">4. 选择框系统</li>
+    <li class="nav__subitem" data-target="events_5" data-page="events" title="电力状态检测 · 560–565">5. 电力状态检测</li>
+  </ul>
+</li>
+
+<li class="nav__group">
+  <div class="nav__item nav__item--parent" page="scripts">新增脚本动作<span class="nav__caret" title="展开 / 收起子目录（不切换页面）"><svg viewBox="0 0 24 24" width="14" height="14" xmlns="http://www.w3.org/2000/svg"><polygon points="9,5 18,12 9,19"/></svg></span></div>
+  <ul class="nav__sub">
+    <li class="nav__subitem" data-target="scripts_1" data-page="scripts" title="分布式装载 · 5500">1. 分布式装载</li>
+    <li class="nav__subitem" data-target="scripts_2" data-page="scripts" title="作战小队路径可视化 · 5501、5502">2. 作战小队路径可视化</li>
+    <li class="nav__subitem" data-target="scripts_3" data-page="scripts" title="分散攻击 · 5503、5508">3. 分散攻击</li>
+    <li class="nav__subitem" data-target="scripts_4" data-page="scripts" title="巡逻系列 · 5504–5507">4. 巡逻系列</li>
+  </ul>
+</li>
+
+<li class="nav__group">
+  <div class="nav__item nav__item--parent" page="fixes">原版 Bug 修复<span class="nav__caret" title="展开 / 收起子目录（不切换页面）"><svg viewBox="0 0 24 24" width="14" height="14" xmlns="http://www.w3.org/2000/svg"><polygon points="9,5 18,12 9,19"/></svg></span></div>
+  <ul class="nav__sub">
+    <li class="nav__subitem" data-target="fixes_1" data-page="fixes" title="跟随单位时视野移动行为失效">1. 跟随单位时视野失效</li>
+    <li class="nav__subitem" data-target="fixes_2" data-page="fixes" title="地图小节中的矿石设置不生效">2. 地图矿石设置不生效</li>
+  </ul>
+</li>
 </ul></nav>
 <div class="search-panel" id="searchPanel"></div>
 
@@ -279,10 +481,17 @@ pre code { padding: 0; font-size: inherit; color: inherit; background: none; }
 <section id="sec_home" class="active">
 <h1 class="doc-title"><a href="https://github.com/Chang-zhi/PhobosExt_Changzhi" target="_blank" class="doc-link doc-link--plain">PhobosExt</a> <span class="doc-title__sub">扩展 DLL</span></h1>
 
+<div class="doc-note doc-note--identity">
+<span class="doc-note__title"><svg class="doc-note__icon" viewBox="0 0 24 24" width="14" height="14" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" fill="none" stroke="#d92929" stroke-width="2"/><rect x="11" y="10.5" width="2" height="6.5" rx="1" fill="#d92929"/><circle cx="12" cy="7" r="1.5" fill="#d92929"/></svg>关于本项目的性质</span>
+<p><strong>PhobosExt_Changzhi</strong> 是作者 <strong>Chang_zhi</strong> 个人开发维护的<strong>非官方</strong>扩展，与 <a href="https://github.com/Phobos-developers/Phobos" target="_blank" class="doc-link">官方 Phobos</a> 项目组无关。</p>
+<p>源码基于官方 Phobos 二次开发（沿用其 <strong>GPL-3.0</strong> 许可），独立于官方维护。<br>
+  版本与功能不与官方同步，也不代表 Phobos 项目组的立场。使用中遇到的问题请向作者反馈，请勿报告给官方 Phobos 项目组。</p>
+</div>
+
 <p>为《红色警戒2：尤里的复仇》扩展游戏功能的 DLL，面向任务与地图作者，可自由用于任务包与模组。<br>
   作者 <a href="https://space.bilibili.com/423792550" target="_blank" class="doc-link"><strong>Chang_zhi</strong></a>。</p>
 <p>仅部分功能依赖 <strong>Phobos</strong>：不安装 Phobos 也可独立使用，推荐与 Phobos 一同使用。</p>
-<p class="doc-text--gray">左侧导航栏查看各功能详情；顶部搜索框可直接搜功能名、编号或键名。</p>
+<p class="doc-text--gray">左侧导航栏可展开各页子目录跳转至对应条目；顶部搜索框可直接搜功能名、编号或键名。</p>
 
 <h2 class="doc-heading--secondary">兼容性</h2>
 <ul class="doc-list">
@@ -330,15 +539,15 @@ pre code { padding: 0; font-size: inherit; color: inherit; background: none; }
 <div class="sec-toc">
 <p class="sec-toc__title">目录</p>
 <ul class="sec-toc__list">
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_1')" class="sec-toc__link">1. 超时空武器扩展</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_2')" class="sec-toc__link">2. 自动游猎</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_3')" class="sec-toc__link">3. AI 单位能否被选为攻击目标</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_4')" class="sec-toc__link">4. 基地节点跨所属方判定</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_5')" class="sec-toc__link">5. 混乱机制扩展</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_6')" class="sec-toc__link">6. 选择框样式</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_7')" class="sec-toc__link">7. 单人任务 Tab 打开任务简报</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_8')" class="sec-toc__link">8. <code>SmartVHPScan</code> 智能火力分配</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_9')" class="sec-toc__link">9. AI 目标类型列表 <code>[AITargetTypes]</code></a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_1')" class="sec-toc__link"><span class="sec-toc__name">1. 超时空武器扩展</span><code class="sec-toc__key">Temporal.Exclusive / TemporalAOE</code></a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_2')" class="sec-toc__link"><span class="sec-toc__name">2. 自动游猎</span><code class="sec-toc__key">AutoHunt</code></a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_3')" class="sec-toc__link"><span class="sec-toc__name">3. AI 单位可否被选为攻击目标</span><code class="sec-toc__key">LegalTargetWhenAIOwner</code></a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_4')" class="sec-toc__link"><span class="sec-toc__name">4. 基地节点跨所属方判定</span><code class="sec-toc__key">BaseNodeCrossOwners</code></a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_5')" class="sec-toc__link"><span class="sec-toc__name">5. 混乱机制扩展</span><code class="sec-toc__key">BerzerkRestoreClearTarget / BerserkReduce</code></a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_6')" class="sec-toc__link"><span class="sec-toc__name">6. 选择框样式</span><code class="sec-toc__key">[ChoiceBoxTypes]</code></a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_7')" class="sec-toc__link"><span class="sec-toc__name">7. 单人任务打开任务简报</span><code class="sec-toc__key">AllowTabBriefingInSinglePlayer</code></a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_8')" class="sec-toc__link"><span class="sec-toc__name">8. 智能火力分配</span><code class="sec-toc__key">SmartVHPScan</code></a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_9')" class="sec-toc__link"><span class="sec-toc__name">9. AI 目标类型列表</span><code class="sec-toc__key">[AITargetTypes]</code></a></li>
 </ul>
 </div>
 
@@ -409,7 +618,7 @@ AutoHunt=                        ; boolean - AI 单位自动进入游猎状态 -
 <hr class="sec-divider--double">
 
 <div id="gameplay_3">
-<h3 class="doc-heading--tertiary">3. AI 单位能否被选为攻击目标</h3>
+<h3 class="doc-heading--tertiary">3. AI 单位可否被选为攻击目标</h3>
 <pre class="doc-code--block"><code>[TechnoType]
 LegalTargetWhenAIOwner=          ; boolean - AI 控制时能否被其他单位选为攻击目标 - (默认 true)</code></pre>
 <p>设为 <code>no</code> 后，该类型在由 AI 控制时不会被其他单位选为普通武器的攻击目标。</p>
@@ -417,7 +626,7 @@ LegalTargetWhenAIOwner=          ; boolean - AI 控制时能否被其他单位�
 <span class="doc-note__title">注意</span>
 <ul>
 <li>不影响人类玩家控制的该类型单位。</li>
-<li>仍可被 C4 爆破、受伤害反馈等非伤害手段命中。</li>
+<li>仍可被 C4 爆破、碎片伤害等手段命中。</li>
 </ul>
 </div>
 </div>
@@ -515,7 +724,7 @@ Button.Text2=                    ; CSF标签 - 按钮 2 的文字 - (默认 无)
 <hr class="sec-divider--double">
 
 <div id="gameplay_7">
-<h3 class="doc-heading--tertiary">7. 单人任务 Tab 打开任务简报</h3>
+<h3 class="doc-heading--tertiary">7. 单人任务打开任务简报</h3>
 <p>原版单人任务中 <code>Tab</code> 无法重新打开任务简报，本项用于放开该限制。</p>
 <pre class="doc-code--block"><code>[General]
 AllowTabBriefingInSinglePlayer=  ; boolean - 单人任务中能否用 Tab 打开任务简报 - (默认 false)</code></pre>
@@ -525,7 +734,7 @@ AllowTabBriefingInSinglePlayer=  ; boolean - 单人任务中能否用 Tab 打开
 <hr class="sec-divider--double">
 
 <div id="gameplay_8">
-<h3 class="doc-heading--tertiary">8. <code>SmartVHPScan</code> 智能火力分配</h3>
+<h3 class="doc-heading--tertiary">8. 智能火力分配</h3>
 <p>名字沿用<code>VHPScan</code>仅为习惯，其独立于原版逻辑，实现更智能、可操作性更强的火力分配。</p>
 
 <pre class="doc-code--block"><code>[TechnoType]
@@ -592,7 +801,7 @@ SmartVHPScan=FullHealth</code></pre>
 <hr class="sec-divider--double">
 
 <div id="gameplay_9">
-<h3 class="doc-heading--tertiary">9. AI 目标类型列表 <code>[AITargetTypes]</code></h3>
+<h3 class="doc-heading--tertiary">9. AI 目标类型列表</h3>
 <p>自定义若干「目标类型清单」，供脚本动作 <code>5508</code> 按索引选用。<br>
   可在 <code>rulesmd.ini</code> 或地图小节中定义，每一行写一个清单。</p>
 <p><a href="javascript:switchPage('scripts');setTimeout(function(){scrollToFeature('scripts_3')},100)" class="doc-link">→ 查看对应的脚本动作（5508）</a></p>
@@ -603,7 +812,7 @@ SmartVHPScan=FullHealth</code></pre>
 <div class="doc-note">
 <span class="doc-note__title">注意</span>
 <ul>
-<li>索引从 0 开始，脚本动作 <code>5508</code> 填的就是这里的键名。</li>
+<li>索引从 0 开始，脚本动作 <code>5508</code> 填的即为该列表中的键名。</li>
 <li>清单内容填科技类型 ID（INI 中的段名，如 <code>MTNK</code>）。</li>
 </ul>
 </div>
@@ -622,7 +831,7 @@ SmartVHPScan=FullHealth</code></pre>
 <div class="sec-toc">
 <p class="sec-toc__title">目录</p>
 <ul class="sec-toc__list">
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('commands_csf')" class="sec-toc__link">CSF 自定义名称</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('commands_csf')" class="sec-toc__link">按键文本自定义（CSF）</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('commands_1')" class="sec-toc__link">1. 自动装载</a></li>
 </ul>
 </div>
@@ -630,7 +839,7 @@ SmartVHPScan=FullHealth</code></pre>
 <hr class="sec-divider">
 
 <div id="commands_csf">
-<h3 class="doc-heading--tertiary">CSF 自定义名称</h3>
+<h3 class="doc-heading--tertiary">按键文本自定义（CSF）</h3>
 <table class="doc-table">
 <thead><tr><th class="doc-table__th" style="width:250px">CSF 标签</th><th class="doc-table__th" style="width:80px">用途</th><th class="doc-table__th">默认文本</th></tr></thead>
 <tbody>
@@ -645,24 +854,18 @@ SmartVHPScan=FullHealth</code></pre>
 
 <div id="commands_1">
 <h3 class="doc-heading--tertiary">1. 自动装载</h3>
-<p>选中空载具后按快捷键，自动招募附近单位上车。招募半径可自定义：</p>
+<p>选中空载具后按快捷键，附近单位会自动上车。招募半径可自定义：</p>
 <pre class="doc-code--block"><code>[General]
 Command.RecruitRange=            ; double - 自动装载的招募半径 - (默认 10.0)</code></pre>
 
-<p><strong>招募顺序</strong>（三轮依次进行）：</p>
-<ol class="doc-list">
-<li><strong>选中的单位优先</strong>：当前选中的非载具单位<strong>不限距离</strong>，全部就近分配到各载具。</li>
-<li><strong>附近单位补位</strong>：在 <code>Command.RecruitRange</code> 范围内，招满剩余座位。</li>
-<li><strong>载具互上</strong>：前两轮没招到人的载具，可以把自己当作乘客登上其他载具。</li>
-</ol>
+<p><strong>装载规则</strong>：</p>
+<ul class="doc-list">
+<li><strong>选中的单位优先</strong>：已选中的单位不限距离，直接参与装载。</li>
+<li><strong>就近上车</strong>：招募半径内，各载具轮流挑选离自己最近的单位（<code>SizeLimit</code> 小的载具优先），队员会分散到多辆载具上；<strong>不会超载</strong>。</li>
+<li><strong>空车也能搭车</strong>：这次没招到人的载具会当乘客，登上其他还有位置的载具（需装得下）；若一辆都没招到人，则全部上剩余容量最大的那辆。</li>
+</ul>
 
-<p><strong>分配规则</strong>：容量小的载具先挑（按 <code>SizeLimit</code> 从小到大），同容量的轮流分配，一组装满才轮到下一组；<br>
-  距离相同时优先选体积更小的单位；<br>
-  满员或没匹配到人的载具仍可作为乘客上车。</p>
-
-<p><strong>自动跳过</strong>：飞行器、已在天上的单位、部署后解除部署会飞行的单位、正在前往其他载具途中的单位。</p>
-<p>部署状态的单位会先解除部署再上车；<br>
-  与载具同格的单位会先散开，避免互相阻挡。</p>
+<p><strong>自动跳过</strong>：飞行器、已在空中的单位、解除部署后会飞行的单位、正在前往其他载具途中的单位。已部署的单位会先解除部署再上车。</p>
 </div>
 
 </section>
@@ -689,11 +892,11 @@ Command.RecruitRange=            ; double - 自动装载的招募半径 - (默�
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_9')" class="sec-toc__link">9. 特遣部队操作</a> <span class="sec-toc__id">670–677</span></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_10')" class="sec-toc__link">10. 解除部署</a> <span class="sec-toc__id">679</span></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_11')" class="sec-toc__link">11. 选择框系统</a> <span class="sec-toc__id">590–593</span></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_12')" class="sec-toc__link">12. 小队路径可视化</a> <span class="sec-toc__id">662、663</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_12')" class="sec-toc__link">12. 作战小队路径可视化</a> <span class="sec-toc__id">662、663</span></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_13')" class="sec-toc__link">13. 任务简报与通关时间</a> <span class="sec-toc__id">664–669、680、681</span></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_14')" class="sec-toc__link">14. 游戏速度</a> <span class="sec-toc__id">682</span></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_15')" class="sec-toc__link">15. 禁止存档 / 读档</a> <span class="sec-toc__id">683–686</span></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_16')" class="sec-toc__link">16. 变卖所属方的全部建筑</a> <span class="sec-toc__id">687</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_15')" class="sec-toc__link">15. 禁止存档与读档</a> <span class="sec-toc__id">683–686</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_16')" class="sec-toc__link">16. 变卖所属方全部建筑</a> <span class="sec-toc__id">687</span></li>
 </ul>
 </div>
 
@@ -1028,7 +1231,7 @@ ShowTextBoxInShroud.Techno=      ; boolean - 单位文本框在黑幕中是否�
 <hr class="sec-divider--double">
 
 <div id="actions_12">
-<h3 class="doc-heading--tertiary">12. 小队路径可视化</h3>
+<h3 class="doc-heading--tertiary">12. 作战小队路径可视化</h3>
 <p>把关联单位的移动路径以虚线实时绘制在地图上，颜色与所属方一致。</p>
 <p><a href="javascript:switchPage('scripts');setTimeout(function(){scrollToFeature('scripts_2')},100)" class="doc-link">→ 查看对应的脚本动作（5501／5502）</a></p>
 <div class="doc-table--action">
@@ -1088,7 +1291,7 @@ ShowTextBoxInShroud.Techno=      ; boolean - 单位文本框在黑幕中是否�
 <hr class="sec-divider--double">
 
 <div id="actions_15">
-<h3 class="doc-heading--tertiary">15. 禁止存档 / 读档</h3>
+<h3 class="doc-heading--tertiary">15. 禁止存档与读档</h3>
 <p>禁用或恢复 Esc 菜单右侧的「读取游戏」「储存游戏」按钮，被禁用时按钮变灰且无法点击。</p>
 <div class="doc-table--action">
 <table class="doc-table">
@@ -1106,12 +1309,12 @@ ShowTextBoxInShroud.Techno=      ; boolean - 单位文本框在黑幕中是否�
 <hr class="sec-divider--double">
 
 <div id="actions_16">
-<h3 class="doc-heading--tertiary">16. 变卖所属方的全部建筑</h3>
+<h3 class="doc-heading--tertiary">16. 变卖所属方全部建筑</h3>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
 <tbody>
-<tr><td class="doc-table__td">687</td><td class="doc-table__td">变卖所属方的全部建筑</td><td class="doc-table__td">所属方</td></tr>
+<tr><td class="doc-table__td">687</td><td class="doc-table__td">变卖所属方全部建筑</td><td class="doc-table__td">所属方</td></tr>
 </tbody>
 </table>
 </div>
@@ -1133,7 +1336,7 @@ ShowTextBoxInShroud.Techno=      ; boolean - 单位文本框在黑幕中是否�
 <p class="sec-toc__title">目录</p>
 <ul class="sec-toc__list">
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('events_1')" class="sec-toc__link">1. 科技类型坐标检测</a> <span class="sec-toc__id">550–553</span></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('events_2')" class="sec-toc__link">2. 流逝时间(帧)</a> <span class="sec-toc__id">554</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('events_2')" class="sec-toc__link">2. 流逝时间（帧）</a> <span class="sec-toc__id">554</span></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('events_3')" class="sec-toc__link">3. 任务计时器检测</a> <span class="sec-toc__id">555、556</span></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('events_4')" class="sec-toc__link">4. 选择框系统</a> <span class="sec-toc__id">557–559</span></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('events_5')" class="sec-toc__link">5. 电力状态检测</a> <span class="sec-toc__id">560–565</span></li>
@@ -1162,13 +1365,13 @@ ShowTextBoxInShroud.Techno=      ; boolean - 单位文本框在黑幕中是否�
 <hr class="sec-divider--double">
 
 <div id="events_2">
-<h3 class="doc-heading--tertiary">2. 流逝时间(帧)</h3>
+<h3 class="doc-heading--tertiary">2. 流逝时间（帧）</h3>
 <p>触发器激活后开始计时，流逝帧数达到指定值时事件成立。</p>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
 <tbody>
-<tr><td class="doc-table__td">554</td><td class="doc-table__td">流逝时间(帧)</td><td class="doc-table__td">等待帧数</td></tr>
+<tr><td class="doc-table__td">554</td><td class="doc-table__td">流逝时间（帧）</td><td class="doc-table__td">等待帧数</td></tr>
 </tbody>
 </table>
 </div>
@@ -1251,9 +1454,9 @@ ShowTextBoxInShroud.Techno=      ; boolean - 单位文本框在黑幕中是否�
 <p class="sec-toc__title">目录</p>
 <ul class="sec-toc__list">
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('scripts_1')" class="sec-toc__link">1. 分布式装载</a> <span class="sec-toc__id">5500</span></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('scripts_2')" class="sec-toc__link">2. 小队路径可视化</a> <span class="sec-toc__id">5501、5502</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('scripts_2')" class="sec-toc__link">2. 作战小队路径可视化</a> <span class="sec-toc__id">5501、5502</span></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('scripts_3')" class="sec-toc__link">3. 分散攻击</a> <span class="sec-toc__id">5503、5508</span></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('scripts_4')" class="sec-toc__link">4. 巡逻系</a> <span class="sec-toc__id">5504–5507</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('scripts_4')" class="sec-toc__link">4. 巡逻系列</a> <span class="sec-toc__id">5504–5507</span></li>
 </ul>
 </div>
 
@@ -1261,7 +1464,7 @@ ShowTextBoxInShroud.Techno=      ; boolean - 单位文本框在黑幕中是否�
 
 <div id="scripts_1">
 <h3 class="doc-heading--tertiary">1. 分布式装载</h3>
-<p>把小队成员按距离就近分配到各运输载具，全员上车后继续执行下一条脚本。</p>
+<p>让小队成员<strong>均匀分散</strong>登上各运输载具：各载具轮流挑选离自己最近的队员；全员上车后继续执行下一条脚本。</p>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
@@ -1270,13 +1473,17 @@ ShowTextBoxInShroud.Techno=      ; boolean - 单位文本框在黑幕中是否�
 </tbody>
 </table>
 </div>
-<p>相比原版脚本 <code>14</code>，不会只认最后一个载具，不会忽略 <code>SizeLimit</code> 与剩余空间，因此不会因为装不下而卡住。</p>
+<p>相比原版脚本 <code>14</code>：</p>
+<ul class="doc-list">
+<li>各载具<strong>轮流接人</strong>，队员分散乘坐多辆载具，不会全部挤向同一辆；</li>
+<li>按 <code>SizeLimit</code> 从小到大分组依次挑选，严格遵守载具容量，<strong>不会因装不下而卡住</strong>。</li>
+</ul>
 </div>
 
 <hr class="sec-divider--double">
 
 <div id="scripts_2">
-<h3 class="doc-heading--tertiary">2. 小队路径可视化</h3>
+<h3 class="doc-heading--tertiary">2. 作战小队路径可视化</h3>
 <p>把小队成员的移动路径以虚线实时绘制在地图上，颜色与所属方一致。</p>
 <p><a href="javascript:switchPage('actions');setTimeout(function(){scrollToFeature('actions_12')},100)" class="doc-link">→ 查看对应的触发行为（662／663）</a></p>
 <div class="doc-table--action">
@@ -1313,7 +1520,7 @@ ShowTextBoxInShroud.Techno=      ; boolean - 单位文本框在黑幕中是否�
 <hr class="sec-divider--double">
 
 <div id="scripts_4">
-<h3 class="doc-heading--tertiary">4. 巡逻系</h3>
+<h3 class="doc-heading--tertiary">4. 巡逻系列</h3>
 <p>让小队巡逻（移动）到指定阵营的建筑附近或基地集结点，<br>
   行为与原版脚本动作 <code>16</code>（巡逻至路径点）相同，只是目标换成建筑或集结点。</p>
 <div class="doc-table--action">
@@ -1340,7 +1547,7 @@ ShowTextBoxInShroud.Techno=      ; boolean - 单位文本框在黑幕中是否�
 <h2 class="doc-heading--secondary">原版 Bug 修复</h2>
 
 <div id="fixes_1" class="doc-fix">
-<h3 class="doc-heading--tertiary"><span class="doc-fix__num">1.</span>跟随单位时视野移动行为失效</h3>
+<h3 class="doc-heading--tertiary"><span class="doc-fix__num">1.</span> 跟随单位时视野移动行为失效</h3>
 <div class="doc-fix__row doc-fix__row--bug">
 <span class="doc-fix__tag">现象</span>
 <p>玩家处于「跟随单位视野」状态时，触发行为 <code>48</code>（移动视野到路径点）与 <code>112</code>（居中视野到路径点）会把视野每帧拉回被跟随的单位，看起来像没执行。</p>
@@ -1352,10 +1559,10 @@ ShowTextBoxInShroud.Techno=      ; boolean - 单位文本框在黑幕中是否�
 </div>
 
 <div id="fixes_2" class="doc-fix">
-<h3 class="doc-heading--tertiary"><span class="doc-fix__num">2.</span>地图小节里的矿石设置不生效</h3>
+<h3 class="doc-heading--tertiary"><span class="doc-fix__num">2.</span> 地图小节中的矿石设置不生效</h3>
 <div class="doc-fix__row doc-fix__row--bug">
 <span class="doc-fix__tag">现象</span>
-<p>地图 ini 内没有声明 <code>[Tiberiums]</code> 注册表时，地图里的矿石小节（例如 <code>[Riparius]</code>、<code>[Cruentus]</code> 等）不生效。</p>
+<p>地图 ini 内没有声明 <code>[Tiberiums]</code> 注册表时，地图中的矿石小节（例如 <code>[Riparius]</code>、<code>[Cruentus]</code> 等）不生效。</p>
 </div>
 <div class="doc-fix__row doc-fix__row--fix">
 <span class="doc-fix__tag">修复后</span>
@@ -1371,10 +1578,12 @@ ShowTextBoxInShroud.Techno=      ; boolean - 单位文本框在黑幕中是否�
 
 
 <footer class="doc-footer">
-<p>PhobosExt — 基于 Phobos 开发的 YR 扩展插件 · <a href="https://github.com/Chang-zhi/PhobosExt_Changzhi" target="_blank" class="doc-link">GitHub 仓库</a></p>
+<p>PhobosExt_Changzhi — 由 Chang_zhi 维护的<strong>非官方</strong> YR 扩展插件 · <a href="https://github.com/Chang-zhi/PhobosExt_Changzhi" target="_blank" class="doc-link">GitHub 仓库</a></p>
 <p>《红色警戒2：尤里的复仇》及其相关素材归 Electronic Arts 所有。</p>
 </footer>
 </div>
+
+<button class="to-top" id="toTop" title="返回顶部" aria-label="返回顶部">↑</button>
 
 
 <script>
@@ -1399,7 +1608,132 @@ function switchPage(p)
       navItems[i].classList.add('nav__item--active');
   }
 
+  /* 展开当前页子目录 → 高亮首条 → 回顶 */
+  openNavGroup(p);
+  highlightFirstSub(p);
   window.scrollTo(0, 0);
+  scrollNavIntoView(document.querySelector('.nav__item--active'));
+}
+
+/* 切页时先高亮该页第一条 */
+function highlightFirstSub(page)
+{
+  var group = null;
+  var groups = document.querySelectorAll('.nav__group');
+  for(var i = 0; i < groups.length; i++)
+  {
+    if(navGroupPage(groups[i]) === page)
+      group = groups[i];
+  }
+
+  var first = group ? group.querySelector('.nav__subitem') : null;
+  markNavSub(first ? first.getAttribute('data-target') : null);
+  spyLock = Date.now() + 1200;
+  /* 回顶动画结束后按实际位置校正 */
+  setTimeout(function(){ updateNavSpy(true); }, 900);
+  setTimeout(function(){ updateNavSpy(true); }, 1600);
+}
+
+/* ============================================================
+   侧边栏子目录：展开 / 收起 / 高亮
+   ============================================================ */
+var spyLock = 0;      // 平滑滚动期间暂停侦测，避免高亮抖动
+
+function navGroupPage(group)
+{
+  var item = group.querySelector('.nav__item--parent');
+  return item ? item.getAttribute('page') : '';
+}
+
+function openNavGroup(page)
+{
+  var groups = document.querySelectorAll('.nav__group');
+  for(var i = 0; i < groups.length; i++)
+    groups[i].classList.toggle('nav__group--open', navGroupPage(groups[i]) === page);
+}
+
+/* 只切换指定分组，不切换页面 */
+function toggleNavGroup(page)
+{
+  var groups = document.querySelectorAll('.nav__group');
+  for(var i = 0; i < groups.length; i++)
+  {
+    if(navGroupPage(groups[i]) === page)
+      groups[i].classList.toggle('nav__group--open');
+  }
+}
+
+function markNavSub(id, lock)
+{
+  var subs = document.querySelectorAll('.nav__subitem');
+  for(var i = 0; i < subs.length; i++)
+    subs[i].classList.toggle('nav__subitem--active',
+      !!id && subs[i].getAttribute('data-target') === id);
+
+  if(id)
+    scrollNavIntoView(document.querySelector('.nav__subitem--active'));
+
+  if(lock !== false)
+    spyLock = Date.now() + 900;
+}
+
+/* 侧边栏自身滚动到条目可见，不影响正文 */
+function scrollNavIntoView(el)
+{
+  var nav = document.getElementById('mainNav');
+  if(!nav || !el)
+    return;
+
+  var top = el.offsetTop;
+  if(top < nav.scrollTop + 8)
+    nav.scrollTop = Math.max(0, top - 74);
+  else if(top + el.offsetHeight > nav.scrollTop + nav.clientHeight - 8)
+    nav.scrollTop = top + el.offsetHeight - nav.clientHeight + 74;
+}
+
+/* 滚动侦测：高亮正文当前所在条目 */
+function updateNavSpy(force)
+{
+  if(!force && Date.now() < spyLock)
+    return;
+
+  var sec = document.querySelector('section.active');
+  if(!sec)
+    return;
+
+  var blocks = sec.children;
+  var line = window.innerHeight * 0.3;
+  var ids = [];
+
+  for(var i = 0; i < blocks.length; i++)
+  {
+    if(blocks[i].id)
+      ids.push(blocks[i].id);
+  }
+
+  if(!ids.length)
+  {
+    if(document.querySelector('.nav__subitem--active'))
+      markNavSub(null, false);
+    return;
+  }
+
+  var current = ids[0];      /* 未滚到任何一条时算第一条 */
+  for(var i = 0; i < ids.length; i++)
+  {
+    var node = document.getElementById(ids[i]);
+    if(!node)
+      continue;
+    if(node.getBoundingClientRect().top <= line)
+      current = ids[i];
+    else
+      break;
+  }
+
+  var cur = document.querySelector('.nav__subitem--active');
+  var curId = cur ? cur.getAttribute('data-target') : null;
+  if(current !== curId)
+    markNavSub(current, false);
 }
 
 /* ============================================================
@@ -1424,9 +1758,7 @@ function scrollToFeature(id, rowIndex)
   if(!el)
     return;
 
-  var rect = el.getBoundingClientRect();
-  var targetY = rect.top + window.scrollY - window.innerHeight * 0.2;
-  window.scrollTo({ top: targetY, behavior: 'smooth' });
+  markNavSub(id);
 
   var flashTarget = el;
   if(rowIndex !== null && rowIndex !== undefined)
@@ -1436,10 +1768,87 @@ function scrollToFeature(id, rowIndex)
       flashTarget = rows[rowIndex];
   }
 
-  flashTarget.classList.remove('flash');
-  void flashTarget.offsetWidth;
-  flashTarget.classList.add('flash');
-  setTimeout(function(){ flashTarget.classList.remove('flash'); }, 1800);
+  var rect = el.getBoundingClientRect();
+  var targetY = rect.top + window.scrollY - window.innerHeight * 0.2;
+  var maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+  if(targetY > maxY) targetY = maxY;
+  if(targetY < 0)    targetY = 0;
+
+  /* 已在目标位置直接闪，否则等滑动到位再闪 */
+  if(Math.abs(targetY - window.scrollY) < 4)
+  {
+    flashElement(flashTarget);
+    return;
+  }
+
+  window.scrollTo({ top: targetY, behavior: 'smooth' });
+  whenScrollSettled(function(){ flashElement(flashTarget); });
+}
+
+function flashElement(el)
+{
+  el.classList.remove('flash');
+  void el.offsetWidth;
+  el.classList.add('flash');
+  setTimeout(function(){ el.classList.remove('flash'); }, 1800);
+}
+
+/* 滚动停止后回调：优先 scrollend，兜底轮询＋超时 */
+function whenScrollSettled(cb)
+{
+  var fired = false;
+  var rafId = 0;
+  var timeoutId = 0;
+
+  function finish()
+  {
+    if(fired)
+      return;
+    fired = true;
+    if(rafId)
+      cancelAnimationFrame(rafId);
+    clearTimeout(timeoutId);
+    window.removeEventListener('scrollend', finish);
+    cb();
+  }
+
+  timeoutId = setTimeout(finish, 1600);
+
+  if('onscrollend' in window)
+  {
+    window.addEventListener('scrollend', finish, { once: true });
+    return;
+  }
+
+  var startY = window.scrollY;
+  var lastY = startY;
+  var idle = 0;
+  var moved = false;
+  var t0 = Date.now();
+
+  rafId = requestAnimationFrame(function tick(){
+    if(fired)
+      return;
+
+    var y = window.scrollY;
+    if(Math.abs(y - startY) >= 1)
+      moved = true;
+
+    if(Math.abs(y - lastY) < 1)
+      idle++;
+    else
+    {
+      idle = 0;
+      lastY = y;
+    }
+
+    if(moved && idle >= 8 && Date.now() - t0 > 200)
+    {
+      finish();
+      return;
+    }
+    rafId = requestAnimationFrame(tick);
+  });
 }
 
 /* ============================================================
@@ -1521,15 +1930,36 @@ function renderResults(list, query)
   }
   else
   {
+    /* 按所属页面分组；组序按首次出现顺序，保证相关度高的分组仍在前面 */
+    var groupOrder = [];
+    var groups = {};
     for(var i = 0; i < list.length; i++)
     {
-      var e = list[i];
-      var num = e.num ? '<span class="sr__id">' + escapeHtml(e.num) + '</span>'
-                      : '<span class="sr__id">·</span>';
-      var sub = (e.type === 'id' && e.sub)
-        ? '<div class="sr__sub">参数：' + escapeHtml(e.sub) + '</div>' : '';
-      html += '<div class="sr" data-i="' + i + '">' + num + escapeHtml(e.title)
-            + '<span class="sr__page">' + escapeHtml(e.label) + '</span>' + sub + '</div>';
+      var lb = list[i].label || '其他';
+      if(!groups[lb])
+      {
+        groups[lb] = [];
+        groupOrder.push(lb);
+      }
+      groups[lb].push(i);
+    }
+
+    for(var g = 0; g < groupOrder.length; g++)
+    {
+      var lb = groupOrder[g];
+      var idxs = groups[lb];
+      html += '<div class="sr__group">' + escapeHtml(lb)
+            + '<span class="sr__group-count">' + idxs.length + '</span></div>';
+
+      for(var j = 0; j < idxs.length; j++)
+      {
+        var e = list[idxs[j]];
+        var num = e.num ? '<span class="sr__id">' + escapeHtml(e.num) + '</span>'
+                        : '<span class="sr__id">·</span>';
+        var sub = (e.type === 'id' && e.sub)
+          ? '<div class="sr__sub">参数：' + escapeHtml(e.sub) + '</div>' : '';
+        html += '<div class="sr" data-i="' + idxs[j] + '">' + num + escapeHtml(e.title) + sub + '</div>';
+      }
     }
   }
 
@@ -1644,15 +2074,86 @@ document.addEventListener('DOMContentLoaded', function()
       item.addEventListener('click', function()
       {
         var p = this.getAttribute('page');
-        if(p)
+        if(!p)
+          return;
+
+        // 点当前页标题＝折叠/展开其子目录
+        if(this.classList.contains('nav__item--active') && this.classList.contains('nav__item--parent'))
+          toggleNavGroup(p);
+        else
           switchPage(p);
       });
     })(navItems[i]);
   }
 
+  // 子目录条目：跳到正文对应位置
+  var navSubs = document.querySelectorAll('.nav__subitem');
+  for(var j = 0; j < navSubs.length; j++)
+  {
+    (function(sub)
+    {
+      sub.addEventListener('click', function()
+      {
+        var id = this.getAttribute('data-target');
+        var page = this.getAttribute('data-page');
+        if(!id)
+          return;
+
+        if(document.querySelector('section.active').id !== 'sec_' + page)
+        {
+          switchPage(page);
+          setTimeout(function(){ scrollToFeature(id); }, 120);
+        }
+        else
+        {
+          scrollToFeature(id);
+        }
+      });
+    })(navSubs[j]);
+  }
+
+  // 三角：只展开/收起，不切换页面
+  var navCarets = document.querySelectorAll('.nav__caret');
+  for(var k = 0; k < navCarets.length; k++)
+  {
+    (function(caret)
+    {
+      caret.addEventListener('click', function(ev)
+      {
+        ev.preventDefault();
+        ev.stopPropagation();   /* 阻止冒泡到标题 */
+        var item = this.parentNode;
+        var p = item ? item.getAttribute('page') : null;
+        if(p)
+          toggleNavGroup(p);
+      });
+    })(navCarets[k]);
+  }
+
+  // 正文滚动时同步高亮侧边栏子目录
+  var spyTick = false;
+  window.addEventListener('scroll', function()
+  {
+    if(spyTick)
+      return;
+    spyTick = true;
+    requestAnimationFrame(function(){ spyTick = false; updateNavSpy(); });
+  }, { passive: true });
+
   // 搜索框
   var input = document.getElementById('searchInput');
-  input.addEventListener('input', doSearch);
+  var searchBox = input.parentNode;
+  var clearBtn = document.getElementById('searchClear');
+
+  function syncClear()
+  {
+    if(input.value)
+      searchBox.classList.add('has-text');
+    else
+      searchBox.classList.remove('has-text');
+  }
+
+  input.addEventListener('input', function(){ syncClear(); doSearch(); });
   input.addEventListener('focus', doSearch);
   input.addEventListener('keydown', function(ev)
   {
@@ -1667,9 +2168,20 @@ document.addEventListener('DOMContentLoaded', function()
     else if(ev.key === 'Escape')
     {
       input.value = '';
+      syncClear();
       closeSearch();
       input.blur();
     }
+  });
+
+  // 自绘清空按钮（两条红线）
+  clearBtn.addEventListener('mousedown', function(ev){ ev.preventDefault(); });
+  clearBtn.addEventListener('click', function()
+  {
+    input.value = '';
+    syncClear();
+    closeSearch();
+    input.focus();
   });
 
   // 快捷键：/ 或 Ctrl+K 聚焦搜索
@@ -1718,6 +2230,30 @@ document.addEventListener('DOMContentLoaded', function()
       document.body.classList.add('nav-collapsed');
   });
 });
+
+/* ============================================================
+   返回顶部
+   ============================================================ */
+(function(){
+  var btn = document.getElementById('toTop');
+  if(!btn)
+    return;
+
+  function update()
+  {
+    if(window.scrollY > 420)
+      btn.classList.add('show');
+    else
+      btn.classList.remove('show');
+  }
+
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+
+  btn.addEventListener('click', function(){
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
 </script>
 </body>
 </html>

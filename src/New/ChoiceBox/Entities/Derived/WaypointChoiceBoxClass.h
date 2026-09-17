@@ -2,15 +2,15 @@
 
 #include "../Base/MapChoiceBoxClass.h"
 
-#include <Phobos.h>
+#include <PhobosExt.h>
 #include <Utilities/SavegameDef.h>
 
 #include <string>
 #include <vector>
 #include <memory>
 
-class PhobosStreamWriter;
-class PhobosStreamReader;
+class PhobosExtStreamWriter;
+class PhobosExtStreamReader;
 class ChoiceBoxTypeClass;
 
 class WaypointChoiceBoxClass final : public MapChoiceBoxClass
@@ -41,8 +41,8 @@ public:
 	static void Clear();                    // 清空所有实例（同 ClearAll）
 
 	// ===== 序列化 =====
-	bool Load(PhobosStreamReader& Stm, bool RegisterForChange) override;
-	bool Save(PhobosStreamWriter& Stm) const override;
+	bool Load(PhobosExtStreamReader& Stm, bool RegisterForChange) override;
+	bool Save(PhobosExtStreamWriter& Stm) const override;
 
 protected:
 	template <typename T>

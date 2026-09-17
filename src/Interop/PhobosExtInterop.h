@@ -3,7 +3,7 @@
 #include <Windows.h>
 
 // =============================================================================
-// Phobos Interop - Auto-detect and load Phobos module
+// PhobosExt Interop - Auto-detect and load PhobosExt module
 // Identified via GetInteropAPIVersion export
 // =============================================================================
 
@@ -93,16 +93,16 @@ typedef HRESULT(__stdcall* fnGetInteropAPIVersion)(InteropAPIVersion* pVersion);
 	FN(Variables_SetGlobal,             fnVariables_SetGlobal, "_Variables_SetGlobal_Phobos@8")
 
 // ============================================================================
-// PhobosInterop - Static class loading Phobos & holding all function pointers
+// PhobosExtInterop - Static class loading PhobosExt & holding all function pointers
 // Call Init() once, then use static function pointers directly
 // ============================================================================
 
-class PhobosInterop
+class PhobosExtInterop
 {
 public:
 	static void Init();
 	static bool IsAvailable() { return s_phobosLoaded; }
-	static HMODULE GetModuleHandle() { return s_hPhobos; }
+	static HMODULE GetModuleHandle() { return s_hPhobosExt; }
 	static bool GetVersion(InteropAPIVersion& version);
 	static bool CheckVersion();
 
@@ -113,5 +113,5 @@ public:
 
 private:
 	static bool s_phobosLoaded;
-	static HMODULE s_hPhobos;
+	static HMODULE s_hPhobosExt;
 };

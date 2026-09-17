@@ -7,7 +7,7 @@
 
 #include <SwizzleManagerClass.h>
 
-class PhobosSwizzle
+class PhobosExtSwizzle
 {
 public:
 	/**
@@ -42,6 +42,6 @@ struct Swizzle
 	Swizzle(T& object)
 	{
 		if constexpr (std::is_pointer_v<T>)
-			PhobosSwizzle::RegisterPointerForChange(object);
+			PhobosExtSwizzle::RegisterPointerForChange(object);
 	}
 };

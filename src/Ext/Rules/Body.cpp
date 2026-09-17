@@ -1,7 +1,7 @@
 #include "Body.h"
 #include <Windows.h>
 #include <string.h>
-#include <Phobos.h>
+#include <PhobosExt.h>
 #include <Utilities/TemplateDef.h>
 #include <Utilities/Parser.h>
 #include <FPSCounter.h>
@@ -93,9 +93,9 @@ void RulesExt::ExtData::LoadAfterTypeData(RulesClass* pThis, CCINIClass* pINI)
 		{
 			std::vector<TechnoTypeClass*> objectsList;
 			char* context = nullptr;
-			pINI->ReadString("AITargetTypes", pINI->GetKeyName("AITargetTypes", i), "", Phobos::readBuffer);
+			pINI->ReadString("AITargetTypes", pINI->GetKeyName("AITargetTypes", i), "", PhobosExt::readBuffer);
 
-			for (char* cur = strtok_s(Phobos::readBuffer, Phobos::readDelims, &context); cur; cur = strtok_s(nullptr, Phobos::readDelims, &context))
+			for (char* cur = strtok_s(PhobosExt::readBuffer, PhobosExt::readDelims, &context); cur; cur = strtok_s(nullptr, PhobosExt::readDelims, &context))
 			{
 				TechnoTypeClass* buffer;
 				if (Parser<TechnoTypeClass*>::TryParse(cur, &buffer))
@@ -139,7 +139,7 @@ void RulesExt::ExtData::Serialize(T& Stm)
 		;
 }
 
-void RulesExt::ExtData::LoadFromStream(PhobosStreamReader& Stm)
+void RulesExt::ExtData::LoadFromStream(PhobosExtStreamReader& Stm)
 {
 	Extension<RulesClass>::LoadFromStream(Stm);
 	this->Serialize(Stm);
@@ -147,7 +147,7 @@ void RulesExt::ExtData::LoadFromStream(PhobosStreamReader& Stm)
 	this->ReplaceVoxelLightSources();
 }
 
-void RulesExt::ExtData::SaveToStream(PhobosStreamWriter& Stm)
+void RulesExt::ExtData::SaveToStream(PhobosExtStreamWriter& Stm)
 {
 	Extension<RulesClass>::SaveToStream(Stm);
 	this->Serialize(Stm);
@@ -196,10 +196,10 @@ DEFINE_HOOK(0x678841, RulesClass_Load_Suffix, 0x7)
 {
 	auto buffer = RulesExt::Global();
 
-	PhobosByteStream Stm(0);
+	PhobosExtByteStream Stm(0);
 	if (Stm.ReadBlockFromStream(RulesExt::g_pStm))
 	{
-		PhobosStreamReader Reader(Stm);
+		PhobosExtStreamReader Reader(Stm);
 
 		if (Reader.Expect(RulesExt::Canary) && Reader.RegisterChange(buffer))
 			buffer->LoadFromStream(Reader);
@@ -211,8 +211,8 @@ DEFINE_HOOK(0x678841, RulesClass_Load_Suffix, 0x7)
 DEFINE_HOOK(0x675205, RulesClass_Save_Suffix, 0x8)
 {
 	auto buffer = RulesExt::Global();
-	PhobosByteStream saver(sizeof(*buffer));
-	PhobosStreamWriter writer(saver);
+	PhobosExtByteStream saver(sizeof(*buffer));
+	PhobosExtStreamWriter writer(saver);
 
 	writer.Expect(RulesExt::Canary);
 	writer.RegisterChange(buffer);

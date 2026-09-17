@@ -530,7 +530,7 @@ void FootPathVisualizer::DrawPathForUnit(FootClass* pFoot, const FootPathConfig&
 	}
 }
 
-bool FootPathVisualizer::SaveGlobals(PhobosStreamWriter& Stm)
+bool FootPathVisualizer::SaveGlobals(PhobosExtStreamWriter& Stm)
 {
 	Stm.Save(AnimationFrame);
 
@@ -556,7 +556,7 @@ bool FootPathVisualizer::SaveGlobals(PhobosStreamWriter& Stm)
 	return true;
 }
 
-bool FootPathVisualizer::LoadGlobals(PhobosStreamReader& Stm)
+bool FootPathVisualizer::LoadGlobals(PhobosExtStreamReader& Stm)
 {
 	Clear();
 	PendingRegistry.clear();

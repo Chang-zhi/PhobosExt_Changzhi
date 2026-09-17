@@ -9,7 +9,7 @@
 
 class HouseClass;
 
-enum class PhobosTriggerAction : unsigned int
+enum class PhobosExtTriggerAction : unsigned int
 {
 	// 指定类型设置路径点标签
 	SetWaypointTextBoxByType = 549,
@@ -287,8 +287,8 @@ public:
 
 		virtual void InvalidatePointer(void* ptr, bool bRemoved) override { }
 
-		virtual void LoadFromStream(PhobosStreamReader& Stm) override;
-		virtual void SaveToStream(PhobosStreamWriter& Stm) override;
+		virtual void LoadFromStream(PhobosExtStreamReader& Stm) override;
+		virtual void SaveToStream(PhobosExtStreamWriter& Stm) override;
 
 	private:
 		template <typename T>

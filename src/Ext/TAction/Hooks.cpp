@@ -17,7 +17,7 @@ DEFINE_HOOK(0x6DD8B0, TActionClass_Execute, 0x6)
 
 	bool handled;
 
-	//Debug::Log("[Phobos Hook]: pThis=%p, pHouse=%p, pObject=%p, pTrigger=%p, pLoc=%p\n",
+	//Debug::Log("[PhobosExt Hook]: pThis=%p, pHouse=%p, pObject=%p, pTrigger=%p, pLoc=%p\n",
 	//	pThis, pHouse, pObject, pTrigger, pLocation);
 
 	if (pObject)

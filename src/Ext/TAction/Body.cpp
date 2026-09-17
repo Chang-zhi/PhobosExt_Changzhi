@@ -2,7 +2,7 @@
 #include "ScriptManipulator.h"
 #include "TaskForceManipulator.h"
 
-#include <Interop/PhobosInterop.h>
+#include <Interop/PhobosExtInterop.h>
 
 #include <YRpp.h>
 #include <TagClass.h>
@@ -50,13 +50,13 @@ void TActionExt::ExtData::Serialize(T& Stm)
 	//Stm;
 }
 
-void TActionExt::ExtData::LoadFromStream(PhobosStreamReader& Stm)
+void TActionExt::ExtData::LoadFromStream(PhobosExtStreamReader& Stm)
 {
 	Extension<TActionClass>::LoadFromStream(Stm);
 	this->Serialize(Stm);
 }
 
-void TActionExt::ExtData::SaveToStream(PhobosStreamWriter& Stm)
+void TActionExt::ExtData::SaveToStream(PhobosExtStreamWriter& Stm)
 {
 	Extension<TActionClass>::SaveToStream(Stm);
 	this->Serialize(Stm);
@@ -82,190 +82,190 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 		break;
 	}
 
-	// Phobos
-	switch (static_cast<PhobosTriggerAction>(pThis->ActionKind))
+	// PhobosExt
+	switch (static_cast<PhobosExtTriggerAction>(pThis->ActionKind))
 	{
 
-	case PhobosTriggerAction::SetWaypointTextBoxByType:
+	case PhobosExtTriggerAction::SetWaypointTextBoxByType:
 		return TActionExt::SetWaypointTextBoxByType(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::SetWaypointTextBoxByData:
+	case PhobosExtTriggerAction::SetWaypointTextBoxByData:
 		return TActionExt::SetWaypointTextBoxByData(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::ClearWaypointTextBox:
+	case PhobosExtTriggerAction::ClearWaypointTextBox:
 		return TActionExt::ClearWaypointTextBox(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::ClearAllWaypointTextBoxs:
+	case PhobosExtTriggerAction::ClearAllWaypointTextBoxs:
 		return TActionExt::ClearAllWaypointTextBoxs(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::BindAllTeamMemberToTag:
+	case PhobosExtTriggerAction::BindAllTeamMemberToTag:
 		return TActionExt::BindAllTeamMemberToTag(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::BindOwnerTeamMemberToTag:
+	case PhobosExtTriggerAction::BindOwnerTeamMemberToTag:
 		return TActionExt::BindOwnerTeamMemberToTag(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::BindAllTechnoTypeToTag:
+	case PhobosExtTriggerAction::BindAllTechnoTypeToTag:
 		return TActionExt::BindAllTechnoTypeToTag(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::BindOwnerTechnoTypeToTag:
+	case PhobosExtTriggerAction::BindOwnerTechnoTypeToTag:
 		return TActionExt::BindOwnerTechnoTypeToTag(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::GiveHouseMoney:
+	case PhobosExtTriggerAction::GiveHouseMoney:
 		return TActionExt::GiveHouseMoney(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::TakeHouseMoney:
+	case PhobosExtTriggerAction::TakeHouseMoney:
 		return TActionExt::TakeHouseMoney(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::SetHouseMoney:
+	case PhobosExtTriggerAction::SetHouseMoney:
 		return TActionExt::SetHouseMoney(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::AddBaseNodeForHouseAtWaypoint:
+	case PhobosExtTriggerAction::AddBaseNodeForHouseAtWaypoint:
 		return TActionExt::AddBaseNodeForHouseAtWaypoint(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::RemoveAllBaseNodeForHouseAtWaypoint:
+	case PhobosExtTriggerAction::RemoveAllBaseNodeForHouseAtWaypoint:
 		return TActionExt::RemoveAllBaseNodeForHouseAtWaypoint(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::RemoveBaseNodesOfBuildingTypeForHouse:
+	case PhobosExtTriggerAction::RemoveBaseNodesOfBuildingTypeForHouse:
 		return TActionExt::RemoveBaseNodesOfBuildingTypeForHouse(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::DestroyAllTagByTagTypeSafely:
+	case PhobosExtTriggerAction::DestroyAllTagByTagTypeSafely:
 		return TActionExt::DestroyAllTagByTagTypeSafely(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::BindTagToTechnoTypeAtWaypoint:
+	case PhobosExtTriggerAction::BindTagToTechnoTypeAtWaypoint:
 		return TActionExt::BindTagToTechnoTypeAtWaypoint(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::BindTagToTechnoTypeOfHouseAtWaypoint:
+	case PhobosExtTriggerAction::BindTagToTechnoTypeOfHouseAtWaypoint:
 		return TActionExt::BindTagToTechnoTypeOfHouseAtWaypoint(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::BindTagToSpecificTechnoTypeWithinWaypointRange:
+	case PhobosExtTriggerAction::BindTagToSpecificTechnoTypeWithinWaypointRange:
 	 	return TActionExt::BindTagToSpecificTechnoTypeWithinWaypointRange(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::BindTagToSpecificTechnoTypeOfSpecificOwnerWithinWaypointRange:
+	case PhobosExtTriggerAction::BindTagToSpecificTechnoTypeOfSpecificOwnerWithinWaypointRange:
 	 	return TActionExt::BindTagToSpecificTechnoTypeOfSpecificOwnerWithinWaypointRange(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::BindTagToAllTechnoTypesWithinWaypointRange:
+	case PhobosExtTriggerAction::BindTagToAllTechnoTypesWithinWaypointRange:
 	 	return TActionExt::BindTagToAllTechnoTypesWithinWaypointRange(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::BindTagToAllTechnoTypesOfSpecificOwnerWithinWaypointRange:
+	case PhobosExtTriggerAction::BindTagToAllTechnoTypesOfSpecificOwnerWithinWaypointRange:
 		return TActionExt::BindTagToAllTechnoTypesOfSpecificOwnerWithinWaypointRange(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::UnifyAllInstancesOfSameTagType:
+	case PhobosExtTriggerAction::UnifyAllInstancesOfSameTagType:
 		return TActionExt::UnifyAllInstancesOfSameTagType(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::SetRecruitableForFoot:
+	case PhobosExtTriggerAction::SetRecruitableForFoot:
 		return TActionExt::SetRecruitableForFoot(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::BindTagsToAllTechTypesInWaypointRangeExceptSpecified:
+	case PhobosExtTriggerAction::BindTagsToAllTechTypesInWaypointRangeExceptSpecified:
 		return TActionExt::BindTagsToAllTechTypesInWaypointRangeExceptSpecified(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::BindTagsToAllTechTypesOfTriggerOwnerInWaypointRangeExceptSpecified:
+	case PhobosExtTriggerAction::BindTagsToAllTechTypesOfTriggerOwnerInWaypointRangeExceptSpecified:
 		return TActionExt::BindTagsToAllTechTypesOfTriggerOwnerInWaypointRangeExceptSpecified(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::UpdateAllBuildingAnims:
+	case PhobosExtTriggerAction::UpdateAllBuildingAnims:
 		return TActionExt::UpdateAllBuildingAnims(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::UpdateAssociatedBuildingsAnims:
+	case PhobosExtTriggerAction::UpdateAssociatedBuildingsAnims:
 		return TActionExt::UpdateAssociatedBuildingsAnims(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::UpdateOwnerBuildingsAnimations:
+	case PhobosExtTriggerAction::UpdateOwnerBuildingsAnimations:
 		return TActionExt::UpdateOwnerBuildingsAnimations(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::CreateTeamConsideringLimits:
+	case PhobosExtTriggerAction::CreateTeamConsideringLimits:
 		return TActionExt::CreateTeamConsideringLimits(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::RecruitNearbyFootToTeam:
+	case PhobosExtTriggerAction::RecruitNearbyFootToTeam:
 		return TActionExt::RecruitNearbyFootToTeam(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::SetUnitTextBoxByTriggerType:
+	case PhobosExtTriggerAction::SetUnitTextBoxByTriggerType:
 		return TActionExt::SetUnitTextBoxByTriggerType(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::SetUnitTextBoxByTriggerData:
+	case PhobosExtTriggerAction::SetUnitTextBoxByTriggerData:
 		return TActionExt::SetUnitTextBoxByTriggerData(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::SetUnitTextBoxByTeamType:
+	case PhobosExtTriggerAction::SetUnitTextBoxByTeamType:
 		return TActionExt::SetUnitTextBoxByTeamType(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::SetUnitTextBoxByTeamData:
+	case PhobosExtTriggerAction::SetUnitTextBoxByTeamData:
 		return TActionExt::SetUnitTextBoxByTeamData(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::ClearUnitTextBoxByType:
+	case PhobosExtTriggerAction::ClearUnitTextBoxByType:
 		return TActionExt::ClearUnitTextBoxByType(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::ClearUnitTextBoxByTag:
+	case PhobosExtTriggerAction::ClearUnitTextBoxByTag:
 		return TActionExt::ClearUnitTextBoxByTag(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::ClearUnitTextBoxByTechType:
+	case PhobosExtTriggerAction::ClearUnitTextBoxByTechType:
 		return TActionExt::ClearUnitTextBoxByTechType(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::ClearUnitTextBoxByHouseAndType:
+	case PhobosExtTriggerAction::ClearUnitTextBoxByHouseAndType:
 		return TActionExt::ClearUnitTextBoxByHouseAndType(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::ClearUnitTextBoxByTeam:
+	case PhobosExtTriggerAction::ClearUnitTextBoxByTeam:
 		return TActionExt::ClearUnitTextBoxByTeam(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::ClearAllUnitTextBoxs:
+	case PhobosExtTriggerAction::ClearAllUnitTextBoxs:
 		return TActionExt::ClearAllUnitTextBoxs(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::ClearAllTextBoxs:
+	case PhobosExtTriggerAction::ClearAllTextBoxs:
 		return TActionExt::ClearAllTextBoxs(pThis, pHouse, pObject, pTrigger, location);
 
 	// ---- ChoiceBox Actions ----
-	case PhobosTriggerAction::SetWaypointChoiceBox:
+	case PhobosExtTriggerAction::SetWaypointChoiceBox:
 		return TActionExt::SetWaypointChoiceBox(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::SetScreenChoiceBox:
+	case PhobosExtTriggerAction::SetScreenChoiceBox:
 		return TActionExt::SetScreenChoiceBox(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::ClearChoiceBoxByID:
+	case PhobosExtTriggerAction::ClearChoiceBoxByID:
 		return TActionExt::ClearChoiceBoxByID(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::ClearAllChoiceBoxs:
+	case PhobosExtTriggerAction::ClearAllChoiceBoxs:
 		return TActionExt::ClearAllChoiceBoxs(pThis, pHouse, pObject, pTrigger, location);
 
 	// ---- Script Manipulation Actions ----
-	case PhobosTriggerAction::ClearScript:
+	case PhobosExtTriggerAction::ClearScript:
 		return TActionExt::ClearScript(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::CopyScript:
+	case PhobosExtTriggerAction::CopyScript:
 		return TActionExt::CopyScript(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::ModifyScriptByParam:
+	case PhobosExtTriggerAction::ModifyScriptByParam:
 		return TActionExt::ModifyScriptByParam(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::ModifyScriptByLocalVar:
+	case PhobosExtTriggerAction::ModifyScriptByLocalVar:
 		return TActionExt::ModifyScriptByLocalVar(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::ModifyScriptByGlobalVar:
+	case PhobosExtTriggerAction::ModifyScriptByGlobalVar:
 		return TActionExt::ModifyScriptByGlobalVar(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::RebindTeamTypeScript:
+	case PhobosExtTriggerAction::RebindTeamTypeScript:
 		return TActionExt::RebindTeamTypeScript(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::ResetTeamTypeScript:
+	case PhobosExtTriggerAction::ResetTeamTypeScript:
 		return TActionExt::ResetTeamTypeScript(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::ResetAllTeamTypeScripts:
+	case PhobosExtTriggerAction::ResetAllTeamTypeScripts:
 		return TActionExt::ResetAllTeamTypeScripts(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::RestoreScriptContent:
+	case PhobosExtTriggerAction::RestoreScriptContent:
 		return TActionExt::RestoreScriptContent(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::RestoreAllScriptContents:
+	case PhobosExtTriggerAction::RestoreAllScriptContents:
 		return TActionExt::RestoreAllScriptContents(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::SeekTeamTypeScript:
+	case PhobosExtTriggerAction::SeekTeamTypeScript:
 		return TActionExt::SeekTeamTypeScript(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::SetTeamTypeMaxValue:
+	case PhobosExtTriggerAction::SetTeamTypeMaxValue:
 		return TActionExt::SetTeamTypeMaxValue(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::RegisterFootPathVisualizer:
+	case PhobosExtTriggerAction::RegisterFootPathVisualizer:
 		return TActionExt::RegisterFootPathVisualizer(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::UnregisterFootPathVisualizer:
+	case PhobosExtTriggerAction::UnregisterFootPathVisualizer:
 		return TActionExt::UnregisterFootPathVisualizer(pThis, pHouse, pObject, pTrigger, location);
 
 	// ---- 任务简报 / 最佳时间 Actions ----
-	case PhobosTriggerAction::SetMissionBriefing:
+	case PhobosExtTriggerAction::SetMissionBriefing:
 		return TActionExt::SetMissionBriefing(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::SetOverParTitle:
+	case PhobosExtTriggerAction::SetOverParTitle:
 		return TActionExt::SetOverParTitle(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::SetOverParMessage:
+	case PhobosExtTriggerAction::SetOverParMessage:
 		return TActionExt::SetOverParMessage(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::SetUnderParTitle:
+	case PhobosExtTriggerAction::SetUnderParTitle:
 		return TActionExt::SetUnderParTitle(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::SetUnderParMessage:
+	case PhobosExtTriggerAction::SetUnderParMessage:
 		return TActionExt::SetUnderParMessage(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::SetParTimeEasy:
+	case PhobosExtTriggerAction::SetParTimeEasy:
 		return TActionExt::SetParTimeEasy(pThis, pHouse, pObject, pTrigger, location);
 
 	// ---- TaskForce Editing Actions ----
-	case PhobosTriggerAction::ClearTaskForce:
+	case PhobosExtTriggerAction::ClearTaskForce:
 		return TActionExt::ClearTaskForce(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::CopyTaskForce:
+	case PhobosExtTriggerAction::CopyTaskForce:
 		return TActionExt::CopyTaskForce(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::ModifyTaskForceEntry:
+	case PhobosExtTriggerAction::ModifyTaskForceEntry:
 		return TActionExt::ModifyTaskForceEntry(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::RebindTeamTypeTaskForce:
+	case PhobosExtTriggerAction::RebindTeamTypeTaskForce:
 		return TActionExt::RebindTeamTypeTaskForce(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::RestoreTaskForce:
+	case PhobosExtTriggerAction::RestoreTaskForce:
 		return TActionExt::RestoreTaskForce(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::RestoreAllTaskForces:
+	case PhobosExtTriggerAction::RestoreAllTaskForces:
 		return TActionExt::RestoreAllTaskForces(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::ResetTeamTypeTaskForce:
+	case PhobosExtTriggerAction::ResetTeamTypeTaskForce:
 		return TActionExt::ResetTeamTypeTaskForce(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::ResetAllTeamTypeTaskForces:
+	case PhobosExtTriggerAction::ResetAllTeamTypeTaskForces:
 		return TActionExt::ResetAllTeamTypeTaskForces(pThis, pHouse, pObject, pTrigger, location);
 
-	case PhobosTriggerAction::RecruitGroupToTeam:
+	case PhobosExtTriggerAction::RecruitGroupToTeam:
 		return TActionExt::RecruitGroupToTeam(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::UndeployHouseUnits:
+	case PhobosExtTriggerAction::UndeployHouseUnits:
 		return TActionExt::UndeployHouseUnits(pThis, pHouse, pObject, pTrigger, location);
 
-	case PhobosTriggerAction::SetParTimeMedium:
+	case PhobosExtTriggerAction::SetParTimeMedium:
 		return TActionExt::SetParTimeMedium(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::SetParTimeDifficult:
+	case PhobosExtTriggerAction::SetParTimeDifficult:
 		return TActionExt::SetParTimeDifficult(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::SetGameSpeed:
+	case PhobosExtTriggerAction::SetGameSpeed:
 		return TActionExt::SetGameSpeed(pThis, pHouse, pObject, pTrigger, location);
 
-	case PhobosTriggerAction::DisableLoadGame:
+	case PhobosExtTriggerAction::DisableLoadGame:
 		return TActionExt::DisableLoadGame(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::DisableSaveGame:
+	case PhobosExtTriggerAction::DisableSaveGame:
 		return TActionExt::DisableSaveGame(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::EnableLoadGame:
+	case PhobosExtTriggerAction::EnableLoadGame:
 		return TActionExt::EnableLoadGame(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::EnableSaveGame:
+	case PhobosExtTriggerAction::EnableSaveGame:
 		return TActionExt::EnableSaveGame(pThis, pHouse, pObject, pTrigger, location);
 
-	case PhobosTriggerAction::SellAllBuildingsOfHouse:
+	case PhobosExtTriggerAction::SellAllBuildingsOfHouse:
 		return TActionExt::SellAllBuildingsOfHouse(pThis, pHouse, pObject, pTrigger, location);
 
-	// case PhobosTriggerAction::testAction:
+	// case PhobosExtTriggerAction::testAction:
 	// 	return TActionExt::testAction(pThis, pHouse, pObject, pTrigger, location);
 
 	default:
@@ -284,17 +284,17 @@ static int testReadVar(bool bGlobal, int index)
 	if (index < 0 || index >= maxIndex)
 		return 0;
 
-	if (PhobosInterop::IsAvailable())
+	if (PhobosExtInterop::IsAvailable())
 	{
 		if (bGlobal)
 		{
-			PhobosInterop::Variables_GetGlobal(index, &value);
-			Debug::LogAndMessage("[OtherDll] [testReadVar] PhobosInterop Global[%d] = %d\n", index, value);
+			PhobosExtInterop::Variables_GetGlobal(index, &value);
+			Debug::LogAndMessage("[OtherDll] [testReadVar] PhobosExtInterop Global[%d] = %d\n", index, value);
 		}
 		else
 		{
-			PhobosInterop::Variables_GetLocal(index, &value);
-			Debug::LogAndMessage("[OtherDll] [testReadVar] PhobosInterop Local[%d] = %d\n", index, value);
+			PhobosExtInterop::Variables_GetLocal(index, &value);
+			Debug::LogAndMessage("[OtherDll] [testReadVar] PhobosExtInterop Local[%d] = %d\n", index, value);
 		}
 	}
 	else if (ScenarioClass::Instance)
@@ -321,17 +321,17 @@ static int testChangeVar(bool bGlobal, int index, int value)
 	if (index < 0 || index >= maxIndex)
 		return 0;
 
-	if (PhobosInterop::IsAvailable())
+	if (PhobosExtInterop::IsAvailable())
 	{
 		if (bGlobal)
 		{
-			PhobosInterop::Variables_SetGlobal(index, value);
-			Debug::LogAndMessage("[OtherDll] [testChangeVar] PhobosInterop Global[%d] := %d\n", index, value);
+			PhobosExtInterop::Variables_SetGlobal(index, value);
+			Debug::LogAndMessage("[OtherDll] [testChangeVar] PhobosExtInterop Global[%d] := %d\n", index, value);
 		}
 		else
 		{
-			PhobosInterop::Variables_SetLocal(index, value);
-			Debug::LogAndMessage("[OtherDll] [testChangeVar] PhobosInterop Local[%d] := %d\n", index, value);
+			PhobosExtInterop::Variables_SetLocal(index, value);
+			Debug::LogAndMessage("[OtherDll] [testChangeVar] PhobosExtInterop Local[%d] := %d\n", index, value);
 		}
 	}
 	else if (ScenarioClass::Instance)

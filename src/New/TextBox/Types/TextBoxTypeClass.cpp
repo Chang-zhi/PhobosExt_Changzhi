@@ -1,6 +1,6 @@
 #include "TextBoxTypeClass.h"
 
-#include <Phobos.h>
+#include <PhobosExt.h>
 #include <CCINIClass.h>
 
 #include <Utilities/INIParser.h>
@@ -30,9 +30,9 @@ void TextBoxTypeClass::LoadFromINI(CCINIClass* pINI)
 	this->Duration.Read(exINI, section, "Duration");
 
 	// Color 格式：Color=255,215,0  （RGB 逗号分隔）
-	if (pINI->ReadString(section, "Color", "", Phobos::readBuffer))
+	if (pINI->ReadString(section, "Color", "", PhobosExt::readBuffer))
 	{
-		const char* pColor = Phobos::readBuffer;
+		const char* pColor = PhobosExt::readBuffer;
 		int r = 255, g = 215, b = 0;
 		if (std::sscanf(pColor, "%d,%d,%d", &r, &g, &b) >= 3)
 		{
@@ -57,12 +57,12 @@ void TextBoxTypeClass::Serialize(T& Stm)
 		;
 }
 
-void TextBoxTypeClass::LoadFromStream(PhobosStreamReader& Stm)
+void TextBoxTypeClass::LoadFromStream(PhobosExtStreamReader& Stm)
 {
 	this->Serialize(Stm);
 }
 
-void TextBoxTypeClass::SaveToStream(PhobosStreamWriter& Stm)
+void TextBoxTypeClass::SaveToStream(PhobosExtStreamWriter& Stm)
 {
 	this->Serialize(Stm);
 }

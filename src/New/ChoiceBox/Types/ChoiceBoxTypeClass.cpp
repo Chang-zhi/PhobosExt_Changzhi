@@ -1,6 +1,6 @@
 #include "ChoiceBoxTypeClass.h"
 
-#include <Phobos.h>
+#include <PhobosExt.h>
 #include <CCINIClass.h>
 
 #include <Utilities/INIParser.h>
@@ -16,12 +16,12 @@ const char* Enumerable<ChoiceBoxTypeClass>::GetMainSection()
 }
 
 // ========== ChoiceBoxButton 序列化 ==========
-bool ChoiceBoxButton::Load(PhobosStreamReader& Stm, bool RegisterForChange)
+bool ChoiceBoxButton::Load(PhobosExtStreamReader& Stm, bool RegisterForChange)
 {
 	return Stm.Process(this->Text, RegisterForChange).Success();
 }
 
-bool ChoiceBoxButton::Save(PhobosStreamWriter& Stm) const
+bool ChoiceBoxButton::Save(PhobosExtStreamWriter& Stm) const
 {
 	return Stm.Process(const_cast<std::string&>(this->Text)).Success();
 }
@@ -49,9 +49,9 @@ void ChoiceBoxTypeClass::LoadFromINI(CCINIClass* pINI)
 	this->Button_Count.Read(exINI, section, "Button.Count");
 
 	// Button.Layout - 枚举字符串 Horizontal/Vertical
-	if (pINI->ReadString(section, "Button.Layout", "", Phobos::readBuffer))
+	if (pINI->ReadString(section, "Button.Layout", "", PhobosExt::readBuffer))
 	{
-		const char* layoutStr = Phobos::readBuffer;
+		const char* layoutStr = PhobosExt::readBuffer;
 		if (_stricmp(layoutStr, "Vertical") == 0)
 		{
 			this->Button_Layout = ChoiceBoxButtonLayout::Vertical;
@@ -65,9 +65,9 @@ void ChoiceBoxTypeClass::LoadFromINI(CCINIClass* pINI)
 	}
 
 	// Button.Mode - 枚举字符串 Normal/Bounce
-	if (pINI->ReadString(section, "Button.Mode", "", Phobos::readBuffer))
+	if (pINI->ReadString(section, "Button.Mode", "", PhobosExt::readBuffer))
 	{
-		const char* modeStr = Phobos::readBuffer;
+		const char* modeStr = PhobosExt::readBuffer;
 		if (_stricmp(modeStr, "Bounce") == 0)
 		{
 			this->Button_Mode = ChoiceBoxButtonMode::Bounce;
@@ -95,18 +95,18 @@ void ChoiceBoxTypeClass::LoadFromINI(CCINIClass* pINI)
 
 		ChoiceBoxButton btn;
 
-		if (pINI->ReadString(section, key, "", Phobos::readBuffer))
+		if (pINI->ReadString(section, key, "", PhobosExt::readBuffer))
 		{
-			btn.Text = Phobos::readBuffer;
+			btn.Text = PhobosExt::readBuffer;
 		}
 
 		this->Buttons.push_back(btn);
 	}
 
 	// Color 格式：Color=255,215,0  （RGB 逗号分隔）
-	if (pINI->ReadString(section, "Color", "", Phobos::readBuffer))
+	if (pINI->ReadString(section, "Color", "", PhobosExt::readBuffer))
 	{
-		const char* pColor = Phobos::readBuffer;
+		const char* pColor = PhobosExt::readBuffer;
 		int r = 255, g = 215, b = 0;
 		if (std::sscanf(pColor, "%d,%d,%d", &r, &g, &b) >= 3)
 		{
@@ -140,12 +140,12 @@ void ChoiceBoxTypeClass::Serialize(T& Stm)
 		;
 }
 
-void ChoiceBoxTypeClass::LoadFromStream(PhobosStreamReader& Stm)
+void ChoiceBoxTypeClass::LoadFromStream(PhobosExtStreamReader& Stm)
 {
 	this->Serialize(Stm);
 }
 
-void ChoiceBoxTypeClass::SaveToStream(PhobosStreamWriter& Stm)
+void ChoiceBoxTypeClass::SaveToStream(PhobosExtStreamWriter& Stm)
 {
 	this->Serialize(Stm);
 }

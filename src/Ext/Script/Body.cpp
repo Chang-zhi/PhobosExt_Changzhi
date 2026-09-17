@@ -21,11 +21,11 @@ ScriptExt::ExtContainer ScriptExt::ExtMap;
 // =============================
 // load / save
 
-void ScriptExt::ExtData::LoadFromStream(PhobosStreamReader& Stm)
+void ScriptExt::ExtData::LoadFromStream(PhobosExtStreamReader& Stm)
 {
 }
 
-void ScriptExt::ExtData::SaveToStream(PhobosStreamWriter& Stm)
+void ScriptExt::ExtData::SaveToStream(PhobosExtStreamWriter& Stm)
 {
 	// 不保存任何状态
 }
@@ -63,43 +63,43 @@ void ScriptExt::ProcessAction(TeamClass* pTeam)
 	const bool fresh = (pNodeIndex != pExt->LastProcessedMission);
 	pExt->LastProcessedMission = pNodeIndex;
 
-	switch (static_cast<PhobosScripts>(action))
+	switch (static_cast<PhobosExtScripts>(action))
 	{
-	case PhobosScripts::DistributedLoadIntoTransports:
+	case PhobosExtScripts::DistributedLoadIntoTransports:
 		ScriptExt::LoadIntoTransportsDistributed(pTeam);
 		break;
 
-	case PhobosScripts::RegisterFootPathVisualizer:
+	case PhobosExtScripts::RegisterFootPathVisualizer:
 		ScriptExt::RegisterFootPathVisualizer(pTeam);
 		break;
 
-	case PhobosScripts::UnregisterFootPathVisualizer:
+	case PhobosExtScripts::UnregisterFootPathVisualizer:
 		ScriptExt::UnregisterFootPathVisualizer(pTeam);
 		break;
 
-	case PhobosScripts::ScatterAttack:
+	case PhobosExtScripts::ScatterAttack:
 		ScriptExt::Mission_ScatterAttack(pTeam, -1);
 		break;
 
-	case PhobosScripts::ScatterAttackByAITargetTypes:
+	case PhobosExtScripts::ScatterAttackByAITargetTypes:
 		ScriptExt::Mission_ScatterAttack(pTeam, static_cast<unsigned>(node.Argument) >> 16);
 		break;
 
-	case PhobosScripts::PatrolToEnemyBuildingNearby:
+	case PhobosExtScripts::PatrolToEnemyBuildingNearby:
 		ScriptExt::PatrolToBuildingNearby(
 			pTeam, node.Argument & 0xFFFF, static_cast<unsigned>(node.Argument) >> 16, fresh, true);
 		break;
 
-	case PhobosScripts::PatrolToEnemyRally:
+	case PhobosExtScripts::PatrolToEnemyRally:
 		ScriptExt::PatrolToRally(pTeam, fresh, true);
 		break;
 
-	case PhobosScripts::PatrolToFriendlyBuildingNearby:
+	case PhobosExtScripts::PatrolToFriendlyBuildingNearby:
 		ScriptExt::PatrolToBuildingNearby(
 			pTeam, node.Argument & 0xFFFF, static_cast<unsigned>(node.Argument) >> 16, fresh, false);
 		break;
 
-	case PhobosScripts::PatrolToFriendlyRally:
+	case PhobosExtScripts::PatrolToFriendlyRally:
 		ScriptExt::PatrolToRally(pTeam, fresh, false);
 		break;
 
@@ -374,7 +374,7 @@ void ScriptExt::LoadIntoTransportsDistributed(TeamClass* pTeam)
 
 	if (totalAssigned > 0)
 		pTeam->StepCompleted = false;
-	// 如果 totalAssigned == 0，说明没有可分配的，Phobos 已设 StepCompleted=true
+	// 如果 totalAssigned == 0，说明没有可分配的，PhobosExt 已设 StepCompleted=true
 }
 
 // =============================

@@ -36,13 +36,13 @@ void TEventExt::ExtData::Serialize(T& Stm)
 	//Stm;
 }
 
-void TEventExt::ExtData::LoadFromStream(PhobosStreamReader& Stm)
+void TEventExt::ExtData::LoadFromStream(PhobosExtStreamReader& Stm)
 {
 	Extension<TEventClass>::LoadFromStream(Stm);
 	this->Serialize(Stm);
 }
 
-void TEventExt::ExtData::SaveToStream(PhobosStreamWriter& Stm)
+void TEventExt::ExtData::SaveToStream(PhobosExtStreamWriter& Stm)
 {
 	Extension<TEventClass>::SaveToStream(Stm);
 	this->Serialize(Stm);
@@ -71,9 +71,9 @@ int TEventExt::GetFlags(int iEvent)
 	//       这类事件每帧都在逻辑更新循环中被检查。
 	//       0x684DCA 是原版游戏中这个逻辑的参考地址。
 
-	switch (static_cast<PhobosTriggerEvent>(iEvent))
+	switch (static_cast<PhobosExtTriggerEvent>(iEvent))
 	{
-	//case PhobosTriggerEvent::TechnoDestroyedByHouse:
+	//case PhobosExtTriggerEvent::TechnoDestroyedByHouse:
 	//	return 0;
 	//case
 	//	return 0x4;
@@ -88,10 +88,10 @@ std::optional<bool> TEventExt::Execute(TEventClass* pThis, int iEvent, HouseClas
 	ObjectClass* pObject, CDTimerClass* pTimer, bool* isPersitant, TechnoClass* pSource,
 	TriggerClass* pTrigger)
 {
-	const auto eventKind = static_cast<PhobosTriggerEvent>(pThis->EventKind);
+	const auto eventKind = static_cast<PhobosExtTriggerEvent>(pThis->EventKind);
 
 	// They must be the same, but for other triggers to take effect normally, this cannot be judged outside case.
-	auto isSameEvent = [&]() { return eventKind == static_cast<PhobosTriggerEvent>(iEvent); };
+	auto isSameEvent = [&]() { return eventKind == static_cast<PhobosExtTriggerEvent>(iEvent); };
 
 	switch (eventKind)
 	{
@@ -100,40 +100,40 @@ std::optional<bool> TEventExt::Execute(TEventClass* pThis, int iEvent, HouseClas
 		// helper struct
 		struct and_with { bool operator()(int a, int b) { return a & b; } };
 
-	case PhobosTriggerEvent::TechnoTypeOfHouseNearWaypoint:
+	case PhobosExtTriggerEvent::TechnoTypeOfHouseNearWaypoint:
 		return TEventExt::TechnoTypeOfHouseNearWaypoint(pThis, pHouse);
-	case PhobosTriggerEvent::TechnoTypeOfHouseAllLeavesWaypoint:
+	case PhobosExtTriggerEvent::TechnoTypeOfHouseAllLeavesWaypoint:
 		return !TEventExt::TechnoTypeOfHouseNearWaypoint(pThis, pHouse);
-	case PhobosTriggerEvent::TechnoTypeOfHouseExistsAtWaypoint:
+	case PhobosExtTriggerEvent::TechnoTypeOfHouseExistsAtWaypoint:
 		return TEventExt::TechnoTypeOfHouseExistsAtWaypoint(pThis, pHouse);
-	case PhobosTriggerEvent::TechnoTypeOfHouseNotExistsAtWaypoint:
+	case PhobosExtTriggerEvent::TechnoTypeOfHouseNotExistsAtWaypoint:
 		return !TEventExt::TechnoTypeOfHouseExistsAtWaypoint(pThis, pHouse);
-	case PhobosTriggerEvent::ElapsedTimeFrames:
+	case PhobosExtTriggerEvent::ElapsedTimeFrames:
 		return TEventExt::ElapsedTimeFramesFunc(pThis);
 
-	case PhobosTriggerEvent::MissionTimerGreater:
+	case PhobosExtTriggerEvent::MissionTimerGreater:
 		return TEventExt::MissionTimerGreaterFunc(pThis);
-	case PhobosTriggerEvent::MissionTimerLess:
+	case PhobosExtTriggerEvent::MissionTimerLess:
 		return TEventExt::MissionTimerLessFunc(pThis);
 
-	case PhobosTriggerEvent::ChoiceBoxButtonClicked:
+	case PhobosExtTriggerEvent::ChoiceBoxButtonClicked:
 		return TEventExt::ChoiceBoxButtonClickedFunc(pThis, pHouse);
-	case PhobosTriggerEvent::ChoiceBoxAnyButtonClicked:
+	case PhobosExtTriggerEvent::ChoiceBoxAnyButtonClicked:
 		return TEventExt::ChoiceBoxAnyButtonClickedFunc(pThis, pHouse);
-	case PhobosTriggerEvent::ChoiceBoxTimedOut:
+	case PhobosExtTriggerEvent::ChoiceBoxTimedOut:
 		return TEventExt::ChoiceBoxTimedOutFunc(pThis, pHouse);
 
-	case PhobosTriggerEvent::HousePowerOutputMuch:
+	case PhobosExtTriggerEvent::HousePowerOutputMuch:
 		return TEventExt::PowerHander(pThis, pHouse, PowerEventMode::Output, true);
-	case PhobosTriggerEvent::HousePowerOutputLess:
+	case PhobosExtTriggerEvent::HousePowerOutputLess:
 		return TEventExt::PowerHander(pThis, pHouse, PowerEventMode::Output, false);
-	case PhobosTriggerEvent::HousePowerDrainMuch:
+	case PhobosExtTriggerEvent::HousePowerDrainMuch:
 		return TEventExt::PowerHander(pThis, pHouse, PowerEventMode::Drain, true);
-	case PhobosTriggerEvent::HousePowerDrainLess:
+	case PhobosExtTriggerEvent::HousePowerDrainLess:
 		return TEventExt::PowerHander(pThis, pHouse, PowerEventMode::Drain, false);
-	case PhobosTriggerEvent::HousePowerSurplusMuch:
+	case PhobosExtTriggerEvent::HousePowerSurplusMuch:
 		return TEventExt::PowerHander(pThis, pHouse, PowerEventMode::Surplus, true);
-	case PhobosTriggerEvent::HousePowerSurplusLess:
+	case PhobosExtTriggerEvent::HousePowerSurplusLess:
 		return TEventExt::PowerHander(pThis, pHouse, PowerEventMode::Surplus, false);
 
 

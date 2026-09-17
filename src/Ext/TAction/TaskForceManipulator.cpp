@@ -56,7 +56,7 @@ void TaskForceManipulator::CaptureFromINI(CCINIClass* pINI)
 		return;
 
 	int tfCount = pINI->GetKeyCount("TaskForces");
-	Debug::Log("[Phobos] TaskForce CaptureFromINI: [TaskForces] has %d entries\n", tfCount);
+	Debug::Log("[PhobosExt] TaskForce CaptureFromINI: [TaskForces] has %d entries\n", tfCount);
 
 	for (int i = 0; i < tfCount; ++i)
 	{
@@ -90,13 +90,13 @@ void TaskForceManipulator::CaptureFromINI(CCINIClass* pINI)
 			}
 		}
 
-		Debug::Log("[Phobos] TaskForce CaptureFromINI: [%s] captured %d entries\n",
+		Debug::Log("[PhobosExt] TaskForce CaptureFromINI: [%s] captured %d entries\n",
 			tfID, pExt->OriginalCountEntries);
 	}
 
 	// --- Read [TeamTypes] to capture original TaskForce binding for each TeamType ---
 	int teamCount = pINI->GetKeyCount("TeamTypes");
-	Debug::Log("[Phobos] TaskForce CaptureFromINI: [TeamTypes] has %d entries\n", teamCount);
+	Debug::Log("[PhobosExt] TaskForce CaptureFromINI: [TeamTypes] has %d entries\n", teamCount);
 
 	for (int i = 0; i < teamCount; ++i)
 	{
@@ -119,7 +119,7 @@ void TaskForceManipulator::CaptureFromINI(CCINIClass* pINI)
 				if (_stricmp(TaskForceClass::Array.GetItem(j)->ID, tfID) == 0)
 				{
 					pExt->OriginalTaskForceIndex = j;
-					Debug::Log("[Phobos] TaskForce CaptureFromINI: TeamType [%s] -> TaskForce [%s] index=%d\n",
+					Debug::Log("[PhobosExt] TaskForce CaptureFromINI: TeamType [%s] -> TaskForce [%s] index=%d\n",
 						teamID, tfID, j);
 					break;
 				}
@@ -127,7 +127,7 @@ void TaskForceManipulator::CaptureFromINI(CCINIClass* pINI)
 		}
 	}
 
-	Debug::Log("[Phobos] TaskForce CaptureFromINI: complete\n");
+	Debug::Log("[PhobosExt] TaskForce CaptureFromINI: complete\n");
 }
 
 // ============================================================================
@@ -219,7 +219,7 @@ void TaskForceManipulator::RefreshTeamsUsingTaskForce(TaskForceClass* pTF)
 				if (current > allowed)
 				{
 					--current;
-					Debug::Log("[Phobos] RefreshTeamsUsingTF: Liberate [%s] from Team [%s] (exceed %d>%d)\n",
+					Debug::Log("[PhobosExt] RefreshTeamsUsingTF: Liberate [%s] from Team [%s] (exceed %d>%d)\n",
 						pType->ID, pTeamType->ID, current + 1, allowed);
 					pTeam->LiberateMember(pUnit);
 					++nTeamsPruned;
@@ -232,7 +232,7 @@ void TaskForceManipulator::RefreshTeamsUsingTaskForce(TaskForceClass* pTF)
 		}
 	}
 
-	Debug::Log("[Phobos] RefreshTeamsUsingTF: [%s] updated %d TeamTypes, pruned %d units\n",
+	Debug::Log("[PhobosExt] RefreshTeamsUsingTF: [%s] updated %d TeamTypes, pruned %d units\n",
 		pTF->ID, nTeamTypesUpdated, nTeamsPruned);
 }
 
@@ -301,7 +301,7 @@ void TaskForceManipulator::RefreshTeamsOfType(TeamTypeClass* pTeamType)
 			if (current > allowed)
 			{
 				--current;
-				Debug::Log("[Phobos] RefreshTeamsOfType: Liberate [%s] from Team [%s]\n",
+				Debug::Log("[PhobosExt] RefreshTeamsOfType: Liberate [%s] from Team [%s]\n",
 					pType->ID, pTeamType->ID);
 				pTeam->LiberateMember(pUnit);
 			}
@@ -321,7 +321,7 @@ void TaskForceManipulator::ClearTaskForce(TActionClass* pThis)
 	auto const pTF = FindTaskForce(pThis->Param3);
 	if (!pTF)
 	{
-		Debug::Log("[Phobos] ClearTaskForce: Param3=%d -> TaskForce not found!\n", pThis->Param3);
+		Debug::Log("[PhobosExt] ClearTaskForce: Param3=%d -> TaskForce not found!\n", pThis->Param3);
 		return;
 	}
 
@@ -334,7 +334,7 @@ void TaskForceManipulator::ClearTaskForce(TActionClass* pThis)
 	auto const pExt = TaskForceExt::ExtMap.Find(pTF);
 	if (pExt) pExt->IsModified = true;
 
-	Debug::Log("[Phobos] ClearTaskForce: TaskForce [%s] cleared\n", pTF->ID);
+	Debug::Log("[PhobosExt] ClearTaskForce: TaskForce [%s] cleared\n", pTF->ID);
 
 	RefreshTeamsUsingTaskForce(pTF);
 }
@@ -349,7 +349,7 @@ void TaskForceManipulator::CopyTaskForce(TActionClass* pThis)
 
 	if (!pSrc || !pDst)
 	{
-		Debug::Log("[Phobos] CopyTaskForce: Src=%d Dst=%d -> not found!\n",
+		Debug::Log("[PhobosExt] CopyTaskForce: Src=%d Dst=%d -> not found!\n",
 			pThis->Param3, pThis->Param4);
 		return;
 	}
@@ -368,7 +368,7 @@ void TaskForceManipulator::CopyTaskForce(TActionClass* pThis)
 	auto const pExt = TaskForceExt::ExtMap.Find(pDst);
 	if (pExt) pExt->IsModified = true;
 
-	Debug::Log("[Phobos] CopyTaskForce: [%s](%d entries) -> [%s]\n",
+	Debug::Log("[PhobosExt] CopyTaskForce: [%s](%d entries) -> [%s]\n",
 		pSrc->ID, pSrc->CountEntries, pDst->ID);
 
 	RefreshTeamsUsingTaskForce(pDst);
@@ -427,7 +427,7 @@ void TaskForceManipulator::ModifyTaskForceEntry(TActionClass* pThis)
 	auto const pExt = TaskForceExt::ExtMap.Find(pTF);
 	if (pExt) pExt->IsModified = true;
 
-	Debug::Log("[Phobos] ModifyTaskForceEntry: [%s] entry[%d] amount=%d type=%s\n",
+	Debug::Log("[PhobosExt] ModifyTaskForceEntry: [%s] entry[%d] amount=%d type=%s\n",
 		pTF->ID, entryIdx, amount, technoID ? technoID : "(keep)");
 
 	RefreshTeamsUsingTaskForce(pTF);
@@ -444,7 +444,7 @@ void TaskForceManipulator::RebindTeamTypeTaskForce(TActionClass* pThis)
 
 	if (!pTeamType || !pNewTF)
 	{
-		Debug::Log("[Phobos] RebindTeamTypeTaskForce: TeamType=%d TF=%d -> not found!\n",
+		Debug::Log("[PhobosExt] RebindTeamTypeTaskForce: TeamType=%d TF=%d -> not found!\n",
 			pThis->Param3, pThis->Param4);
 		return;
 	}
@@ -452,7 +452,7 @@ void TaskForceManipulator::RebindTeamTypeTaskForce(TActionClass* pThis)
 	auto const pExt = TeamTypeExt::ExtMap.FindOrAllocate(pTeamType);
 	CaptureOriginalTaskForceIndex(pExt, pTeamType);
 
-	Debug::Log("[Phobos] RebindTeamTypeTaskForce: [%s] -> TaskForce [%s]\n",
+	Debug::Log("[PhobosExt] RebindTeamTypeTaskForce: [%s] -> TaskForce [%s]\n",
 		pTeamType->ID, pNewTF->ID);
 
 	pTeamType->TaskForce = pNewTF;
@@ -470,14 +470,14 @@ void TaskForceManipulator::ResetTeamTypeTaskForce(TActionClass* pThis)
 	if (!pTeamType)
 		return;
 
-	Debug::Log("[Phobos] ResetTeamTypeTaskForce: Param3=%d\n", pThis->Param3);
+	Debug::Log("[PhobosExt] ResetTeamTypeTaskForce: Param3=%d\n", pThis->Param3);
 
 	auto const pExt = TeamTypeExt::ExtMap.FindOrAllocate(pTeamType);
 	CaptureOriginalTaskForceIndex(pExt, pTeamType);
 
 	if (pExt->OriginalTaskForceIndex < 0)
 	{
-		Debug::Log("[Phobos] ResetTeamTypeTaskForce: No original TaskForce index!\n");
+		Debug::Log("[PhobosExt] ResetTeamTypeTaskForce: No original TaskForce index!\n");
 		return;
 	}
 
@@ -486,7 +486,7 @@ void TaskForceManipulator::ResetTeamTypeTaskForce(TActionClass* pThis)
 	pTeamType->ProcessTaskForce();
 	RefreshTeamsOfType(pTeamType);
 
-	Debug::Log("[Phobos] ResetTeamTypeTaskForce: [%s] -> TaskForce [%s]\n",
+	Debug::Log("[PhobosExt] ResetTeamTypeTaskForce: [%s] -> TaskForce [%s]\n",
 		pTeamType->ID, pOriginalTF->ID);
 }
 
@@ -495,7 +495,7 @@ void TaskForceManipulator::ResetTeamTypeTaskForce(TActionClass* pThis)
 // ============================================================================
 void TaskForceManipulator::ResetAllTeamTypeTaskForces()
 {
-	Debug::Log("[Phobos] ResetAllTeamTypeTaskForces\n");
+	Debug::Log("[PhobosExt] ResetAllTeamTypeTaskForces\n");
 
 	for (int i = 0; i < TeamTypeClass::Array.Count; ++i)
 	{
@@ -524,7 +524,7 @@ void TaskForceManipulator::ResetAllTeamTypeTaskForces()
 		RefreshTeamsOfType(pTeamType);
 	}
 
-	Debug::Log("[Phobos] ResetAllTeamTypeTaskForces: complete\n");
+	Debug::Log("[PhobosExt] ResetAllTeamTypeTaskForces: complete\n");
 }
 
 // ============================================================================
@@ -540,7 +540,7 @@ void TaskForceManipulator::RestoreTaskForce(TActionClass* pThis)
 	if (pExt)
 	{
 		pExt->RestoreOriginal();
-		Debug::Log("[Phobos] RestoreTaskForce: [%s] restored\n", pTF->ID);
+		Debug::Log("[PhobosExt] RestoreTaskForce: [%s] restored\n", pTF->ID);
 	}
 }
 
@@ -549,7 +549,7 @@ void TaskForceManipulator::RestoreTaskForce(TActionClass* pThis)
 // ============================================================================
 void TaskForceManipulator::RestoreAllTaskForces()
 {
-	Debug::Log("[Phobos] RestoreAllTaskForces\n");
+	Debug::Log("[PhobosExt] RestoreAllTaskForces\n");
 
 	for (int i = 0; i < TaskForceClass::Array.Count; ++i)
 	{

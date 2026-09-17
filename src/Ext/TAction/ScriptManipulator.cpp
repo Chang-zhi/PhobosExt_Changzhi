@@ -1,6 +1,6 @@
 #include "ScriptManipulator.h"
 
-#include <Interop/PhobosInterop.h>
+#include <Interop/PhobosExtInterop.h>
 
 #include <Ext/ScriptType/Body.h>
 #include <Ext/TeamType/Body.h>
@@ -33,12 +33,12 @@ static int ReadVar(bool bGlobal, int index)
 	if (index < 0 || index >= maxIndex)
 		return 0;
 
-	if (PhobosInterop::IsAvailable())
+	if (PhobosExtInterop::IsAvailable())
 	{
 		if (bGlobal)
-			PhobosInterop::Variables_GetGlobal(index, &value);
+			PhobosExtInterop::Variables_GetGlobal(index, &value);
 		else
-			PhobosInterop::Variables_GetLocal(index, &value);
+			PhobosExtInterop::Variables_GetLocal(index, &value);
 	}
 	else if (ScenarioClass::Instance)
 	{
@@ -63,7 +63,7 @@ void ScriptManipulator::CaptureFromINI(CCINIClass* pINI)
 
 	// --- Read [ScriptTypes] to capture original actions for each ScriptType ---
 	int scriptCount = pINI->GetKeyCount("ScriptTypes");
-	Debug::Log("[Phobos] CaptureFromINI: [ScriptTypes] has %d entries\n", scriptCount);
+	Debug::Log("[PhobosExt] CaptureFromINI: [ScriptTypes] has %d entries\n", scriptCount);
 
 	for (int i = 0; i < scriptCount; ++i)
 	{
@@ -95,13 +95,13 @@ void ScriptManipulator::CaptureFromINI(CCINIClass* pINI)
 			}
 		}
 
-		Debug::Log("[Phobos] CaptureFromINI: Script [%s] captured %d actions\n",
+		Debug::Log("[PhobosExt] CaptureFromINI: Script [%s] captured %d actions\n",
 			scriptID, pExt->OriginalActionsCount);
 	}
 
 	// --- Read [TeamTypes] to capture original ScriptType index for each TeamType ---
 	int teamCount = pINI->GetKeyCount("TeamTypes");
-	Debug::Log("[Phobos] CaptureFromINI: [TeamTypes] has %d entries\n", teamCount);
+	Debug::Log("[PhobosExt] CaptureFromINI: [TeamTypes] has %d entries\n", teamCount);
 
 	for (int i = 0; i < teamCount; ++i)
 	{
@@ -124,7 +124,7 @@ void ScriptManipulator::CaptureFromINI(CCINIClass* pINI)
 				if (_stricmp(ScriptTypeClass::Array.GetItem(j)->ID, scriptID) == 0)
 				{
 					pExt->OriginalScriptTypeIndex = j;
-					Debug::Log("[Phobos] CaptureFromINI: TeamType [%s] -> Script [%s] index=%d\n",
+					Debug::Log("[PhobosExt] CaptureFromINI: TeamType [%s] -> Script [%s] index=%d\n",
 						teamID, scriptID, j);
 					break;
 				}
@@ -132,7 +132,7 @@ void ScriptManipulator::CaptureFromINI(CCINIClass* pINI)
 		}
 	}
 
-	Debug::Log("[Phobos] CaptureFromINI: complete\n");
+	Debug::Log("[PhobosExt] CaptureFromINI: complete\n");
 }
 
 // ============================================================================
@@ -174,7 +174,7 @@ void ScriptManipulator::ResetTeamsUsingScript(ScriptTypeClass* pScript)
 			continue;
 
 		++nReset;
-		Debug::Log("[Phobos] ResetTeamsUsingScript: Team #%d [%s] Script.CurrentMission=%d->0\n",
+		Debug::Log("[PhobosExt] ResetTeamsUsingScript: Team #%d [%s] Script.CurrentMission=%d->0\n",
 			i, pTeam->Type->ID, pTeam->CurrentScript->CurrentMission);
 
 		// Set to -1 so NextMission() increments to 0 on next tick (action 0 will execute)
@@ -182,7 +182,7 @@ void ScriptManipulator::ResetTeamsUsingScript(ScriptTypeClass* pScript)
 		pTeam->StepCompleted = true;
 	}
 
-	Debug::Log("[Phobos] ResetTeamsUsingScript: Script [%s] reset %d teams\n",
+	Debug::Log("[PhobosExt] ResetTeamsUsingScript: Script [%s] reset %d teams\n",
 		pScript->ID, nReset);
 }
 
@@ -194,20 +194,20 @@ void ScriptManipulator::ClearScript(TActionClass* pThis)
 	ScriptTypeClass* const pScript = FindScript(pThis->Param3);
 	if (!pScript)
 	{
-		Debug::Log("[Phobos] ClearScript: Param3=%d -> ScriptType not found!\n", pThis->Param3);
+		Debug::Log("[PhobosExt] ClearScript: Param3=%d -> ScriptType not found!\n", pThis->Param3);
 		return;
 	}
 
 	auto const pExt = CaptureOriginalScriptContent(pScript);
 
-	Debug::Log("[Phobos] ClearScript: Script [%s] Param3=%d ActionsCount=%d IsModified=%d\n",
+	Debug::Log("[PhobosExt] ClearScript: Script [%s] Param3=%d ActionsCount=%d IsModified=%d\n",
 		pScript->ID, pThis->Param3, pScript->ActionsCount, pExt->IsModified);
 	pScript->ActionsCount = 0;
 	for (int i = 0; i < 50; ++i)
 		pScript->ScriptActions[i] = { 0, 0 };
 	pExt->IsModified = true;
 
-	Debug::Log("[Phobos] ClearScript: Script [%s] cleared, ActionsCount=0 IsModified=1\n",
+	Debug::Log("[PhobosExt] ClearScript: Script [%s] cleared, ActionsCount=0 IsModified=1\n",
 		pScript->ID);
 
 	ResetTeamsUsingScript(pScript);
@@ -230,7 +230,7 @@ void ScriptManipulator::CopyScript(TActionClass* pThis)
 	if (count > 50)
 		count = 50;
 
-	Debug::Log("[Phobos] CopyScript: Src=[%s](%d actions) Dst=[%s] Param3=%d Param4=%d\n",
+	Debug::Log("[PhobosExt] CopyScript: Src=[%s](%d actions) Dst=[%s] Param3=%d Param4=%d\n",
 		pSrc->ID, pSrc->ActionsCount, pDst->ID, pThis->Param3, pThis->Param4);
 
 	pDst->ActionsCount = count;
@@ -254,7 +254,7 @@ void ScriptManipulator::CopyScript(TActionClass* pThis)
 void ScriptManipulator::ModifyScriptByParam(TActionClass* pThis)
 {
 	auto const pScript = FindScript(pThis->Text);
-	Debug::Log("[Phobos] ModifyScriptByParam: Text=[%s] Param3=%d Param4=%d Param5=%d Param6=%d\n",
+	Debug::Log("[PhobosExt] ModifyScriptByParam: Text=[%s] Param3=%d Param4=%d Param5=%d Param6=%d\n",
 		pThis->Text, pThis->Param3, pThis->Param4, pThis->Param5, pThis->Param6);
 	if (!pScript)
 		return;
@@ -287,7 +287,7 @@ void ScriptManipulator::ModifyScriptByParam(TActionClass* pThis)
 void ScriptManipulator::ModifyScriptByLocalVar(TActionClass* pThis)
 {
 	auto const pScript = FindScript(pThis->Text);
-	Debug::Log("[Phobos] ModifyScriptByLocalVar: Text=[%s] Param3=%d Param4=%d Param5=%d Param6=%d\n",
+	Debug::Log("[PhobosExt] ModifyScriptByLocalVar: Text=[%s] Param3=%d Param4=%d Param5=%d Param6=%d\n",
 		pThis->Text, pThis->Param3, pThis->Param4, pThis->Param5, pThis->Param6);
 	if (!pScript)
 		return;
@@ -321,7 +321,7 @@ void ScriptManipulator::ModifyScriptByLocalVar(TActionClass* pThis)
 void ScriptManipulator::ModifyScriptByGlobalVar(TActionClass* pThis)
 {
 	auto const pScript = FindScript(pThis->Text);
-	Debug::Log("[Phobos] ModifyScriptByGlobalVar: Text=[%s] Param3=%d Param4=%d Param5=%d Param6=%d\n",
+	Debug::Log("[PhobosExt] ModifyScriptByGlobalVar: Text=[%s] Param3=%d Param4=%d Param5=%d Param6=%d\n",
 		pThis->Text, pThis->Param3, pThis->Param4, pThis->Param5, pThis->Param6);
 	if (!pScript)
 		return;
@@ -411,7 +411,7 @@ void ScriptManipulator::RebindTeamTypeScript(TActionClass* pThis)
 	auto const pExt = TeamTypeExt::ExtMap.FindOrAllocate(pTeamType);
 	CaptureOriginalScriptIndex(pExt, pTeamType);
 
-	Debug::Log("[Phobos] RebindTeamTypeScript: TeamType Param3=%d NewScript Param4=%d\n",
+	Debug::Log("[PhobosExt] RebindTeamTypeScript: TeamType Param3=%d NewScript Param4=%d\n",
 		pThis->Param3, pThis->Param4);
 
 	pTeamType->ScriptType = pNewScript;
@@ -427,7 +427,7 @@ void ScriptManipulator::ResetTeamTypeScript(TActionClass* pThis)
 	if (!pTeamType)
 		return;
 
-	Debug::Log("[Phobos] ResetTeamTypeScript: Param3=%d\n", pThis->Param3);
+	Debug::Log("[PhobosExt] ResetTeamTypeScript: Param3=%d\n", pThis->Param3);
 
 	auto const pExt = TeamTypeExt::ExtMap.FindOrAllocate(pTeamType);
 	CaptureOriginalScriptIndex(pExt, pTeamType);
@@ -445,7 +445,7 @@ void ScriptManipulator::ResetTeamTypeScript(TActionClass* pThis)
 // ============================================================================
 void ScriptManipulator::ResetAllTeamTypeScripts()
 {
-	Debug::Log("[Phobos] ResetAllTeamTypeScripts\n");
+	Debug::Log("[PhobosExt] ResetAllTeamTypeScripts\n");
 
 	for (int i = 0; i < TeamTypeClass::Array.Count; ++i)
 	{
@@ -502,7 +502,7 @@ static bool RestoreOriginalScriptContent(ScriptTypeClass* pScript)
 void ScriptManipulator::RestoreScriptContent(TActionClass* pThis)
 {
 	auto const pScript = FindScript(pThis->Param3);
-	Debug::Log("[Phobos] RestoreScriptContent: Param3=%d\n", pThis->Param3);
+	Debug::Log("[PhobosExt] RestoreScriptContent: Param3=%d\n", pThis->Param3);
 
 	if (RestoreOriginalScriptContent(pScript))
 		ResetTeamsUsingScript(pScript);
@@ -513,7 +513,7 @@ void ScriptManipulator::RestoreScriptContent(TActionClass* pThis)
 // ============================================================================
 void ScriptManipulator::RestoreAllScriptContents()
 {
-	Debug::Log("[Phobos] RestoreAllScriptContents\n");
+	Debug::Log("[PhobosExt] RestoreAllScriptContents\n");
 
 	for (int i = 0; i < ScriptTypeClass::Array.Count; ++i)
 	{
@@ -539,7 +539,7 @@ void ScriptManipulator::SeekTeamTypeScript(TActionClass* pThis)
 	int const targetLine = pThis->Param4;
 	int const seekTo = (targetLine <= 0) ? -1 : (targetLine - 1);
 
-	Debug::Log("[Phobos] SeekTeamTypeScript: TeamType [%s] targetLine=%d seekTo=%d\n",
+	Debug::Log("[PhobosExt] SeekTeamTypeScript: TeamType [%s] targetLine=%d seekTo=%d\n",
 		pTeamType->ID, targetLine, seekTo);
 
 	for (int i = 0; i < TeamClass::Array.Count; ++i)

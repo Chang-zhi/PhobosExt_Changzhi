@@ -2,7 +2,7 @@
 #include "ScriptManipulator.h"
 #include "TaskForceManipulator.h"
 
-#include <Interop/PhobosInterop.h>
+#include <Interop/PhobosExtInterop.h>
 
 #include <YRpp.h>
 #include <TagClass.h>

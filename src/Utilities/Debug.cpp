@@ -157,8 +157,8 @@ void __declspec(naked) _Fake_Debug_Log()
 	__asm { jmp eax }
 }
 
-// Filtered hook: formats the string, checks for Phobos tag in OUTPUT, writes conditionally
-void __declspec(naked) _PhobosOnly_Debug_Log()
+// Filtered hook: formats the string, checks for PhobosExt tag in OUTPUT, writes conditionally
+void __declspec(naked) _PhobosExtOnly_Debug_Log()
 {
 	__asm { mov ecx, [esp + 0x4] }
 	__asm { lea edx, [esp + 0x8] }
@@ -173,7 +173,7 @@ HANDLE Console::ConsoleHandle;
 
 bool Console::Create()
 {
-	// Try to allocate a new console; if it already exists (e.g. from original Phobos),
+	// Try to allocate a new console; if it already exists (e.g. from original PhobosExt),
 	// still try to get a valid handle to it
 	bool consoleAllocated = (AllocConsole() != FALSE);
 
@@ -194,12 +194,12 @@ bool Console::Create()
 	if (AresHelper::CanUseAres)
 		PatchLog(0x4A4AC0, _Fake_Debug_Log, &_Real_Debug_Log);
 
-	// Patch game log function with filter: only show Phobos messages on console
-	PatchLog(0x4068E0, _PhobosOnly_Debug_Log, nullptr);
+	// Patch game log function with filter: only show PhobosExt messages on console
+	PatchLog(0x4068E0, _PhobosExtOnly_Debug_Log, nullptr);
 
 	if (!consoleAllocated)
 	{
-		// Console already exists (original Phobos created it) - still set CP_UTF8 above
+		// Console already exists (original PhobosExt created it) - still set CP_UTF8 above
 		return true;
 	}
 

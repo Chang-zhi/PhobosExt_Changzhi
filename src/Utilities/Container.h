@@ -9,7 +9,7 @@
 #include "Debug.h"
 #include "Stream.h"
 #include "Swizzle.h"
-#include "Phobos.h"
+#include "PhobosExt.h"
 
 enum class InitState
 {
@@ -109,13 +109,13 @@ public:
 
 	virtual void InvalidatePointer(void* ptr, bool bRemoved) = 0;
 
-	virtual inline void SaveToStream(PhobosStreamWriter& Stm)
+	virtual inline void SaveToStream(PhobosExtStreamWriter& Stm)
 	{
 		//Stm.Save(this->AttachedToObject);
 		Stm.Save(this->Initialized);
 	}
 
-	virtual inline void LoadFromStream(PhobosStreamReader& Stm)
+	virtual inline void LoadFromStream(PhobosExtStreamReader& Stm)
 	{
 		//Stm.Load(this->AttachedToObject);
 		Stm.Load(this->Initialized);
@@ -541,8 +541,8 @@ protected:
 		}
 
 		// write the current pointer, the size of the block, and the canary
-		PhobosByteStream saver(sizeof(*buffer));
-		PhobosStreamWriter writer(saver);
+		PhobosExtByteStream saver(sizeof(*buffer));
+		PhobosExtStreamWriter writer(saver);
 
 		writer.Save(T::Canary);
 		writer.Save(buffer);
@@ -579,14 +579,14 @@ protected:
 			return nullptr;
 		}
 
-		PhobosByteStream loader(0);
+		PhobosExtByteStream loader(0);
 		if (!loader.ReadBlockFromStream(pStm))
 		{
 			Debug::Log("LoadKey - Failed to read data from save stream?!\n");
 			return nullptr;
 		}
 
-		PhobosStreamReader reader(loader);
+		PhobosExtStreamReader reader(loader);
 		if (reader.Expect(T::Canary) && reader.RegisterChange(buffer))
 		{
 			buffer->LoadFromStream(reader);

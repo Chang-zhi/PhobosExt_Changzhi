@@ -57,15 +57,15 @@ public:
 
 		for (int i = 0; i < len; ++i)
 		{
-			if (pINI->ReadString(section, pINI->GetKeyName(section, i), "", Phobos::readBuffer))
-				FindOrAllocate(Phobos::readBuffer);
+			if (pINI->ReadString(section, pINI->GetKeyName(section, i), "", PhobosExt::readBuffer))
+				FindOrAllocate(PhobosExt::readBuffer);
 		}
 
 		for (auto const& item : Array)
 			item->LoadFromINI(pINI);
 	}
 
-	static bool LoadGlobals(PhobosStreamReader& Stm)
+	static bool LoadGlobals(PhobosExtStreamReader& Stm)
 	{
 		Clear();
 
@@ -83,7 +83,7 @@ public:
 				return false;
 
 			auto newPtr = FindOrAllocate(name);
-			PhobosSwizzle::RegisterChange(oldPtr, newPtr);
+			PhobosExtSwizzle::RegisterChange(oldPtr, newPtr);
 
 			newPtr->LoadFromStream(Stm);
 		}
@@ -91,7 +91,7 @@ public:
 		return true;
 	}
 
-	static bool SaveGlobals(PhobosStreamWriter& Stm)
+	static bool SaveGlobals(PhobosExtStreamWriter& Stm)
 	{
 		Stm.Save(Array.size());
 
@@ -115,9 +115,9 @@ public:
 
 	void LoadFromINI(CCINIClass* pINI) = delete;
 
-	void LoadFromStream(PhobosStreamReader& Stm) = delete;
+	void LoadFromStream(PhobosExtStreamReader& Stm) = delete;
 
-	void SaveToStream(PhobosStreamWriter& Stm) = delete;
+	void SaveToStream(PhobosExtStreamWriter& Stm) = delete;
 
-	PhobosFixedString<32> Name;
+	PhobosExtFixedString<32> Name;
 };

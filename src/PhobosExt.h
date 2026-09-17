@@ -2,7 +2,7 @@
 
 #include <Syringe.h>
 
-#include <Phobos.version.h>
+#include <PhobosExt.version.h>
 
 #include <Windows.h>
 #include <string>
@@ -15,7 +15,7 @@ constexpr auto NONE_STR2 = "none";
 constexpr auto SIDEBAR_SECTION = "Sidebar";
 constexpr auto UISETTINGS_SECTION = "UISettings";
 
-class Phobos
+class PhobosExt
 {
 public:
 	//variables

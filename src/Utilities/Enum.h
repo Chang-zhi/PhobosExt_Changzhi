@@ -193,7 +193,7 @@ enum class InterceptedStatus : unsigned char
 
 MAKE_ENUM_FLAGS(InterceptedStatus);
 
-enum class PhobosAction
+enum class PhobosExtAction
 {
 	None = 0,
 	Hijack = 1,

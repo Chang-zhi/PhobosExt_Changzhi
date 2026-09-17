@@ -5,8 +5,8 @@
 
 #include <unordered_map>
 
-class PhobosStreamWriter;
-class PhobosStreamReader;
+class PhobosExtStreamWriter;
+class PhobosExtStreamReader;
 
 // 路径绘制配置
 struct FootPathConfig
@@ -34,8 +34,8 @@ public:
 
 	static void DrawAll();
 
-	static bool SaveGlobals(PhobosStreamWriter& Stm);
-	static bool LoadGlobals(PhobosStreamReader& Stm);
+	static bool SaveGlobals(PhobosExtStreamWriter& Stm);
+	static bool LoadGlobals(PhobosExtStreamReader& Stm);
 
 	struct PathCacheEntry
 	{

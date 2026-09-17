@@ -26,11 +26,11 @@ void TaskForceExt::ExtData::Serialize(T& Stm)
 		;
 
 	// Note: OriginalEntries contain TechnoTypeClass* pointers which are not
-	// directly serializable via the Phobos stream API. Original backup data
+	// directly serializable via the PhobosExt stream API. Original backup data
 	// is re-captured from INI at load time.
 }
 
-void TaskForceExt::ExtData::LoadFromStream(PhobosStreamReader& Stm)
+void TaskForceExt::ExtData::LoadFromStream(PhobosExtStreamReader& Stm)
 {
 	Extension<TaskForceClass>::LoadFromStream(Stm);
 	this->Serialize(Stm);
@@ -48,7 +48,7 @@ void TaskForceExt::ExtData::LoadFromStream(PhobosStreamReader& Stm)
 	}
 }
 
-void TaskForceExt::ExtData::SaveToStream(PhobosStreamWriter& Stm)
+void TaskForceExt::ExtData::SaveToStream(PhobosExtStreamWriter& Stm)
 {
 	Extension<TaskForceClass>::SaveToStream(Stm);
 	this->Serialize(Stm);
@@ -60,14 +60,14 @@ void TaskForceExt::ExtData::CaptureOriginal()
 
 	if (this->OriginalCountEntries > 0)
 	{
-		Debug::Log("[Phobos] CaptureOriginal: TaskForce [%s] already captured, skip\n",
+		Debug::Log("[PhobosExt] CaptureOriginal: TaskForce [%s] already captured, skip\n",
 			pType ? pType->ID : "null");
 		return;
 	}
 
 	if (pType->CountEntries <= 0)
 	{
-		Debug::Log("[Phobos] CaptureOriginal: TaskForce [%s] has no entries, skip\n",
+		Debug::Log("[PhobosExt] CaptureOriginal: TaskForce [%s] has no entries, skip\n",
 			pType ? pType->ID : "null");
 		return;
 	}
@@ -79,7 +79,7 @@ void TaskForceExt::ExtData::CaptureOriginal()
 		this->OriginalEntries[i] = pType->Entries[i];
 	}
 
-	Debug::Log("[Phobos] CaptureOriginal: TaskForce [%s] captured %d entries\n",
+	Debug::Log("[PhobosExt] CaptureOriginal: TaskForce [%s] captured %d entries\n",
 		pType->ID, this->OriginalCountEntries);
 }
 
@@ -89,7 +89,7 @@ void TaskForceExt::ExtData::RestoreOriginal()
 	if (!this->IsModified)
 		return;
 
-	Debug::Log("[Phobos] RestoreOriginal: TaskForce [%s] restore %d entries\n",
+	Debug::Log("[PhobosExt] RestoreOriginal: TaskForce [%s] restore %d entries\n",
 		pType->ID, this->OriginalCountEntries);
 
 	pType->CountEntries = this->OriginalCountEntries;

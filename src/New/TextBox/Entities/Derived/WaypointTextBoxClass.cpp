@@ -224,12 +224,12 @@ bool WaypointTextBoxClass::Serialize(T& Stm)
 		.Success();
 }
 
-bool WaypointTextBoxClass::Load(PhobosStreamReader& Stm, bool RegisterForChange)
+bool WaypointTextBoxClass::Load(PhobosExtStreamReader& Stm, bool RegisterForChange)
 {
 	return this->Serialize(Stm);
 }
 
-bool WaypointTextBoxClass::Save(PhobosStreamWriter& Stm) const
+bool WaypointTextBoxClass::Save(PhobosExtStreamWriter& Stm) const
 {
 	return const_cast<WaypointTextBoxClass*>(this)->Serialize(Stm);
 }

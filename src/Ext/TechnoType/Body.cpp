@@ -116,13 +116,13 @@ void TechnoTypeExt::ExtData::Serialize(T& Stm)
 		.Process(this->SmartVHPScan_IncludeInflight)
 		;
 }
-void TechnoTypeExt::ExtData::LoadFromStream(PhobosStreamReader& Stm)
+void TechnoTypeExt::ExtData::LoadFromStream(PhobosExtStreamReader& Stm)
 {
 	Extension<TechnoTypeClass>::LoadFromStream(Stm);
 	this->Serialize(Stm);
 }
 
-void TechnoTypeExt::ExtData::SaveToStream(PhobosStreamWriter& Stm)
+void TechnoTypeExt::ExtData::SaveToStream(PhobosExtStreamWriter& Stm)
 {
 	Extension<TechnoTypeClass>::SaveToStream(Stm);
 	this->Serialize(Stm);

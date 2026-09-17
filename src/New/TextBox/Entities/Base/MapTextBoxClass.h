@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Phobos.h>
+#include <PhobosExt.h>
 #include <GeneralStructures.h>
 #include <Utilities/SavegameDef.h>
 
@@ -8,8 +8,8 @@
 #include <vector>
 #include <memory>
 
-class PhobosStreamWriter;
-class PhobosStreamReader;
+class PhobosExtStreamWriter;
+class PhobosExtStreamReader;
 
 class MapTextBoxClass
 {
@@ -48,12 +48,12 @@ public:
 	static void Clear();        // 清空所有实例（同 ClearAll）
 
 	// 全局存档/读档
-	static bool SaveGlobals(PhobosStreamWriter& Stm);
-	static bool LoadGlobals(PhobosStreamReader& Stm);
+	static bool SaveGlobals(PhobosExtStreamWriter& Stm);
+	static bool LoadGlobals(PhobosExtStreamReader& Stm);
 
 	// ===== 序列化 =====
-	virtual bool Load(PhobosStreamReader& Stm, bool RegisterForChange);
-	virtual bool Save(PhobosStreamWriter& Stm) const;
+	virtual bool Load(PhobosExtStreamReader& Stm, bool RegisterForChange);
+	virtual bool Save(PhobosExtStreamWriter& Stm) const;
 
 protected:
 	MapTextBoxClass() = default;    // 默认构造（供反序列化使用）
