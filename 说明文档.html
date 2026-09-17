@@ -325,7 +325,7 @@ Button.Text3=                 ; CSF标签  更多按钮以此类推  (默认无)
 <td class="doc-table__td"><code>Button.Mode</code></td>
 <td class="doc-table__td">
 按钮的交互模式。<br>
-<code>Normal</code> = 普通模式：玩家点击按钮后选择框会消失（需要正确设置 <code>Duration</code>）。<br>
+<code>Normal</code> = 普通模式：玩家点击按钮后选择框会消失（无需依赖 <code>Duration</code>，点击即自动隐藏并清理）。<br>
 <code>Bounce</code> = 回弹模式：玩家点击按钮后会回弹，适合需要多次点击的场景（建议配合 <code>Duration=-1</code> 使用）。
 </td>
 </tr>
@@ -929,7 +929,7 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 yes — 单位文本�
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
 <tbody>
-  <tr><td class="doc-table__td">557</td><td class="doc-table__td">选择框指定按钮被点击</td><td class="doc-table__td">选择框编号, 按钮索引</td></tr>
+  <tr><td class="doc-table__td">557</td><td class="doc-table__td">选择框指定按钮被点击</td><td class="doc-table__td">按钮序号(从1开始), 选择框编号</td></tr>
   <tr><td class="doc-table__td">558</td><td class="doc-table__td">选择框任意按钮被点击</td><td class="doc-table__td">选择框编号</td></tr>
   <tr><td class="doc-table__td">559</td><td class="doc-table__td">选择框超时未选</td><td class="doc-table__td">选择框编号</td></tr>
 </tbody>

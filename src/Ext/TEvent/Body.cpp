@@ -253,21 +253,17 @@ bool TEventExt::MissionTimerLessFunc(TEventClass* pThis)
 
 // ============================================================================
 // 557: ChoiceBox 指定按钮被点击
+// FA2 参数映射：第 1 个编辑器参数 → Value，第 2 个 → String
+// 557 参数顺序为 [按钮序号(从1开始), 选择框编号]，因此 Value = 按钮序号，String = 选择框编号
 // ============================================================================
 bool TEventExt::ChoiceBoxButtonClickedFunc(TEventClass* pThis, HouseClass* pHouse)
 {
 	int targetID = std::atoi(pThis->String);
 	int targetButtonIndex = pThis->Value - 1;
 
-	// Debug::Log(L"[ChoiceBox] 557: ID=%d, buttonIdx=%d\n",
-	// 	targetID, targetButtonIndex);
-
 	auto* pBox = MapChoiceBoxClass::FindByID(targetID);
-	if (!pBox || pBox->ClickedConsumed)
+	if (!pBox || pBox->IsExpired || pBox->ClickedConsumed)
 		return false;
-
-	// /Debug::Log(L"[ChoiceBox] 557: ID=%d, buttonIdx=%d, actual=%d\n",
-	//	targetID, targetButtonIndex, pBox->ClickedIndex);
 
 	if (pBox->ClickedIndex == targetButtonIndex)
 	{
@@ -279,19 +275,15 @@ bool TEventExt::ChoiceBoxButtonClickedFunc(TEventClass* pThis, HouseClass* pHous
 
 // ============================================================================
 // 558: ChoiceBox 任意按钮被点击
-// Value = 选择框 ID
+// 唯一参数：选择框编号（→ Value）
 // ============================================================================
 bool TEventExt::ChoiceBoxAnyButtonClickedFunc(TEventClass* pThis, HouseClass* pHouse)
 {
 	int targetID = pThis->Value;
-	// Debug::Log(L"[ChoiceBox] 558: ID=%d\n", targetID);
 
 	auto* pBox = MapChoiceBoxClass::FindByID(targetID);
-	if (!pBox || pBox->ClickedConsumed)
+	if (!pBox || pBox->IsExpired || pBox->ClickedConsumed)
 		return false;
-
-	// Debug::Log(L"[ChoiceBox] 558: ID=%d, clicked=%d\n",
-	//	targetID, pBox->ClickedIndex);
 
 	if (pBox->ClickedIndex >= 0)
 	{
@@ -303,21 +295,18 @@ bool TEventExt::ChoiceBoxAnyButtonClickedFunc(TEventClass* pThis, HouseClass* pH
 
 // ============================================================================
 // 559: ChoiceBox 超时未选
-// Value = 选择框 ID
+// 唯一参数：选择框编号（→ Value）
+// 仅在"Duration 耗尽且从未点击"时触发；点击后销毁的选择框不触发超时
 // ============================================================================
 bool TEventExt::ChoiceBoxTimedOutFunc(TEventClass* pThis, HouseClass* pHouse)
 {
 	int targetID = pThis->Value;
-	// Debug::Log(L"[ChoiceBox] 559: ID=%d\n", targetID);
 
 	auto* pBox = MapChoiceBoxClass::FindByID(targetID);
 	if (!pBox)
 		return false;
 
-	// Debug::Log(L"[ChoiceBox] 559: ID=%d, expired=%d\n",
-	//	targetID, pBox->IsExpired);
-
-	return pBox->IsExpired;
+	return pBox->IsTimedOut();
 }
 
 bool TEventExt::PowerHander(TEventClass* pThis, HouseClass* pHouse, PowerEventMode mode, bool isMuch)

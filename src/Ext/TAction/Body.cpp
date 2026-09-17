@@ -163,8 +163,8 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 		return TActionExt::SetWaypointChoiceBox(pThis, pHouse, pObject, pTrigger, location);
 	case PhobosTriggerAction::SetScreenChoiceBox:
 		return TActionExt::SetScreenChoiceBox(pThis, pHouse, pObject, pTrigger, location);
-	case PhobosTriggerAction::ClearChoiceBoxByLabel:
-		return TActionExt::ClearChoiceBoxByLabel(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::ClearChoiceBoxByID:
+		return TActionExt::ClearChoiceBoxByID(pThis, pHouse, pObject, pTrigger, location);
 	case PhobosTriggerAction::ClearAllChoiceBoxs:
 		return TActionExt::ClearAllChoiceBoxs(pThis, pHouse, pObject, pTrigger, location);
 
@@ -1957,9 +1957,6 @@ bool TActionExt::SetScreenChoiceBox(TActionClass* pThis, HouseClass* pHouse, Obj
 	int screenY = pThis->Param5;
 	int typeIndex = pThis->Param6;
 
-	Debug::Log(L"Param3 is %d, Param4 is %d, Param5 is %d, Param6 is %d\n",
-				pThis->Param3, pThis->Param4, pThis->Param5, pThis->Param6);
-
 	if (typeIndex >= 0
 		&& static_cast<size_t>(typeIndex) < ChoiceBoxTypeClass::Array.size())
 	{
@@ -1969,7 +1966,7 @@ bool TActionExt::SetScreenChoiceBox(TActionClass* pThis, HouseClass* pHouse, Obj
 	return true;
 }
 
-bool TActionExt::ClearChoiceBoxByLabel(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+bool TActionExt::ClearChoiceBoxByID(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {
 	int choiceID = pThis->Param3;
 
