@@ -1,11 +1,13 @@
 #include "Debug.h"
 #include "Macro.h"
+#include "AresHelper.h"
 
 #include <YRPPCore.h>
 #include <MessageListClass.h>
 #include <CRT.h>
 
 char Debug::StringBuffer[0x1000];
+wchar_t Debug::WideBuffer[0x1000];
 char Debug::FinalStringBuffer[0x1000];
 char Debug::DeferredStringBuffer[0x1000];
 int Debug::CurrentBufferSize = 0;
@@ -15,6 +17,21 @@ void Debug::Log(const char* pFormat, ...)
 	va_list args;
 	va_start(args, pFormat);
 	vsprintf_s(FinalStringBuffer, pFormat, args);
+
+	LogGame("%s %s", "[PhobosExt]", FinalStringBuffer);
+	va_end(args);
+}
+
+void Debug::Log(const wchar_t* pFormat, ...)
+{
+	va_list args;
+	va_start(args, pFormat);
+	vswprintf_s(WideBuffer, pFormat, args);
+
+	// Convert to UTF-8 for console and debug.log output
+	WideCharToMultiByte(CP_UTF8, 0, WideBuffer, -1,
+		FinalStringBuffer, sizeof(FinalStringBuffer), nullptr, nullptr);
+
 	LogGame("%s %s", "[PhobosExt]", FinalStringBuffer);
 	va_end(args);
 }
@@ -72,7 +89,7 @@ void Debug::FatalErrorAndExit(const char* pFormat, ...)
 	va_start(args, pFormat);
 	LogWithVArgs(pFormat, args);
 	va_end(args);
-	MessageBox(0, StringBuffer, "Fatal error ", MB_ICONERROR);
+	MessageBoxA(0, StringBuffer, "Fatal error ", MB_ICONERROR);
 	FatalExit(static_cast<int>(ExitCode::Undefined));
 }
 
@@ -82,7 +99,7 @@ void Debug::FatalErrorAndExit(ExitCode nExitCode, const char* pFormat, ...)
 	va_start(args, pFormat);
 	LogWithVArgs(pFormat, args);
 	va_end(args);
-	MessageBox(0, StringBuffer, "Fatal error ", MB_ICONERROR);
+	MessageBoxA(0, StringBuffer, "Fatal error ", MB_ICONERROR);
 	FatalExit(static_cast<int>(nExitCode));
 }
 
@@ -97,21 +114,25 @@ DEFINE_PATCH( // Replace SUN.INI with RA2MD.INI in the debug.log
 );
 
 static DWORD _Real_Debug_Log = 0x4A4AF9;
+
+// Full hook: writes ALL log messages to console (used for Ares hook point)
 void __declspec(naked) _Fake_Debug_Log()
 {
-	// va_start(args, pFormat);
-	// Console::WriteWithVArgs(pFormat, args);
-	// // va_end(args);
-	// No need to use va_end here.
-	//
-	// As Console::WriteWithVArgs uses __fastcall,
-	// ECX: pFormat, EDX: args
 	__asm { mov ecx, [esp + 0x4] }
 	__asm { lea edx, [esp + 0x8] }
 	__asm { call Console::WriteWithVArgs }
-	// __asm { mov edx, 0}
 
-	// goto original bytes
+	__asm { mov eax, _Real_Debug_Log }
+	__asm { jmp eax }
+}
+
+// Filtered hook: formats the string, checks for Phobos tag in OUTPUT, writes conditionally
+void __declspec(naked) _PhobosOnly_Debug_Log()
+{
+	__asm { mov ecx, [esp + 0x4] }
+	__asm { lea edx, [esp + 0x8] }
+	__asm { call Console::WriteWithVArgsFiltered }
+
 	__asm { mov eax, _Real_Debug_Log }
 	__asm { jmp eax }
 }
@@ -121,21 +142,35 @@ HANDLE Console::ConsoleHandle;
 
 bool Console::Create()
 {
-	if (FALSE == AllocConsole())
-		return false;
+	// Try to allocate a new console; if it already exists (e.g. from original Phobos),
+	// still try to get a valid handle to it
+	bool consoleAllocated = (AllocConsole() != FALSE);
 
 	ConsoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 	if (NULL == ConsoleHandle)
 		return false;
 
-	SetConsoleTitle("Phobos Debug Console");
+	SetConsoleTitleA("PhobosExt Debug Console");
+
+	// Set console to UTF-8 mode to match /utf-8 compilation
+	SetConsoleOutputCP(CP_UTF8);
 
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
 	GetConsoleScreenBufferInfo(ConsoleHandle, &csbi);
 	TextAttribute.AsWord = csbi.wAttributes;
 
-	PatchLog(0x4A4AC0, _Fake_Debug_Log, &_Real_Debug_Log);
-	PatchLog(0x4068E0, _Fake_Debug_Log, nullptr);
+	// If Ares is loaded, patch its hook point first to capture the original target
+	if (AresHelper::CanUseAres)
+		PatchLog(0x4A4AC0, _Fake_Debug_Log, &_Real_Debug_Log);
+
+	// Patch game log function with filter: only show Phobos messages on console
+	PatchLog(0x4068E0, _PhobosOnly_Debug_Log, nullptr);
+
+	if (!consoleAllocated)
+	{
+		// Console already exists (original Phobos created it) - still set CP_UTF8 above
+		return true;
+	}
 
 	return true;
 }
@@ -185,7 +220,7 @@ void Console::EnableUnderscore(bool enable)
 void Console::Write(const char* str, int len)
 {
 	if (NULL != ConsoleHandle)
-		WriteConsole(ConsoleHandle, str, len, nullptr, nullptr);
+		WriteConsoleA(ConsoleHandle, str, len, nullptr, nullptr);
 }
 
 void Console::WriteLine(const char* str, int len)
@@ -194,10 +229,44 @@ void Console::WriteLine(const char* str, int len)
 	Write("\n");
 }
 
+void Console::WriteW(const wchar_t* str, int len)
+{
+	if (NULL != ConsoleHandle)
+		WriteConsoleW(ConsoleHandle, str, len, nullptr, nullptr);
+}
+
 void __fastcall Console::WriteWithVArgs(const char* pFormat, va_list args)
 {
 	vsprintf_s(Debug::StringBuffer, pFormat, args);
 	Write(Debug::StringBuffer, strlen(Debug::StringBuffer));
+}
+
+void __fastcall Console::WriteWithVArgsFiltered(const char* pFormat, va_list args)
+{
+	vsprintf_s(Debug::StringBuffer, pFormat, args);
+
+	// Skip console write for known game internal spam patterns
+	// These are high-frequency game debug messages, not extension log calls
+	static const char* spamPatterns[] = {
+		"Theme::",
+		"Playing",
+		"FacingClass:"
+	};
+
+	bool isSpam = false;
+	for (const char* pattern : spamPatterns)
+	{
+		if (strstr(Debug::StringBuffer, pattern) != nullptr)
+		{
+			isSpam = true;
+			break;
+		}
+	}
+
+	if (!isSpam)
+	{
+		Write(Debug::StringBuffer, strlen(Debug::StringBuffer));
+	}
 }
 
 void Console::WriteFormat(const char* pFormat, ...)
@@ -223,9 +292,15 @@ void Console::PatchLog(DWORD dwAddr, void* fakeFunc, DWORD* pdwRealFunc)
 
 	pInst = (JMP_STRUCT*)dwAddr;
 
-	if (pdwRealFunc && pInst->opcode == 0xE9) // If this function is hooked by Ares
-		*pdwRealFunc = pInst->offset + dwAddr + 5;
+	if (pdwRealFunc)
+		{
+			if (pInst->opcode == 0xE9) // If this function is hooked by Ares
+				*pdwRealFunc = pInst->offset + dwAddr + 5;
+			else
+				*pdwRealFunc = dwAddr + 5;
+		}
 
+	pInst->opcode = 0xE9;
 	pInst->offset = reinterpret_cast<DWORD>(fakeFunc) - dwAddr - 5;
 
 	VirtualProtect((LPVOID)dwAddr, 5, dwOldFlag, NULL);

@@ -266,7 +266,7 @@ bool Phobos::DetachFromDebugger()
 			return dwParentProcessId;
 		};
 
-	HMODULE hModule = LoadLibrary("ntdll.dll");
+	HMODULE hModule = LoadLibraryA("ntdll.dll");
 	if (hModule != NULL)
 	{
 		auto const NtRemoveProcessDebug =

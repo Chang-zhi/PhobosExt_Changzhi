@@ -13,11 +13,13 @@ public:
 	};
 
 	static char StringBuffer[0x1000];
+	static wchar_t WideBuffer[0x1000];
 	static char FinalStringBuffer[0x1000];
 	static char DeferredStringBuffer[0x1000];
 	static int CurrentBufferSize;
 
 	static void Log(const char* pFormat, ...);
+	static void Log(const wchar_t* pFormat, ...);
 	static void LogGame(const char* pFormat, ...);
 	static void LogDeferred(const char* pFormat, ...);
 	static void LogDeferredFinalize();
@@ -87,7 +89,9 @@ public:
 	static void EnableUnderscore(bool enable);
 	static void Write(const char* str, int len);
 	static void WriteLine(const char* str, int len);
+	static void WriteW(const wchar_t* str, int len);
 	static void __fastcall WriteWithVArgs(const char* pFormat, va_list args);
+	static void __fastcall WriteWithVArgsFiltered(const char* pFormat, va_list args);
 	static void WriteFormat(const char* pFormat, ...);
 
 private:

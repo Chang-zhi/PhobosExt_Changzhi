@@ -1,10 +1,11 @@
 #pragma once
 
-#include <Windows.h>
-#include <string>
+#include <Syringe.h>
 
 #include <Phobos.version.h>
-#include <Syringe.h>
+
+#include <Windows.h>
+#include <string>
 
 class CCINIClass;
 class AbstractClass;
@@ -19,6 +20,7 @@ class Phobos
 public:
 	//variables
 	static HANDLE hInstance;
+	static const char* AppIconPath;
 
 	static const size_t readLength = 2048;
 	static char readBuffer[readLength];
@@ -31,6 +33,8 @@ public:
 	static std::wstring CustomGameSaveDescription;
 
 	static void ExeRun();
+	static void CmdLineParse(char**, int);
+	static void ExeTerminate();
 	static bool DetachFromDebugger();
 
 	class Config

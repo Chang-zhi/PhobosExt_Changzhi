@@ -6,6 +6,7 @@
 #include <TagTypeClass.h>
 #include <TechnoClass.h>
 #include <HouseClass.h>
+#include <Ext/House/Body.h>
 #include <ArrayClasses.h>
 #include <MessageListClass.h>
 
@@ -111,15 +112,17 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 	case PhobosTriggerAction::UpdateAssociatedBuildingsAnims:
 		return TActionExt::UpdateAssociatedBuildingsAnims(pThis, pHouse, pObject, pTrigger, location);
 	case PhobosTriggerAction::UpdateOwnerBuildingsAnimations:
-		return TActionExt::UpdateOwnerBuildingsAnimations(pThis, pHouse, pObject, pTrigger, location);
+	return TActionExt::UpdateOwnerBuildingsAnimations(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::CreateTeamConsideringLimits:
+		return TActionExt::CreateTeamConsideringLimits(pThis, pHouse, pObject, pTrigger, location);
 
 
 	//case PhobosTriggerAction::RemoveBaseNodesExceedingAttemptCountForHouse:
 	//	return TActionExt::RemoveBaseNodesExceedingAttemptCountForHouse(pThis, pHouse, pObject, pTrigger, location);
 	//case PhobosTriggerAction::SetObjectRecruitable:
 	//	return TActionExt::SetObjectRecruitable(pThis, pHouse, pObject, pTrigger, location);
-	// case PhobosTriggerAction::testAction:
-	// 	return TActionExt::testAction(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::testAction:
+		return TActionExt::testAction(pThis, pHouse, pObject, pTrigger, location);
 
 	default:
 		bHandled = false;
@@ -359,7 +362,7 @@ bool TActionExt::AddBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseClass* 
 	const int buildTypeIndex = pThis->Param5;
 	const int forceAtFront = pThis->Param6;
 
-	// ===== 基础信息 ===== 
+	// ===== 基础信息 =====
 	HouseClass* pOwner = HouseClass::FindByCountryIndex(houseIndex);
 	if (!pOwner) return false;
 
@@ -370,7 +373,7 @@ bool TActionExt::AddBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseClass* 
 
 	BaseNodeClass newNode = { buildTypeIndex, cell, false, 0 };
 
-	// ===== 强制放到最前面 ===== 
+	// ===== 强制放到最前面 =====
 	if (forceAtFront)
 	{
 	    // 1.清除工厂序列
@@ -380,7 +383,7 @@ bool TActionExt::AddBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseClass* 
 	    	if (!pBuilding->Factory
 	    		|| !pBuilding->Factory->Object
 	    		|| pBuilding->Factory->Object->WhatAmI() != AbstractType::Building) continue;
-	    
+
 	    	TechnoTypeClass* pFactObjType = pBuilding->Factory->Object->GetTechnoType();
 
 	    	pBuilding->Factory->AbandonProduction();
@@ -410,6 +413,9 @@ bool TActionExt::AddBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseClass* 
 	// ===== 直接加就行, 不管他什么时候造 =====
 	else
 		pOwner->Base.BaseNodes.AddItem(newNode);
+
+	// 将此节点加入授权列表，防止被自动清理
+	HouseExt::AuthorizeBaseNode(pOwner, buildTypeIndex, cell.X, cell.Y);
 
 	return true;
 }
@@ -446,7 +452,7 @@ bool TActionExt::RemoveAllBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseC
 	{
 		if (buildTypeIndex < 0 || buildTypeIndex >= BuildingTypeClass::Array.Count)
 		{
-			Debug::Log("Invalid buildTypeIndex %d at waypoint %d\n", buildTypeIndex, waypointIndex);
+			// Debug::Log("Invalid buildTypeIndex %d at waypoint %d\n", buildTypeIndex, waypointIndex);
 			continue;
 		}
 		const char* buildTypeID = BuildingTypeClass::Array[buildTypeIndex]->get_ID();
@@ -474,8 +480,9 @@ bool TActionExt::RemoveAllBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseC
 		pOwner->Base.BaseNodes.RemoveItem(*it);
 	}
 
-	Debug::Log("[End]: Removed %zu base nodes at waypoint %d (cell %d,%d). New node count: %d\n",
-		indicesToRemove.size(), waypointIndex, cell.X, cell.Y, pOwner->Base.BaseNodes.Count);
+	// 同步删除授权注册表中的条目
+	HouseExt::RemoveAuthorizedNodeByCoord(pOwner, cell.X, cell.Y);
+
 	return true;
 }
 
@@ -490,12 +497,12 @@ bool TActionExt::RemoveBaseNodesOfBuildingTypeForHouse(TActionClass* pThis, Hous
 
 	if (buildTypeIndex < 0 || buildTypeIndex >= BuildingTypeClass::Array.Count)
 	{
-		Debug::Log("Invalid buildTypeIndex %d\n", buildTypeIndex);
+		// Debug::Log("Invalid buildTypeIndex %d\n", buildTypeIndex);
 		return false;
 	}
 
 	const char* buildTypeID = BuildingTypeClass::Array[buildTypeIndex]->get_ID();
-	Debug::Log("[Start]: Removing base nodes for building type \"%s\".\n", buildTypeID);
+	// Debug::Log("[Start]: Removing base nodes for building type \"%s\".\n", buildTypeID);
 
 	// 1. 收集需要删除的节点索引
 	std::vector<int> indicesToRemove;
@@ -507,7 +514,7 @@ bool TActionExt::RemoveBaseNodesOfBuildingTypeForHouse(TActionClass* pThis, Hous
 
 	if (indicesToRemove.empty())
 	{
-		Debug::Log("[End]: No base nodes found for type \"%s\".\n", buildTypeID);
+		// Debug::Log("[End]: No base nodes found for type \"%s\".\n", buildTypeID);
 		return true;
 	}
 
@@ -534,8 +541,9 @@ bool TActionExt::RemoveBaseNodesOfBuildingTypeForHouse(TActionClass* pThis, Hous
 		pOwner->Base.BaseNodes.RemoveItem(*it);
 	}
 
-	Debug::Log("[End]: Removed %zu base nodes for type \"%s\". New node count: %d\n",
-		indicesToRemove.size(), buildTypeID, pOwner->Base.BaseNodes.Count);
+	// 同步删除授权注册表中的条目
+	HouseExt::RemoveAuthorizedNodeByType(pOwner, buildTypeIndex);
+
 	return true;
 }
 
@@ -589,7 +597,7 @@ bool TActionExt::BindTagToTechnoTypeAtWaypoint(TActionClass* pThis, HouseClass* 
 				{
 					if (pBuilding->AttachedTag) pBuilding->ReplaceTag(pTagClass);
 					else pBuilding->AttachTrigger(pTagClass);
-				}	
+				}
 			}
 			else
 			{
@@ -746,7 +754,7 @@ bool TActionExt::BindTagToAllTechnoTypesWithinWaypointRange(TActionClass* pThis,
 
 bool TActionExt::BindTagToAllTechnoTypesOfSpecificOwnerWithinWaypointRange(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {
-	
+
 	int houseIndex = pThis->Value;
 	int tagIndex = pThis->Param3;
 	int waypointIndex = pThis->Param4;
@@ -785,10 +793,10 @@ bool TActionExt::BindTagToAllTechnoTypesOfSpecificOwnerWithinWaypointRange(TActi
 bool TActionExt::UnifyAllInstancesOfSameTagType(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {
 	int tagIndex = pThis->Param3;
-	
+
 	TagClass* pUnifiedTag = GetTagClassByIndex(tagIndex, true);
 	if (!pUnifiedTag) return false;
-	
+
 	std::set<TagClass*> tagsToUnify;
 
 	for(TechnoClass *pTechno : TechnoClass::Array)
@@ -886,17 +894,17 @@ bool TActionExt::BindTagsToAllTechTypesOfTriggerOwnerInWaypointRangeExceptSpecif
 			if (!pTechno)
 				continue;
 
-			Debug::Log("Techno id is \"%s\".\n", pTechno->get_ID());
+			// Debug::Log("Techno id is \"%s\".\n", pTechno->get_ID());
 
 			if (pTechno->get_ID() == std::string(techno))
 			{
-				Debug::Log("Techno 冲突, continue.\"%s\"\n", pTechno->get_ID());
+				// Debug::Log(L"Techno 冲突, continue.\"%hs\"\n", pTechno->get_ID());
 				continue;
 			}
 
 			if (IsTechnoNearCell(pTechno, cell, range))
 			{
-				Debug::Log("AttachedTag, techno is \"%s\"\n", pTechno->get_ID());
+				// Debug::Log("AttachedTag, techno is \"%s\"\n", pTechno->get_ID());
 				if (pTechno->AttachedTag) pTechno->ReplaceTag(pTagClass);
 				else pTechno->AttachTrigger(pTagClass);
 			}
@@ -950,6 +958,104 @@ bool TActionExt::UpdateOwnerBuildingsAnimations(TActionClass* pThis, HouseClass*
 			pBuilding->DisableStuff();
 			pBuilding->EnableStuff();
 		}
+	}
+
+	return true;
+}
+
+bool TActionExt::CreateTeamConsideringLimits(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	int teamIndex = pThis->Param3;
+	bool useMaxLimit     = (pThis->Param4 != 0); // Param4: 是否启用 Max 上限限制
+	bool useZoneCheck    = (pThis->Param5 != 0); // Param5: 是否启用区域连接检查
+	bool requireAllZone  = (pThis->Param6 != 0); // Param6: 区域连通模式(Param5=1时生效), 0=任一兵种连通即可, 1=全部兵种都需要连通
+
+	// ===== 1, 获取队伍类型 =====
+	TeamTypeClass* pTeamType = nullptr;
+	for(TeamTypeClass* pCurrentTeamType : TeamTypeClass::Array)
+	{
+		if(pCurrentTeamType && pCurrentTeamType->get_ID() == ("0" + std::to_string(teamIndex)))
+		{
+			pTeamType = pCurrentTeamType;
+			break;
+		}
+	}
+	if(!pTeamType) return false;
+
+
+	// ===== 2, 检查实例上限 =====
+	auto const id = pTeamType->get_ID();
+	auto const cnt = pTeamType->cntInstances;
+	auto const max = pTeamType->Max;
+
+	// Debug::Log(L"尝试创建小队 \"%hs\", 当前实例数: %d, 最大上限: %d.\n", id, cnt, max);
+
+	if(useMaxLimit && cnt >= max && max >= 0)
+	{
+		// Debug::Log(L"小队 \"%hs\" 已达上限 (%d/%d), 无法继续创建.\n", id, cnt, max);
+		return true;
+	}
+
+	// ===== 3, 区域连接检查 =====
+	if(useZoneCheck)
+	{
+		HouseClass* pOwner = pTeamType->Owner;
+		HouseClass* pEnemy = nullptr;
+
+		if(pOwner)
+		{
+			// 优先使用 EnemyHouseIndex
+			if(pOwner->EnemyHouseIndex >= 0)
+				pEnemy = HouseClass::FindByIndex(pOwner->EnemyHouseIndex);
+
+			// 备选: 遍历所有 House, 找第一个非盟友
+			if(!pEnemy || pEnemy == pOwner)
+			{
+				for(HouseClass* const pHouse : HouseClass::Array)
+				{
+					if(pHouse && pHouse != pOwner && !pOwner->IsAlliedWith(pHouse))
+					{
+						pEnemy = pHouse;
+						break;
+					}
+				}
+			}
+
+			if(pEnemy && pEnemy != pOwner)
+			{
+				// Debug::Log(L"区域检查: 所属方 \"%hs\"(基地%d,%d), 敌人 \"%hs\"(基地%d,%d).\n",
+				//	pOwner->get_ID(), pOwner->GetBaseCenter().X, pOwner->GetBaseCenter().Y,
+				//	pEnemy->get_ID(), pEnemy->GetBaseCenter().X, pEnemy->GetBaseCenter().Y);
+
+				if(!CheckTaskForceZoneConnection(pOwner, pEnemy, pTeamType->TaskForce, requireAllZone))
+				{
+					// Debug::Log(L"小队 \"%hs\" 的所属方与敌人之间没有区域连接(%s), 跳过创建.\n",
+					//	id, requireAllZone ? L"全部兵种" : L"任一兵种");
+					return true;
+				}
+			}
+			else
+			{
+				// Debug::Log(L"区域检查: 未找到敌方, 跳过区域检查.\n");
+			}
+		}
+	}
+
+	// Debug::Log(L"创建小队 \"%hs\" 成功, 当前实例数: %d, 最大上限: %d.\n", id, cnt + 1, max);
+	pTeamType->CreateTeam(pTeamType->Owner);
+	return true;
+}
+
+bool TActionExt::testAction(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	for (BuildingClass* pBuilding : BuildingClass::Array)
+	{
+		if (!pBuilding) continue;
+		if (!pBuilding->Factory) continue;
+
+		// Debug::Log(L"工厂 \"%hs\" 有 %d 个待生产对象.\n",
+		//	pBuilding->GetTechnoType()->get_ID(),
+		//	pBuilding->Factory->QueuedObjects.Count);
 	}
 
 	return true;

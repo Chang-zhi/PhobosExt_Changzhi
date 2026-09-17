@@ -74,7 +74,7 @@ void RulesExt::ExtData::InitializeAfterTypeData(RulesClass* const pThis)
 
 void RulesExt::ExtData::InitializeAfterAllLoaded()
 {
-	
+
 }
 
 // =============================
