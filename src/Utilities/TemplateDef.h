@@ -95,7 +95,7 @@ namespace detail
 		}
 		else if (!parser.empty())
 		{
-			Debug::INIParseFailed(pSection, pKey, parser.value(), "Expected a valid boolean value [1, true, yes, 0, false, no]");
+			Debug::INIParseFailed(pSection, pKey, parser.value(), "[Change_zhi Custom Phobos] Expected a valid boolean value [1, true, yes, 0, false, no]");
 		}
 
 		return false;

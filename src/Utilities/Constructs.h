@@ -47,7 +47,6 @@
 #include <vector>
 
 #include <Phobos.h>
-#include <Phobos.CRT.h>
 
 class PhobosStreamReader;
 class PhobosStreamWriter;

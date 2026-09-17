@@ -21,7 +21,12 @@
     <ClCompile Include="src\CopyProtection.cpp" />
     <ClCompile Include="src\Ext\TAction\Body.cpp" />
     <ClCompile Include="src\Ext\TAction\Hooks.cpp" />
+    <ClCompile Include="src\Ext\TechnoType\Body.cpp" />
     <ClCompile Include="src\Ext\Techno\Body.cpp" />
+    <ClCompile Include="src\Ext\Techno\Hooks.cpp" />
+    <ClCompile Include="src\Ext\Techno\Hooks.Firing.cpp" />
+    <ClCompile Include="src\Ext\Techno\MyNew\AutoHunt.cpp" />
+    <ClCompile Include="src\Ext\Techno\MyNew\TemporalExclusive.cpp" />
     <ClCompile Include="src\Ext\Techno\WeaponHelpers.cpp" />
     <ClCompile Include="src\Misc\Hooks.Ares.cpp" />
     <ClCompile Include="src\MyNew\Hooks.WaypointLabelClass.cpp" />
@@ -29,9 +34,9 @@
     <ClCompile Include="src\Utilities\Anchor.cpp" />
     <ClCompile Include="src\Utilities\AresAddressInit.cpp" />
     <ClCompile Include="src\Utilities\AresHelper.cpp" />
+    <ClCompile Include="src\Utilities\Constructs.cpp" />
     <ClCompile Include="src\Utilities\Debug.cpp" />
     <ClCompile Include="src\Ext\WarheadType\Body.cpp" />
-    <ClCompile Include="src\Phobos.CRT.cpp" />
     <ClCompile Include="src\Phobos.Ext.cpp" />
     <ClCompile Include="src\Phobos.cpp" />
     <ClCompile Include="src\Utilities\ShapeTextPrinter.cpp" />
@@ -45,10 +50,14 @@
   <ItemGroup>
     <ClInclude Include="src\Commands\NextTeam.h" />
     <ClInclude Include="src\Ext\TAction\Body.h" />
+    <ClInclude Include="src\Ext\TechnoType\Body.h" />
+    <ClInclude Include="src\Ext\Techno\MyNew\AutoHunt.h" />
+    <ClInclude Include="src\Ext\Techno\MyNew\TemporalExclusive.h" />
     <ClInclude Include="src\MyNew\WaypointLabelClass.h" />
     <ClInclude Include="src\Utilities\Anchor.h" />
     <ClInclude Include="src\Utilities\AresFunctions.h" />
     <ClInclude Include="src\Utilities\AresHelper.h" />
+    <ClInclude Include="src\Utilities\Constructs.h" />
     <ClInclude Include="src\Utilities\Enumerable.h" />
     <ClInclude Include="src\Ext\Techno\Body.h" />
     <ClInclude Include="src\Utilities\Savegame.h" />
@@ -57,7 +66,6 @@
     <ClInclude Include="src\Utilities\SpawnerHelper.h" />
     <ClInclude Include="src\Utilities\Stream.h" />
     <ClInclude Include="src\Utilities\Swizzle.h" />
-    <ClInclude Include="src\Phobos.CRT.h" />
     <ClInclude Include="src\Phobos.version.h" />
     <ClInclude Include="src\Utilities\Container.h" />
     <ClInclude Include="src\Utilities\Debug.h" />
@@ -107,7 +115,7 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
     <XPDeprecationWarning>false</XPDeprecationWarning>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -257,7 +265,6 @@
       <AssemblerListingLocation>$(IntDir)\%(RelativeDir)</AssemblerListingLocation>
       <ObjectFileName>$(IntDir)\%(RelativeDir)</ObjectFileName>
       <CallingConvention>StdCall</CallingConvention>
-      <AdditionalOptions>%(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4100;4201;4530;4731;4740;4458;4819;5103;5105;26495</DisableSpecificWarnings>
       <EnableModules>true</EnableModules>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>

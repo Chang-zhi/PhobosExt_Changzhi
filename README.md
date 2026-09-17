@@ -1,153 +1,120 @@
-![Phobos YR Engine Extension](logo.png)
+# [PhobosExt_Changzhi](https://github.com/Chang-zhi/PhobosExt_Changzhi)
 
-[![Github All Releases](https://img.shields.io/github/downloads/Phobos-developers/Phobos/total.svg)](https://github.com/Phobos-developers/Phobos/releases)
-[![Docs status](https://readthedocs.org/projects/phobos/badge/?version=latest)](https://phobos.readthedocs.io/en/latest/?badge=latest)
-[![Workflow](https://img.shields.io/github/actions/workflow/status/Phobos-developers/Phobos/nightly.yml?branch=develop)](https://github.com/Phobos-developers/Phobos/actions)
-[![EditorConfig](https://github.com/Phobos-developers/Phobos/workflows/EditorConfig/badge.svg)](https://github.com/Phobos-developers/Phobos/actions?query=workflow%3AEditorConfig)
-[![license](https://img.shields.io/github/license/Phobos-developers/Phobos.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
+一个扩展《红色警戒2：尤里的复仇》游戏功能的 DLL，基于 Phobos 开发。
 
-> **Warning**
-> The project is currently not maintained actively enough and thus we are looking for active maintainers at the moment. Please message us [in Discord channel](https://discord.gg/sZeMzz6qVg) (or PM Kerbiter directly).
+**理论上可以脱离 Ares 和 Phobos 单独运行，但仍建议与原版 Phobos 或 Ares 一同使用**
 
-# Phobos
+说是基于 Phobos，其实只是删了删代码 (  
+低创作品，大佬轻喷。
 
-...is a community engine extension project providing a set of new features and fixes for Yuri's Revenge based on [modified YRpp](https://github.com/Metadorius/YRpp) and [Syringe](https://github.com/Ares-Developers/Syringe) to allow injecting code. It's meant to accompany [Ares](https://github.com/Ares-Developers/Ares) rather than replace it, thus it won't introduce incompatibilities.
+---
 
-While Phobos is independent of Ares and does NOT require Ares specifically to function, Phobos complements some of the features found in Ares and vice versa.
+### 兼容性说明
 
-EA has not endorsed and does not support this product.
+与 Ares 或 Phobos 共存时，本 DLL 已避免使用 ExtPointerOffset，改用独立 unordered_map 存储扩展数据，不会与它们的原生扩展数据冲突。（严格来说可能变慢, 但对现代cpu的影响应该可以忽略不计）
 
-Community
----------
+需保证游戏版本为 YR 1.001。
 
-As the project is international and English is currently studied the most commonly as a second language, it's the main project language. We do not limit the creation of language-specific community groups though, because we understand that many may not know English as well as their native language and/or may have trouble accessing Discord.
+---
 
-- **[🌐 International Discord channel on C&C Mod Haven](https://discord.gg/sZeMzz6qVg)**
-- [🇨🇳 Chinese QQ Phobos group](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=f_h7TZoVX_8--ZedVFBMmjRrLBIzjMKJ&authKey=QfNyW4DZUFqL3ZKzGL5PgLUWTnISj0myWn4WGtPPQmi3F%2FP3vfnuBd3YjLFk%2BU94&noverify=0&group_code=630590659) (630590659)
+### 已知问题  
+当单位当前正在使用带有`TemporalExclusive=yes`弹头的武器时, 会强制改变单位的索敌逻辑, 可能会产生bug
 
-Downloads
----------
+---
 
-You can choose one of the following:
-- [Latest stable branch build](https://github.com/Phobos-developers/Phobos/releases/latest) (most bug-free release but very slow on new features)
-- [Latest development branch builds](https://github.com/Phobos-developers/Phobos/releases) (a bit less bug-free releases, devbuilds get new features when they are finished)
-- [Latest development branch nightly](https://nightly.link/Phobos-developers/Phobos/blob/develop/.github/workflows/nightly.yml) (added unreleased features that will be in next devbuild)
-- Individual new feature nightly builds for testing can be found in [pull requests](https://github.com/Phobos-developers/Phobos/pulls)
+### 致谢
+[*Ares*](https://github.com/Ares-Developers/Ares) 项目组  
+[*Phobos*](https://github.com/Phobos-developers/Phobos) 项目组  
+偏微whyffu [*@B站主页*](https://space.bilibili.com/41073096)  
 
-### Note on nightly builds
+<span style="color: gray;">排名不分先后</span>
 
-Last two listed versions are bleeding edge (don't redistribute them outside of testing!) and have build information (commit and branch/tag) in them which is displayed ingame and can't be turned off. You can get a build for development branch (link above) any up-to-date pull request via an automatic bot comment that would appear in it and would contain the most recent successfully compiled version of Phobos for that feature branch. Please note that the build is  produced *only if the PR has no merge conflicts*. Alternatively, you can get an artifact manually from GitHub Actions runs. You can get an artifact for a specific commit which is built automatically with a GitHub Actions workflow, just press on a green tick, open the workflow, find and download the build artifact. This is limited to authorized users only.
+---
 
-Installation and Usage
-----------------------
+### 许可
+本项目代码采用与 Phobos 相同的许可证。（详见 LICENSE 文件）  
+《红色警戒2：尤里的复仇》及其相关素材归 Electronic Arts 所有。
 
-0. If you don't have Syringe installed into your mod already, you can download it together with the [latest Ares package](https://launchpad.net/ares/+download). To install simply drop `Syringe.exe` into your game folder (where your `gamemd.exe` is located). It's highly recommended to **install Ares** too to get full Phobos feature set, just drop all the files from the archive except documentation folder into your game folder.
-1. Obtain a Phobos "package" (official builds can be found on [releases page](https://github.com/Phobos-developers/Phobos/releases); read below to learn how to get nightly builds). You should end up with two files: `Phobos.dll` and `Phobos.pdb`.
-2. Place those files in the game folder (where your `gamemd.exe` is located).
-3. To launch the game with Phobos (and all other installed Syringe-compatible engine extensions including Ares) you need to execute `Syringe.exe "gamemd.exe" [command line arguments for gamemd.exe]` in command line (omit arguments if you don't need any). `RunAres.bat` from Ares package does the same so you may use that as well.
+---
 
-If you already use Ares in your mod, you just need to drop Phobos files mentioned above in your game folder, Syringe will load Phobos automatically. This also applies to mods using XNA client with Syringe; if your mod doesn't use Syringe and Ares (or you just haven't set up the client) yet we recommend to use [CnCNet client mod base by Starkku](https://github.com/Starkku/cncnet-client-mod-base) which is compatible with Ares and Phobos out of the box.
+## 新增功能
 
-Additional files and tools that you may need are located at [Phobos supplementaries repo](https://github.com/Phobos-developers/PhobosSupplementaries).
+### 1. 路径点文本显示
 
-By default Phobos doesn't do any very noticeable changes except a few bugfixes. To learn how to use Phobos features head over to official documentation.
+在地图路径点上绘制自定义文本，支持触发动作 550、551、552。
 
-Documentation
--------------
+**特性**：
+- 可自定义文本内容、显示宽度（像素）、背景不透明度。
+- 可分别设置文本颜色和边框颜色（预定义 9 种颜色）。
+- 鼠标移动到文本框上时，文本会暂时停止绘制（避免遮挡操作）。
 
-- [Official docs](https://phobos.readthedocs.io) (also available in [Chinese](https://phobos.readthedocs.io/zh_CN/latest))
-- [Community Chinese docs](https://docs.qq.com/doc/p/dc3da1ce39a6e787b6e133f7d33d6aebef581cb4)
-  - Because the Chinese translation of the official docs is currently underdeveloped, at the time it is recommended to use the community docs for Chinese users.
+**触发动作说明**：
+- `550` – 在指定路径点绘制文本...（参数：路径点索引，文本内容，宽度，不透明度，颜色）
+- `551` – 清除指定路径点的文本...（参数：路径点索引）
+- `552` – 清除所有路径点文本...
 
-You can switch between versions (displays latest develop nightly version by default) in the bottom right corner, as well as download a PDF version.
+### 2. 超时空武器互斥锁定
 
-The documentation is split by a few major categories, each represented with a page on the sidebar. Each page has its contents grouped into multiple subcategories, be it buildings, technotypes, infantries, superweapons or something else.
-
-### How to read code snippets
+为 `Temporal=yes` 的弹头增加互斥锁定机制。
 
 ```ini
-; which section the entries should be in
-; can be a freeform name - in this case the comment would explain what it is
-; if no comment to be found - then it's a precise name
-[SOMENAME]           ; BuildingType
-; KeyName=DefaultValue ; accepted type with optional explanation
-; if there's nothing to the right of equals sign - the default value is empty/absent
-; if these keys have had their value set, they can only be set to their default
-; unset state again by setting the value to <default>, <none> or none
-; for list of values only <default> clears the entire list
-; if the default value is not static - it's written and explained in a comment
-UIDescription=<none> ; CSF entry key
+[WarheadType]
+TemporalExclusive=              ; boolean（布尔值），默认 false
+```
+当弹头同时设置 `Temporal=yes` 和 `TemporalExclusive=yes` 时，  
+该武器无法瞄准已被其他 `TemporalClass` 实例锁定的单位（即正在遭受超时空冻结的单位）。
+
+普通的超时空武器（`Temporal=yes` 但未设置 `TemporalExclusive`）仍可以攻击已被互斥武器锁定的单位。
+
+互斥武器不能攻击被普通超时空武器冻结的目标。
+
+### 3. 自动游猎
+```ini
+[TechnoType]
+AutoHunt=                       ; boolean（布尔值），默认 false
+```
+当科技类型设置`AutoHunt=yes` 时，该类型的所有单位在游戏中会自动强制进入 Hunt 状态,  
+主动搜索并攻击敌方目标，且不受玩家直接操控。  
+（即玩家无法通过鼠标点击控制该单位的移动、攻击等行为）  
+
+<span style="color: gray;">当玩家操控时可以用Phobos的`Convert.ComputerToHuman=`变形成换皮单位来避免强制索敌。</span>
+
+---
+
+## 触发编辑器配置
+
+为了在触发编辑器（FinalAlert 2）中使用新的触发动作（550、551、552），需要修改 `FAData.ini` 或对应版本的配置文件。
+
+### 标准 FinalAlert 2
+编辑 `FAData.ini`，在 `[ActionsRA2]` 小节中添加以下内容：
+
+```ini
+[ActionsRA2]
+...
+550=在指定路径点绘制文本... (PhobosExt by Chang_zhi),-4,13,30,6,6,6,0,0,0,在指定路径点绘制文本。\n第三个数值是宽度(像素，1~1000，默认250)。\n第四个数值是背景不透明度(百分比，0~100)。\n第五个数值是颜色(金=0，白=1，红=2，蓝=3，绿=4，黄=5，紫=6，粉=7，淡蓝=8),0,1,902,1
+551=清除指定路径点的文本... (PhobosExt by Chang_zhi),0,0,30,0,0,0,0,0,0,清除指定路径点的文本。,0,1,903,1
+552=清除所有路径点文本... (PhobosExt by Chang_zhi),0,0,0,0,0,0,0,0,0,清除屏幕上所有已设置的路径点文本。,0,1,904,1
+...
 ```
 
-Building manually
------------------
+### [*FA2SP_HDM_Edition*](https://github.com/handama/FA2sp)（韩大妈版本）
+需要同时修改 FAData_TriggerAndScript.ini 中的 `[English-ActionsRA2]` 和 `[Chinese-ActionsRA2]` 小节。
 
-0. Install **Visual Studio** (2022 is minimum) with the dependencies listed in `.vsconfig` (it will prompt you to install missing dependences when you open the project, or you can run VS installer and import the config). If you prefer to use **Visual Studio Code** you may install **VS Build Tools** with the dependencies from `.vsconfig` instead. Not using a code editor or IDE and building via **command line scripts** included with the project is also an option.
-1. Clone this repo recursively via your favorite git client (that will also clone YRpp).
-2. To build the extension:
-   - in Visual Studio: open the solution file in VS and build it (`Debug` build config is recommended);
-   - in VSCode: open the project folder and hit `Run Build Task...` (`Ctrl + Shift + B`);
-   - barebones: run `scripts/build_debug.bat`.
-3. Upon build completion the resulting `Phobos.dll` and `Phobos.pdb` would be placed in the subfolder identical to the name of the buildconfig executed.
-
-Credits
--------
-
-This project was founded by [@Belonit](https://github.com/Belonit) (Gluk-v48) and [@Metadorius](https://github.com/Metadorius) (Kerbiter) in 2020, with the first public stable release in 2021. Since then it has grown into a large community project with many contributors and maintainers.
-
-### Maintenance crew
-
-Maintenance crew consists of experienced Phobos contributors who are recognized and given the permission to maintain and shape the project to the extent of their permissions.
-
-Every maintenance crew member is welcome to put a donation link to their entry in the list below.
-
-- **Kerbiter ([@Metadorius](https://github.com/Metadorius))** - T3 maintainer (lead)
-  - [Patreon](https://www.patreon.com/kerbiter) · PayPal (preferable because of no fees) on request
-- **[@Starkku](https://github.com/Starkku)** - T2 maintainer
-  - [Patreon](https://www.patreon.com/Starkku)
-- **[@CrimRecya](https://github.com/CrimRecya) (绯红热茶)** - T2 maintainer
-  - [Alipay](https://i2.hdslb.com/bfs/new_dyn/8de77b17b8fc2e005613821b62008e37362533219.jpg)
-- **[@ZivDero](https://github.com/ZivDero)** - T2 maintainer
-  - [Patreon](https://www.patreon.com/c/ZivDero)
-- **Ollerus ([@Coronia](https://github.com/Coronia))** - T1 maintainer
-  - [Alipay](https://i2.hdslb.com/bfs/new_dyn/7c5f82c5530c88dc076a6f1ca2c02b46362533219.jpg)
-- **[@NetsuNegi](https://github.com/NetsuNegi)** - T1 maintainer
-  - [Alipay](https://i2.hdslb.com/bfs/new_dyn/cb69d2b5eb08c13d03bc79664e68b6c2362533219.png)
-- **[@TaranDahl](https://github.com/TaranDahl) (航味麻酱)** - T1 maintainer
-  - [WeChatPay](https://i2.hdslb.com/bfs/new_dyn/ffd5d36cc5efcdd83d93138062ec116e362533219.jpg)
-- **Noble_Fish ([@DeathFishAtEase](https://github.com/DeathFishAtEase))** - triage, doc maintainer
-  - [Alipay](https://i2.hdslb.com/bfs/new_dyn/b080641faea49ae3e10b4728679ef2e5362533219.jpg)
-- **FlyStar ([@Fly-Star-him](https://github.com/Fly-Star-him))** - triage
-- **[@Fryone](https://github.com/Fryone)** - triage
-
-#### Inactive
-
-*Please note that being put here just means that you seem to be currently inactive as a part of maintenance crew. You are always welcome to return to the active crew if you want to help out again!*
-
-- **Gluk-v48 ([@Belonit](https://github.com/Belonit))** - lead in the past
-- **Uranusian ([@Thrifinesma](https://github.com/Thrifinesma))** - T2 maintainer, CN community ambassador, doc maintainer
-- **[@secsome](https://github.com/secsome)** - maintainer
-- **[@Otamaa](https://github.com/Otamaa) (Fahroni, BoredEXE)** - maintainer
-- **[@FS-21](https://github.com/FS-21)** - inactive as a maintainer specifically
-- **Morton ([@MortonPL](https://github.com/FS-21))** - T2 maintainer
-- **Trsdy ([@chaserli](https://github.com/chaserli))** - T2 maintainer
-
-The project is so big that listing here all the help we receive or received will make the size of the readme explode, so please see the [full credits list](CREDITS.md) for that. We appreciate your help, contributions and support regardless!
-
-Attribution
------
-
-You can show your appreciation and help project's publicity by displaying the logo (monochrome version can be found [here](https://github.com/Phobos-developers/Phobos/blob/develop/logo-mono.png)) in your client/launcher (make it a button that opens Phobos GitHub page for extra fanciness). To fit with the mod styling, you are allowed to stylize the monochrome logo in a non-intrusive way (for example, recolor it to match the mod theme) without otherwise changing it. If unsure - ask us first.
-
-When promoting features of your mod that you implemented using Phobos, please give credit to Phobos and it's contributors. A good promotion for Phobos is concise and specific to features that are being showcased, for example: "This feature is made possible by Phobos", "Implemented using XYZ from Phobos", etc. This helps end users understand the nature of Phobos and its role in the modding community, and gives the needed recognition to the project and its contributors.
-
-Legal and License
------
-
-[![GPL v3](https://www.gnu.org/graphics/gplv3-127x51.png)](https://opensource.org/license/GPL-3.0)
-
-The Phobos project is an unofficial open-source community collaboration project to extend the Red Alert 2 Yuri's Revenge engine for modding and compatibility purposes.
-
-As a modification, the project complies with [EA C&C modding guidelines](https://www.ea.com/games/command-and-conquer/command-and-conquer-remastered/modding-faq); should there be conflict between the project's license and modding guidelines - the rules imposed by guidelines shall take precedence (for example, the project should not be commercial or used to make money).
-
-This project has no direct affiliation with Electronic Arts Inc. Command & Conquer, Command & Conquer Red Alert 2, Command & Conquer Yuri's Revenge are registered trademarks of Electronic Arts Inc. All Rights Reserved.
+在`[English-ActionsRA2]`小节中添加:
+```ini
+[English-ActionsRA2]
+...
+550=Draw Text at Specified Waypoint... (PhobosExt by Chang_zhi),-4,13,30,6,6,6,0,0,0,Draw text at the specified waypoint.\nThe third value is the width in pixels (1~1000，default: 250).\nThe fourth value is the background opacity percentage (0~100).\nThe fifth value is the color (Gold=0，White=1，Red=2，Blue=3，Green=4，Yellow=5，Purple=6，Pink=7，Light Blue=8),0,1,902,1
+551=Clear Text at Specified Waypoint... (PhobosExt by Chang_zhi),0,0,30,0,0,0,0,0,0,Clear the text at the specified waypoint.,0,1,903,1
+552=Clear All Waypoint Texts... (PhobosExt by Chang_zhi),0,0,0,0,0,0,0,0,0,Clear all waypoint texts displayed on screen.,0,1,904,1
+...
+```
+在`[Chinese-ActionsRA2]`小节中中添加:
+```ini
+[Chinese-ActionsRA2]
+...
+550=在指定路径点绘制文本... (PhobosExt by Chang_zhi),-4,13,30,6,6,6,0,0,0,在指定路径点绘制文本。\n第三个数值是宽度(像素，1~1000，默认250)。\n第四个数值是背景不透明度(百分比，0~100)。\n第五个数值是颜色(金=0，白=1，红=2，蓝=3，绿=4，黄=5，紫=6，粉=7，淡蓝=8),0,1,902,1
+551=清除指定路径点的文本... (PhobosExt by Chang_zhi),0,0,30,0,0,0,0,0,0,清除指定路径点的文本。,0,1,903,1
+552=清除所有路径点文本... (PhobosExt by Chang_zhi),0,0,0,0,0,0,0,0,0,清除屏幕上所有已设置的路径点文本。,0,1,904,1
+...
+```

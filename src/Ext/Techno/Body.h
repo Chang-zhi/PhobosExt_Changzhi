@@ -9,20 +9,24 @@
 #include <Utilities/TemplateDef.h>
 #include <Utilities/Macro.h>
 
+#include <Ext\TechnoType\Body.h>
+
 class TechnoExt
 {
 public:
 	using base_type = TechnoClass;
 
 	static constexpr DWORD Canary = 0xAAAACCCC;
-	static constexpr size_t ExtPointerOffset = 0x34C;
-	static constexpr bool ShouldConsiderInvalidatePointer = true;
+	// static constexpr size_t ExtPointerOffset = 0x34C;
+	// static constexpr bool ShouldConsiderInvalidatePointer = true;
 
 	class ExtData final : public Extension<TechnoClass>
 	{
 	public:
+		TechnoTypeExt::ExtData* TypeExtData;
 
 		ExtData(TechnoClass* OwnerObject) : Extension<TechnoClass>(OwnerObject)
+			, TypeExtData { nullptr }
 		{ }
 
 		virtual ~ExtData() override;
