@@ -33,6 +33,15 @@ enum PhobosTriggerEvent
 	// 任务计时器小于 N 秒
 	MissionTimerLess = 556,
 
+	// 指定标签的选择框中指定按钮被点击...
+	ChoiceBoxButtonClicked = 557,
+
+	// 指定标签的选择框中任意按钮被点击...
+	ChoiceBoxAnyButtonClicked = 558,
+
+	// 指定标签的选择框超时未选...
+	ChoiceBoxTimedOut = 559,
+
 	_DummyMaximum,
 };
 
@@ -74,6 +83,10 @@ public:
 	static bool ElapsedTimeFramesFunc(TEventClass* pThis);
 	static bool MissionTimerGreaterFunc(TEventClass* pThis);
 	static bool MissionTimerLessFunc(TEventClass* pThis);
+
+	static bool ChoiceBoxButtonClickedFunc(TEventClass* pThis, HouseClass* pHouse);
+	static bool ChoiceBoxAnyButtonClickedFunc(TEventClass* pThis, HouseClass* pHouse);
+	static bool ChoiceBoxTimedOutFunc(TEventClass* pThis, HouseClass* pHouse);
 
 	class ExtContainer final : public Container<TEventExt>
 	{

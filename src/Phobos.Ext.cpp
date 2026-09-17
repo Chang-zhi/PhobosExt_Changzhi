@@ -14,6 +14,10 @@
 #include <MyNew/TextBox/Entities/Derived/TechnoTextBoxClass.h>
 #include <MyNew/TextBox/Entities/Derived/WaypointTextBoxClass.h>
 #include <MyNew/TextBox/Types/TextBoxTypeClass.h>
+#include <MyNew/ChoiceBox/Entities/Base/MapChoiceBoxClass.h>
+#include <MyNew/ChoiceBox/Entities/Derived/WaypointChoiceBoxClass.h>
+#include <MyNew/ChoiceBox/Entities/Derived/ScreenChoiceBoxClass.h>
+#include <MyNew/ChoiceBox/Types/ChoiceBoxTypeClass.h>
 
 #include <utility>
 
@@ -188,7 +192,11 @@ using PhobosTypeRegistry = TypeRegistry <
 	MapTextBoxClass,
 	TechnoTextBoxClass,
 	WaypointTextBoxClass,
-	TextBoxTypeClass
+	TextBoxTypeClass,
+	ChoiceBoxTypeClass,
+	MapChoiceBoxClass,
+	WaypointChoiceBoxClass,
+	ScreenChoiceBoxClass
 	// other classes
 > ;
 

@@ -52,6 +52,11 @@
     <ClCompile Include="src\MyNew\TextBox\Entities\Derived\TechnoTextBoxClass.cpp" />
     <ClCompile Include="src\MyNew\TextBox\Entities\Derived\WaypointTextBoxClass.cpp" />
     <ClCompile Include="src\MyNew\TextBox\Types\TextBoxTypeClass.cpp" />
+    <ClCompile Include="src\MyNew\ChoiceBox\Entities\Hooks.MapChoiceBoxClass.cpp" />
+    <ClCompile Include="src\MyNew\ChoiceBox\Entities\Base\MapChoiceBoxClass.cpp" />
+    <ClCompile Include="src\MyNew\ChoiceBox\Entities\Derived\WaypointChoiceBoxClass.cpp" />
+    <ClCompile Include="src\MyNew\ChoiceBox\Entities\Derived\ScreenChoiceBoxClass.cpp" />
+    <ClCompile Include="src\MyNew\ChoiceBox\Types\ChoiceBoxTypeClass.cpp" />
     <ClCompile Include="src\Utilities\Anchor.cpp" />
     <ClCompile Include="src\Utilities\AresAddressInit.cpp" />
     <ClCompile Include="src\Utilities\AresHelper.cpp" />
@@ -91,6 +96,10 @@
     <ClInclude Include="src\MyNew\TextBox\Entities\Derived\TechnoTextBoxClass.h" />
     <ClInclude Include="src\MyNew\TextBox\Entities\Derived\WaypointTextBoxClass.h" />
     <ClInclude Include="src\MyNew\TextBox\Types\TextBoxTypeClass.h" />
+    <ClInclude Include="src\MyNew\ChoiceBox\Entities\Base\MapChoiceBoxClass.h" />
+    <ClInclude Include="src\MyNew\ChoiceBox\Entities\Derived\WaypointChoiceBoxClass.h" />
+    <ClInclude Include="src\MyNew\ChoiceBox\Entities\Derived\ScreenChoiceBoxClass.h" />
+    <ClInclude Include="src\MyNew\ChoiceBox\Types\ChoiceBoxTypeClass.h" />
     <ClInclude Include="src\Utilities\Anchor.h" />
     <ClInclude Include="src\Utilities\AresFunctions.h" />
     <ClInclude Include="src\Utilities\AresHelper.h" />
