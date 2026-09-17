@@ -51,7 +51,7 @@ enum class PhobosTriggerAction : unsigned int
 	RemoveBaseNodesOfBuildingTypeForHouse = 562,
 
 	// 安全地销毁标签...
-	DestroyTagSafely = 563,
+	DestroyAllTagByTagTypeSafely = 563,
 
 	// 为路径点上的科技类型绑定标签...
 	BindTagToTechnoTypeAtWaypoint = 564,
@@ -59,9 +59,26 @@ enum class PhobosTriggerAction : unsigned int
 	// 为路径点上指定所属方的科技类型绑定标签...
 	BindTagToTechnoTypeOfHouseAtWaypoint = 565,
 
-	//// 设置关联单位单位的可招募属性...
-	//SetObjectRecruitable = 566,
+	// 为路径点范围内的指定科技类型绑定标签...
+	BindTagToSpecificTechnoTypeWithinWaypointRange = 566,
 
+	// 为路径点范围内指定所属方的指定科技类型绑定标签...
+	BindTagToSpecificTechnoTypeOfSpecificOwnerWithinWaypointRange = 567,
+
+	// 为路径点范围内的所有科技类型绑定标签...
+	BindTagToAllTechnoTypesWithinWaypointRange = 568,
+
+	// 为路径点范围内指定所属方的所有科技类型绑定标签...
+	BindTagToAllTechnoTypesOfSpecificOwnerWithinWaypointRange = 569,
+
+	// 统一指定标签类型的所有实例
+	UnifyAllInstancesOfSameTagType = 570,
+
+
+	// 清除指定所属方尝试次数超过指定数值的基地节点...
+	//RemoveBaseNodesExceedingAttemptCountForHouse = 570,
+	// 设置关联单位单位的可招募属性...
+	// SetObjectRecruitable = 566,
 
 	// 测试用
 	testAction = 1150,
@@ -113,9 +130,17 @@ public:
 	ACTION_FUNC(AddBaseNodeForHouseAtWaypoint);
 	ACTION_FUNC(RemoveAllBaseNodeForHouseAtWaypoint);
 	ACTION_FUNC(RemoveBaseNodesOfBuildingTypeForHouse);
-	ACTION_FUNC(DestroyTagSafely);
+	ACTION_FUNC(DestroyAllTagByTagTypeSafely);
 	ACTION_FUNC(BindTagToTechnoTypeAtWaypoint);
 	ACTION_FUNC(BindTagToTechnoTypeOfHouseAtWaypoint);
+	ACTION_FUNC(BindTagToSpecificTechnoTypeWithinWaypointRange);
+	ACTION_FUNC(BindTagToSpecificTechnoTypeOfSpecificOwnerWithinWaypointRange);
+	ACTION_FUNC(BindTagToAllTechnoTypesWithinWaypointRange);
+	ACTION_FUNC(BindTagToAllTechnoTypesOfSpecificOwnerWithinWaypointRange);
+	ACTION_FUNC(UnifyAllInstancesOfSameTagType);
+
+
+	// ACTION_FUNC(RemoveBaseNodesExceedingAttemptCountForHouse);
 	// ACTION_FUNC(SetObjectRecruitable);
 
 	ACTION_FUNC(testAction);

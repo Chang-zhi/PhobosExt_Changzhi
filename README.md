@@ -58,6 +58,7 @@
 ---
 
 ### 2. 动态标签绑定功能
+
 <span style="color: red;">**注意!**   
 触发系统事实上很复杂，需读者了解其组成和运行机制。  
 这里默认读者已经具备了相关知识，可以阅读 `Handama` 的 `触发系统.docx` 以了解相关知识。
@@ -71,32 +72,41 @@
 （写都写了.jpg，不过确实有所不同）  
 </span>
 
-**触发动作说明：**
-- `553` – 将指定小队全部成员关联到指定标签...（参数：小队索引，标签索引）
-- `554` – 将指定所属方的指定小队全部成员关联到指定标签...（参数：小队索引，标签索引，所属方国家索引）
-- `555` – 将特定科技类型全部关联到指定标签...（参数：科技类型ID，标签索引）
-- `556` – 将指定所属方的特定科技类型全部关联到指定标签...（参数：科技类型ID，标签索引，所属方国家索引）
-- `563` – 安全地销毁标签...（参数：标签索引）
-- `564` – 为路径点上的指定科技类型绑定标签...（参数：路径点索引，科技类型ID，标签索引）  
-- `565` – 为路径点上指定所属方的指定科技类型绑定标签...（参数：路径点索引，科技类型ID，标签索引，所属方国家索引）
+#### 触发动作说明
 
-<span style="color: red;">**注意!**   
-</span> 
-1.
-使用本触发时，会更新指定标签的 `InstanceCount` 。   
-2.
-由本触发创建的标签可以被动作 `70` 摧毁而不会会弹框。  
-3.
-哪怕想要绑定的科技类型正在建造中也会被关联到指定标签。  
-4.
-通过此触发给小队成员关联的的标签，小队解散后标签不会消失。  
-5.
-对于事件 `552`,`553`, 若科技类型为建筑，则每一格都会检测，不支持ares的自定义Foundation。   
-6.
-当指定对象的已经有标签时，新标签会覆盖原有的标签，会更新原有标签的 `InstanceCount` 。  
-7. 
-与常规销毁不同，动作 `563` 不会导致由小队创建的标签被销毁时弹框崩溃，因此可安全用于动态标签。
+| ID | 名称 | 参数说明 |
+| :---: | :--- | :--- |
+| 553 | 将指定小队全部成员关联到指定标签... | 小队索引，标签索引，布尔值 |
+| 554 | 将指定所属方的指定小队全部成员关联到指定标签... | 小队索引，标签索引，所属方国家索引，布尔值 |
+| 555 | 将特定科技类型全部关联到指定标签... | 科技类型ID，标签索引，布尔值 |
+| 556 | 将指定所属方的特定科技类型全部关联到指定标签... | 科技类型ID，标签索引，所属方国家索引，布尔值 |
+| 563 | 安全地销毁指定标签类型的所有实例... | 标签索引 |
+| 564 | 为路径点上的指定科技类型绑定标签... | 路径点索引，科技类型ID，标签索引，布尔值 |
+| 565 | 为路径点上指定所属方的指定科技类型绑定标签... | 路径点索引，科技类型ID，标签索引，所属方国家索引，布尔值 |
+| 566 | 为路径点范围内的指定科技类型绑定标签... | 路径点索引，科技类型ID，标签索引，范围（单元格），布尔值 |
+| 567 | 为路径点范围内触发所属方的指定科技类型绑定标签... | 路径点索引，科技类型ID，标签索引，范围，布尔值 |
+| 568 | 为路径点范围内的所有科技类型绑定标签... | 路径点索引，标签索引，范围，布尔值 |
+| 569 | 为路径点范围内指定所属方的所有科技类型绑定标签... | 路径点索引，所属方国家索引，标签索引，范围，布尔值 |
+| 570 | 统一指定标签类型的所有实例... | 标签索引 |
 
+> - **范围**：整数，以单元格为单位的圆形半径 。
+> - **布尔值**：`0` 或 `1`，控制是否强制创建一个新的标签实例。（见下文注意事项第9条）
+
+#### 重要注意事项
+
+1. 使用本组触发时，会更新指定标签的 `InstanceCount`（引用计数）。  
+2. 由本组触发创建的标签可以被原版动作 `70`（摧毁关联对象）安全销毁而不会弹框。  
+3. 即使想要绑定的科技类型**正在建造中**，也会被关联到指定标签。  
+4. 通过本组触发给小队成员关联的标签，在小队解散后标签不会自动消失。  
+5. 对于动作 `564`、`565`，若科技类型为建筑，则**每一格都会检测**，当前**不支持 Ares 自定义建筑地基**。  
+6. 当指定对象已经拥有标签时，新标签会**覆盖**原有标签，并且原有标签的 `InstanceCount` 会相应更新。  
+7. 与常规销毁（动作 `70`）不同，动作 `563` **不会导致由小队创建的标签被销毁时弹框崩溃**，因此可安全用于标签的批量清理。  
+8. 动作 `570` 的原理：  
+   - 该动作会强制创建一个**全新**的标签实例，然后将当前所有已经绑定了该标签类型（TagType）的科技对象**全部重新指向**这个新标签，最后销毁原有的所有标签实例。  
+9. **布尔值参数（强制新建）**：  
+   - 若为 `1`（真），则无论当前是否存在相同标签类型的实例，都会创建一个**全新的标签实例**，可用于统一实例。（新实例与同类型其他实例独立存在，引擎允许多实例）  
+   - 若为 `0`（假），则优先寻找游戏内已存在的该标签类型实例，找到则直接使用，找不到才会创建新标签。  
+   - 注意：当使用 `0` 时，若存在多个同类型标签实例，实际绑定到哪一个**不确定**（取决于遍历顺序），建议在需要明确控制实例时使用 `1`。
 
 ---
 
@@ -121,7 +131,7 @@
 - `562` – 移除特定所属方所有指定建筑类型的基地节点...（参数：所属方国家索引，建筑类型索引）
 
 **注意事项：**   
-对于动作 `561`,`562`, 会重置 ai 的建造序列。 
+对于动作 `561`,`562`, 会重置 ai 的建造序列, 如果基地正在建造需要移除的基地节点, 则会强制中断建造。 
 
 ---
 
@@ -135,7 +145,6 @@
 - `553` – 路径点上不存在所属方的指定科技类型... （参数：路径点索引，科技类型）  
 
 **注意事项：**   
-对于事件 `550`,`551`, 使用使用切比雪夫距离判断是否在方形范围内。  
 对于事件 `552`,`553`, 若科技类型为建筑，则每一格都会检测，不支持ares的自定义Foundation。
 
 ---
@@ -182,108 +191,55 @@ AutoHunt=                       ; boolean（布尔值），默认 false
 为了在触发编辑器（FinalAlert 2）中使用新的触发动作，需要修改 `FAData.ini` 或对应版本的配置文件。
 
 ### 标准 FinalAlert 2
-编辑 `FAData.ini`，需在 `[EventsRA2]` 和 `[ActionsRA2]` 小节中添加以下内容：
+需在 `FAData.ini` 的 `[EventsRA2]` 和 `[ActionsRA2]` 小节中添加内容, 可以参考 `FA2SP_HDM_Edition` 版本。
 
-
-```ini
-[EventsRA2]
-...
-550=路径点附近存在所属方的任意科技类型... (PhobosExt by Chang_zhi),48,30,0,0,当指定路径点的指定距离内存在触发所属方任意科技类型时，此事件被满足。,0,1,550,1
-551=路径点附近不存在所属方的任意科技类型... (PhobosExt by Chang_zhi),48,30,0,0,当指定路径点的指定距离内不存在触发所属方任意科技类型时，此事件被满足。,0,1,551,1
-552=路径点上存在所属方的指定科技类型... (PhobosExt by Chang_zhi),49,46,0,0,当路径点上存在触发所属方的指定科技类型时，此事件被满足。(若科技类型为建筑，则每一格都会检测，不支持ares的自定义Foundation),0,1,552,1
-553=路径点上不存在所属方的指定科技类型... (PhobosExt by Chang_zhi),49,46,0,0,当路径点上不再存在触发所属方的指定科技类型时，此事件被满足。(若科技类型为建筑，则每一格都会检测，不支持ares的自定义Foundation),0,1,553,1
-...
-```
-
-```ini
-[ActionsRA2]
-...
-550=在指定路径点绘制文本... (PhobosExt by Chang_zhi),-4,13,30,6,6,6,0,0,0,在指定路径点绘制文本。\n第三个数值是宽度(像素，1~1000，默认250)。\n第四个数值是背景不透明度(百分比，0~100)。\n第五个数值是颜色(金=0，白=1，红=2，蓝=3，绿=4，黄=5，紫=6，粉=7，淡蓝=8),0,1,902,1
-551=清除指定路径点的文本... (PhobosExt by Chang_zhi),0,0,30,0,0,0,0,0,0,清除指定路径点的文本。,0,1,903,1
-552=清除所有路径点文本... (PhobosExt by Chang_zhi),0,0,0,0,0,0,0,0,0,清除屏幕上所有已设置的路径点文本。,0,1,904,1
-553=将指定小队全部成员关联到指定标签... (PhobosExt by Chang_zhi),0,0,7,38,0,0,0,0,0,将指定小队内所有成员关联到指定标签。若标签不存在/已销毁，则会根据标签类型创建一个新标签，确保目标会与标签关联。(详细细节请见readme.md里的相关介绍),0,1,553,1
-554=将指定所属方的指定小队全部成员关联到指定标签... (PhobosExt by Chang_zhi),0,0,7,38,2,0,0,0,0,将指定所属方下的指定小队所有成员关联到指定标签。若标签不存在/已销毁，则会根据标签类型创建一个新标签，确保目标会与标签关联。(详细细节请见readme.md里的相关介绍),0,1,554,1
-555=将特定科技类型全部关联到指定标签... (PhobosExt by Chang_zhi),-4,46,38,0,0,0,0,0,0,将指定科技类型的所有实例关联到指定标签。若标签不存在/已销毁，则会根据标签类型创建一个新标签，确保目标会与标签关联。(详细细节请见readme.md里的相关介绍),0,1,555,1
-556=将指定所属方的特定科技类型全部关联到指定标签... (PhobosExt by Chang_zhi),-4,46,38,2,0,0,0,0,0,将指定所属方下指定科技类型的所有实例关联到指定标签。若标签不存在/已销毁，则会根据标签类型创建一个新标签，确保目标会与标签关联。(详细细节请见readme.md里的相关介绍),0,1,556,1
-557=为所属方添加金钱数额... (PhobosExt by Chang_zhi),0,0,2,6,0,0,0,0,0,为指定所属方添加指定的金钱数额。,0,1,557,1
-558=为所属方扣除金钱数额... (PhobosExt by Chang_zhi),0,0,2,6,0,0,0,0,0,为指定所属方扣除指定的金钱数额。,0,1,558,1
-559=设置所属方的金钱数额... (PhobosExt by Chang_zhi),0,0,2,6,0,0,0,0,0,设置指定所属方的金钱数额。,0,1,559,1
-560=在指定路径点添加基地节点... (PhobosExt by Chang_zhi),0,0,2,30,8,0,0,0,0,在指定路径点添加指定所属方的基地节点。,0,1,560,1
-561=移除指定路径点上的所有基地节点... (PhobosExt by Chang_zhi),0,0,2,30,0,0,0,0,0,移除指定路径点上指定所属方的所有基地节点。(会重置ai的建造序列),0,1,561,1
-562=移除特定所属方所有指定建筑类型的基地节点... (PhobosExt by Chang_zhi),0,0,2,8,0,0,0,0,0,移除特定所属方所有指定建筑类型的基地节点。(会重置ai的建造序列),0,1,562,1
-563=安全地销毁标签... (PhobosExt by Chang_zhi),0,0,38,0,0,0,0,0,0,销毁特定的标签，不会阻止未来可能的实例。 既可以销毁一开始就存在的标签，也可以销毁由触发/小队创建的标签，不会导致由小队创建的标签被销毁时弹框崩溃。(详细细节请见readme.md里的相关介绍),0,1,563,1
-564=为路径点上的指定科技类型绑定标签... (PhobosExt by Chang_zhi),-4,46,38,30,0,0,0,0,0,为指定路径点上的指定科技类型绑定指定标签。(若科技类型为建筑，则每一格都会检测，不支持ares的自定义Foundation，详细细节请见readme.md里的相关介绍),0,1,564,1
-565=为路径点上指定所属方的指定科技类型绑定标签... (PhobosExt by Chang_zhi),-4,46,38,30,2,0,0,0,0,为指定路径点上指定所属方的指定科技类型绑定指定标签。(若科技类型为建筑，则每一格都会检测，不支持ares的自定义Foundation，详细细节请见readme.md里的相关介绍),0,1,565,1
-...
-```
+---
 
 ### [*FA2SP_HDM_Edition*](https://github.com/handama/FA2sp)（韩大妈版本）
 需同时编辑 `FAData_TriggerAndScript.ini` 中的   
 `[English-EventsRA2]`, `[Chinese-EventsRA2]`, `[English-ActionsRA2]`, `[Chinese-ActionsRA2]` 小节。
 
-添加以下内容:
+在 `[Chinese-EventsRA2]` 和 `[English-ActionsRA2]` 中添加以下内容:
 
 ```ini
-[English-EventsRA2]
-...
-550=There is a techno type of the house near the waypoint... (PhobosExt by Chang_zhi),48,30,0,0,This event is satisfied when there is any techno type of the triggering house within the specified distance of the specified waypoint.,0,1,550,1
-551=There is no techno type of the house near the waypoint... (PhobosExt by Chang_zhi),48,30,0,0,This event is satisfied when there is no techno type of the triggering house within the specified distance of the specified waypoint.,0,1,551,1
-552=Specified techno type of house exists at waypoint... (PhobosExt by Chang_zhi),49,46,0,0,This event is satisfied when the specified techno type of the triggering house exists at the waypoint. (If the techno type is a building，every cell of its foundation will be checked. Does not support Ares' custom Foundation shapes.),0,1,552,1
-553=Specified techno type of house does NOT exist at waypoint... (PhobosExt by Chang_zhi),49,46,0,0,This event is satisfied when the specified techno type of the triggering house does NOT exist at the waypoint. (If the techno type is a building，every cell of its foundation will be checked. Does not support Ares' custom Foundation shapes.),0,1,553,1
-...
-```
-
-```ini
-[Chinese-EventsRA2]
+[Chinese-EventsRA2]/[English-ActionsRA2]
 ...
 550=路径点附近存在所属方的任意科技类型... (PhobosExt by Chang_zhi),48,30,0,0,当指定路径点的指定距离内存在触发所属方任意科技类型时，此事件被满足。,0,1,550,1
 551=路径点附近不存在所属方的任意科技类型... (PhobosExt by Chang_zhi),48,30,0,0,当指定路径点的指定距离内不存在触发所属方任意科技类型时，此事件被满足。,0,1,551,1
 552=路径点上存在所属方的指定科技类型... (PhobosExt by Chang_zhi),49,46,0,0,当路径点上存在触发所属方的指定科技类型时，此事件被满足。(若科技类型为建筑，则每一格都会检测，不支持ares的自定义Foundation),0,1,552,1
 553=路径点上不存在所属方的指定科技类型... (PhobosExt by Chang_zhi),49,46,0,0,当路径点上不再存在触发所属方的指定科技类型时，此事件被满足。(若科技类型为建筑，则每一格都会检测，不支持ares的自定义Foundation),0,1,553,1
-
 ...
 ```
 
-
+在 `[Chinese-ActionsRA2]` 和 `[English-ActionsRA2]` 中添加以下内容:
 ```ini
-[English-ActionsRA2]
-...
-550=Draw Text at Specified Waypoint... (PhobosExt by Chang_zhi),-4,13,30,6,6,6,0,0,0,Draw text at the specified waypoint.\nThe third value is the width in pixels (1~1000，default: 250).\nThe fourth value is the background opacity percentage (0~100).\nThe fifth value is the color (Gold=0，White=1，Red=2，Blue=3，Green=4，Yellow=5，Purple=6，Pink=7，Light Blue=8),0,1,902,1
-551=Clear Text at Specified Waypoint... (PhobosExt by Chang_zhi),0,0,30,0,0,0,0,0,0,Clear the text at the specified waypoint.,0,1,903,1
-552=Clear All Waypoint Texts... (PhobosExt by Chang_zhi),0,0,0,0,0,0,0,0,0,Clear all waypoint texts displayed on screen.,0,1,904,1
-553=Associate all members of the specified team to the specified tag... (PhobosExt by Chang_zhi),0,0,7,38,0,0,0,0,0,Associate all members within the specified team to the specified tag. If the tag does not exist or has been destroyed，a new tag will be created according to the tag type (TagType) to ensure the target is associated with the tag.,0,1,553,1
-554=Associate all members of the specified team under the specified owner to the specified tag... (PhobosExt by Chang_zhi),0,0,7,38,2,0,0,0,0,Associate all members of the specified team under the specified owner to the specified tag. If the tag does not exist or has been destroyed，a new tag will be created according to the tag type (TagType) to ensure the target is associated with the tag.,0,1,554,1
-555=Associate all instances of the specified technotype to the specified tag... (PhobosExt by Chang_zhi),-4,46,38,0,0,0,0,0,0,Associate all instances of the specified technotype to the specified tag. If the tag does not exist or has been destroyed，a new tag will be created according to the tag type (TagType) to ensure the target is associated with the tag.,0,1,555,1
-556=Associate all instances of the specified technotype under the specified owner to the specified tag... (PhobosExt by Chang_zhi),-4,46,38,2,0,0,0,0,0,Associate all instances of the specified technotype under the specified owner to the specified tag. If the tag does not exist or has been destroyed，a new tag will be created according to the tag type (TagType) to ensure the target is associated with the tag.,0,1,556,1
-556=Associate all instances of the specified technotype under the specified owner to the specified tag... (PhobosExt by Chang_zhi),-4,46,38,2,0,0,0,0,0,Associate all instances of the specified technotype under the specified owner to the specified tag. If the tag does not exist or has been destroyed，a new tag will be created according to the tag type (TagType) to ensure the target is associated with the tag.,0,1,556,1
-557=Add a specified amount of money to the specified house...,0,0,2,6,0,0,0,0,0,Adds the specified amount of money to the specified house.,0,1,557,1
-558=Deduct a specified amount of money from the specified house...,0,0,2,6,0,0,0,0,0,Deducts the specified amount of money from the specified house.,0,1,558,1
-559=Set the money amount for the specified house...,0,0,2,6,0,0,0,0,0,Sets the money amount for the specified house.,0,1,559,1
-560=Add base node at waypoint...,0,0,2,30,8,0,0,0,0,Add base node for specified house at waypoint.,0,1,560,1
-561=Remove all base nodes at waypoint...,0,0,2,30,0,0,0,0,0,Remove all base nodes for specified house at waypoint.,0,1,561,1
-562=Remove all base nodes of specified building type for house...,0,0,2,8,0,0,0,0,0,Remove all base nodes of specified building type for house.,0,1,562,1
-563=Safely destroy tag... (PhobosExt by Chang_zhi),0,0,38,0,0,0,0,0,0,Destroy a specific tag without preventing future possible instances. Can destroy both pre-existing tags and those created by triggers/teams. (See the relevant section in readme.md for details.),0,1,563,1
-...
-```
-
-```ini
-[Chinese-ActionsRA2]
+[Chinese-ActionsRA2]/[English-ActionsRA2]
 ...
 550=在指定路径点绘制文本... (PhobosExt by Chang_zhi),-4,13,30,6,6,6,0,0,0,在指定路径点绘制文本。\n第三个数值是宽度(像素，1~1000，默认250)。\n第四个数值是背景不透明度(百分比，0~100)。\n第五个数值是颜色(金=0，白=1，红=2，蓝=3，绿=4，黄=5，紫=6，粉=7，淡蓝=8),0,1,902,1
 551=清除指定路径点的文本... (PhobosExt by Chang_zhi),0,0,30,0,0,0,0,0,0,清除指定路径点的文本。,0,1,903,1
 552=清除所有路径点文本... (PhobosExt by Chang_zhi),0,0,0,0,0,0,0,0,0,清除屏幕上所有已设置的路径点文本。,0,1,904,1
-553=将指定小队全部成员关联到指定标签... (PhobosExt by Chang_zhi),0,0,7,38,0,0,0,0,0,将指定小队内所有成员关联到指定标签。若标签不存在/已销毁，则会根据标签类型创建一个新标签，确保目标会与标签关联。(详细细节请见readme.md里的相关介绍),0,1,553,1
-554=将指定所属方的指定小队全部成员关联到指定标签... (PhobosExt by Chang_zhi),0,0,7,38,2,0,0,0,0,将指定所属方下的指定小队所有成员关联到指定标签。若标签不存在/已销毁，则会根据标签类型创建一个新标签，确保目标会与标签关联。(详细细节请见readme.md里的相关介绍),0,1,554,1
-555=将特定科技类型全部关联到指定标签... (PhobosExt by Chang_zhi),-4,46,38,0,0,0,0,0,0,将指定科技类型的所有实例关联到指定标签。若标签不存在/已销毁，则会根据标签类型创建一个新标签，确保目标会与标签关联。(详细细节请见readme.md里的相关介绍),0,1,555,1
-556=将指定所属方的特定科技类型全部关联到指定标签... (PhobosExt by Chang_zhi),-4,46,38,2,0,0,0,0,0,将指定所属方下指定科技类型的所有实例关联到指定标签。若标签不存在/已销毁，则会根据标签类型创建一个新标签，确保目标会与标签关联。(详细细节请见readme.md里的相关介绍),0,1,556,1
+553=将指定小队全部成员关联到指定标签... (PhobosExt by Chang_zhi),0,0,7,38,15,0,0,0,0,将指定小队内所有成员关联到指定标签。布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见readme.md里的相关介绍),0,1,553,1
+554=将指定所属方的指定小队全部成员关联到指定标签... (PhobosExt by Chang_zhi),0,0,7,38,2,15,0,0,0,将指定所属方下的指定小队所有成员关联到指定标签。布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见readme.md里的相关介绍)。,0,1,554,1
+555=将特定科技类型全部关联到指定标签... (PhobosExt by Chang_zhi),-4,46,38,15,0,0,0,0,0,将指定科技类型的所有实例关联到指定标签。(即使正在建造中)\n布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见readme.md里的相关介绍),0,1,555,1
+550=在指定路径点绘制文本... (PhobosExt by Chang_zhi),-4,13,30,6,6,6,0,0,0,在指定路径点绘制文本。\n第三个数值是宽度(像素，1~1000，默认250)。\n第四个数值是背景不透明度(百分比，0~100)。\n第五个数值是颜色(金=0，白=1，红=2，蓝=3，绿=4，黄=5，紫=6，粉=7，淡蓝=8),0,1,902,1
+551=清除指定路径点的文本... (PhobosExt by Chang_zhi),0,0,30,0,0,0,0,0,0,清除指定路径点的文本。,0,1,903,1
+552=清除所有路径点文本... (PhobosExt by Chang_zhi),0,0,0,0,0,0,0,0,0,清除屏幕上所有已设置的路径点文本。,0,1,904,1
+553=将指定小队全部成员关联到指定标签... (PhobosExt by Chang_zhi),0,0,7,38,15,0,0,0,0,将指定小队内所有成员关联到指定标签。布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见readme.md里的相关介绍),0,1,553,1
+554=将指定所属方的指定小队全部成员关联到指定标签... (PhobosExt by Chang_zhi),0,0,7,38,2,15,0,0,0,将指定所属方下的指定小队所有成员关联到指定标签。布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见readme.md里的相关介绍)。,0,1,554,1
+555=将特定科技类型全部关联到指定标签... (PhobosExt by Chang_zhi),-4,46,38,15,0,0,0,0,0,将指定科技类型的所有实例关联到指定标签。(即使正在建造中)\n布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见readme.md里的相关介绍),0,1,555,1
+556=将指定所属方的特定科技类型全部关联到指定标签... (PhobosExt by Chang_zhi),-4,46,38,2,15,0,0,0,0,将指定所属方下指定科技类型的所有实例关联到指定标签。(即使正在建造中)\n布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见readme.md里的相关介绍),0,1,556,1
 557=为所属方添加金钱数额... (PhobosExt by Chang_zhi),0,0,2,6,0,0,0,0,0,为指定所属方添加指定的金钱数额。,0,1,557,1
 558=为所属方扣除金钱数额... (PhobosExt by Chang_zhi),0,0,2,6,0,0,0,0,0,为指定所属方扣除指定的金钱数额。,0,1,558,1
 559=设置所属方的金钱数额... (PhobosExt by Chang_zhi),0,0,2,6,0,0,0,0,0,设置指定所属方的金钱数额。,0,1,559,1
 560=在指定路径点添加基地节点... (PhobosExt by Chang_zhi),0,0,2,30,8,0,0,0,0,在指定路径点添加指定所属方的基地节点。,0,1,560,1
 561=移除指定路径点上的所有基地节点... (PhobosExt by Chang_zhi),0,0,2,30,0,0,0,0,0,移除指定路径点上指定所属方的所有基地节点。(会重置ai的建造序列),0,1,561,1
 562=移除特定所属方所有指定建筑类型的基地节点... (PhobosExt by Chang_zhi),0,0,2,8,0,0,0,0,0,移除特定所属方所有指定建筑类型的基地节点。(会重置ai的建造序列),0,1,562,1
-563=安全地销毁标签... (PhobosExt by Chang_zhi),0,0,38,0,0,0,0,0,0,销毁特定的标签，不会阻止未来可能的实例。 既可以销毁一开始就存在的标签，也可以销毁由触发/小队创建的标签，不会导致由小队创建的标签被销毁时弹框崩溃。(详细细节请见readme.md里的相关介绍),0,1,563,1
-564=为路径点上的指定科技类型绑定标签... (PhobosExt by Chang_zhi),-4,46,38,30,0,0,0,0,0,为指定路径点上的指定科技类型绑定指定标签。(若科技类型为建筑，则每一格都会检测，不支持ares的自定义Foundation，详细细节请见readme.md里的相关介绍),0,1,564,1
-565=为路径点上指定所属方的指定科技类型绑定标签... (PhobosExt by Chang_zhi),-4,46,38,30,2,0,0,0,0,为指定路径点上指定所属方的指定科技类型绑定指定标签。(若科技类型为建筑，则每一格都会检测，不支持ares的自定义Foundation，详细细节请见readme.md里的相关介绍),0,1,565,1
+563=安全地销毁指定标签类型的所有实例... (PhobosExt by Chang_zhi),0,0,38,0,0,0,0,0,0,销毁指定标签类型的所有实例，不会阻止未来可能的实例。 既会销毁一开始就存在的实例，也会销毁由触发/小队创建的实例，不会导致由小队创建的标签实例被销毁时弹框崩溃。(详细细节请见readme.md里的相关介绍),0,1,563,1
+564=为路径点上的指定科技类型绑定标签... (PhobosExt by Chang_zhi),-4,46,38,30,15,0,0,0,0,为指定路径点上的指定科技类型绑定指定标签。布尔值用来指定是否优先创建一个新的标签实例(TagClass)。(若科技类型为建筑，则每一格都会检测，不支持ares的自定义Foundation，详细细节请见readme.md里的相关介绍),0,1,564,1
+565=为路径点上指定所属方的指定科技类型绑定标签... (PhobosExt by Chang_zhi),-4,46,38,30,2,15,0,0,0,为指定路径点上指定所属方的指定科技类型绑定指定标签。布尔值用来指定是否优先创建一个新的标签实例(TagClass)。(若科技类型为建筑，则每一格都会检测，不支持ares的自定义Foundation，详细细节请见readme.md里的相关介绍),0,1,565,1
+566=为路径点范围内的指定科技类型绑定标签... (PhobosExt by Chang_zhi),-4,46,38,30,6,15,0,0,0,为指定路径点指定范围内的所有指定科技类型绑定标签。(圆形范围)\n布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见readme.md里的相关介绍),0,1,566,1
+567=为路径点范围内触发所属方的指定科技类型绑定标签... (PhobosExt by Chang_zhi),-4,46,38,30,6,15,0,0,0,为指定路径点指定范围内触发所属方的所有指定科技类型绑定标签。(圆形范围)\n布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见readme.md里的相关介绍),0,1,567,1
+568=为路径点范围内的所有科技类型绑定标签... (PhobosExt by Chang_zhi),0,0,38,30,6,15,0,0,0,为指定路径点指定范围内的所有科技类型绑定标签。(圆形范围)\n布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见readme.md里的相关介绍),0,1,568,1
+569=为路径点范围内指定所属方的所有科技类型绑定标签... (PhobosExt by Chang_zhi),0,2,38,30,6,15,0,0,0,为指定路径点指定范围内指定所属方的所有科技类型绑定标签。(圆形范围)\n布尔值用来指定是否优先创建一个新的标签实例。(详细细节请见readme.md里的相关介绍),0,1,569,1
 ...
 ```
