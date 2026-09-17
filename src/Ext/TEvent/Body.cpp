@@ -78,6 +78,10 @@ std::optional<bool> TEventExt::Execute(TEventClass* pThis, int iEvent, HouseClas
 		return !TEventExt::TechnoTypeOfHouseNearWaypoint(pThis, pObject, pHouse);
 	// case PhobosTriggerEvent::TechnoDestroyedByHouse:
 	// 	return TEventExt::TechnoDestroyedByHouse(pThis, pObject);
+	case PhobosTriggerEvent::TechnoTypeOfHouseExistsAtWaypoint:
+		return TEventExt::TechnoTypeOfHouseExistsAtWaypoint(pThis, pHouse);
+	case PhobosTriggerEvent::TechnoTypeOfHouseNotExistsAtWaypoint:
+		return !TEventExt::TechnoTypeOfHouseExistsAtWaypoint(pThis, pHouse);
 
 	default:
 		return std::nullopt;
@@ -105,11 +109,68 @@ bool TEventExt::TechnoTypeOfHouseNearWaypoint(TEventClass* pThis, ObjectClass* p
 	return false;
 }
 
-bool TEventExt::TechnoDestroyedByHouse(TEventClass* pThis, ObjectClass* pAttached)
+//bool TEventExt::TechnoDestroyedByHouse(TEventClass* pThis, ObjectClass* pAttached)
+//{
+//	// 大败而归
+//	return false;
+//}
+
+bool TEventExt::TechnoTypeOfHouseExistsAtWaypoint(TEventClass* pThis, HouseClass* pHouse)
 {
-	// 大败而归
+	int wayPointIndex = pThis->Value;
+	const char* technoID = pThis->String;
+	// Debug::Log("[TEventExt] Value is \"%d\" , String is \"%s\", pHouse is \"%s\".\n", wayPointIndex, technoID, pHouse->Type->get_ID());
+
+	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(wayPointIndex);
+
+	for(TechnoClass* pTechno : TechnoClass::Array)
+	{
+		//if(pTechno)
+		//	Debug::Log("[TEventExt] Checking Techno \"%s\"\n", pTechno->get_ID());
+
+		if (pTechno
+			&& pTechno->Owner == pHouse
+			&& strcmp(pTechno->get_ID(), technoID) == 0)
+		{
+			// Debug::Log("[TEventExt] Found Techno common ID and HOUSE.\n");
+			if (pTechno->WhatAmI() == AbstractType::Building) // 是建筑, 需要判断坐标是否在建筑基底范围内
+			{
+				// Debug::Log("[TEventExt] Techno is a building.\n");
+				if (BuildingClass* pBuilding = abstract_cast<BuildingClass*>(pTechno))
+				{
+					// Debug::Log("[TEventExt] Checking building foundation.\n");
+					if (IsCellInBuildingFoundation(pBuilding, cell))
+					{
+						// Debug::Log("[TEventExt] TechnoTypeOfHouseExistsAtWaypoint: Found Building at waypoint.\n");
+						return true;
+					}
+				}
+			}
+			else
+			{
+				// Debug::Log("[TEventExt] Techno is not a building.\n");
+				if (CellClass::Coord2Cell(pTechno->GetCoords()) == cell) // 不是建筑类型, 直接判断坐标即可
+				{
+					// Debug::Log("[TEventExt] TechnoTypeOfHouseExistsAtWaypoint: Found Techno at waypoint.\n");
+					return true;
+				}
+			}
+		}
+	}
+
 	return false;
 }
+
+
+// test code for parameters
+// bool TechnoTypeOfHouseExistsAtWaypoint(TEventClass* pThis, HouseClass* pHouse)
+// {
+// 	int Value = pThis->Value;
+// 	const char* String = pThis->String;
+// 	Debug::Log("[TEventExt] Value is \"%d\" , String is \"%s\", pHouse is \"%s\".\n", Value, String, pHouse->Type->get_ID());
+// 
+// 	return true;
+// }
 
 
 // =============================

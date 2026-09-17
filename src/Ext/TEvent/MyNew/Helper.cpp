@@ -3,6 +3,8 @@
 #include <FootClass.h>
 #include <GeneralStructures.h>
 #include <TechnoClass.h>
+#include <BuildingClass.h>
+#include <BuildingTypeClass.h>
 #include <CellClass.h>
 
 /**
@@ -29,3 +31,26 @@ bool IsTechnoNearCell(const TechnoClass* pTechno, const CellStruct& targetCell, 
 	// 使用切比雪夫距离（max(dx, dy)）判断是否在方形范围内
 	return (std::abs(dx) <= distanceCells) && (std::abs(dy) <= distanceCells);
 }
+
+// 检查指定单元格是否位于建筑物的FoundationData内
+bool IsCellInBuildingFoundation(BuildingClass* pBuilding, const CellStruct& cell)
+{
+	if (!pBuilding || !pBuilding->Type) return false;
+
+	BuildingTypeClass* pType = pBuilding->Type;
+	CellStruct baseCell = pBuilding->GetCell()->MapCoords;
+	short width = pType->GetFoundationWidth();
+	short height = pType->GetFoundationHeight(true);
+
+	for (short dy = 0; dy < height; ++dy)
+	{
+		for (short dx = 0; dx < width; ++dx)
+		{
+			if (baseCell + CellStruct { dx, dy } == cell)
+				return true;
+		}
+	}
+
+	return false;
+}
+

@@ -67,7 +67,7 @@
 若标签不存在/已销毁，则会根据标签类型（TagType）创建一个新标签，确保目标会与标签关联。  
 
 <span style="color: gray;">事实上，触发也会在小队创建时实例化，因此动作 `553` 和 `554` 实际上可能并没有必要，  
-只需要在 `作战小队` 的 `挂载标签` 上挂载所需标签即可以实现与该动作类似的效果，但仍保留以备不时之需  
+只需要在 `作战小队` 的 `挂载标签` 上挂载所需标签即可以实现与该动作类似的效果，但仍保留以备不时之需。   
 （写都写了.jpg，不过确实可能有不同之处）  
 </span>
 
@@ -114,14 +114,16 @@
 
 ---
 
-### 5. 路径点附近科技类型检测
-在指定路径点的一定距离范围内，检测是否存在触发所属方的任意科技类型。
+### 5. 科技类型坐标检测
+在指定路径点上或附近距离，检测是否存在触发所属方的科技类型。
 
 **触发事件说明**：   
 - `550` – 路径点附近存在所属方的科技类型... （参数：距离，路径点索引）  
 - `551` – 路径点附近不存在所属方的科技类型... （参数：距离，路径点索引）  
-
-**注**: 使用使用切比雪夫距离判断是否在方形范围内。
+**注**: 对于行为 `550`,`551`, 使用使用切比雪夫距离判断是否在方形范围内。
+- `552` – 路径点上存在所属方的指定科技类型... （参数：路径点索引，科技类型）  
+- `553` – 路径点上不存在所属方的指定科技类型... （参数：路径点索引，科技类型）  
+**注**: 对于行为 `552`,`553`, 若科技类型为建筑，则每一格都会检测，不支持ares的自定义Foundation。
 
 ---
 
@@ -173,8 +175,10 @@ AutoHunt=                       ; boolean（布尔值），默认 false
 ```ini
 [EventsRA2]
 ...
-550=路径点附近存在所属方的科技类型... (PhobosExt by Chang_zhi),48,30,0,0,当指定路径点的指定距离内存在触发所属方任意科技类型时，此事件被满足。,0,1,550,1
-551=路径点附近不存在所属方的科技类型... (PhobosExt by Chang_zhi),48,30,0,0,当指定路径点的指定距离内不存在触发所属方任意科技类型时，此事件被满足。,0,1,551,1
+550=路径点附近存在所属方的任意科技类型... (PhobosExt by Chang_zhi),48,30,0,0,当指定路径点的指定距离内存在触发所属方任意科技类型时，此事件被满足。,0,1,550,1
+551=路径点附近不存在所属方的任意科技类型... (PhobosExt by Chang_zhi),48,30,0,0,当指定路径点的指定距离内不存在触发所属方任意科技类型时，此事件被满足。,0,1,551,1
+552=路径点上存在所属方的指定科技类型... (PhobosExt by Chang_zhi),49,46,0,0,当路径点上存在触发所属方的指定科技类型时，此事件被满足。(若科技类型为建筑，则每一格都会检测，不支持ares的自定义Foundation),0,1,552,1
+553=路径点上不存在所属方的指定科技类型... (PhobosExt by Chang_zhi),49,46,0,0,当路径点上不再存在触发所属方的指定科技类型时，此事件被满足。(若科技类型为建筑，则每一格都会检测，不支持ares的自定义Foundation),0,1,553,1
 ...
 ```
 
@@ -209,14 +213,18 @@ AutoHunt=                       ; boolean（布尔值），默认 false
 ...
 550=There is a techno type of the house near the waypoint... (PhobosExt by Chang_zhi),48,30,0,0,This event is satisfied when there is any techno type of the triggering house within the specified distance of the specified waypoint.,0,1,550,1
 551=There is no techno type of the house near the waypoint... (PhobosExt by Chang_zhi),48,30,0,0,This event is satisfied when there is no techno type of the triggering house within the specified distance of the specified waypoint.,0,1,551,1
+552=Specified techno type of house exists at waypoint... (PhobosExt by Chang_zhi),49,46,0,0,This event is satisfied when the specified techno type of the triggering house exists at the waypoint. (If the techno type is a building，every cell of its foundation will be checked. Does not support Ares' custom Foundation shapes.),0,1,552,1
+553=Specified techno type of house does NOT exist at waypoint... (PhobosExt by Chang_zhi),49,46,0,0,This event is satisfied when the specified techno type of the triggering house does NOT exist at the waypoint. (If the techno type is a building，every cell of its foundation will be checked. Does not support Ares' custom Foundation shapes.),0,1,553,1
 ...
 ```
 
 ```ini
 [Chinese-EventsRA2]
 ...
-550=路径点附近存在所属方的科技类型... (PhobosExt by Chang_zhi),48,30,0,0,当指定路径点的指定距离内存在触发所属方任意科技类型时，此事件被满足。,0,1,550,1
-551=路径点附近不存在所属方的科技类型... (PhobosExt by Chang_zhi),48,30,0,0,当指定路径点的指定距离内不存在触发所属方任意科技类型时，此事件被满足。,0,1,551,1
+550=路径点附近存在所属方的任意科技类型... (PhobosExt by Chang_zhi),48,30,0,0,当指定路径点的指定距离内存在触发所属方任意科技类型时，此事件被满足。,0,1,550,1
+551=路径点附近不存在所属方的任意科技类型... (PhobosExt by Chang_zhi),48,30,0,0,当指定路径点的指定距离内不存在触发所属方任意科技类型时，此事件被满足。,0,1,551,1
+552=路径点上存在所属方的指定科技类型... (PhobosExt by Chang_zhi),49,46,0,0,当路径点上存在触发所属方的指定科技类型时，此事件被满足。(若科技类型为建筑，则每一格都会检测，不支持ares的自定义Foundation),0,1,552,1
+553=路径点上不存在所属方的指定科技类型... (PhobosExt by Chang_zhi),49,46,0,0,当路径点上不再存在触发所属方的指定科技类型时，此事件被满足。(若科技类型为建筑，则每一格都会检测，不支持ares的自定义Foundation),0,1,553,1
 ...
 ```
 
