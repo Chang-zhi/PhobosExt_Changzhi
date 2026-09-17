@@ -51,3 +51,5 @@ void ValidateGlobalSecondaryClaims();
 
 // 读档后第一帧深度清理标记（引擎指针修复完成后执行）
 extern bool s_PostLoadCleanupNeeded;
+
+
