@@ -786,7 +786,6 @@ bool TActionExt::UnifyAllInstancesOfSameTagType(TActionClass* pThis, HouseClass*
 	return true;
 }
 
-
 bool TActionExt::SetRecruitableForFoot(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {
 	bool recruitableA = pThis->Param3;
@@ -797,7 +796,7 @@ bool TActionExt::SetRecruitableForFoot(TActionClass* pThis, HouseClass* pHouse, 
 		if (pFoot && pFoot->AttachedTag && pFoot->AttachedTag->ContainsTrigger(pTrigger))
 		{
 			pFoot->RecruitableA = recruitableA;
-			pFoot->RecruitableB = recruitableA;
+			pFoot->RecruitableB = recruitableB;
 		}
 	}
 
