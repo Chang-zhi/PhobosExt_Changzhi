@@ -27,6 +27,12 @@ enum PhobosTriggerEvent
 	// 流逝时间(帧)...
 	ElapsedTimeFrames = 554,
 
+	// 任务计时器大于 N 秒
+	MissionTimerGreater = 555,
+
+	// 任务计时器小于 N 秒
+	MissionTimerLess = 556,
+
 	_DummyMaximum,
 };
 
@@ -66,6 +72,8 @@ public:
 	static bool TechnoTypeOfHouseExistsAtWaypoint(TEventClass* pThis, HouseClass* pHouse);
 	// static bool TechnoDestroyedByHouse(TEventClass* pThis, ObjectClass* pAttached);
 	static bool ElapsedTimeFramesFunc(TEventClass* pThis);
+	static bool MissionTimerGreaterFunc(TEventClass* pThis);
+	static bool MissionTimerLessFunc(TEventClass* pThis);
 
 	class ExtContainer final : public Container<TEventExt>
 	{
