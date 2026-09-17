@@ -95,7 +95,8 @@ enum class PhobosTriggerAction : unsigned int
 	// 建立作战小队(考虑限制)...
 	CreateTeamConsideringLimits = 577,
 
-
+	// 将路径点范围内指定所属方的所有可招募单位加入已存在的作战小队...
+	RecruitNearbyFootToTeam = 578,
 
 	// 清除指定所属方尝试次数超过指定数值的基地节点...
 	//RemoveBaseNodesExceedingAttemptCountForHouse = 570,
@@ -167,7 +168,7 @@ public:
 	ACTION_FUNC(UpdateAssociatedBuildingsAnims);
 	ACTION_FUNC(UpdateOwnerBuildingsAnimations);
 	ACTION_FUNC(CreateTeamConsideringLimits);
-
+	ACTION_FUNC(RecruitNearbyFootToTeam);
 
 	// ACTION_FUNC(RemoveBaseNodesExceedingAttemptCountForHouse);
 	// ACTION_FUNC(SetObjectRecruitable);
