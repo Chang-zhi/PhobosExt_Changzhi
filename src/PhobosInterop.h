@@ -3,11 +3,11 @@
 #include <Windows.h>
 
 // =============================================================================
-// Phobos Interop - 自动识别并加载 Phobos 模块
-// 通过 GetInteropAPIVersion 识别
-// =============================================================================\
+// Phobos Interop - Auto-detect and load Phobos module
+// Identified via GetInteropAPIVersion export
+// =============================================================================
 
-// Interop API 版本信息
+// Interop API version info (SemVer 2.0.0)
 struct InteropAPIVersion
 {
 	unsigned int major;
@@ -15,16 +15,16 @@ struct InteropAPIVersion
 	unsigned int patch;
 };
 
-// 当前支持的版本
-// 版本规则：
-//   X（主版本）：破坏性变更，不兼容修改 → 主版本不对直接禁用 API
-//   Y（次版本）：新增功能，向后兼容   → 版本不匹配给警告但仍可使用
-//   Z（修订号）：Bug 修复，无 API 变更 → 同上
+// Version supported by this DLL
+//   Major: breaking changes → mismatch disables API
+//   Minor: new features, backward compatible → warns but works
+//   Patch: bug fixes, no API change → same as minor
 constexpr InteropAPIVersion INTEROP_VERSION_CURRENT = { 1, 0, 0 };
 
 // ============================================================================
-// 导出函数类型定义（与 Interop/ 下的声明一致，方便外部 GetProcAddress 后转型）
-// 实际游戏指针类型请自行转换为 void*
+// Exported function type definitions
+// Matches declarations in Interop/*.h for GetProcAddress casting
+// All game pointers are typed as void*; cast as needed by caller
 // ============================================================================
 
 // AE_Attach(pTarget, pInvokerHouse, pInvoker, pSource, effectTypeNames, typeCount,
@@ -56,43 +56,44 @@ typedef HRESULT(__stdcall* fnConvertToType)(void* pThis, void* pToType);
 typedef HRESULT(__stdcall* fnBullet_SetFirerOwner)(void* pBullet, void* pHouse);
 
 // RegisterCalculateExtraThreatCallback(callback)
-// callback: double __stdcall(void*, void*, double)
 typedef HRESULT(__stdcall* fnRegisterCalculateExtraThreatCallback)(void* callback);
 
 // RegisterCalculateSightCallback(callback)
-// callback: double __stdcall(void*, double)
 typedef HRESULT(__stdcall* fnRegisterCalculateSightCallback)(void* callback);
 
 // EventExt_AddEvent(pEventExt)
 typedef HRESULT(__stdcall* fnEventExt_AddEvent)(void* pEventExt);
 
+// Variables_GetLocal_Phobos(index, pValue)
+typedef HRESULT(__stdcall* fnVariables_GetLocal)(int index, int* pValue);
+
+// Variables_SetLocal_Phobos(index, value)
+typedef HRESULT(__stdcall* fnVariables_SetLocal)(int index, int value);
+
+// Variables_GetGlobal_Phobos(index, pValue)
+typedef HRESULT(__stdcall* fnVariables_GetGlobal)(int index, int* pValue);
+
+// Variables_SetGlobal_Phobos(index, value)
+typedef HRESULT(__stdcall* fnVariables_SetGlobal)(int index, int value);
+
 // GetInteropAPIVersion(pVersion)
 typedef HRESULT(__stdcall* fnGetInteropAPIVersion)(InteropAPIVersion* pVersion);
 
 // ============================================================================
-// PhobosInterop 全静态类 - 加载 Phobos 并持有所有 Interop 函数指针
-// Init() 后直接使用静态函数指针调用
+// PhobosInterop - Static class loading Phobos & holding all function pointers
+// Call Init() once, then use static function pointers directly
 // ============================================================================
 
 class PhobosInterop
 {
 public:
-	// 自动识别并加载 Phobos 模块，获取所有导出函数地址
 	static void Init();
-
-	// 检查 Phobos 是否已有效加载
 	static bool IsAvailable() { return s_phobosLoaded; }
-
-	// 获取已加载的 Phobos 模块句柄
 	static HMODULE GetModuleHandle() { return s_hPhobos; }
-
-	// 获取 Phobos Interop API 版本
 	static bool GetVersion(InteropAPIVersion& version);
-
-	// 检查已加载的 Phobos 版本与当前支持的版本是否兼容
 	static bool CheckVersion();
 
-	// 函数指针（Init 里面初始化）
+	// Function pointers (initialized by Init())
 	static fnAE_Attach                               AE_Attach;
 	static fnAE_Detach                               AE_Detach;
 	static fnAE_DetachByGroups                       AE_DetachByGroups;
@@ -102,6 +103,10 @@ public:
 	static fnRegisterCalculateExtraThreatCallback    RegisterCalculateExtraThreatCallback;
 	static fnRegisterCalculateSightCallback          RegisterCalculateSightCallback;
 	static fnEventExt_AddEvent                       EventExt_AddEvent;
+	static fnVariables_GetLocal                      Variables_GetLocal;
+	static fnVariables_SetLocal                      Variables_SetLocal;
+	static fnVariables_GetGlobal                     Variables_GetGlobal;
+	static fnVariables_SetGlobal                     Variables_SetGlobal;
 
 private:
 	static bool s_phobosLoaded;

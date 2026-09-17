@@ -25,13 +25,14 @@
 
 <p>一个扩展《红色警戒2：尤里的复仇》游戏功能的 DLL，基于 Phobos 开发，作者<a href="https://space.bilibili.com/423792550" target="_blank" class="doc-link"><strong>Chang_zhi</strong></a>。</p>
 <p>主要面向 任务/地图 作者，可以自由的将其用于任务包或模组制作。</p>
-<p><strong>尽管叫 PhobosExt , 但不依赖 Ares 或 Phobos，可独立运行。推荐和其一同使用。</strong></p>
+<p><strong>尽管叫 PhobosExt , 但仅部分功能需要依赖 Phobos，也可独立运行。推荐和其一同使用。</strong><br>
 <p>说是基于 Phobos，其实只是删了删代码 ( <span class="doc-title--gray;">低创作品，大佬轻喷</span> )</p>
 <p style="margin-top:1.5rem">← 左侧导航栏点击查看各功能详情</p>
 
 <h2 class="doc-heading--secondary">兼容性说明</h2>
 <p>需保证游戏版本为 YR 1.001。</p>
-<p><strong>不依赖 Ares 或 Phobos，可单独使用。</strong></p>
+<p><strong>不依赖 Ares 或 Phobos，可单独使用。</strong> </p>
+<p>部分功能（如触发动作 653、654）依赖 Phobos ，详见对应章节。</p>
 <p>本 DLL 已避免使用 <code class="doc-code--inline">ExtPointerOffset</code> ，改用独立 <code class="doc-code--inline">unordered_map</code> 存储扩展数据，不会与 Ares 或 Phobos 的原生扩展数据冲突。(严格来说可能变慢, 但对现代cpu的影响应该可以忽略不计)</p>
 
 <h2 class="doc-heading--secondary">已知问题</h2>
@@ -74,37 +75,78 @@
 <div class="sec-toc">
 <p class="sec-toc__title">目录：</p>
 <ul class="sec-toc__list">
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_1')" class="sec-toc__link">1. 路径点文本显示</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_1')" class="sec-toc__link">1. 文本框系统</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_2')" class="sec-toc__link">2. 动态标签绑定功能</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_3')" class="sec-toc__link">3. 金钱操作功能</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_4')" class="sec-toc__link">4. 基地节点操作功能</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_6')" class="sec-toc__link">5. 单位可招募属性设置</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_7')" class="sec-toc__link">6. 更新建筑动画功能</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_11')" class="sec-toc__link">7. 作战小队操作</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_12')" class="sec-toc__link">8. 脚本操作</a></li>
 </ul>
 </div>
 
 <hr class="sec-divider">
 
 <div id="actions_1">
-<h3 class="doc-heading--tertiary" style="margin-top:2em">1. 路径点文本显示</h3>
-<p>在地图路径点上绘制自定义文本。</p>
+<h3 class="doc-heading--tertiary" style="margin-top:2em">1. 文本框系统</h3>
+<p>在地图路径点或科技类型上绘制自定义文本框，支持预定义样式(TextBoxType)或直接指定参数。</p>
 <p class="doc-paragraph--only-vertical"><strong>特性：</strong></p>
 <ul class="doc-list--content">
-<li>可自定义文本内容、显示宽度(像素)、背景不透明度。</li>
-<li>可分别设置文本颜色和边框颜色(预定义 9 种颜色)。</li>
+<li>可自定义文本内容、最大显示宽度(像素)、背景不透明度。</li>
+<li>支持预定义样式(TextBoxType)，包括文本颜色和边框颜色(RGB)。</li>
 <li>鼠标移动到文本框上时，文本会暂时停止绘制(避免遮挡操作)。</li>
+<li>单位进入载具(limbo状态)时，文本框会暂时停止绘制，离开载具后自动恢复。</li>
+<li>单位标签支持所有科技类型(TechnoClass，含建筑)。小队相关动作限制为FootClass。</li>
 </ul>
+
+<h4>文本框类型</h4>
+<p>在 <code class="doc-code--inline">rulesmd.ini</code> 的 <code class="doc-code--inline">[TextBoxTypes]</code> 段中定义文本框样式，可按需添加任意多个。</p>
+<pre class="doc-code--block"><code>[TextBoxTypes]
+0=FirstBoxType
+1=YourBoxType
+
+[YourBoxType]
+MaxWidth=300                ;integer - 最大像素宽度(1-1000)，文本超出自动换行，默认250
+BackgroundOpacity=55        ;integer - 背景不透明度百分比(0-100)。默认75
+Color=255,215,0             ;integer,integer,integer - 文本和边框颜色，RGB格式。默认255,215,0(金色)
+</code></pre>
+
+<h4>路径点文本框</h4>
 <p><strong>触发动作说明：</strong></p>
 <ul class="doc-list--content">
-<li><code class="doc-code--inline">550</code> – 在指定路径点绘制文本...(参数：路径点索引，文本内容，像素宽度，不透明度百分比，文本颜色)</li>
-<li><code class="doc-code--inline">551</code> – 清除指定路径点的文本...(参数：路径点索引)</li>
-<li><code class="doc-code--inline">552</code> – 清除所有路径点文本...</li>
+<li><code class="doc-code--inline">549</code> – 在指定路径点绘制文本框(根据类型)...(参数：路径点，TextBoxType)</li>
+<li><code class="doc-code--inline">550</code> – 在指定路径点绘制文本框(根据数据)...(参数：路径点，文本内容，像素宽度，不透明度百分比，文本颜色)</li>
+<li><code class="doc-code--inline">551</code> – 清除指定路径点的文本框...(参数：路径点索引)</li>
+<li><code class="doc-code--inline">552</code> – 清除所有路径点文本框...</li>
 </ul>
-<p>在 <code class="doc-code--inline">[General]</code> 的增加新变量，用来控制当路径点在黑幕里时是否绘制。</p>
+
+<h4>单位文本框</h4>
+<p><strong>触发动作说明：</strong></p>
+<div class="doc-table--action">
+<table class="doc-table">
+<thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
+<tbody>
+<tr><td class="doc-table__td">579</td><td class="doc-table__td">在关联单位上绘制文本框(根据类型)...</td><td class="doc-table__td">CSF标签，文本框类型</td></tr>
+<tr><td class="doc-table__td">580</td><td class="doc-table__td">在关联单位上绘制文本框(根据数据)...</td><td class="doc-table__td">CSF标签，宽度，不透明度，颜色</td></tr>
+<tr><td class="doc-table__td">581</td><td class="doc-table__td">在作战小队成员上绘制文本框(根据类型)...</td><td class="doc-table__td">CSF标签，小队索引，文本框类型</td></tr>
+<tr><td class="doc-table__td">582</td><td class="doc-table__td">在作战小队成员上绘制文本框(根据数据)...</td><td class="doc-table__td">CSF标签，小队索引，宽度，不透明度，颜色</td></tr>
+<tr><td class="doc-table__td">583</td><td class="doc-table__td">清除单位文本框(根据类型)...</td><td class="doc-table__td">文本框类型</td></tr>
+<tr><td class="doc-table__td">584</td><td class="doc-table__td">清除关联单位文本框...</td><td class="doc-table__td">无参数</td></tr>
+<tr><td class="doc-table__td">585</td><td class="doc-table__td">清除单位文本框(根据科技类型)...</td><td class="doc-table__td">科技类型ID</td></tr>
+<tr><td class="doc-table__td">586</td><td class="doc-table__td">清除单位文本框(根据所属方和科技类型)...</td><td class="doc-table__td">科技类型ID，国家索引</td></tr>
+<tr><td class="doc-table__td">587</td><td class="doc-table__td">清除单位文本框(根据作战小队)...</td><td class="doc-table__td">小队索引</td></tr>
+<tr><td class="doc-table__td">588</td><td class="doc-table__td">清除所有单位文本框...</td><td class="doc-table__td">无参数</td></tr>
+<tr><td class="doc-table__td">589</td><td class="doc-table__td">清除所有文本框...</td><td class="doc-table__td">无参数(含路径点)</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>在 <code class="doc-code--inline">[General]</code> 中增加新变量，用来控制文本框在黑幕中是否绘制。</p>
 <pre class="doc-code--block"><code>[General]
-ShowWaypointLabelInShroud=                  ; boolean(布尔值)，默认 true</code></pre>
-<p><strong>注:</strong> 仅判断路径点本身是否被黑幕遮挡, 不检测整个标签。</p>
+ShowTextBoxInShroud.Waypoint=           ; boolean，默认 true — 路径点文本框在黑幕中是否显示
+ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本框在黑幕中是否显示</code></pre>
+<p><strong>注:</strong> 仅检测路径点格子或单位所在单元格是否被黑幕遮挡, 不检测整个文本框区域。</p>
 </div>
 
 <hr class="sec-divider--double">
@@ -247,6 +289,39 @@ ShowWaypointLabelInShroud=                  ; boolean(布尔值)，默认 true</
 <li>将指定路径点指定范围内、指定所属方的所有可招募地面单位(FootClass)加入一个已存在的作战小队实例。</li>
 <li>如果没有该类型的已有实例，则无动作。</li>
 <li>只会招募满足以下条件的单位：属于指定所属方、未加入其他小队、可被招募(<code class="doc-code--inline">CanBeRecruited</code>)、在路径点指定范围内。</li>
+</ul>
+</div>
+
+<hr class="sec-divider--double">
+
+<div id="actions_12">
+<h3 class="doc-heading--tertiary" style="margin-top:2em">8. 脚本操作</h3>
+
+<div class="doc-table--action">
+<table class="doc-table">
+<thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
+<tbody>
+<tr><td class="doc-table__td">650</td><td class="doc-table__td">清空指定脚本内容...</td><td class="doc-table__td">脚本类型</td></tr>
+<tr><td class="doc-table__td">651</td><td class="doc-table__td">复制脚本内容...</td><td class="doc-table__td">源脚本类型，目标脚本类型</td></tr>
+<tr><td class="doc-table__td">652</td><td class="doc-table__td">以参数修改脚本行...</td><td class="doc-table__td">脚本类型，行号，动作类型，参数，额外参数</td></tr>
+<tr><td class="doc-table__td">653</td><td class="doc-table__td">以局部变量修改脚本行... <em>(暂不可用)</em></td><td class="doc-table__td">脚本类型，行号，动作类型(变量索引)，参数(变量索引)，额外参数(变量索引)</td></tr>
+<tr><td class="doc-table__td">654</td><td class="doc-table__td">以全局变量修改脚本行... <em>(暂不可用)</em></td><td class="doc-table__td">脚本类型，行号，动作类型(变量索引)，参数(变量索引)，额外参数(变量索引)</td></tr>
+<tr><td class="doc-table__td">655</td><td class="doc-table__td">重新指定小队脚本索引...</td><td class="doc-table__td">作战小队类型，目标脚本类型</td></tr>
+<tr><td class="doc-table__td">656</td><td class="doc-table__td">恢复小队脚本索引...</td><td class="doc-table__td">作战小队类型</td></tr>
+<tr><td class="doc-table__td">657</td><td class="doc-table__td">恢复所有小队脚本索引...</td><td class="doc-table__td">无参数</td></tr>
+<tr><td class="doc-table__td">658</td><td class="doc-table__td">恢复脚本内容...</td><td class="doc-table__td">脚本类型</td></tr>
+<tr><td class="doc-table__td">659</td><td class="doc-table__td">恢复所有脚本内容...</td><td class="doc-table__td">无参数</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="doc-paragraph--only-vertical"><strong>说明：</strong></p>
+<ul class="doc-list--content">
+<li>动作 650-654 在游戏运行时动态修改脚本类型(ScriptType)的动作内容（即该脚本的各行具体指令）。</li>
+<li>动作 655-657 改变作战小队类型(TeamType)引用的脚本类型（即该小队执行的脚本是哪个），不对脚本内容本身做任何修改。</li>
+<li>动作 658-659 将之前通过 650-654 修改过的脚本内容恢复到 INI 定义的原始状态，不影响小队绑定索引。</li>
+<li>以上所有动作执行后，使用该脚本的作战小队会立即重置到第 0 行执行。</li>
+<li><strong>注意：动作 653、654 暂不可用</strong>，需等待 Phobos PR#2256 通过，且必须与 Phobos 配合使用。</li>
 </ul>
 </div>
 

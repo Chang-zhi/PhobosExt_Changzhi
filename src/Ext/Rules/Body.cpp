@@ -4,6 +4,8 @@
 #include <GameOptionsClass.h>
 
 #include <Ext/TechnoType/Body.h>
+#include <MyNew/TextBox/Types/TextBoxTypeClass.h>
+#include <Ext/TAction/MyNew/ScriptManipulator.h>
 #include <Utilities/Patch.h>
 
 std::unique_ptr<RulesExt::ExtData> RulesExt::Data = nullptr;
@@ -25,12 +27,14 @@ void RulesExt::LoadFromINIFile(RulesClass* pThis, CCINIClass* pINI)
 
 void RulesExt::LoadBeforeTypeData(RulesClass* pThis, CCINIClass* pINI)
 {
+	TextBoxTypeClass::LoadFromINIList(pINI);
 
 	Data->LoadBeforeTypeData(pThis, pINI);
 }
 
 void RulesExt::LoadAfterTypeData(RulesClass* pThis, CCINIClass* pINI)
 {
+	ScriptManipulator::CaptureFromINI(pINI);
 
 	if (pINI == CCINIClass::INI_Rules)
 		Data->InitializeAfterTypeData(pThis);
@@ -55,7 +59,8 @@ void RulesExt::ExtData::LoadBeforeTypeData(RulesClass* pThis, CCINIClass* pINI)
 {
 	INI_EX exINI(pINI);
 
-	this->ShowWaypointLabelInShroud.Read(exINI, GameStrings::General, "ShowWaypointLabelInShroud");
+	this->ShowTextBoxInShroud_Waypoint.Read(exINI, GameStrings::General, "ShowTextBoxInShroud.Waypoint");
+	this->ShowTextBoxInShroud_Techno.Read(exINI, GameStrings::General, "ShowTextBoxInShroud.Techno");
 
 }
 
@@ -86,7 +91,8 @@ template <typename T>
 void RulesExt::ExtData::Serialize(T& Stm)
 {
 	Stm
-		.Process(this->ShowWaypointLabelInShroud)
+		.Process(this->ShowTextBoxInShroud_Waypoint)
+		.Process(this->ShowTextBoxInShroud_Techno)
 		.Process(this->BerzerkRestoreClearTarget)
 		;
 }

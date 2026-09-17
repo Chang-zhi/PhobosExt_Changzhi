@@ -25,6 +25,11 @@
     <ClCompile Include="src\Ext\TAction\Body.cpp" />
     <ClCompile Include="src\Ext\TAction\Hooks.cpp" />
     <ClCompile Include="src\Ext\TAction\MyNew\Helper.cpp" />
+    <ClCompile Include="src\Ext\TAction\MyNew\ScriptManipulator.cpp" />
+    <ClCompile Include="src\Ext\TeamType\Body.cpp" />
+    <ClCompile Include="src\Ext\TeamType\Hooks.cpp" />
+    <ClCompile Include="src\Ext\ScriptType\Body.cpp" />
+    <ClCompile Include="src\Ext\ScriptType\Hooks.cpp" />
     <ClCompile Include="src\Ext\TechnoType\Body.cpp" />
     <ClCompile Include="src\Ext\Techno\Body.cpp" />
     <ClCompile Include="src\Ext\Techno\Hooks.cpp" />
@@ -40,8 +45,11 @@
     <ClCompile Include="src\Ext\TEvent\Hooks.cpp" />
     <ClCompile Include="src\Ext\TEvent\MyNew\Helper.cpp" />
     <ClCompile Include="src\Misc\Hooks.Ares.cpp" />
-    <ClCompile Include="src\MyNew\Hooks.WaypointLabelClass.cpp" />
-    <ClCompile Include="src\MyNew\WaypointLabelClass.cpp" />
+    <ClCompile Include="src\MyNew\TextBox\Entities\Hooks.MapTextBoxClass.cpp" />
+    <ClCompile Include="src\MyNew\TextBox\Entities\Base\MapTextBoxClass.cpp" />
+    <ClCompile Include="src\MyNew\TextBox\Entities\Derived\TechnoTextBoxClass.cpp" />
+    <ClCompile Include="src\MyNew\TextBox\Entities\Derived\WaypointTextBoxClass.cpp" />
+    <ClCompile Include="src\MyNew\TextBox\Types\TextBoxTypeClass.cpp" />
     <ClCompile Include="src\Utilities\Anchor.cpp" />
     <ClCompile Include="src\Utilities\AresAddressInit.cpp" />
     <ClCompile Include="src\Utilities\AresHelper.cpp" />
@@ -64,6 +72,9 @@
     <ClInclude Include="src\Ext\Rules\Body.h" />
     <ClInclude Include="src\Ext\TAction\Body.h" />
     <ClInclude Include="src\Ext\TAction\MyNew\Helper.h" />
+    <ClInclude Include="src\Ext\TAction\MyNew\ScriptManipulator.h" />
+    <ClInclude Include="src\Ext\TeamType\Body.h" />
+    <ClInclude Include="src\Ext\ScriptType\Body.h" />
     <ClInclude Include="src\Ext\TechnoType\Body.h" />
     <ClInclude Include="src\Ext\Techno\MyNew\AutoHunt.h" />
     <ClInclude Include="src\Ext\Techno\MyNew\BerzerkRestore.h" />
@@ -72,7 +83,10 @@
     <ClInclude Include="src\Ext\Techno\MyNew\TemporalAOE.h" />
     <ClInclude Include="src\Ext\TEvent\Body.h" />
     <ClInclude Include="src\Ext\TEvent\MyNew\Helper.h" />
-    <ClInclude Include="src\MyNew\WaypointLabelClass.h" />
+    <ClInclude Include="src\MyNew\TextBox\Entities\Base\MapTextBoxClass.h" />
+    <ClInclude Include="src\MyNew\TextBox\Entities\Derived\TechnoTextBoxClass.h" />
+    <ClInclude Include="src\MyNew\TextBox\Entities\Derived\WaypointTextBoxClass.h" />
+    <ClInclude Include="src\MyNew\TextBox\Types\TextBoxTypeClass.h" />
     <ClInclude Include="src\Utilities\Anchor.h" />
     <ClInclude Include="src\Utilities\AresFunctions.h" />
     <ClInclude Include="src\Utilities\AresHelper.h" />
