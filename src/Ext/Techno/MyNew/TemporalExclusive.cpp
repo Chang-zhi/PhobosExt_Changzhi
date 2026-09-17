@@ -1,6 +1,5 @@
 #include "TemporalExclusive.h"
 #include "TemporalAOE.h"
-
 #include <TechnoClass.h>
 
 #include <Ext/Techno/body.h>
@@ -96,8 +95,8 @@ void HandleTemporalExclusiveTargeting(TechnoClass* pThis)
 			if (pWeapon && pWeapon->Warhead && pWeapon->Warhead->Temporal)
 			{
 				// 检查是否是其他 AOE 的副目标
-				auto ftIt = TemporalAOE::FakeTemporals.find(pTarget);
-				if (ftIt != TemporalAOE::FakeTemporals.end() && ftIt->second.Attacker != pThis)
+				auto claimIt = TemporalAOE::SecondaryClaims.find(pTarget);
+				if (claimIt != TemporalAOE::SecondaryClaims.end() && claimIt->second != pThis)
 				{
 					Debug::Log("[TemporalAOE] %s forced to abandon AOE secondary target %s\n",
 						pThis->GetTechnoType()->ID, pTarget->GetTechnoType()->ID);

@@ -85,7 +85,7 @@ void Phobos::CmdLineParse(char** ppArgs, int nNumArgs)
 	bool foundInclude = false;
 	bool dontSetExceptionHandler =
 #ifdef DEBUG
-		true;
+		false;
 #else
 		false;
 #endif // DEBUG
