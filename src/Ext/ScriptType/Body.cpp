@@ -67,8 +67,6 @@ void ScriptTypeExt::ExtData::CaptureOriginal()
 	// Only capture if not already captured (lazy: OriginalActionsCount == 0)
 	if (this->OriginalActionsCount > 0 || pType->ActionsCount <= 0)
 	{
-		Debug::Log("[Phobos] CaptureOriginal: Script [%s] skip (OrigCnt=%d, ActCnt=%d)\n",
-			pType ? pType->ID : "null", this->OriginalActionsCount, pType ? pType->ActionsCount : -1);
 		return;
 	}
 
@@ -78,9 +76,6 @@ void ScriptTypeExt::ExtData::CaptureOriginal()
 	{
 		this->OriginalActions[i] = pType->ScriptActions[i];
 	}
-
-	Debug::Log("[Phobos] CaptureOriginal: Script [%s] captured %d actions\n",
-		pType->ID, this->OriginalActionsCount);
 }
 
 void ScriptTypeExt::ExtData::RestoreOriginal()
@@ -88,13 +83,8 @@ void ScriptTypeExt::ExtData::RestoreOriginal()
 	auto const pType = this->OwnerObject();
 	if (!this->IsModified)
 	{
-		Debug::Log("[Phobos] RestoreOriginal: Script [%s] not modified, skip\n",
-			pType ? pType->ID : "null");
 		return;
 	}
-
-	Debug::Log("[Phobos] RestoreOriginal: Script [%s] restore %d actions\n",
-		pType->ID, this->OriginalActionsCount);
 
 	pType->ActionsCount = this->OriginalActionsCount;
 
