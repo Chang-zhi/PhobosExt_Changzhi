@@ -7,7 +7,7 @@
 #include <TechnoTypeClass.h>
 
 #include <Ext/WarheadType/Body.h>
-#include <Ext/Techno/MyNew/TemporalAOE.h>
+#include <Ext/Techno/TemporalAOE.h>
 #include <Utilities/EnumFunctions.h>
 #include <Utilities/Debug.h>
 

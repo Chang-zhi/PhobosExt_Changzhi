@@ -192,7 +192,8 @@ enum class PhobosTriggerAction : unsigned int
 	// 停止绘制关联单位的移动路径
 	UnregisterFootPathVisualizer = 663,
 
-	// SetMissionBriefing = 664,
+	// 设置任务简报
+	SetMissionBriefing = 664,
 
 	// 设置超时标题
 	SetOverParTitle = 665,
@@ -249,6 +250,21 @@ enum class PhobosTriggerAction : unsigned int
 
 	// 设置游戏速度
 	SetGameSpeed = 682,
+
+	// 禁止读档
+	DisableLoadGame = 683,
+
+	// 禁止存档
+	DisableSaveGame = 684,
+
+	// 恢复读档
+	EnableLoadGame = 685,
+
+	// 恢复存档
+	EnableSaveGame = 686,
+
+	// 变卖指定所属方的全部建筑...
+	SellAllBuildingsOfHouse = 687,
 
 	// 测试用
 	testAction = 1150,
@@ -366,7 +382,7 @@ static bool name(TActionClass* pThis, HouseClass* pHouse, \
 	ACTION_FUNC(UnregisterFootPathVisualizer);
 
 	// ---- 任务简报 / 最佳时间 Actions ----
-	// ACTION_FUNC(SetMissionBriefing);
+	ACTION_FUNC(SetMissionBriefing);
 	ACTION_FUNC(SetOverParTitle);
 	ACTION_FUNC(SetOverParMessage);
 	ACTION_FUNC(SetUnderParTitle);
@@ -377,6 +393,15 @@ static bool name(TActionClass* pThis, HouseClass* pHouse, \
 
 	// 设置游戏速度
 	ACTION_FUNC(SetGameSpeed);
+
+	// 存读档权限控制 Actions
+	ACTION_FUNC(DisableLoadGame);
+	ACTION_FUNC(DisableSaveGame);
+	ACTION_FUNC(EnableLoadGame);
+	ACTION_FUNC(EnableSaveGame);
+
+	// 变卖指定所属方的全部建筑
+	ACTION_FUNC(SellAllBuildingsOfHouse);
 
 	// 测试用
 	ACTION_FUNC(testAction);

@@ -20,9 +20,16 @@ public:
 		Valueable<bool> AutoHunt;
 		Valueable<bool> LegalTargetWhenAIOwner;
 
+		Valueable<TargetZoneScanType> TargetZoneScanType;
+		Valueable<int> RadarJamRadius;
+		Nullable<int> InhibitorRange;
+
 		ExtData(TechnoTypeClass* OwnerObject) : Extension<TechnoTypeClass>(OwnerObject)
 			, AutoHunt { false }
 			, LegalTargetWhenAIOwner { true }
+			, TargetZoneScanType { TargetZoneScanType::Same }
+			, RadarJamRadius { 0 }
+			, InhibitorRange { }
 		{ }
 
 		virtual ~ExtData() = default;

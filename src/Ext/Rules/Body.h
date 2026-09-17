@@ -36,12 +36,14 @@ public:
 
 		Valueable<bool> BerzerkRestoreClearTarget;
 		Valueable<double> Command_RecruitRange;
+		Valueable<bool> AllowTabBriefingInSinglePlayer;
 
 		ExtData(RulesClass* OwnerObject) : Extension<RulesClass>(OwnerObject)
 			, ShowTextBoxInShroud_Waypoint { true }
 			, ShowTextBoxInShroud_Techno { true }
 			, BerzerkRestoreClearTarget { false }
 			, Command_RecruitRange { 10 }
+			, AllowTabBriefingInSinglePlayer { false }
 		{ }
 
 		virtual ~ExtData() = default;

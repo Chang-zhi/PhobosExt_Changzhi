@@ -5,7 +5,7 @@
 #include <TechnoClass.h>
 
 // 检查节点位置是否有其他所属方的同类型建筑
-static bool IsNodeOccupiedByOther(short nodeType, short nodeX, short nodeY, HouseClass* pAI)
+static bool IsNodeOccupiedByOther(int nodeType, short nodeX, short nodeY, HouseClass* pAI)
 {
 	if (nodeType < 0)
 		return false;
@@ -30,7 +30,7 @@ static bool IsNodeOccupiedByOther(short nodeType, short nodeX, short nodeY, Hous
 }
 
 // 检查节点位置是否有AI自己的建筑（建造成功）
-static bool IsNodeBuiltByAI(short nodeType, short nodeX, short nodeY, HouseClass* pAI)
+static bool IsNodeBuiltByAI(int nodeType, short nodeX, short nodeY, HouseClass* pAI)
 {
 	if (nodeType < 0)
 		return false;
@@ -331,7 +331,7 @@ DEFINE_HOOK(0x4C9C70, FactoryClass_DemandProduction_Intercept, 0x9)
 	int nBuilt = 0, nOccupied = 0;
 	for (AuthorizedNodeKey& key : pExt->AuthorizedNodeKeys)
 	{
-		if (IsNodeBuiltByAI((short)key.BuildingTypeIndex, key.X, key.Y, pOwner))
+		if (IsNodeBuiltByAI(key.BuildingTypeIndex, key.X, key.Y, pOwner))
 		{
 			// 获取第一个已建的类型作为 fallback
 			if (fallbackType < 0)
@@ -339,7 +339,7 @@ DEFINE_HOOK(0x4C9C70, FactoryClass_DemandProduction_Intercept, 0x9)
 			++nBuilt;
 			continue;
 		}
-		if (IsNodeOccupiedByOther((short)key.BuildingTypeIndex, key.X, key.Y, pOwner))
+		if (IsNodeOccupiedByOther(key.BuildingTypeIndex, key.X, key.Y, pOwner))
 		{
 			++nOccupied;
 			continue;
