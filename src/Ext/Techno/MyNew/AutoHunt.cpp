@@ -12,8 +12,8 @@ void UpdateAutoHunt(FootClass* pThis)
 	if (pThis->Transporter) return;
 
 	// 如果是人类控制, 不启用逻辑
-	if (!pThis->Owner || pThis->Owner->IsControlledByHuman())
-		return;
+	//if (!pThis->Owner || pThis->Owner->IsControlledByHuman())
+	//	return;
 
 	auto pType = pThis->GetTechnoType();
 	auto pTypeExt = TechnoTypeExt::ExtMap.Find(pType);
@@ -23,13 +23,26 @@ void UpdateAutoHunt(FootClass* pThis)
 		pThis->GetType()->ID,
 		pThis->Owner ? pThis->Owner->get_ID() : "null");
 
+		if(pThis->Target)
+		{
+			// 如果不可抵达目标的单元格, 取消逻辑
+			if (!pThis->UpdatePathfinding(pThis->WaypointCell, false, 0)) return;
+
+			// 攻击的是单元格, 则取消目标(防止A地), 重新Hunt
+			if (pThis->Target->WhatAmI() == AbstractType::Cell)
+			{
+				pThis->SetTarget(nullptr);
+				pThis->QueueMission(Mission::Hunt, true);
+			}
+		}
+
 		// 禁止招募
+		if (pThis->RecruitableA) pThis->RecruitableA = false;
+		if (pThis->RecruitableB) pThis->RecruitableB = false;
 		if (pThis->Team)
 		{
 			pThis->Team->LiberateMember(pThis);
 		}
-		if (pThis->RecruitableA) pThis->RecruitableA = false;
-		if (pThis->RecruitableB) pThis->RecruitableB = false;
 
 		// 如果是部署状态，先解除部署
 		if (auto pInf = abstract_cast<InfantryClass*>(pThis))
@@ -42,16 +55,6 @@ void UpdateAutoHunt(FootClass* pThis)
 		{
 			if(pUnit->Deployed)
 			pUnit->Undeploy();
-		}
-
-		// 攻击的是单元格, 则取消目标(防止A地), 重新Hunt
-		if(pThis->Target)
-		{
-			if (pThis->Target->WhatAmI() == AbstractType::Cell)
-			{
-				pThis->SetTarget(nullptr);
-				pThis->QueueMission(Mission::Hunt, true);
-			}
 		}
 
 		// 不是Hunt状态，则强制设为Hunt
