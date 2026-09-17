@@ -17,11 +17,7 @@ DevBuild/
 *.mo
 
 /.vscode
-
-# 本地文档与逆向报告（仅本地保留，不入库）
 /docs/
-
-# WorkBuddy 工作区数据（memory / 会话状态，仅本地保留）
 /.workbuddy/
 
 build

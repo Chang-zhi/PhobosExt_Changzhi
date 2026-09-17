@@ -68,6 +68,7 @@
     <ClCompile Include="src\Ext\TEvent\Hooks.cpp" />
     <ClCompile Include="src\Misc\Hooks.Ares.cpp" />
     <ClCompile Include="src\Misc\Hooks.TextBox.cpp" />
+    <ClCompile Include="src\Ext\Tiberium\Hooks.MapOverride.cpp" />
     <ClCompile Include="src\New\TextBox\Entities\Base\MapTextBoxClass.cpp" />
     <ClCompile Include="src\New\TextBox\Entities\Derived\TechnoTextBoxClass.cpp" />
     <ClCompile Include="src\New\TextBox\Entities\Derived\WaypointTextBoxClass.cpp" />
@@ -94,7 +95,6 @@
     <ClCompile Include="src\Utilities\Patch.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Commands\NextTeam.h" />
     <ClInclude Include="src\Commands\Command.h" />
     <ClInclude Include="src\Commands\RecruitPassengers.h" />
     <ClInclude Include="src\Ext\House\Body.h" />
@@ -208,7 +208,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <GenerateManifest>false</GenerateManifest>
-    <IncludePath>$(SolutionDir)src\;$(SolutionDir)src\ExtraHeaders;$(SolutionDir)yrpp;$(SolutionDir)lib;$(VC_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)src\;$(SolutionDir)yrpp;$(VC_IncludePath)</IncludePath>
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\IntDir\</IntDir>
@@ -216,7 +216,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DevBuild|Win32'">
     <GenerateManifest>false</GenerateManifest>
-    <IncludePath>$(SolutionDir)src\;$(SolutionDir)src\ExtraHeaders;$(SolutionDir)yrpp;$(SolutionDir)lib;$(VC_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)src\;$(SolutionDir)yrpp;$(VC_IncludePath)</IncludePath>
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\IntDir\</IntDir>
@@ -224,7 +224,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <GenerateManifest>false</GenerateManifest>
-    <IncludePath>$(SolutionDir)src\;$(SolutionDir)src\ExtraHeaders;$(SolutionDir)yrpp;$(SolutionDir)lib;$(VC_IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)src\;$(SolutionDir)yrpp;$(VC_IncludePath)</IncludePath>
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\IntDir\</IntDir>

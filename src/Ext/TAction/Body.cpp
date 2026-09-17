@@ -265,8 +265,8 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 	case PhobosTriggerAction::SellAllBuildingsOfHouse:
 		return TActionExt::SellAllBuildingsOfHouse(pThis, pHouse, pObject, pTrigger, location);
 
-	case PhobosTriggerAction::testAction:
-		return TActionExt::testAction(pThis, pHouse, pObject, pTrigger, location);
+	// case PhobosTriggerAction::testAction:
+	// 	return TActionExt::testAction(pThis, pHouse, pObject, pTrigger, location);
 
 	default:
 		bHandled = false;
@@ -351,23 +351,14 @@ static int testChangeVar(bool bGlobal, int index, int value)
 	return value;
 }
 
-bool TActionExt::testAction(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
-{
-	ScenarioClass* pScenario = ScenarioClass::Instance;
-	if (!pScenario)
-		return false;
+// bool TActionExt::testAction(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+// {
+// 	ScenarioClass* pScenario = ScenarioClass::Instance;
+// 	if (!pScenario)
+// 		return false;
 
-	Debug::Log(L"[testAction]: ParTimeEasy=%d, ParTimeMedium=%d, ParTimeDifficult=%d\n"
-		L"  UnderParTitle = %hs, UnderParMessage = %hs\n"
-		L"  OverParTitle = %hs, OverParMessage = %hs\n"
-		L"  BriefingCSF = %hs\n  Briefing = %ls\n",
-		pScenario->ParTimeEasy, pScenario->ParTimeMedium, pScenario->ParTimeDifficult,
-		pScenario->UnderParTitle, pScenario->UnderParMessage,
-		pScenario->OverParTitle, pScenario->OverParMessage,
-		pScenario->BriefingCSF, pScenario->Briefing);
-
-	return true;
-}
+// 	return true;
+// }
 
 // =============================
 // container
