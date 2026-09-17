@@ -169,6 +169,9 @@ enum class PhobosTriggerAction : unsigned int
 	// 将指定作战小队类型的所有实例的脚本执行行号调整至
 	SeekTeamTypeScript = 660,
 
+	// 修改指定作战小队类型的 Max 值
+	SetTeamTypeMaxValue = 661,
+
 	// ---- TaskForce Editing Actions (670-677) ----
 
 	// 清空指定作战小队类型的所有内容
@@ -292,6 +295,7 @@ static bool name(TActionClass* pThis, HouseClass* pHouse, \
 	ACTION_FUNC(RestoreScriptContent);
 	ACTION_FUNC(RestoreAllScriptContents);
 	ACTION_FUNC(SeekTeamTypeScript);
+	ACTION_FUNC(SetTeamTypeMaxValue);
 
 	// ---- TaskForce Editing Actions ----
 	ACTION_FUNC(ClearTaskForce);

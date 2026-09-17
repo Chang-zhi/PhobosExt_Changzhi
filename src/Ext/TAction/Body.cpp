@@ -176,7 +176,11 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 	case PhobosTriggerAction::SeekTeamTypeScript:
 		return TActionExt::SeekTeamTypeScript(pThis, pHouse, pObject, pTrigger, location);
 
-	// ---- TaskForce Editing Actions ----
+	case PhobosTriggerAction::SetTeamTypeMaxValue:
+		return TActionExt::SetTeamTypeMaxValue(pThis, pHouse, pObject, pTrigger, location);
+
+
+		// ---- TaskForce Editing Actions ----
 	case PhobosTriggerAction::ClearTaskForce:
 		return TActionExt::ClearTaskForce(pThis, pHouse, pObject, pTrigger, location);
 	case PhobosTriggerAction::CopyTaskForce:
@@ -1495,6 +1499,33 @@ bool TActionExt::RestoreAllScriptContents(TActionClass* pThis, HouseClass* pHous
 bool TActionExt::SeekTeamTypeScript(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {
 	ScriptManipulator::SeekTeamTypeScript(pThis);
+	return true;
+}
+
+// =============================
+// 661: Set TeamType Max Value
+
+bool TActionExt::SetTeamTypeMaxValue(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	int teamIndex = pThis->Param3;
+	int newMax = pThis->Param4;
+
+	// 查找作战小队类型
+	TeamTypeClass* pTeamType = nullptr;
+	for (TeamTypeClass* pCurrent : TeamTypeClass::Array)
+	{
+		if (pCurrent && pCurrent->get_ID() == ("0" + std::to_string(teamIndex)))
+		{
+			pTeamType = pCurrent;
+			break;
+		}
+	}
+
+	if (!pTeamType)
+		return false;
+
+	pTeamType->Max = newMax;
+
 	return true;
 }
 
