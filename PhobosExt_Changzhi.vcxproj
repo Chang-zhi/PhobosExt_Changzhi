@@ -50,6 +50,7 @@
     <ClCompile Include="src\Ext\WarheadType\Body.cpp" />
     <ClCompile Include="src\Phobos.Ext.cpp" />
     <ClCompile Include="src\Phobos.cpp" />
+    <ClCompile Include="src\PhobosInterop.cpp" />
     <ClCompile Include="src\Utilities\ShapeTextPrinter.cpp" />
     <ClCompile Include="src\Utilities\SpawnerHelper.cpp" />
     <ClCompile Include="src\Utilities\Stream.cpp" />
@@ -89,6 +90,7 @@
     <ClInclude Include="src\Utilities\Debug.h" />
     <ClInclude Include="src\Ext\WarheadType\Body.h" />
     <ClInclude Include="src\Phobos.h" />
+    <ClInclude Include="src\PhobosInterop.h" />
     <ClInclude Include="src\Utilities\Enum.h" />
     <ClInclude Include="src\Utilities\EnumFunctions.h" />
     <ClInclude Include="src\Utilities\GeneralUtils.h" />

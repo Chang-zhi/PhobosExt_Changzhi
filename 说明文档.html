@@ -2,7 +2,8 @@
 <html lang="zh-CN">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PhobosExt 说明文档</title><style>*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}body{background-color:#f5f5f5;font-family:'Microsoft Yahei','Segoe UI',Roboto,system-ui,sans-serif;line-height:1.65;color:#222}.nav{position:fixed;top:0;left:0;width:180px;height:100vh;background:#fff;border-right:1px solid #eee;z-index:100;overflow-y:auto;padding:1rem 0;transition:transform .25s ease}.nav__title{font-size:1rem;font-weight:700;color:#d92929;padding:0.5rem 1rem 0.8rem;border-bottom:2px solid #d92929;margin:0 0.8rem 0.5rem;text-align:center;position:relative;padding-left:1.4rem;padding-right:1.6rem}.nav__list{list-style:none;padding:0;margin:0}.nav__item{display:block;padding:0.45rem 1rem;font-size:0.82rem;color:#555;cursor:pointer;transition:all .15s;border-left:3px solid transparent;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.nav__item:hover{background:#fdf7f7;color:#d92929;border-left-color:#f0c8c8}.nav__item--active{background:#fef0f0;color:#d92929;border-left-color:#d92929;font-weight:600}.doc-container{max-width:960px;margin:2rem auto;background:#fff;border:1px solid #eee;border-radius:15px;padding:2rem 2.2rem 3rem}section{display:none}section.active{display:block}h1,h2,h3,h4{font-weight:600;margin-top:1.8em;margin-bottom:0.6em;line-height:1.35}.doc-title{font-size:2rem;color:#d92929;border-bottom:2px solid #d92929;display:inline-block;padding-bottom:.3em;margin-top:.2em;margin-bottom:1em}.doc-title__sub{font-size:.9rem;font-weight:normal;background:#f8f0f0;color:#d92929;padding:.2rem .6rem;border-radius:2px;margin-left:.8rem;vertical-align:middle}.doc-heading--secondary{font-size:1.6rem;border-left:4px solid #d92929;padding-left:12px;background:#fdf7f7}.doc-heading--tertiary{font-size:1.3rem;color:#b81c1c;border-bottom:1px solid #f0c8c8;padding-bottom:.2em}.doc-link{color:#d92929;text-decoration:none;border-bottom:1px solid transparent;transition:.2s}.doc-link:hover{border-bottom-color:#d92929}code,pre{font-family:'Consolas','JetBrains Mono',monospace;border-radius:3px}.doc-code--inline{padding:.15rem .4rem;font-size:.9em;color:#d92929;background:#fff1f1}.doc-code--block{padding:1rem;overflow-x:auto;background:#2b2b2b;color:#e6e6e6;margin:1rem 0;font-size:.85rem}.doc-table{width:100%;border-collapse:collapse;margin:1.2rem 0;font-size:.9rem}.doc-table__th,.doc-table__td{border:1px solid #ddd;padding:9px 12px;text-align:left;vertical-align:top}.doc-table__th{background:#f8f0f0;color:#b81c1c;font-weight:600}.doc-notice--warning{background:#fef0f0;border-left:4px solid #d92929;padding:.8rem 1rem;margin:1rem 0;border-radius:2px}.doc-list--content{margin:0 4%;line-height:1.8}.doc-footer{margin-top:3rem;padding-top:1.2rem;text-align:center;border-top:1px solid #eee;font-size:.85rem;color:#777}.doc-text--gray{color:#666;margin:2% 0}.doc-hr{margin:2rem 0;border:none;height:1px;background:#f0c8c8}
-.sec-divider{margin:2rem -2.2rem;border:none;height:1px;background:#e0b0b0}.doc-code--inline--deepColor{padding:.15rem .4rem;font-size:.9em;color:#d92929;background:#f7dfdf}.doc-paragraph--only-vertical{margin:1% 0}.doc-paragraph--wrapped{margin:2% 2%}.nav-toggle{display:block;position:fixed;top:.6rem;left:.6rem;z-index:200;background:#d92929;color:#fff;border:none;border-radius:4px;padding:.4rem .7rem;font-size:1.1rem;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.15);transition:left .25s ease}.nav-collapsed .nav{transform:translateX(-100%)}body:not(.nav-collapsed) .nav{transform:translateX(0)}.nav__close{position:absolute;left:2%;top:45%;transform:translateY(-50%);cursor:pointer;color:#d92929;font-size:.85rem;padding:.25rem;border-radius:2px;line-height:1;user-select:none}.nav__close:hover{background:#fef0f0}.nav__lock{position:absolute;right:4px;top:45%;transform:translateY(-50%);cursor:pointer;padding:4px;border-radius:3px;line-height:0;user-select:none}.nav__lock:hover{background:#fef0f0}.lock-icon--unlocked{display:none}body:not(.nav-locked) .lock-icon--locked{display:none}body:not(.nav-locked) .lock-icon--unlocked{display:inline}body:not(.nav-collapsed) .nav-toggle{display:none}
+.sec-divider{margin:2rem -2.2rem;border:none;height:1px;background:#e0b0b0}
+.sec-divider--double{margin:2rem -2.2rem;height:5px;border:none;border-top:1px solid #e0b0b0;border-bottom:1px solid #e0b0b0}.doc-code--inline--deepColor{padding:.15rem .4rem;font-size:.9em;color:#d92929;background:#f7dfdf}.doc-paragraph--only-vertical{margin:1% 0}.doc-paragraph--wrapped{margin:2% 2%}.nav-toggle{display:block;position:fixed;top:.6rem;left:.6rem;z-index:200;background:#d92929;color:#fff;border:none;border-radius:4px;padding:.4rem .7rem;font-size:1.1rem;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.15);transition:left .25s ease}.nav-collapsed .nav{transform:translateX(-100%)}body:not(.nav-collapsed) .nav{transform:translateX(0)}.nav__close{position:absolute;left:2%;top:45%;transform:translateY(-50%);cursor:pointer;color:#d92929;font-size:.85rem;padding:.25rem;border-radius:2px;line-height:1;user-select:none}.nav__close:hover{background:#fef0f0}.nav__lock{position:absolute;right:4px;top:45%;transform:translateY(-50%);cursor:pointer;padding:4px;border-radius:3px;line-height:0;user-select:none}.nav__lock:hover{background:#fef0f0}.lock-icon--unlocked{display:none}body:not(.nav-locked) .lock-icon--locked{display:none}body:not(.nav-locked) .lock-icon--unlocked{display:inline}body:not(.nav-collapsed) .nav-toggle{display:none}
 .sec-toc{background:#fdf7f7;border-radius:3px;padding:16px 20px;margin:1.2rem 0;border-left:3px solid #d92929}
 .sec-toc__title{color:#d92929;font-size:1.1rem;font-weight:600;margin:0 0 10px 0;padding:0}
 .sec-toc__list{list-style:none;padding:0;margin:0;line-height:1.8}
@@ -36,7 +37,7 @@
 <h2 class="doc-heading--secondary">已知问题</h2>
 <p>1. 当单位当前正在使用带有 <code class="doc-code--inline">Temporal=yes</code> 和 <code class="doc-code--inline">Temporal.Exclusive=yes</code> 弹头的武器时, 会强制改变单位的索敌逻辑, 可能会产生bug。</p>
 <p>2. 当科技类型的 <code class="doc-code--inline">LegalTargetWhenAIOwner=no</code> 且不由人类玩家控制时, 会强制改变其他单位的索敌逻辑, 可能会产生bug。</p>
-<p>3. 基地节点跨所属方判定：开启后不要让 AI 造围墙，与触发动作 30 不兼容。详见<a href="javascript:switchPage(12)" class="doc-link">对应章节</a>。</p>
+<p>3. 基地节点跨所属方判定：开启后不要让 AI 造围墙，与触发动作 30 不兼容。详见<a href="javascript:switchPage('gameplay');setTimeout(function(){scrollToFeature('gameplay_12')},100)" class="doc-link">对应章节</a>。</p>
 <p>4. 当单位当前正在使用带有 <code class="doc-code--inline">Temporal=yes</code> 弹头的武器反复攻击同一个目标时, 可能会出现中间的目标没有进入冻结状态但其他目标进入的情况(不过时间到了仍会被一同抹除)。</p>
 <br>
 <p><strong>如果遇到bug或兼容性问题可以我发私信, 我会尽量解决。</strong></p>
@@ -63,6 +64,7 @@
 <h2 class="doc-heading--secondary">触发编辑器配置</h2>
 <p>为了在触发编辑器中使用新的触发动作，您需要复制压缩包里面的 <code class="doc-code--inline">FAData_TriggerAndScript.ini</code> 到地编的根目录下。</p><br>
 <p>仅支持 <a href="https://github.com/handama/FA2sp" target="_blank" class="doc-link">FA2SP_HDM_Edition</a>(韩大妈版本)<br>其他版本请自行移植。</p>
+
 </section>
 
 <!-- 触发器新动作 -->
@@ -81,6 +83,9 @@
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_11')" class="sec-toc__link">7. 作战小队操作</a></li>
 </ul>
 </div>
+
+<hr class="sec-divider">
+
 <div id="actions_1">
 <h3 class="doc-heading--tertiary" style="margin-top:2em">1. 路径点文本显示</h3>
 <p>在地图路径点上绘制自定义文本。</p>
@@ -101,7 +106,9 @@
 ShowWaypointLabelInShroud=                  ; boolean(布尔值)，默认 true</code></pre>
 <p><strong>注:</strong> 仅判断路径点本身是否被黑幕遮挡, 不检测整个标签。</p>
 </div>
-<hr class="sec-divider">
+
+<hr class="sec-divider--double">
+
 <div id="actions_2">
 <h3 class="doc-heading--tertiary" style="margin-top:2em">2. 动态标签绑定功能</h3>
 <div class="doc-notice--warning">
@@ -156,7 +163,9 @@ ShowWaypointLabelInShroud=                  ; boolean(布尔值)，默认 true</
 </li>
 </ol>
 </div>
-<hr class="sec-divider">
+
+<hr class="sec-divider--double">
+
 <div id="actions_3">
 <h3 class="doc-heading--tertiary" style="margin-top:2em">3. 金钱操作功能</h3>
 <p>允许动态调整指定所属方的资金数额。</p>
@@ -168,7 +177,9 @@ ShowWaypointLabelInShroud=                  ; boolean(布尔值)，默认 true</
 <li><code class="doc-code--inline">559</code> – 设置指定所属方的金钱数额...(参数：所属方国家索引，金额数额)</li>
 </ul>
 </div>
-<hr class="sec-divider">
+
+<hr class="sec-divider--double">
+
 <div id="actions_4">
 <h3 class="doc-heading--tertiary" style="margin-top:2em">4. 基地节点操作功能</h3>
 <p>允许动态添加或移除指定所属方的AI基地节点。</p>
@@ -184,7 +195,9 @@ ShowWaypointLabelInShroud=                  ; boolean(布尔值)，默认 true</
 <li>对于动作 <code class="doc-code--inline">561</code>,<code class="doc-code--inline">562</code>, 会重置 ai 的建造序列, 如果基地正在建造需要移除的基地节点, 则会强制中断建造。</li>
 </ol>
 </div>
-<hr class="sec-divider">
+
+<hr class="sec-divider--double">
+
 <div id="actions_6">
 <h3 class="doc-heading--tertiary" style="margin-top:2em">5. 单位可招募属性设置</h3>
 <p><strong>触发动作说明：</strong></p>
@@ -193,7 +206,9 @@ ShowWaypointLabelInShroud=                  ; boolean(布尔值)，默认 true</
 </ul>
 <p class="doc-paragraph--wrapped"><strong>注意事项：</strong> 只会修改 <code class="doc-code--inline">FootClass</code> 的实例。可招募A对应 <code class="doc-code--inline">RecruitableA</code>，可招募B对应 <code class="doc-code--inline">RecruitableB</code>。</p>
 </div>
-<hr class="sec-divider">
+
+<hr class="sec-divider--double">
+
 <div id="actions_7">
 <h3 class="doc-heading--tertiary" style="margin-top:2em">6. AI 更新建筑动画功能</h3>
 <p>更新建筑的动画，用于处理建筑改变所属后动画会停止播放的问题。</p>
@@ -205,7 +220,9 @@ ShowWaypointLabelInShroud=                  ; boolean(布尔值)，默认 true</
 <li><code class="doc-code--inline">576</code> – 更新指定所属方所有建筑的动画... (参数：所属方国家索引)</li>
 </ul>
 </div>
-<hr class="sec-divider">
+
+<hr class="sec-divider--double">
+
 <div id="actions_11">
 <h3 class="doc-heading--tertiary" style="margin-top:2em">7. 作战小队操作</h3>
 <p><strong>触发动作说明：</strong></p>
@@ -232,7 +249,9 @@ ShowWaypointLabelInShroud=                  ; boolean(布尔值)，默认 true</
 <li>只会招募满足以下条件的单位：属于指定所属方、未加入其他小队、可被招募(<code class="doc-code--inline">CanBeRecruited</code>)、在路径点指定范围内。</li>
 </ul>
 </div>
+
 </section>
+
 
 
 <!-- 触发器新事件 -->
@@ -246,6 +265,9 @@ ShowWaypointLabelInShroud=                  ; boolean(布尔值)，默认 true</
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('events_13')" class="sec-toc__link">2. 流逝时间检测</a></li>
 </ul>
 </div>
+
+<hr class="sec-divider">
+
 <div id="events_5">
 <h3 class="doc-heading--tertiary" style="margin-top:2em">1. 科技类型坐标检测</h3>
 <p>在指定路径点上或附近距离，检测是否存在触发所属方的科技类型。</p>
@@ -258,7 +280,9 @@ ShowWaypointLabelInShroud=                  ; boolean(布尔值)，默认 true</
 </ul>
 <p class="doc-paragraph--wrapped"><strong>注意事项：</strong> 对于事件 <code class="doc-code--inline">552</code>,<code class="doc-code--inline">553</code>, 若科技类型为建筑，则<strong>每一格都会检测，支持ares的自定义Foundation。</strong></p>
 </div>
-<hr class="sec-divider">
+
+<hr class="sec-divider--double">
+
 <div id="events_13">
 <h3 class="doc-heading--tertiary" style="margin-top:2em">2. 流逝时间检测</h3>
 <p>从触发器激活时开始计时，当流逝帧数达到指定值时触发。</p>
@@ -267,7 +291,9 @@ ShowWaypointLabelInShroud=                  ; boolean(布尔值)，默认 true</
 <li><code class="doc-code--inline">554</code> – 流逝时间(帧)... (参数：等待帧数)</li>
 </ul>
 </div>
+
 </section>
+
 
 
 <!-- 游戏扩展机制 -->
@@ -284,6 +310,9 @@ ShowWaypointLabelInShroud=                  ; boolean(布尔值)，默认 true</
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_14')" class="sec-toc__link">5. 混乱机制</a></li>
 </ul>
 </div>
+
+<hr class="sec-divider">
+
 <div id="gameplay_8">
 <h3 class="doc-heading--tertiary" style="margin-top:2em">1. 超时空武器扩展</h3>
 <p>为 <code class="doc-code--inline">Temporal=yes</code> 的弹头增加互斥锁定和范围冻结（AOE）机制。</p>
@@ -311,7 +340,9 @@ TemporalAOE.AffectsAllies=                 ; boolean，默认 false — 是否�
 <li><strong>超时空武器拦截</strong>：所有 <code class="doc-code--inline">Temporal=yes</code> 的超时空武器（无论是否设置 Exclusive/AOE）均无法将已被 AOE 锁定的<strong>主目标和副目标</strong>选为攻击对象。(防止bug)</li>
 </ul>
 </div>
-<hr class="sec-divider">
+
+<hr class="sec-divider--double">
+
 <div id="gameplay_9">
 <h3 class="doc-heading--tertiary" style="margin-top:2em">2. 自动游猎</h3>
 <pre class="doc-code--block"><code>[TechnoType]
@@ -328,7 +359,9 @@ AutoHunt=                       ; boolean，默认 false</code></pre>
 <li><strong>攻击地面修正：</strong>如果单位当前攻击目标是单元格(强制攻击地面)，会自动清除该目标，转为 <code class="doc-code--inline">Hunt</code> 索敌。</li>
 </ul>
 </div>
-<hr class="sec-divider">
+
+<hr class="sec-divider--double">
+
 <div id="gameplay_10">
 <h3 class="doc-heading--tertiary" style="margin-top:2em">3. AI 所属单位目标判定</h3>
 <pre class="doc-code--block"><code>[TechnoType]
@@ -379,7 +412,9 @@ BaseNodeCrossOwners=                  ; boolean，默认 false</code></pre>
 </ol>
 </div>
 </div>
-<hr class="sec-divider">
+
+<hr class="sec-divider--double">
+
 <div id="gameplay_14">
 <h3 class="doc-heading--tertiary" style="margin-top:2em">5. 混乱机制</h3>
 <h4 style="margin-top:1.2em">5.1 混乱恢复设置</h4>
@@ -398,6 +433,8 @@ BerserkReduce=                           ; integer，默认 0</code></pre>
 </div>
 
 </section>
+
+
 <footer class="doc-footer">
 <p>PhobosExt — 基于 Phobos 开发的 YR 扩展插件 · <a href="https://github.com/Chang-zhi/PhobosExt_Changzhi" target="_blank" class="doc-link">GitHub 仓库</a></p>
 <p>《红色警戒2：尤里的复仇》及其相关素材归 Electronic Arts 所有。</p>
@@ -416,10 +453,20 @@ function scrollToFeature(id)
     setTimeout(function()
     {
       var o=document.createElement('div');
-      o.id='hl_'+id;o.style.cssText='position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(255,235,150,0.18);border-radius:20px;pointer-events:none;z-index:1;opacity:0;transition:opacity .5s ease';
+      o.id='hl_'+id;o.style.cssText='position:absolute;\
+      top:0;\
+      left:0;\
+      right:0;\
+      bottom:0;\
+      background:rgba(255,235,150,0.25);\
+      border-radius:20px;\
+      pointer-events:none;\
+      z-index:1;\
+      opacity:0;\
+      transition:opacity .5s ease';
       el.style.position='relative';
       el.appendChild(o);
-      requestAnimationFrame(function(){o.style.opacity='1';setTimeout(function(){o.style.opacity='0';setTimeout(function(){if(o.parentNode)o.parentNode.removeChild(o)},500)},1200)})
+      requestAnimationFrame(function(){o.style.opacity='1';setTimeout(function(){o.style.opacity='0';setTimeout(function(){o.style.opacity='1';setTimeout(function(){o.style.opacity='0';setTimeout(function(){if(o.parentNode)o.parentNode.removeChild(o)},300)},300)},300)},300)})
     }
     ,500)
   }
@@ -430,4 +477,5 @@ document.addEventListener('DOMContentLoaded',function(){var n=document.querySele
 function toggleNav(){document.body.classList.toggle('nav-collapsed')}
 function toggleLock(){document.body.classList.toggle('nav-locked')}
 document.addEventListener('DOMContentLoaded',function(){if(window.innerWidth<=640)document.body.classList.add('nav-collapsed');document.body.classList.add('nav-locked');switchPage('home');document.addEventListener('click',function(e){if(document.body.classList.contains('nav-collapsed')||document.body.classList.contains('nav-locked'))return;var n=document.getElementById('mainNav'),t=document.getElementById('navToggle');if(!n.contains(e.target)&&e.target!==t&&!t.contains(e.target))document.body.classList.add('nav-collapsed')})})</script>
-</body></html>
+</body>
+</html>

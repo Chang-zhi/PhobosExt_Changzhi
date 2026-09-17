@@ -1,4 +1,5 @@
 #include "Phobos.h"
+#include "PhobosInterop.h"
 
 #include <Drawing.h>
 #include <SessionClass.h>
@@ -194,6 +195,7 @@ DEFINE_HOOK(0x52F639, _YR_CmdLineParse, 0x5)
 	GET(int, nNumArgs, EDI);
 
 	Phobos::CmdLineParse(ppArgs, nNumArgs);
+	PhobosInterop::Init();
 	Debug::LogDeferredFinalize();
 	return 0;
 }
