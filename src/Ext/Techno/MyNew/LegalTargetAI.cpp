@@ -3,6 +3,7 @@
 #include <TechnoTypeClass.h>
 
 #include <Ext/TechnoType/Body.h>
+#include <Utilities/Debug.h>
 
 void HandleLegalTargetAITargeting(TechnoClass* pThis)
 {
@@ -22,6 +23,8 @@ void HandleLegalTargetAITargeting(TechnoClass* pThis)
 		&& !pTechnoTypeExt->LegalTargetWhenAIOwner
 		&& !pTechno->Owner->HouseClass::IsControlledByHuman())
 	{
+		Debug::Log("[LegalTargetAI] %s cancels attack on %s (AI-owned, LegalTargetWhenAIOwner=0)\n",
+			pThis->GetTechnoType()->ID, pTechnoType->ID);
 		pThis->SetTarget(nullptr);
 	}
 }

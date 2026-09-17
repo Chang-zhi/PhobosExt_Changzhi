@@ -19,7 +19,13 @@ void WarheadTypeExt::ExtData::LoadFromINIFile(CCINIClass* const pINI)
 	const char* pSection = pThis->ID;
 	INI_EX exINI(pINI);
 
-	this->TemporalExclusive.Read(exINI, pSection, "TemporalExclusive");
+	this->Temporal_Exclusive.Read(exINI, pSection, "Temporal.Exclusive");
+
+	// Temporal AOE
+	this->TemporalAOE_Enable.Read(exINI, pSection, "TemporalAOE.Enable");
+	this->TemporalAOE_CellSpread.Read(exINI, pSection, "TemporalAOE.CellSpread");
+	this->TemporalAOE_SecondaryWeight.Read(exINI, pSection, "TemporalAOE.SecondaryWeight");
+	this->TemporalAOE_AffectsAllies.Read(exINI, pSection, "TemporalAOE.AffectsAllies");
 
 }
 
@@ -27,7 +33,11 @@ template <typename T>
 void WarheadTypeExt::ExtData::Serialize(T& Stm)
 {
 	Stm
-		.Process(this->TemporalExclusive)
+		.Process(this->Temporal_Exclusive)
+		.Process(this->TemporalAOE_Enable)
+		.Process(this->TemporalAOE_CellSpread)
+		.Process(this->TemporalAOE_SecondaryWeight)
+		.Process(this->TemporalAOE_AffectsAllies)
 		;
 }
 

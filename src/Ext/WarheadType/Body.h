@@ -18,10 +18,20 @@ public:
 	{
 
 	public:
-		Valueable<bool> TemporalExclusive;
+		Valueable<bool> Temporal_Exclusive;
+
+		// Temporal AOE
+		Valueable<bool> TemporalAOE_Enable;
+		Valueable<double> TemporalAOE_CellSpread;
+		Valueable<double> TemporalAOE_SecondaryWeight;
+		Valueable<bool> TemporalAOE_AffectsAllies;
 
 		ExtData(WarheadTypeClass* OwnerObject) : Extension<WarheadTypeClass>(OwnerObject)
-			, TemporalExclusive { false }
+			, Temporal_Exclusive { false }
+			, TemporalAOE_Enable { false }
+			, TemporalAOE_CellSpread { 3.0 }
+			, TemporalAOE_SecondaryWeight { 1.0 }
+			, TemporalAOE_AffectsAllies { false }
 		{ }
 
 		virtual ~ExtData() = default;

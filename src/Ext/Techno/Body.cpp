@@ -6,6 +6,7 @@
 #include <JumpjetLocomotionClass.h>
 
 #include <Utilities/AresFunctions.h>
+#include <Ext/Techno/MyNew/TemporalAOE.h>
 TechnoExt::ExtContainer TechnoExt::ExtMap;
 
 TechnoExt::ExtData::~ExtData()
@@ -20,11 +21,75 @@ void TechnoExt::ExtData::Serialize(T& Stm)
 {
 	Stm
 		.Process(this->TypeExtData)
+		.Process(this->AOEState.Active)
+		.Process(this->AOEState.CellSpread)
+		.Process(this->AOEState.SecondaryWeight)
+		.Process(this->AOEState.WeaponDamage)
+		.Process(this->AOEState.ExtraWarpAdded)
+		.Process(this->AOEState.MainTarget)
+		.Process(this->AOEState.WarpingOut)
+		.Process(this->AOEState.ScanInterval)
+		.Process(this->AOEState.ScanCounter)
+		.Process(this->AOEState.TargetsInRange)
 		;
+
+	// 手动序列化 BuildingsDisabled (std::set → 用临时 vector 中转)
+	if constexpr (std::is_same_v<T, PhobosStreamWriter>)
+	{
+		std::vector<TechnoClass*> bldVec(
+			this->AOEState.BuildingsDisabled.begin(),
+			this->AOEState.BuildingsDisabled.end());
+		Stm.Process(bldVec);
+	}
+	else
+	{
+		std::vector<TechnoClass*> bldVec;
+		Stm.Process(bldVec);
+		this->AOEState.BuildingsDisabled.clear();
+		this->AOEState.BuildingsDisabled.insert(bldVec.begin(), bldVec.end());
+	}
 }
 
 void TechnoExt::ExtData::InvalidatePointer(void* ptr, bool bRemoved)
 {
+	if (!ptr) return;
+	auto& state = this->AOEState;
+
+	// 主目标指针失效
+	if (state.MainTarget == ptr)
+		state.MainTarget = nullptr;
+
+	// 副目标列表（遍历删除，不用 static_cast）
+	for (auto it = state.TargetsInRange.begin(); it != state.TargetsInRange.end(); )
+	{
+		if (*it == ptr)
+		{
+			if (*it) (*it)->BeingWarpedOut = false;
+			it = state.TargetsInRange.erase(it);
+		}
+		else
+		{
+			++it;
+		}
+	}
+
+	// 建筑禁用列表（遍历删除，避免对非 TechnoClass 指针做 static_cast）
+	for (auto it = state.BuildingsDisabled.begin(); it != state.BuildingsDisabled.end(); )
+	{
+		if (*it == ptr)
+		{
+			if (auto pBld = abstract_cast<BuildingClass*>(*it))
+			{
+				if (pBld->Health > 0 && !pBld->InLimbo)
+					pBld->EnableTemporal();
+			}
+			it = state.BuildingsDisabled.erase(it);
+		}
+		else
+		{
+			++it;
+		}
+	}
 }
 
 void TechnoExt::ExtData::LoadFromStream(PhobosStreamReader& Stm)
@@ -75,6 +140,7 @@ DEFINE_HOOK(0x6F4500, TechnoClass_DTOR, 0x5)
 {
 	GET(TechnoClass*, pItem, ECX);
 
+	InvalidateAOESecondaryClaims(pItem);
 	TechnoExt::ExtMap.Remove(pItem);
 
 	return 0;
