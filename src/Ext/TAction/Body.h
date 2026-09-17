@@ -48,8 +48,23 @@ enum class PhobosTriggerAction : unsigned int
 	RemoveAllBaseNodeForHouseAtWaypoint = 561,
 
 	// 移除指定所属方的指定建筑类型的所有基地节点...
-	RemoveBaseNodesOfBuildingTypeForHouse = 562
+	RemoveBaseNodesOfBuildingTypeForHouse = 562,
 
+	// 安全地销毁标签...
+	DestroyTagSafely = 563,
+
+	// 为路径点上的科技类型绑定标签...
+	BindTagToTechnoTypeAtWaypoint = 564,
+
+	// 为路径点上指定所属方的科技类型绑定标签...
+	BindTagToTechnoTypeOfHouseAtWaypoint = 565,
+
+	//// 设置关联单位单位的可招募属性...
+	//SetObjectRecruitable = 566,
+
+
+	// 测试用
+	testAction = 1150,
 };
 
 class TActionExt
@@ -98,6 +113,12 @@ public:
 	ACTION_FUNC(AddBaseNodeForHouseAtWaypoint);
 	ACTION_FUNC(RemoveAllBaseNodeForHouseAtWaypoint);
 	ACTION_FUNC(RemoveBaseNodesOfBuildingTypeForHouse);
+	ACTION_FUNC(DestroyTagSafely);
+	ACTION_FUNC(BindTagToTechnoTypeAtWaypoint);
+	ACTION_FUNC(BindTagToTechnoTypeOfHouseAtWaypoint);
+	// ACTION_FUNC(SetObjectRecruitable);
+
+	ACTION_FUNC(testAction);
 
 #undef ACTION_FUNC
 #pragma pop_macro("ACTION_FUNC")

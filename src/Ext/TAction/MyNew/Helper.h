@@ -1,6 +1,11 @@
 #pragma once
 
-#include <TagClass.h>
+#include <GeneralStructures.h>
+
+class TagClass;
+class BuildingClass;
 
 TagClass* GetTagClassByIndex(int Index);
 
+// 在 TEventExt 的 Helper.cpp 里
+extern bool IsCellInBuildingFoundation(BuildingClass* pBuilding, const CellStruct& cell);

@@ -83,7 +83,19 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 		return TActionExt::RemoveAllBaseNodeForHouseAtWaypoint(pThis, pHouse, pObject, pTrigger, location);
 	case PhobosTriggerAction::RemoveBaseNodesOfBuildingTypeForHouse:
 		return TActionExt::RemoveBaseNodesOfBuildingTypeForHouse(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::DestroyTagSafely:
+		return TActionExt::DestroyTagSafely(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::BindTagToTechnoTypeAtWaypoint:
+		return TActionExt::BindTagToTechnoTypeAtWaypoint(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::BindTagToTechnoTypeOfHouseAtWaypoint:
+		return TActionExt::BindTagToTechnoTypeOfHouseAtWaypoint(pThis, pHouse, pObject, pTrigger, location);
+	//case PhobosTriggerAction::SetObjectRecruitable:
+	//	return TActionExt::SetObjectRecruitable(pThis, pHouse, pObject, pTrigger, location);
 
+
+
+	case PhobosTriggerAction::testAction:
+		return TActionExt::testAction(pThis, pHouse, pObject, pTrigger, location);
 	default:
 		bHandled = false;
 		return true;
@@ -160,7 +172,8 @@ bool TActionExt::BindAllTeamMemberToTag(TActionClass* pThis, HouseClass* pHouse,
 				{
 					for (auto pUnit = pFoot->Team->FirstUnit; pUnit; pUnit = pUnit->NextTeamMember)
 					{
-						pUnit->AttachTrigger(pTagClass);
+						if (pUnit->AttachedTag) pUnit->ReplaceTag(pTagClass);
+						else pUnit->AttachTrigger(pTagClass);
 					}
 				}
 			}
@@ -199,7 +212,8 @@ bool TActionExt::BindOwnerTeamMemberToTag(TActionClass* pThis, HouseClass* pHous
 					{
 						for (auto pUnit = pFoot->Team->FirstUnit; pUnit; pUnit = pUnit->NextTeamMember)
 						{
-							pUnit->AttachTrigger(pTagClass);
+							if (pUnit->AttachedTag) pUnit->ReplaceTag(pTagClass);
+							else pUnit->AttachTrigger(pTagClass);
 						}
 					}
 				}
@@ -223,7 +237,8 @@ bool TActionExt::BindAllTechnoTypeToTag(TActionClass* pThis, HouseClass* pHouse,
 	{
 		if (pTechno->get_ID() == std::string(techno))
 		{
-			pTechno->AttachTrigger(pTagClass);
+			if (pTechno->AttachedTag) pTechno->ReplaceTag(pTagClass);
+			else pTechno->AttachTrigger(pTagClass);
 		}
 	}
 
@@ -249,7 +264,8 @@ bool TActionExt::BindOwnerTechnoTypeToTag(TActionClass* pThis, HouseClass* pHous
 		{
 			if (pTechno->get_ID() == std::string(techno))
 			{
-				pTechno->AttachTrigger(pTagClass);
+				if (pTechno->AttachedTag) pTechno->ReplaceTag(pTagClass);
+				else pTechno->AttachTrigger(pTagClass);
 			}
 		}
 	}
@@ -497,6 +513,176 @@ bool TActionExt::RemoveBaseNodesOfBuildingTypeForHouse(TActionClass* pThis, Hous
 	Debug::Log("[Inter]: New base nodes count = %d\n", pOwner->Base.BaseNodes.Count);
 
 	Debug::Log("[End]: Finished removing base nodes for building type \"%s\".\n", buildTypeID);
+	return true;
+}
+
+bool TActionExt::DestroyTagSafely(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	int tagIndex = pThis->Param3;
+
+	// 因为没有标签会尝试创建一个, 所以不会崩溃(大概)
+	TagClass* pTagClass = GetTagClassByIndex(tagIndex);
+
+	for (auto pTechno : TechnoClass::Array)
+	{
+		if (pTechno->AttachedTag && pTechno->AttachedTag->Type == pTagClass->Type)
+		{
+			pTechno->AttachedTag->Destroy();
+		}
+	}
+
+	pTagClass->Destroy();
+	return true;
+}
+
+bool TActionExt::BindTagToTechnoTypeAtWaypoint(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	const char* techno = pThis->Text;
+	int tagIndex = pThis->Param3;
+	const int waypointIndex = pThis->Param4;
+	// int houseIndex = pThis->Param5;
+
+	TagClass* pTagClass = GetTagClassByIndex(tagIndex);
+	if (!pTagClass) return false;
+
+	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
+	if (cell.X < 0 || cell.Y < 0) return false;
+
+	// HouseClass* pOwner = HouseClass::FindByCountryIndex(houseIndex);
+	// if (!pOwner) return false;
+
+	// 遍历 TechnoClass, 尝试把 TagClass 绑定到 TechnoClass 上
+	for (auto const pTechno : TechnoClass::Array)
+	{
+		if (pTechno && pTechno->get_ID() == std::string(techno))
+		{
+			if (BuildingClass* pBuilding = abstract_cast<BuildingClass*>(pTechno))
+			{
+				if(IsCellInBuildingFoundation(pBuilding, cell))
+				{
+					if (pBuilding->AttachedTag) pBuilding->ReplaceTag(pTagClass);
+					else pBuilding->AttachTrigger(pTagClass);
+				}	
+			}
+			else
+			{
+				if (CellClass::Coord2Cell(pTechno->GetCoords()) == cell) // 不是建筑类型, 直接判断坐标即可
+				{
+					if (pBuilding->AttachedTag) pBuilding->ReplaceTag(pTagClass);
+					else pBuilding->AttachTrigger(pTagClass);
+				}
+			}
+		}
+	}
+
+	return true;
+}
+
+bool TActionExt::BindTagToTechnoTypeOfHouseAtWaypoint(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	const char* techno = pThis->Text;
+	int tagIndex = pThis->Param3;
+	const int waypointIndex = pThis->Param4;
+	int houseIndex = pThis->Param5;
+
+	TagClass* pTagClass = GetTagClassByIndex(tagIndex);
+	if (!pTagClass) return false;
+
+	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
+	if (cell.X < 0 || cell.Y < 0) return false;
+
+	HouseClass* pOwner = HouseClass::FindByCountryIndex(houseIndex);
+	if (!pOwner) return false;
+
+	// 遍历 TechnoClass, 尝试把 TagClass 绑定到 TechnoClass 上
+	for (auto const pTechno : TechnoClass::Array)
+	{
+		if (pTechno && pTechno->get_ID() == std::string(techno) && pTechno->Owner == pOwner)
+		{
+			if (BuildingClass* pBuilding = abstract_cast<BuildingClass*>(pTechno))
+			{
+				if (IsCellInBuildingFoundation(pBuilding, cell))
+				{
+					if (pBuilding->AttachedTag) pBuilding->ReplaceTag(pTagClass);
+					else pBuilding->AttachTrigger(pTagClass);
+				}
+			}
+			else
+			{
+				if (CellClass::Coord2Cell(pTechno->GetCoords()) == cell) // 不是建筑类型, 直接判断坐标即可
+				{
+					if (pBuilding->AttachedTag) pBuilding->ReplaceTag(pTagClass);
+					else pBuilding->AttachTrigger(pTagClass);
+				}
+			}
+		}
+	}
+
+	return true;
+}
+
+//bool TActionExt::SetObjectRecruitable(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+//{
+//	bool recruitableA = pThis->Param3;
+//	bool recruitableB = pThis->Param4;
+//
+//	if(pThis->TagType)
+//	{
+//		Debug::Log("This TagType is \"%s\".\n", pThis->TagType);
+//	}
+//
+//	if (pObject)
+//	{
+//		Debug::Log("Object \"%s\" is being processed.\n", pObject->GetTechnoType()->ID);
+//	}
+//
+//	if(auto pTechno = abstract_cast<TechnoClass*>(pObject))
+//	{
+//		pTechno->RecruitableA = recruitableA;
+//		pTechno->RecruitableB = recruitableB;
+//	}
+//
+//	return true;
+//}
+
+bool TActionExt::testAction(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	int tagIndex = pThis->Param3;
+
+	std::string tagIndex_str = ("0" + std::to_string(tagIndex));
+	TagTypeClass* pTagType = TagTypeClass::FindByNameOrID(tagIndex_str.c_str());
+	Debug::Log("Looking for TagType with ID \"%s\".\n", tagIndex_str.c_str());
+
+	Debug::Log("[Array]: Try to check tag.\n");
+	for (TagClass* it : TagClass::Array)
+	{
+		Debug::Log("[Array]: Check tag: \"%s\".\n", it->Type->ID);
+		if(it->Type == pTagType)
+		{
+			Debug::Log("[Array]: Found tag with matching type! Tag ID: \"%s\".\n", it->Type->ID);
+		}
+	}
+
+	Debug::Log("[Array_Logic]: Try to check tag.\n");
+	for (TagClass* it : TagClass::Array_Logic)
+	{
+		Debug::Log("[Array_Logic]: Check tag: \"%s\".\n", it->Type->ID);
+		if (it->Type == pTagType)
+		{
+			Debug::Log("[Array_Logic]: Found tag with matching type! Tag ID: \"%s\".\n", it->Type->ID);
+		}
+	}
+
+	Debug::Log("[Array_unknown]: Try to check tag.\n");
+	for (TagClass* it : TagClass::Array_unknown)
+	{
+		Debug::Log("[Array_unknown]: Check tag: \"%s\".\n", it->Type->ID);
+		if (it->Type == pTagType)
+		{
+			Debug::Log("[Array_unknown]: Found tag with matching type! Tag ID: \"%s\".\n", it->Type->ID);
+		}
+	}
+
 	return true;
 }
 
