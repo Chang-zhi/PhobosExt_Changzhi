@@ -11,7 +11,7 @@
 // 根据你的项目需求修改以下数值
 #define VERSION_MAJOR 0          // 主版本号
 #define VERSION_MINOR 0          // 次版本号
-#define VERSION_REVISION 11       // 修订号
+#define VERSION_REVISION 12       // 修订号
 #define VERSION_PATCH 0          // 补丁号
 
 #define BUILD_NUMBER 48           // 构建号（每次发布递增）
