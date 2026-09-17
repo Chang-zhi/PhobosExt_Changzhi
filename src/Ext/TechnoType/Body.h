@@ -4,6 +4,7 @@
 #include <Helpers/Macro.h>
 #include <Utilities/Container.h>
 #include <Utilities/TemplateDef.h>
+#include <Utilities/Enum.h>
 
 class Matrix3D;
 class ParticleSystemTypeClass;
@@ -24,12 +25,33 @@ public:
 		Valueable<int> RadarJamRadius;
 		Nullable<int> InhibitorRange;
 
+		Valueable<SmartVHPScanType> SmartVHPScan;
+		Valueable<int> SmartVHPScan_Count;
+		Valueable<int> SmartVHPScan_Damage;
+		Valueable<double> SmartVHPScan_Bias;
+		Valueable<double> SmartVHPScan_UnknownFactor;
+		Valueable<double> SmartVHPScan_ExcludeFraction;
+
+		// ---- 中央调度 ----
+		Valueable<double> SmartVHPScan_Overflow;
+		Valueable<double> SmartVHPScan_SwitchThreshold;
+		Valueable<bool> SmartVHPScan_IncludeInflight;
+
 		ExtData(TechnoTypeClass* OwnerObject) : Extension<TechnoTypeClass>(OwnerObject)
 			, AutoHunt { false }
 			, LegalTargetWhenAIOwner { true }
 			, TargetZoneScanType { TargetZoneScanType::Same }
 			, RadarJamRadius { 0 }
 			, InhibitorRange { }
+			, SmartVHPScan { SmartVHPScanType::None }
+			, SmartVHPScan_Count { 1 }
+			, SmartVHPScan_Damage { 0 }
+			, SmartVHPScan_Bias { 2.0 }
+			, SmartVHPScan_UnknownFactor { 1.0 }
+			, SmartVHPScan_ExcludeFraction { 0.0 }
+			, SmartVHPScan_Overflow { 0.25 }
+			, SmartVHPScan_SwitchThreshold { 1.25 }
+			, SmartVHPScan_IncludeInflight { true }
 		{ }
 
 		virtual ~ExtData() = default;

@@ -28,6 +28,10 @@
     <ClCompile Include="src\Ext\Script\Mission.Attack.cpp" />
     <ClCompile Include="src\Ext\Script\Hooks.cpp" />
     <ClCompile Include="src\New\FootPath\FootPathVisualizer.cpp" />
+    <ClCompile Include="src\New\SmartVHPScan\Takeover.cpp" />
+    <ClCompile Include="src\New\SmartVHPScan\Scoring.cpp" />
+    <ClCompile Include="src\New\SmartVHPScan\FireDuty.cpp" />
+    <ClCompile Include="src\New\SmartVHPScan\OrderLedger.cpp" />
     <ClCompile Include="src\Misc\Hooks.FootPathVisualizer.cpp" />
     <ClCompile Include="src\Ext\Script\PatrolService.cpp" />
     <ClCompile Include="src\Ext\TAction\Body.cpp" />
@@ -111,6 +115,9 @@
     <ClInclude Include="src\Ext\Techno\TemporalAOE.h" />
     <ClInclude Include="src\Ext\TEvent\Body.h" />
     <ClInclude Include="src\New\FootPath\FootPathVisualizer.h" />
+    <ClInclude Include="src\New\SmartVHPScan\Scoring.h" />
+    <ClInclude Include="src\New\SmartVHPScan\FireDuty.h" />
+    <ClInclude Include="src\New\SmartVHPScan\OrderLedger.h" />
     <ClInclude Include="src\New\TextBox\Entities\Base\MapTextBoxClass.h" />
     <ClInclude Include="src\New\TextBox\Entities\Derived\TechnoTextBoxClass.h" />
     <ClInclude Include="src\New\TextBox\Entities\Derived\WaypointTextBoxClass.h" />

@@ -1012,6 +1012,48 @@ namespace detail
 	}
 
 	template <>
+	inline bool read<SmartVHPScanType>(SmartVHPScanType& value, INI_EX& parser, const char* pSection, const char* pKey)
+	{
+		if (parser.ReadString(pSection, pKey))
+		{
+			auto parsed = SmartVHPScanType::None;
+
+			if (_strcmpi(parser.value(), "None") == 0
+				|| _strcmpi(parser.value(), "Off") == 0
+				|| _strcmpi(parser.value(), "Disabled") == 0)
+			{
+				parsed = SmartVHPScanType::None;
+			}
+			else if (_strcmpi(parser.value(), "LowHealth") == 0)
+			{
+				parsed = SmartVHPScanType::LowHealth;
+			}
+			else if (_strcmpi(parser.value(), "FullHealth") == 0
+				|| _strcmpi(parser.value(), "Healthy") == 0)
+			{
+				parsed = SmartVHPScanType::FullHealth;
+			}
+			else if (_strcmpi(parser.value(), "Count") == 0
+				|| _strcmpi(parser.value(), "Quantity") == 0
+				|| _strcmpi(parser.value(), "FocusFire") == 0)
+			{
+				parsed = SmartVHPScanType::Count;
+			}
+			else
+			{
+				Debug::INIParseFailed(pSection, pKey, parser.value(),
+					"SmartVHPScan can be either None/Off, Damaged, FullHealth or Count");
+				return false;
+			}
+
+			value = parsed;
+			return true;
+		}
+
+		return false;
+	}
+
+	template <>
 	inline bool read<ChronoSparkleDisplayPosition>(ChronoSparkleDisplayPosition& value, INI_EX& parser, const char* pSection, const char* pKey)
 	{
 		if (parser.ReadString(pSection, pKey))
