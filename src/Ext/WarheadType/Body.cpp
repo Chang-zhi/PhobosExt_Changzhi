@@ -28,7 +28,7 @@ void WarheadTypeExt::ExtData::LoadFromINIFile(CCINIClass* const pINI)
 	this->TemporalAOE_AffectsAllies.Read(exINI, pSection, "TemporalAOE.AffectsAllies");
 
 	// BerserkReduce
-	this->BerserkReduce.Read(exINI, pSection, "c");
+	this->BerserkReduce.Read(exINI, pSection, "BerserkReduce");
 
 }
 

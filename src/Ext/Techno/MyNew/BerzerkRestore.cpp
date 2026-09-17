@@ -1,13 +1,14 @@
 #include "BerzerkRestore.h"
 
 #include <TechnoClass.h>
+#include <FootClass.h>
 #include <Ext/Rules/Body.h>
 #include <Utilities/Debug.h>
 
-#include <map>
+#include <unordered_map>
 
 // 缓存每个单位上一帧的 Berzerk 状态，用于检测状态变化
-static std::map<TechnoClass*, bool> BerzerkStateCache;
+static std::unordered_map<TechnoClass*, bool> BerzerkStateCache;
 
 void BerzerkRestorePointerInvalidate(void* ptr)
 {
@@ -20,6 +21,11 @@ void BerzerkRestorePointerInvalidate(void* ptr)
 		else
 			++it;
 	}
+}
+
+void BerzerkRestoreClearCache()
+{
+	BerzerkStateCache.clear();
 }
 
 // ============================================================
@@ -45,11 +51,18 @@ void BerzerkRestoreCheck(TechnoClass* pThis)
 			Debug::Log("[BerzerkRestore] %s recovered from berserk, clearing target\n",
 				pThis->GetTechnoType()->ID);
 
-			pThis->ForceMission(Mission::Guard);
 			pThis->SetTarget(nullptr);
-			if(auto pFoot = abstract_cast<FootClass*>(pThis))
+			pThis->ArchiveTarget = nullptr;
+			pThis->ForceMission(Mission::Guard);
+			if (auto pFoot = abstract_cast<FootClass*>(pThis))
 			{
 				pFoot->Locomotor->Stop_Moving();
+				pFoot->Destination = nullptr;
+				pFoot->LastDestination = nullptr;
+				pFoot->MegaDestination = nullptr;
+				pFoot->MegaTarget = nullptr;
+				pFoot->ClearNavigationList();
+				pFoot->AbortMotion();
 			}
 		}
 	}

@@ -8,6 +8,8 @@
 #include <Utilities/AresFunctions.h>
 #include <Ext/Techno/MyNew/TemporalAOE.h>
 #include <Ext/Techno/MyNew/BerzerkRestore.h>
+#include <Ext/Techno/MyNew/TemporalExclusive.h>
+#include <TemporalClass.h>
 
 TechnoExt::ExtContainer TechnoExt::ExtMap;
 
@@ -50,34 +52,24 @@ void TechnoExt::ExtData::Serialize(T& Stm)
 		.Process(this->AOEState.SecondaryWeight)
 		.Process(this->AOEState.WeaponDamage)
 		.Process(this->AOEState.ExtraWarpAdded)
-		.Process(this->AOEState.CachedMain)
 		.Process(this->AOEState.CachedMainDead)
 		.Process(this->AOEState.WarpingOut)
 		.Process(this->AOEState.ScanInterval)
 		.Process(this->AOEState.ScanCounter)
-		.Process(this->AOEState.TargetsInRange)
 		;
 
-	// 手动序列化 BuildingsDisabled (std::set → 用临时 vector 中转)
-	if constexpr (std::is_same_v<T, PhobosStreamWriter>)
+	// 读档时：完全重置 AOEState（存档中的标记位不可信，下次更新自动重建）
+	if constexpr (std::is_same_v<T, PhobosStreamReader>)
 	{
-		std::vector<TechnoClass*> bldVec(
-			this->AOEState.BuildingsDisabled.begin(),
-			this->AOEState.BuildingsDisabled.end());
-		Stm.Process(bldVec);
-	}
-	else
-	{
-		std::vector<TechnoClass*> bldVec;
-		Stm.Process(bldVec);
+		// 全部重置为默认值，消除状态不一致风险
+		this->AOEState.Active = false;
+		this->AOEState.CachedMain = nullptr;
+		this->AOEState.TargetsInRange.clear();
 		this->AOEState.BuildingsDisabled.clear();
-		this->AOEState.BuildingsDisabled.insert(bldVec.begin(), bldVec.end());
-
-		// 读档后重建 TemporalAOECachedMainOwners 全局映射（防止其他 CLEG 抢夺目标）
-		if (this->AOEState.CachedMain && this->OwnerObject())
-		{
-			TemporalAOECachedMainOwners[this->AOEState.CachedMain] = this->OwnerObject();
-		}
+		this->AOEState.CachedMainDead = false;
+		this->AOEState.WarpingOut = false;
+		this->AOEState.ExtraWarpAdded = 0;
+		this->AOEState.ScanCounter = 0;
 	}
 }
 
@@ -94,37 +86,25 @@ void TechnoExt::ExtData::InvalidatePointer(void* ptr, bool bRemoved)
 			(DWORD)ptr);
 	}
 
-	// 副目标列表（遍历删除，不用 static_cast）
+	// 副目标列表（由 InvalidateAOESecondaryClaims 统一处理指针失效）
 	for (auto it = state.TargetsInRange.begin(); it != state.TargetsInRange.end(); )
 	{
 		if (*it == ptr)
-		{
-			if (*it) (*it)->BeingWarpedOut = false;
 			it = state.TargetsInRange.erase(it);
-		}
 		else
-		{
 			++it;
-		}
 	}
 
-	// 建筑禁用列表（遍历删除，避免对非 TechnoClass 指针做 static_cast）
+	// 建筑禁用列表（遍历删除）
 	for (auto it = state.BuildingsDisabled.begin(); it != state.BuildingsDisabled.end(); )
 	{
 		if (*it == ptr)
-		{
-			if (auto pBld = abstract_cast<BuildingClass*>(*it))
-			{
-				if (pBld->Health > 0 && !pBld->InLimbo)
-					pBld->EnableTemporal();
-			}
 			it = state.BuildingsDisabled.erase(it);
-		}
 		else
-		{
 			++it;
-		}
 	}
+
+	// 假 Temporal 条目的清理由 InvalidateAOESecondaryClaims 统一处理（见 TemporalAOE.cpp）
 }
 
 void TechnoExt::ExtData::LoadFromStream(PhobosStreamReader& Stm)
@@ -141,6 +121,19 @@ void TechnoExt::ExtData::SaveToStream(PhobosStreamWriter& Stm)
 
 bool TechnoExt::LoadGlobals(PhobosStreamReader& Stm)
 {
+	// ⚠ 此时引擎指针修复尚未完成，不能访问任何游戏对象指针
+
+	// 清理全局 maps（旧会话的指针在新会话中无效）
+	FakeTemporals.clear();
+	TemporalAOESecondaryClaims.clear();
+	TemporalAOEWarpingOutTargets.clear();
+	TemporalAOECachedMainOwners.clear();
+	TemporalExclusiveTargetsMap.clear();
+	BerzerkRestoreClearCache();
+
+	// 标记：指针修复完成后在第一帧执行深度清理
+	s_PostLoadCleanupNeeded = true;
+
 	return Stm
 		.Success();
 }
@@ -177,6 +170,14 @@ DEFINE_HOOK(0x6F4500, TechnoClass_DTOR, 0x5)
 
 	InvalidateAOESecondaryClaims(pItem);
 	BerzerkRestorePointerInvalidate(pItem);
+	// 清理 TemporalAOECachedMainOwners 中指向已销毁对象的条目
+	for (auto it = TemporalAOECachedMainOwners.begin(); it != TemporalAOECachedMainOwners.end(); )
+	{
+		if (it->first == pItem || it->second == pItem)
+			it = TemporalAOECachedMainOwners.erase(it);
+		else
+			++it;
+	}
 	TechnoExt::ExtMap.Remove(pItem);
 
 	return 0;

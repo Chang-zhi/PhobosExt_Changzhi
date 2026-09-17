@@ -10,7 +10,7 @@
 #include <map>
 
 // 定义独占映射
-std::map<TechnoClass*, TechnoClass*> TemporalExclusiveTargetsMap;
+std::unordered_map<TechnoClass*, TechnoClass*> TemporalExclusiveTargetsMap;
 
 // Check if a unit has an exclusive temporal weapon
 bool IsCurrentUseExclusiveTemporalWeapon(TechnoClass* pTechno)
@@ -190,7 +190,7 @@ void UpdateTemporalExclusive()
 
 	if (count <= 1) return;
 
-	std::map<TechnoClass*, TemporalClass*> lockedTargets;
+	std::unordered_map<TechnoClass*, TemporalClass*> lockedTargets;
 	std::vector<TemporalClass*> toRelease;
 
 	for (int i = 0; i < count; ++i)

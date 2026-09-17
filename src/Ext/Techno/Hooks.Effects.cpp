@@ -44,20 +44,27 @@ DEFINE_HOOK(0x701900, TechnoClass_ReceiveDamage_Effects, 0x6)
             }
             else
             {
-                // 减到0以下 → 立即清除混乱
+                // 减到0以下 -> 立即清除混乱
                 Debug::Log("[BerserkReduce] %s berserk cleared!\n",
                     pThis->GetTechnoType()->ID);
 
                 pThis->Berzerk = false;
                 pThis->BerzerkDurationLeft = 0;
 
-                // 停止移动、切到警戒、清除目标，防止乱跑
+                // 清除所有目标点、停止移动、切到警戒，防止乱跑
+                pThis->SetTarget(nullptr);
+                pThis->ArchiveTarget = nullptr;
+                pThis->ForceMission(Mission::Guard);
                 if (auto pFoot = abstract_cast<FootClass*>(pThis))
                 {
                     pFoot->Locomotor->Stop_Moving();
+                    pFoot->Destination = nullptr;
+                    pFoot->LastDestination = nullptr;
+                    pFoot->MegaDestination = nullptr;
+                    pFoot->MegaTarget = nullptr;
+                    pFoot->ClearNavigationList();
+                    pFoot->AbortMotion();
                 }
-                pThis->ForceMission(Mission::Guard);
-                pThis->SetTarget(nullptr);
             }
         }
     }

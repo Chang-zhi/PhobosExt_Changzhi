@@ -7,3 +7,6 @@ void BerzerkRestoreCheck(TechnoClass* pThis);
 
 // 当某个 TechnoClass 指针失效时清理缓存（在 TechnoClass_DTOR 中调用）
 void BerzerkRestorePointerInvalidate(void* ptr);
+
+// 读档时清空状态缓存（指针已失效）
+void BerzerkRestoreClearCache();
