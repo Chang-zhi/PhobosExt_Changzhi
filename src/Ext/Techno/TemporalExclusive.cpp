@@ -1,6 +1,7 @@
 #include "TemporalExclusive.h"
 #include "TemporalAOE.h"
 #include <TechnoClass.h>
+#include <Fundamentals.h>
 
 #include <Ext/Techno/body.h>
 #include <Ext/WarheadType/body.h>
@@ -81,103 +82,75 @@ void CleanupInvalidTemporalLocks()
 // 处理互斥超时空武器的目标独占逻辑
 void HandleTemporalExclusiveTargeting(TechnoClass* pThis)
 {
-    // 1. 首先清理所有无效的锁（防止僵尸占用）
-    CleanupInvalidTemporalLocks();
-	// 更新新互斥超时空武器的独占逻辑
-	UpdateTemporalExclusive();
+
+	TechnoClass* pCurrentTarget = abstract_cast<TechnoClass*>(pThis->Target);
+	if (!pCurrentTarget)
+		return;
+
+	// 当前武器只解析一次，AOE 拦截与独占仲裁共用（原本会解析两次）
+	WeaponTypeClass* pWeapon = TechnoExt::GetCurrentWeapon(pThis);
+	if (!pWeapon || !pWeapon->Warhead || !pWeapon->Warhead->Temporal)
+		return;
 
 	// AOE 主/副目标拦截：所有超时空武器都不能选择已被其他 AOE 锁定的目标
 	{
-		TechnoClass* pTarget = abstract_cast<TechnoClass*>(pThis->Target);
-		if (pTarget)
+		// 检查是否是其他 AOE 的副目标
+		auto claimIt = TemporalAOE::SecondaryClaims.find(pCurrentTarget);
+		if (claimIt != TemporalAOE::SecondaryClaims.end() && claimIt->second != pThis)
 		{
-			WeaponTypeClass* pWeapon = TechnoExt::GetCurrentWeapon(pThis);
-			if (pWeapon && pWeapon->Warhead && pWeapon->Warhead->Temporal)
-			{
-				// 检查是否是其他 AOE 的副目标
-				auto claimIt = TemporalAOE::SecondaryClaims.find(pTarget);
-				if (claimIt != TemporalAOE::SecondaryClaims.end() && claimIt->second != pThis)
-				{
-					Debug::Log("[TemporalAOE] %s forced to abandon AOE secondary target %s\n",
-						pThis->GetTechnoType()->ID, pTarget->GetTechnoType()->ID);
-					pThis->SetTarget(nullptr);
-					return;
-				}
+			Debug::Log("[TemporalAOE] %s forced to abandon AOE secondary target %s\n",
+				pThis->GetTechnoType()->ID, pCurrentTarget->GetTechnoType()->ID);
+			pThis->SetTarget(nullptr);
+			return;
+		}
 
-				// 检查是否是其他 AOE 的主目标（其他 CLEG 正在攻击的目标）
-				auto mainIt = TemporalAOE::CachedMainOwners.find(pTarget);
-				if (mainIt != TemporalAOE::CachedMainOwners.end() && mainIt->second != pThis)
-				{
-					Debug::Log("[TemporalAOE] %s forced to abandon AOE main target %s\n",
-						pThis->GetTechnoType()->ID, pTarget->GetTechnoType()->ID);
-					pThis->SetTarget(nullptr);
-					return;
-				}
-			}
+		// 检查是否是其他 AOE 的主目标（其他 CLEG 正在攻击的目标）
+		auto mainIt = TemporalAOE::CachedMainOwners.find(pCurrentTarget);
+		if (mainIt != TemporalAOE::CachedMainOwners.end() && mainIt->second != pThis)
+		{
+			Debug::Log("[TemporalAOE] %s forced to abandon AOE main target %s\n",
+				pThis->GetTechnoType()->ID, pCurrentTarget->GetTechnoType()->ID);
+			pThis->SetTarget(nullptr);
+			return;
 		}
 	}
 
-	// 2. 如果当前单位没有独占武器，直接返回
-	if (!IsCurrentUseExclusiveTemporalWeapon(pThis))
+	// 非互斥超时空不参与独占仲裁
+	auto const pWHExt = WarheadTypeExt::ExtMap.Find(pWeapon->Warhead);
+	if (!pWHExt || !pWHExt->Temporal_Exclusive)
+		return;
+
+	auto it = TemporalExclusiveTargetsMap.find(pCurrentTarget);
+
+	// 目标未被任何人占用 -> 声明占用
+	if (it == TemporalExclusiveTargetsMap.end())
 	{
+		TemporalExclusiveTargetsMap[pCurrentTarget] = pThis;
 		return;
 	}
 
-	TechnoClass* pCurrentTarget = abstract_cast<TechnoClass*>(pThis->Target);
+	TechnoClass* pOccupier = it->second;
 
-    // 情况 1: 当前单位没有目标
-    if (!pCurrentTarget)
-    {
-        // 清理映射中所有由该单位占用的记录（以防万一 Cleanup 没扫到）
-        for (auto it = TemporalExclusiveTargetsMap.begin(); it != TemporalExclusiveTargetsMap.end(); )
-        {
-            if (it->second == pThis)
-            {
-                it = TemporalExclusiveTargetsMap.erase(it);
-            }
-            else
-            {
-                ++it;
-            }
-        }
-        return;
-    }
+	// 占用者是我自己 -> 保持现状，无需操作
+	if (pOccupier == pThis)
+		return;
 
-    // 情况 2: 当前单位有目标
-    auto it = TemporalExclusiveTargetsMap.find(pCurrentTarget);
-
-    // 子情况 A: 目标未被任何人占用 -> 声明占用
-    if (it == TemporalExclusiveTargetsMap.end())
-    {
-        TemporalExclusiveTargetsMap[pCurrentTarget] = pThis;
-    }
-    // 子情况 B: 目标已被占用
-    else
-    {
-        TechnoClass* pOccupier = it->second;
-
-        // 如果占用者不是我自己 -> 强制放弃目标以解决冲突
-        if (pOccupier != pThis)
-        {
-            // 双重检查：确保占用者真的还在攻击这个目标（防止竞态条件）
-            if (abstract_cast<TechnoClass*>(pOccupier->Target) == pCurrentTarget &&
-                IsCurrentUseExclusiveTemporalWeapon(pOccupier))
-            {
-                // 确实发生冲突，强制当前单位放弃
-                Debug::Log("[TemporalExclusive] CONFLICT: %s forced to abandon %s (locked by %s)\n",
-                    pThis->GetTechnoType()->ID, pCurrentTarget->GetTechnoType()->ID,
-                    pOccupier->GetTechnoType()->ID);
-                pThis->SetTarget(nullptr);
-            }
-            else
-            {
-                // 占用者其实已经无效了（虽然 Cleanup 跑过了，但可能刚好在这一帧变化）
-                // 我们抢占这个目标
-                TemporalExclusiveTargetsMap[pCurrentTarget] = pThis;
-            }
-        }
-        // 如果占用者是我自己 -> 保持现状，无需操作
-    }
+	// 双重检查：确保占用者真的还在攻击这个目标（防止竞态条件）
+	if (abstract_cast<TechnoClass*>(pOccupier->Target) == pCurrentTarget &&
+		IsCurrentUseExclusiveTemporalWeapon(pOccupier))
+	{
+		// 确实发生冲突，强制当前单位放弃
+		Debug::Log("[TemporalExclusive] CONFLICT: %s forced to abandon %s (locked by %s)\n",
+			pThis->GetTechnoType()->ID, pCurrentTarget->GetTechnoType()->ID,
+			pOccupier->GetTechnoType()->ID);
+		pThis->SetTarget(nullptr);
+	}
+	else
+	{
+		// 占用者其实已经无效了（虽然 Cleanup 跑过了，但可能刚好在这一帧变化）
+		// 我们抢占这个目标
+		TemporalExclusiveTargetsMap[pCurrentTarget] = pThis;
+	}
 }
 
 // 更新新互斥超时空武器的独占逻辑
@@ -198,13 +171,14 @@ void UpdateTemporalExclusive()
 
 		if (!pCurrent || !pCurrent->Target) continue;
 
-		TechnoClass* pTarget = pCurrent->Target;
-
-		// 2. 如果当前单位没有独占武器，直接返回
+		// 非互斥超时空（原版 CLEG、超武 Temporal 等）不参与仲裁，
+		// 必须 continue 跳过，不能 return —— 否则任意一个都会让整轮去重失效
 		if (!IsCurrentUseExclusiveTemporalWeapon(pCurrent->Owner))
 		{
-			return;
+			continue;
 		}
+
+		TechnoClass* pTarget = pCurrent->Target;
 
 		auto it = lockedTargets.find(pTarget);
 		if (it == lockedTargets.end())
@@ -217,15 +191,18 @@ void UpdateTemporalExclusive()
 		}
 	}
 
-	// Release the conflicting instances
 	for (auto pInst : toRelease)
 	{
-		if (pInst)
-		{
-			Debug::Log("[TemporalExclusive] Releasing duplicate temporal: %s -> %s\n",
-				pInst->Owner->GetTechnoType()->ID,
-				pInst->Target->GetTechnoType()->ID);
-			pInst->JustLetGo();
-		}
+		if (!pInst || !pInst->Target)
+			continue;
+
+		if (pInst->Target->TemporalTargetingMe == pInst && pInst->NextTemporal)
+			pInst->Target->TemporalTargetingMe = pInst->NextTemporal;
+
+		Debug::Log("[TemporalExclusive] Releasing duplicate temporal: %s -> %s\n",
+			pInst->Owner ? pInst->Owner->GetTechnoType()->ID : "<none>",
+			pInst->Target->GetTechnoType()->ID);
+
+		pInst->LetGo();
 	}
 }

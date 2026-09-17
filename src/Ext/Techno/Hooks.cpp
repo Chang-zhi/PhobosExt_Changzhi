@@ -24,6 +24,17 @@ DEFINE_HOOK(0x6F9E50, TechnoClass_AI, 0x5)
 	// Berzerk restore check
 	BerzerkRestoreCheck(pThis);
 
+	// Temporal exclusive 的全局维护：每帧只跑一次
+	{
+		static int lastTemporalFrame = 0;
+		if (Unsorted::CurrentFrame != lastTemporalFrame)
+		{
+			lastTemporalFrame = Unsorted::CurrentFrame;
+			CleanupInvalidTemporalLocks();
+			UpdateTemporalExclusive();
+		}
+	}
+
 	// Temporal exclusive
 	HandleLegalTargetAITargeting(pThis);
 	HandleTemporalExclusiveTargeting(pThis);

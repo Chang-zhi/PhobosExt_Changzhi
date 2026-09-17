@@ -134,6 +134,10 @@ bool TechnoExt::LoadGlobals(PhobosStreamReader& Stm)
 
 	// 清理全局 maps（旧会话的指针在新会话中无效）
 	TemporalAOE::FakeTemporals.clear();
+	// 必须与 FakeTemporals 成对清理：FakeTemporals 是正向表，SecondariesByAttacker
+	// 是其反向索引，二者必须时刻一致。否则残留的陈旧索引会让 DestroyFakeTemporalsByAttacker
+	// 和每帧心跳拿到上一会话的野指针去查表。
+	TemporalAOE::SecondariesByAttacker.clear();
 	TemporalAOE::SecondaryClaims.clear();
 	TemporalAOE::WarpingOutTargets.clear();
 	TemporalAOE::CachedMainOwners.clear();

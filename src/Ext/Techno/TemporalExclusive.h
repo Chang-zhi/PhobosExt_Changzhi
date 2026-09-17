@@ -15,6 +15,7 @@ void CleanupInvalidTemporalLocks();
 
 // 处理互斥超时空武器的目标独占逻辑
 // 确保同一时间仅有一个目标被TemporalExclusive实例占用, 属于修改了选敌逻辑, 可能影响攻击逻辑
+// 每单位每帧调用；CleanupInvalidTemporalLocks() 与 UpdateTemporalExclusive() 需由调用方每帧单独跑一次
 void HandleTemporalExclusiveTargeting(TechnoClass* pThis);
 
 // 更新新互斥超时空武器的独占逻辑
