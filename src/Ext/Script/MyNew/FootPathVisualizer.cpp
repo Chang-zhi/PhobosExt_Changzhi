@@ -129,7 +129,11 @@ CellStruct FootPathVisualizer::ApplyFacing(CellStruct current, int facing)
 
 void FootPathVisualizer::CellToScreen(CellStruct cell, Point2D& outScreen)
 {
-	auto world = CellClass::Cell2Coord(cell);
+	CoordStruct world = CellClass::Cell2Coord(cell);
+
+	if (auto pCell = MapClass::Instance.TryGetCellAt(cell))
+		world = pCell->GetCellCoords();
+
 	CoordToScreen(world, outScreen);
 }
 
@@ -148,7 +152,7 @@ void FootPathVisualizer::GetHouseColor(FootClass* pFoot, int& outR, int& outG, i
 
 	int rawIdx = pFoot->Owner->ColorSchemeIndex;
 
-	// 统一处理玩家颜色索引�?-8）到实际颜色方案索引的映�?
+	// 统一处理玩家颜色索引（0-8）到实际颜色方案索引的映射
 	if (rawIdx >= 0 && rawIdx < 9)
 		rawIdx = ColorScheme::PlayerColorToColorSchemeLUT[rawIdx];
 
@@ -236,7 +240,7 @@ void FootPathVisualizer::DrawPathForUnit(FootClass* pFoot, const FootPathConfig&
 	if (it == FullPathCache.end() || it->second.directions.empty())
 		return;
 
-	// 单位没有移动目标且不在移动类任务中时跳过绘制（手动停止后路径消失�?
+	// 单位没有移动目标且不在移动类任务中时跳过绘制（手动停止后路径消失）
 	if (!pFoot->Destination
 		&& pFoot->CurrentMission != Mission::Move
 		&& pFoot->CurrentMission != Mission::QMove
@@ -250,7 +254,7 @@ void FootPathVisualizer::DrawPathForUnit(FootClass* pFoot, const FootPathConfig&
 
 	const auto& dirs = it->second.directions;
 
-	// Step 1: 构建完整的路径格子序列（�?startCell 到终点）
+	// Step 1: 构建完整的路径格子序列（从 startCell 到终点）
 	std::vector<CellStruct> allCells;
 	allCells.reserve(dirs.size() + 1);
 	allCells.push_back(it->second.startCell);
@@ -278,7 +282,7 @@ void FootPathVisualizer::DrawPathForUnit(FootClass* pFoot, const FootPathConfig&
 			}
 		}
 
-		// 无精确匹配时找最近邻格（单位实际路径可能与缓存路径有偏差�?
+		// 无精确匹配时找最近邻格（单位实际路径可能与缓存路径有偏差）
 		if (!exactMatch)
 		{
 			size_t bestIdx = 0;
@@ -296,7 +300,7 @@ void FootPathVisualizer::DrawPathForUnit(FootClass* pFoot, const FootPathConfig&
 			}
 			consumed = bestIdx;
 
-			// 如果最近邻是终点，回退一格确保有后继�?
+			// 如果最近邻是终点，回退一格确保有后继
 			if (consumed + 1 >= allCells.size() && allCells.size() >= 2)
 				consumed = allCells.size() - 2;
 		}
@@ -305,7 +309,7 @@ void FootPathVisualizer::DrawPathForUnit(FootClass* pFoot, const FootPathConfig&
 	if (consumed + 1 >= allCells.size())
 		return;
 
-	// 计算单位�?consumed→consumed+1 段上的进�?
+	// 计算单位在 consumed→consumed+1 段上的进度
 	{
 		CoordStruct fromCenter = CellClass::Cell2Coord(allCells[consumed]);
 		CoordStruct toCenter = CellClass::Cell2Coord(allCells[consumed + 1]);
@@ -325,7 +329,7 @@ void FootPathVisualizer::DrawPathForUnit(FootClass* pFoot, const FootPathConfig&
 		}
 	}
 
-	// Step 3: 在屏幕上找到绘制起点 = 单位�?consumed→consumed+1 段上的投�?
+	// Step 3: 在屏幕上找到绘制起点 = 单位在 consumed→consumed+1 段上的投影
 	Point2D fromScr, toScr;
 	CellToScreen(allCells[consumed], fromScr);
 	CellToScreen(allCells[consumed + 1], toScr);
@@ -394,7 +398,7 @@ void FootPathVisualizer::DrawPathForUnit(FootClass* pFoot, const FootPathConfig&
 		Point2D fwdScreen {};
 		bool hasFwd = false;
 
-		// 尝试用最后一个方向延�?
+		// 尝试用最后一个方向延伸
 		if (dirs.size() > 0)
 		{
 			int lastFacing = dirs.back();
@@ -606,7 +610,7 @@ void FootPathVisualizer::DrawAll()
 
 	ResolvePostLoad();
 
-	// 在遍历绘制的同时清理已死亡的单位，避免额外遍�?
+	// 在遍历绘制的同时清理已死亡的单位，避免额外遍历
 	for (auto it = Registry.begin(); it != Registry.end(); )
 	{
 		FootClass* pFoot = it->first;
