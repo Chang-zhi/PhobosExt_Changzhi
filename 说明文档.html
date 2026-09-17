@@ -38,7 +38,7 @@
 <h2 class="doc-heading--secondary">已知问题</h2>
 <p>1. 当单位当前正在使用带有 <code class="doc-code--inline">Temporal=yes</code> 和 <code class="doc-code--inline">Temporal.Exclusive=yes</code> 弹头的武器时, 会强制改变单位的索敌逻辑, 可能会产生bug。</p>
 <p>2. 当科技类型的 <code class="doc-code--inline">LegalTargetWhenAIOwner=no</code> 且不由人类玩家控制时, 会强制改变其他单位的索敌逻辑, 可能会产生bug。</p>
-<p>3. 基地节点跨所属方判定：开启后不要让 AI 造围墙，与触发动作 30 不兼容。详见<a href="javascript:switchPage('gameplay');setTimeout(function(){scrollToFeature('gameplay_12')},100)" class="doc-link">对应章节</a>。</p>
+<p>3. 基地节点跨所属方判定：开启后不要让 AI 造围墙，与触发动作 30 不兼容。详见<a href="javascript:switchPage('gameplay');setTimeout(function(){scrollToFeature('gameplay_4')},100)" class="doc-link">对应章节</a>。</p>
 <p>4. 当单位当前正在使用带有 <code class="doc-code--inline">Temporal=yes</code> 弹头的武器反复攻击同一个目标时, 可能会出现中间的目标没有进入冻结状态但其他目标进入的情况(不过时间到了仍会被一同抹除)。</p>
 <br>
 <p><strong>如果遇到bug或兼容性问题可以我发私信, 我会尽量解决。</strong></p>
@@ -79,10 +79,12 @@
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_2')" class="sec-toc__link">2. 动态标签绑定功能</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_3')" class="sec-toc__link">3. 金钱操作功能</a></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_4')" class="sec-toc__link">4. 基地节点操作功能</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_6')" class="sec-toc__link">5. 单位可招募属性设置</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_7')" class="sec-toc__link">6. 更新建筑动画功能</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_11')" class="sec-toc__link">7. 作战小队操作</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_12')" class="sec-toc__link">8. 脚本操作</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_5')" class="sec-toc__link">5. 单位可招募属性设置</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_6')" class="sec-toc__link">6. 更新建筑动画功能</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_7')" class="sec-toc__link">7. 作战小队操作</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_8')" class="sec-toc__link">8. 脚本操作</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_9')" class="sec-toc__link">9. 特遣部队操作</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_10')" class="sec-toc__link">10. 解除部署</a></li>
 </ul>
 </div>
 
@@ -240,7 +242,7 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本
 
 <hr class="sec-divider--double">
 
-<div id="actions_6">
+<div id="actions_5">
 <h3 class="doc-heading--tertiary" style="margin-top:2em">5. 单位可招募属性设置</h3>
 <p><strong>触发动作说明：</strong></p>
 <ul class="doc-list--content">
@@ -251,7 +253,7 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本
 
 <hr class="sec-divider--double">
 
-<div id="actions_7">
+<div id="actions_6">
 <h3 class="doc-heading--tertiary" style="margin-top:2em">6. AI 更新建筑动画功能</h3>
 <p>更新建筑的动画，用于处理建筑改变所属后动画会停止播放的问题。</p>
 <p>(但遥控坦克的状态仍然不会更新)</p>
@@ -265,12 +267,13 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本
 
 <hr class="sec-divider--double">
 
-<div id="actions_11">
+<div id="actions_7">
 <h3 class="doc-heading--tertiary" style="margin-top:2em">7. 作战小队操作</h3>
 <p><strong>触发动作说明：</strong></p>
 <ul class="doc-list--content">
 <li><code class="doc-code--inline">577</code> – 建立作战小队(考虑限制)... (参数：小队索引，上限限制开关，区域检查开关，连通模式)</li>
-<li><code class="doc-code--inline">578</code> – 将路径点范围内指定所属方的可招募单位加入已存在的作战小队... (参数：小队索引，路径点，范围，所属方国家索引)</li>
+<li><code class="doc-code--inline">578</code> – 将路径点范围内可招募单位加入已存在的作战小队... (参数：小队索引，路径点，范围，仅招募可招募单位)</li>
+<li><code class="doc-code--inline">678</code> – 将指定分组的单位加入小队... (参数：分组号(0-9,-1=不限)，所属方国家索引，小队索引)</li>
 </ul>
 <br>
 <p><strong>动作 577 (建立作战小队)：</strong></p>
@@ -286,15 +289,24 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本
 <br>
 <p><strong>动作 578 (招募单位到已有小队)：</strong></p>
 <ul class="doc-list--content">
-<li>将指定路径点指定范围内、指定所属方的所有可招募地面单位(FootClass)加入一个已存在的作战小队实例。</li>
+<li>将指定路径点指定范围内的所有可招募地面单位(FootClass)加入一个已存在的作战小队实例。</li>
 <li>如果没有该类型的已有实例，则无动作。</li>
-<li>只会招募满足以下条件的单位：属于指定所属方、未加入其他小队、可被招募(<code class="doc-code--inline">CanBeRecruited</code>)、在路径点指定范围内。</li>
+<li>只会招募满足以下条件的单位：属于该小队所属方、未加入其他小队、在路径点指定范围内。</li>
+<li><strong>仅招募可招募单位(参数4)：</strong><code class="doc-code--inline">0</code>=不检查可招募属性，<code class="doc-code--inline">1</code>=仅招募 <code class="doc-code--inline">CanBeRecruited</code> 返回 <code class="doc-code--inline">true</code> 的单位。</li>
+</ul>
+<br>
+<p><strong>动作 678 (将指定分组的单位加入小队)：</strong></p>
+<ul class="doc-list--content">
+<li>将指定分组(Group)和所属方(House)的所有地面单位(FootClass)加入一个已存在的作战小队实例。</li>
+<li>如果没有该类型的已有实例，则无动作。</li>
+<li>分组号为 <code class="doc-code--inline">-1</code> 时不限制分组（即招募该所属方的所有可用单位）。</li>
+<li>只会招募满足以下条件的单位：属于指定所属方、未加入其他小队、分组号匹配。</li>
 </ul>
 </div>
 
 <hr class="sec-divider--double">
 
-<div id="actions_12">
+<div id="actions_8">
 <h3 class="doc-heading--tertiary" style="margin-top:2em">8. 脚本操作</h3>
 
 <div class="doc-table--action">
@@ -311,6 +323,7 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本
 <tr><td class="doc-table__td">657</td><td class="doc-table__td">恢复所有小队脚本索引...</td><td class="doc-table__td">无参数</td></tr>
 <tr><td class="doc-table__td">658</td><td class="doc-table__td">恢复脚本内容...</td><td class="doc-table__td">脚本类型</td></tr>
 <tr><td class="doc-table__td">659</td><td class="doc-table__td">恢复所有脚本内容...</td><td class="doc-table__td">无参数</td></tr>
+<tr><td class="doc-table__td">660</td><td class="doc-table__td">将小队脚本执行行号跳转至...</td><td class="doc-table__td">作战小队类型，目标行号(0-based)</td></tr>
 </tbody>
 </table>
 </div>
@@ -320,8 +333,52 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本
 <li>动作 650-654 在游戏运行时动态修改脚本类型(ScriptType)的动作内容（即该脚本的各行具体指令）。</li>
 <li>动作 655-657 改变作战小队类型(TeamType)引用的脚本类型（即该小队执行的脚本是哪个），不对脚本内容本身做任何修改。</li>
 <li>动作 658-659 将之前通过 650-654 修改过的脚本内容恢复到 INI 定义的原始状态，不影响小队绑定索引。</li>
+<li>动作 660 将指定作战小队类型的所有实例的脚本执行行号跳转到指定位置(0-based)，不会修改脚本内容或小队绑定。</li>
 <li>以上所有动作执行后，使用该脚本的作战小队会立即重置到第 0 行执行。</li>
 <li><strong>注意：动作 653、654 暂不可用</strong>，需等待 Phobos PR#2256 通过，且必须与 Phobos 配合使用。</li>
+</ul>
+</div>
+
+<hr class="sec-divider--double">
+
+<div id="actions_9">
+<h3 class="doc-heading--tertiary" style="margin-top:2em">9. 特遣部队操作</h3>
+
+<div class="doc-table--action">
+<table class="doc-table">
+<thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
+<tbody>
+<tr><td class="doc-table__td">670</td><td class="doc-table__td">清空特遣部队内容...</td><td class="doc-table__td">特遣部队</td></tr>
+<tr><td class="doc-table__td">671</td><td class="doc-table__td">复制特遣部队内容...</td><td class="doc-table__td">源特遣部队，目标特遣部队</td></tr>
+<tr><td class="doc-table__td">672</td><td class="doc-table__td">修改特遣部队条目...</td><td class="doc-table__td">科技类型，特遣部队，条目索引(0-5)，数量</td></tr>
+<tr><td class="doc-table__td">673</td><td class="doc-table__td">重新指定小队特遣部队...</td><td class="doc-table__td">作战小队类型，目标特遣部队</td></tr>
+<tr><td class="doc-table__td">674</td><td class="doc-table__td">恢复特遣部队内容...</td><td class="doc-table__td">特遣部队</td></tr>
+<tr><td class="doc-table__td">675</td><td class="doc-table__td">恢复所有特遣部队内容...</td><td class="doc-table__td">无参数</td></tr>
+<tr><td class="doc-table__td">676</td><td class="doc-table__td">恢复小队特遣部队索引...</td><td class="doc-table__td">作战小队类型</td></tr>
+<tr><td class="doc-table__td">677</td><td class="doc-table__td">恢复所有小队特遣部队索引...</td><td class="doc-table__td">无参数</td></tr>
+</tbody>
+</table>
+</div>
+
+<p class="doc-paragraph--only-vertical"><strong>说明：</strong></p>
+<ul class="doc-list--content">
+<li><strong>内容</strong>指特遣部队的编制条目；<strong>索引</strong>指作战小队类型绑定了哪个特遣部队。</li>
+<li>所有动作执行后自动刷新活跃小队（重新统计成员、释放超额、更新满编/缺编状态）。</li>
+</ul>
+</div>
+
+<hr class="sec-divider--double">
+
+<div id="actions_10">
+<h3 class="doc-heading--tertiary" style="margin-top:2em">10. 解除部署</h3>
+<p><strong>触发动作说明：</strong></p>
+<ul class="doc-list--content">
+<li><code class="doc-code--inline">679</code> – 解除所属方单位部署... (参数：所属方国家索引)</li>
+</ul>
+<p class="doc-paragraph--only-vertical"><strong>说明：</strong></p>
+<ul class="doc-list--content">
+<li><strong>原理:</strong> 设置任务为 <code class="doc-code--inline">Unload</code>。</li>
+<li>仅作用于参数指定的所属方，不影响其他国家的单位。</li>
 </ul>
 </div>
 
@@ -336,14 +393,14 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本
 <div class="sec-toc">
 <p class="sec-toc__title">目录：</p>
 <ul class="sec-toc__list">
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('events_5')" class="sec-toc__link">1. 科技类型坐标检测</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('events_13')" class="sec-toc__link">2. 流逝时间检测</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('events_1')" class="sec-toc__link">1. 科技类型坐标检测</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('events_2')" class="sec-toc__link">2. 流逝时间检测</a></li>
 </ul>
 </div>
 
 <hr class="sec-divider">
 
-<div id="events_5">
+<div id="events_1">
 <h3 class="doc-heading--tertiary" style="margin-top:2em">1. 科技类型坐标检测</h3>
 <p>在指定路径点上或附近距离，检测是否存在触发所属方的科技类型。</p>
 <p><strong>触发事件说明：</strong></p>
@@ -358,7 +415,7 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本
 
 <hr class="sec-divider--double">
 
-<div id="events_13">
+<div id="events_2">
 <h3 class="doc-heading--tertiary" style="margin-top:2em">2. 流逝时间检测</h3>
 <p>从触发器激活时开始计时，当流逝帧数达到指定值时触发。</p>
 <p><strong>触发事件说明：</strong></p>
@@ -378,17 +435,17 @@ ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本
 <div class="sec-toc">
 <p class="sec-toc__title">目录：</p>
 <ul class="sec-toc__list">
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_8')" class="sec-toc__link">1. 超时空武器扩展</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_9')" class="sec-toc__link">2. 自动游猎</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_10')" class="sec-toc__link">3. AI 所属单位目标判定</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_12')" class="sec-toc__link">4. 基地节点跨所属方判定</a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_14')" class="sec-toc__link">5. 混乱机制</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_1')" class="sec-toc__link">1. 超时空武器扩展</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_2')" class="sec-toc__link">2. 自动游猎</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_3')" class="sec-toc__link">3. AI 所属单位目标判定</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_4')" class="sec-toc__link">4. 基地节点跨所属方判定</a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_5')" class="sec-toc__link">5. 混乱机制</a></li>
 </ul>
 </div>
 
 <hr class="sec-divider">
 
-<div id="gameplay_8">
+<div id="gameplay_1">
 <h3 class="doc-heading--tertiary" style="margin-top:2em">1. 超时空武器扩展</h3>
 <p>为 <code class="doc-code--inline">Temporal=yes</code> 的弹头增加互斥锁定和范围冻结（AOE）机制。</p>
 <pre class="doc-code--block"><code>[WarheadType]
@@ -418,7 +475,7 @@ TemporalAOE.AffectsAllies=                 ; boolean，默认 false — 是否�
 
 <hr class="sec-divider--double">
 
-<div id="gameplay_9">
+<div id="gameplay_2">
 <h3 class="doc-heading--tertiary" style="margin-top:2em">2. 自动游猎</h3>
 <pre class="doc-code--block"><code>[TechnoType]
 AutoHunt=                       ; boolean，默认 false</code></pre>
@@ -437,7 +494,7 @@ AutoHunt=                       ; boolean，默认 false</code></pre>
 
 <hr class="sec-divider--double">
 
-<div id="gameplay_10">
+<div id="gameplay_3">
 <h3 class="doc-heading--tertiary" style="margin-top:2em">3. AI 所属单位目标判定</h3>
 <pre class="doc-code--block"><code>[TechnoType]
 LegalTargetWhenAIOwner=             ; boolean，默认 true</code></pre>
@@ -445,7 +502,7 @@ LegalTargetWhenAIOwner=             ; boolean，默认 true</code></pre>
 (但仍可被 C4 爆破、受到伤害反馈等)</p>
 </div>
 <hr class="sec-divider">
-<div id="gameplay_12">
+<div id="gameplay_4">
 <h3 class="doc-heading--tertiary" style="margin-top:2em">4. 基地节点跨所属方判定</h3>
 <pre class="doc-code--block"><code>[Country House]
 BaseNodeCrossOwners=                  ; boolean，默认 false</code></pre>
@@ -490,7 +547,7 @@ BaseNodeCrossOwners=                  ; boolean，默认 false</code></pre>
 
 <hr class="sec-divider--double">
 
-<div id="gameplay_14">
+<div id="gameplay_5">
 <h3 class="doc-heading--tertiary" style="margin-top:2em">5. 混乱机制</h3>
 <h4 style="margin-top:1.2em">5.1 混乱恢复设置</h4>
 <pre class="doc-code--block"><code>[General]

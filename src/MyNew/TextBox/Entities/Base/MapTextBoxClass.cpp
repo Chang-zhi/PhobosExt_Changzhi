@@ -98,9 +98,29 @@ void MapTextBoxClass::UpdateLayout()
 	if (!m_cache)
 		m_cache = std::make_unique<Cache>();
 
-	m_cache->CachedTextPtr = StringTable::TryFetchString(this->CurrentLabel.c_str());
+	const wchar_t* textPtr = StringTable::TryFetchString(this->CurrentLabel.c_str());
 
-	if (!m_cache->CachedTextPtr || wcslen(m_cache->CachedTextPtr) == 0)
+	// Fallback: if CSF label not found, convert CurrentLabel ANSI -> wide directly
+	std::wstring fallbackText;
+	if (!textPtr || wcslen(textPtr) == 0)
+	{
+		if (this->CurrentLabel.empty())
+		{
+			m_cache->CachedLines.clear();
+			m_cache->CachedBgWidth = 0;
+			m_cache->CachedBgHeight = 0;
+			m_cache->IsLayoutDirty = false;
+			return;
+		}
+
+		// Simple char-by-char conversion (label text is typically ASCII)
+		fallbackText.reserve(this->CurrentLabel.length());
+		for (char ch : this->CurrentLabel)
+			fallbackText += static_cast<wchar_t>(static_cast<unsigned char>(ch));
+		textPtr = fallbackText.c_str();
+	}
+
+	if (!textPtr || wcslen(textPtr) == 0)
 	{
 		m_cache->CachedLines.clear();
 		m_cache->CachedBgWidth = 0;
@@ -109,7 +129,7 @@ void MapTextBoxClass::UpdateLayout()
 		return;
 	}
 
-	m_cache->CachedLines = WrapText(m_cache->CachedTextPtr, this->MaxLineWidth);
+	m_cache->CachedLines = WrapText(textPtr, this->MaxLineWidth);
 	if (m_cache->CachedLines.empty())
 	{
 		m_cache->CachedBgWidth = 0;

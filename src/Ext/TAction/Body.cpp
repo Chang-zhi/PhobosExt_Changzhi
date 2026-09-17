@@ -1,11 +1,16 @@
-﻿#include "Body.h"
+#include "Body.h"
 #include "MyNew/Helper.h"
 #include "MyNew/ScriptManipulator.h"
+#include "MyNew/TaskForceManipulator.h"
+
+#include <PhobosInterop.h>
 
 #include <YRpp.h>
 #include <TagClass.h>
 #include <TagTypeClass.h>
 #include <TechnoClass.h>
+#include <UnitClass.h>
+#include <InfantryClass.h>
 #include <HouseClass.h>
 #include <Ext/House/Body.h>
 #include <ArrayClasses.h>
@@ -168,13 +173,38 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 		return TActionExt::RestoreScriptContent(pThis, pHouse, pObject, pTrigger, location);
 	case PhobosTriggerAction::RestoreAllScriptContents:
 		return TActionExt::RestoreAllScriptContents(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::SeekTeamTypeScript:
+		return TActionExt::SeekTeamTypeScript(pThis, pHouse, pObject, pTrigger, location);
+
+	// ---- TaskForce Editing Actions ----
+	case PhobosTriggerAction::ClearTaskForce:
+		return TActionExt::ClearTaskForce(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::CopyTaskForce:
+		return TActionExt::CopyTaskForce(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::ModifyTaskForceEntry:
+		return TActionExt::ModifyTaskForceEntry(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::RebindTeamTypeTaskForce:
+		return TActionExt::RebindTeamTypeTaskForce(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::RestoreTaskForce:
+		return TActionExt::RestoreTaskForce(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::RestoreAllTaskForces:
+		return TActionExt::RestoreAllTaskForces(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::ResetTeamTypeTaskForce:
+		return TActionExt::ResetTeamTypeTaskForce(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::ResetAllTeamTypeTaskForces:
+		return TActionExt::ResetAllTeamTypeTaskForces(pThis, pHouse, pObject, pTrigger, location);
+
+	case PhobosTriggerAction::RecruitGroupToTeam:
+		return TActionExt::RecruitGroupToTeam(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::UndeployHouseUnits:
+		return TActionExt::UndeployHouseUnits(pThis, pHouse, pObject, pTrigger, location);
 
 	//case PhobosTriggerAction::RemoveBaseNodesExceedingAttemptCountForHouse:
 	//	return TActionExt::RemoveBaseNodesExceedingAttemptCountForHouse(pThis, pHouse, pObject, pTrigger, location);
 	//case PhobosTriggerAction::SetObjectRecruitable:
 	//	return TActionExt::SetObjectRecruitable(pThis, pHouse, pObject, pTrigger, location);
-	//case PhobosTriggerAction::testAction:
-	//	return TActionExt::testAction(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::testAction:
+		return TActionExt::testAction(pThis, pHouse, pObject, pTrigger, location);
 
 	default:
 		bHandled = false;
@@ -1112,7 +1142,7 @@ bool TActionExt::RecruitNearbyFootToTeam(TActionClass* pThis, HouseClass* pHouse
 	int teamIndex = pThis->Param3;
 	int waypointIndex = pThis->Param4;
 	int range = pThis->Param5;
-	int houseIndex = pThis->Param6;
+	bool isOnlyRecruitable = pThis->Param6 != 0;
 
 	// ===== 1. 获取作战小队类型 =====
 	TeamTypeClass* pTeamType = nullptr;
@@ -1131,16 +1161,18 @@ bool TActionExt::RecruitNearbyFootToTeam(TActionClass* pThis, HouseClass* pHouse
 
 	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
 	if (cell.X < 0 || cell.Y < 0) return false;
-
-	HouseClass* pOwner = HouseClass::FindByCountryIndex(houseIndex);
-	if (!pOwner) return false;
+\
 
 	for (FootClass* pFoot : FootClass::Array)
 	{
 		if (!pFoot) continue;
-		if (pFoot->Owner != pOwner) continue;
+		if (pFoot->Owner != pTeam->Owner) continue;
 		if (pFoot->Team) continue; // 已经在其他小队中
-		if (!pFoot->CanBeRecruited(pOwner)) continue;
+		if(isOnlyRecruitable)
+		{
+			if (!pFoot->CanBeRecruited(pFoot->Owner))
+				continue;
+		}
 		if (!IsTechnoNearCell(pFoot, cell, range)) continue;
 
 		pTeam->AddMember(pFoot, true);
@@ -1457,6 +1489,230 @@ bool TActionExt::RestoreScriptContent(TActionClass* pThis, HouseClass* pHouse, O
 bool TActionExt::RestoreAllScriptContents(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {
 	ScriptManipulator::RestoreAllScriptContents();
+	return true;
+}
+
+bool TActionExt::SeekTeamTypeScript(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	ScriptManipulator::SeekTeamTypeScript(pThis);
+	return true;
+}
+
+// =============================
+// TaskForce Editing Actions (670-675)
+
+bool TActionExt::ClearTaskForce(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	TaskForceManipulator::ClearTaskForce(pThis);
+	return true;
+}
+
+bool TActionExt::CopyTaskForce(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	TaskForceManipulator::CopyTaskForce(pThis);
+	return true;
+}
+
+bool TActionExt::ModifyTaskForceEntry(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	TaskForceManipulator::ModifyTaskForceEntry(pThis);
+	return true;
+}
+
+bool TActionExt::RebindTeamTypeTaskForce(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	TaskForceManipulator::RebindTeamTypeTaskForce(pThis);
+	return true;
+}
+
+bool TActionExt::RestoreTaskForce(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	TaskForceManipulator::RestoreTaskForce(pThis);
+	return true;
+}
+
+bool TActionExt::RestoreAllTaskForces(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	TaskForceManipulator::RestoreAllTaskForces();
+	return true;
+}
+
+bool TActionExt::ResetTeamTypeTaskForce(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	TaskForceManipulator::ResetTeamTypeTaskForce(pThis);
+	return true;
+}
+
+bool TActionExt::ResetAllTeamTypeTaskForces(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	TaskForceManipulator::ResetAllTeamTypeTaskForces();
+	return true;
+}
+
+// =============================
+// 678: Recruit Group to Team
+
+bool TActionExt::RecruitGroupToTeam(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	int group = pThis->Param3;
+	int houseIdx = pThis->Param4;
+	int teamIdx = pThis->Param5;
+
+	HouseClass* pOwner = HouseClass::FindByCountryIndex(houseIdx);
+	if (!pOwner)
+		return false;
+
+	TeamTypeClass* pTeamType = nullptr;
+	for (auto const pTT : TeamTypeClass::Array)
+	{
+		if (pTT && pTT->get_ID() == ("0" + std::to_string(teamIdx)))
+		{
+			pTeamType = pTT;
+			break;
+		}
+	}
+	if (!pTeamType)
+		return false;
+
+	TeamClass* pTeam = pTeamType->FindFirstInstance();
+	if (!pTeam)
+		return true;
+
+	for (auto pFoot : FootClass::Array)
+	{
+		if (!pFoot)
+			continue;
+		if (pFoot->Owner != pOwner)
+			continue;
+		if (pFoot->Team)
+			continue;
+		if (group >= 0 && pFoot->Group != group)
+			continue;
+
+		pTeam->AddMember(pFoot, true);
+	}
+
+	return true;
+}
+
+// =============================
+// 679: Undeploy House Units
+
+bool TActionExt::UndeployHouseUnits(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	int houseIdx = pThis->Param3;
+	HouseClass* pOwner = HouseClass::FindByCountryIndex(houseIdx);
+	if (!pOwner)
+		return false;
+
+	for (auto pFoot : FootClass::Array)
+	{
+		if (!pFoot || pFoot->Owner != pOwner)
+			continue;
+
+		if (auto pUnit = abstract_cast<UnitClass*>(pFoot))
+		{
+			if (pUnit->Deployed)
+				pFoot->ForceMission(Mission::Unload);
+		}
+		else if (auto pInf = abstract_cast<InfantryClass*>(pFoot))
+		{
+			if (pInf->IsDeployed())
+				pFoot->ForceMission(Mission::Unload);
+		}
+	}
+
+	return true;
+}
+
+// test helper
+static int testReadVar(bool bGlobal, int index)
+{
+	int value = 0;
+	int maxIndex = bGlobal ? 50 : 100;
+
+	if (index < 0 || index >= maxIndex)
+		return 0;
+
+	if (PhobosInterop::IsAvailable())
+	{
+		if (bGlobal)
+		{
+			PhobosInterop::Variables_GetGlobal(index, &value);
+			Debug::LogAndMessage("[OtherDll] [testReadVar] PhobosInterop Global[%d] = %d\n", index, value);
+		}
+		else
+		{
+			PhobosInterop::Variables_GetLocal(index, &value);
+			Debug::LogAndMessage("[OtherDll] [testReadVar] PhobosInterop Local[%d] = %d\n", index, value);
+		}
+	}
+	else if (ScenarioClass::Instance)
+	{
+		if (bGlobal)
+		{
+			value = ScenarioClass::Instance->GlobalVariables[index].Value;
+			Debug::LogAndMessage("[OtherDll] [testReadVar] ScenarioClass Global[%d] = %d\n", index, value);
+		}
+		else
+		{
+			value = ScenarioClass::Instance->LocalVariables[index].Value;
+			Debug::LogAndMessage("[OtherDll] [testReadVar] ScenarioClass Local[%d] = %d\n", index, value);
+		}
+	}
+
+	return value;
+}
+
+static int testChangeVar(bool bGlobal, int index, int value)
+{
+	int maxIndex = bGlobal ? 50 : 100;
+
+	if (index < 0 || index >= maxIndex)
+		return 0;
+
+	if (PhobosInterop::IsAvailable())
+	{
+		if (bGlobal)
+		{
+			PhobosInterop::Variables_SetGlobal(index, value);
+			Debug::LogAndMessage("[OtherDll] [testChangeVar] PhobosInterop Global[%d] := %d\n", index, value);
+		}
+		else
+		{
+			PhobosInterop::Variables_SetLocal(index, value);
+			Debug::LogAndMessage("[OtherDll] [testChangeVar] PhobosInterop Local[%d] := %d\n", index, value);
+		}
+	}
+	else if (ScenarioClass::Instance)
+	{
+		if (bGlobal)
+		{
+			ScenarioClass::Instance->GlobalVariables[index].Value = value;
+			Debug::LogAndMessage("[OtherDll] [testChangeVar] ScenarioClass Global[%d] := %d\n", index, value);
+		}
+		else
+		{
+			ScenarioClass::Instance->LocalVariables[index].Value = value;
+			Debug::LogAndMessage("[OtherDll] [testChangeVar] ScenarioClass Local[%d] := %d\n", index, value);
+		}
+	}
+
+	return value;
+}
+
+bool TActionExt::testAction(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	int valIndex = pThis->Param3;
+	int targetVal = pThis->Param4;
+	bool isGlobal = (pThis->Param5 != 0);
+	bool isChange = (pThis->Param6 != 0);
+
+	if (isChange)
+		testChangeVar(isGlobal, valIndex, targetVal);
+	else
+		testReadVar(isGlobal, valIndex);
+
 	return true;
 }
 

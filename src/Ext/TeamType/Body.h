@@ -17,10 +17,12 @@ public:
 	{
 	public:
 		int OriginalScriptTypeIndex;
+		int OriginalTaskForceIndex;
 
 		ExtData(TeamTypeClass* const OwnerObject)
 			: Extension<TeamTypeClass>(OwnerObject)
 			, OriginalScriptTypeIndex { -1 }
+			, OriginalTaskForceIndex { -1 }
 		{ }
 
 		virtual ~ExtData() = default;

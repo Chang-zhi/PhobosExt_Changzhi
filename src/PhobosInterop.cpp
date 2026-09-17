@@ -9,19 +9,9 @@
 bool PhobosInterop::s_phobosLoaded = false;
 HMODULE PhobosInterop::s_hPhobos = nullptr;
 
-fnAE_Attach                  PhobosInterop::AE_Attach                        = nullptr;
-fnAE_Detach                  PhobosInterop::AE_Detach                        = nullptr;
-fnAE_DetachByGroups          PhobosInterop::AE_DetachByGroups                = nullptr;
-fnAE_TransferEffects         PhobosInterop::AE_TransferEffects               = nullptr;
-fnConvertToType              PhobosInterop::ConvertToType                    = nullptr;
-fnBullet_SetFirerOwner       PhobosInterop::Bullet_SetFirerOwner             = nullptr;
-fnRegisterCalculateExtraThreatCallback PhobosInterop::RegisterCalculateExtraThreatCallback = nullptr;
-fnRegisterCalculateSightCallback       PhobosInterop::RegisterCalculateSightCallback       = nullptr;
-fnEventExt_AddEvent          PhobosInterop::EventExt_AddEvent                = nullptr;
-fnVariables_GetLocal         PhobosInterop::Variables_GetLocal               = nullptr;
-fnVariables_SetLocal         PhobosInterop::Variables_SetLocal               = nullptr;
-fnVariables_GetGlobal        PhobosInterop::Variables_GetGlobal              = nullptr;
-fnVariables_SetGlobal        PhobosInterop::Variables_SetGlobal              = nullptr;
+#define GEN_STATIC_INIT(name, fnType, ...) fnType PhobosInterop::name = nullptr;
+FOREACH_INTEROP_FN(GEN_STATIC_INIT)
+#undef GEN_STATIC_INIT
 
 // ============================================================================
 // Find Phobos module by scanning all loaded modules for GetInteropAPIVersion.
@@ -45,11 +35,7 @@ static HMODULE FindPhobosModule(bool* conflictDetected)
 		do
 		{
 			auto pfn = (fnGetInteropAPIVersion)
-				GetProcAddress(me.hModule, "GetInteropAPIVersion");
-
-			if (!pfn)
-				pfn = (fnGetInteropAPIVersion)
-					GetProcAddress(me.hModule, "_GetInteropAPIVersion@4");
+				GetProcAddress(me.hModule, "_GetInteropAPIVersion@4");
 
 			if (!pfn)
 				continue;
@@ -65,25 +51,10 @@ static HMODULE FindPhobosModule(bool* conflictDetected)
 				Debug::Log(L"[PhobosInterop] Found: %s (v%u.%u.%u)\n",
 					me.szModule, ver.major, ver.minor, ver.patch);
 
-				// DEFINE_EXPORT uses __stdcall → decorated names _Func@N
-				#define LOAD_EXPORT(var, fnType, name) \
-					var = (fnType)GetProcAddress(me.hModule, name);
-
-				LOAD_EXPORT(PhobosInterop::AE_Attach,                          fnAE_Attach,                     "_AE_Attach@44");
-				LOAD_EXPORT(PhobosInterop::AE_Detach,                          fnAE_Detach,                     "_AE_Detach@16");
-				LOAD_EXPORT(PhobosInterop::AE_DetachByGroups,                  fnAE_DetachByGroups,             "_AE_DetachByGroups@16");
-				LOAD_EXPORT(PhobosInterop::AE_TransferEffects,                 fnAE_TransferEffects,            "_AE_TransferEffects@8");
-				LOAD_EXPORT(PhobosInterop::ConvertToType,                      fnConvertToType,                 "_ConvertToType_Phobos@8");
-				LOAD_EXPORT(PhobosInterop::Bullet_SetFirerOwner,               fnBullet_SetFirerOwner,          "_Bullet_SetFirerOwner@8");
-				LOAD_EXPORT(PhobosInterop::RegisterCalculateExtraThreatCallback, fnRegisterCalculateExtraThreatCallback, "_RegisterCalculateExtraThreatCallback@4");
-				LOAD_EXPORT(PhobosInterop::RegisterCalculateSightCallback,      fnRegisterCalculateSightCallback,   "_RegisterCalculateSightCallback@4");
-				LOAD_EXPORT(PhobosInterop::EventExt_AddEvent,                  fnEventExt_AddEvent,             "_EventExt_AddEvent@4");
-				LOAD_EXPORT(PhobosInterop::Variables_GetLocal,                 fnVariables_GetLocal,            "_Variables_GetLocal_Phobos@8");
-				LOAD_EXPORT(PhobosInterop::Variables_SetLocal,                 fnVariables_SetLocal,            "_Variables_SetLocal_Phobos@8");
-				LOAD_EXPORT(PhobosInterop::Variables_GetGlobal,                fnVariables_GetGlobal,           "_Variables_GetGlobal_Phobos@8");
-				LOAD_EXPORT(PhobosInterop::Variables_SetGlobal,                fnVariables_SetGlobal,           "_Variables_SetGlobal_Phobos@8");
-
-				#undef LOAD_EXPORT
+				#define GEN_LOAD_EXPORT(name, fnType, decorated) \
+					PhobosInterop::name = (fnType)GetProcAddress(me.hModule, decorated);
+				FOREACH_INTEROP_FN(GEN_LOAD_EXPORT)
+				#undef GEN_LOAD_EXPORT
 			}
 			else
 			{
@@ -148,9 +119,11 @@ void PhobosInterop::Init()
 		return;
 	}
 
-	s_phobosLoaded = AE_Attach || AE_Detach || AE_DetachByGroups
-		|| AE_TransferEffects || ConvertToType || Bullet_SetFirerOwner
-		|| Variables_GetLocal || Variables_GetGlobal;
+	s_phobosLoaded = true;
+#define GEN_LOAD_CHECK(name, fnType, ...) \
+	if (!PhobosInterop::name) s_phobosLoaded = false;
+	FOREACH_INTEROP_FN(GEN_LOAD_CHECK)
+#undef GEN_LOAD_CHECK
 
 	Debug::Log(L"[PhobosInterop] %s\n",
 		s_phobosLoaded ? L"Loaded" : L"Failed");

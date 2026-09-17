@@ -27,8 +27,6 @@ constexpr InteropAPIVersion INTEROP_VERSION_CURRENT = { 1, 0, 0 };
 // All game pointers are typed as void*; cast as needed by caller
 // ============================================================================
 
-// AE_Attach(pTarget, pInvokerHouse, pInvoker, pSource, effectTypeNames, typeCount,
-//           durationOverride, delay, initialDelay, recreationDelay, pAttachedCount)
 typedef HRESULT(__stdcall* fnAE_Attach)(
 	void* pTarget, void* pInvokerHouse, void* pInvoker, void* pSource,
 	const char** effectTypeNames, int typeCount,
@@ -36,48 +34,55 @@ typedef HRESULT(__stdcall* fnAE_Attach)(
 	int* pAttachedCount
 );
 
-// AE_Detach(pTarget, effectTypeNames, typeCount, pRemovedCount)
 typedef HRESULT(__stdcall* fnAE_Detach)(
 	void* pTarget, const char** effectTypeNames, int typeCount, int* pRemovedCount
 );
 
-// AE_DetachByGroups(pTarget, groupNames, groupCount, pRemovedCount)
 typedef HRESULT(__stdcall* fnAE_DetachByGroups)(
 	void* pTarget, const char** groupNames, int groupCount, int* pRemovedCount
 );
 
-// AE_TransferEffects(pSource, pTarget)
 typedef HRESULT(__stdcall* fnAE_TransferEffects)(void* pSource, void* pTarget);
 
-// ConvertToType_Phobos(pThis, toType)
 typedef HRESULT(__stdcall* fnConvertToType)(void* pThis, void* pToType);
 
-// Bullet_SetFirerOwner(pBullet, pHouse)
 typedef HRESULT(__stdcall* fnBullet_SetFirerOwner)(void* pBullet, void* pHouse);
 
-// RegisterCalculateExtraThreatCallback(callback)
 typedef HRESULT(__stdcall* fnRegisterCalculateExtraThreatCallback)(void* callback);
 
-// RegisterCalculateSightCallback(callback)
 typedef HRESULT(__stdcall* fnRegisterCalculateSightCallback)(void* callback);
 
-// EventExt_AddEvent(pEventExt)
 typedef HRESULT(__stdcall* fnEventExt_AddEvent)(void* pEventExt);
 
-// Variables_GetLocal_Phobos(index, pValue)
 typedef HRESULT(__stdcall* fnVariables_GetLocal)(int index, int* pValue);
 
-// Variables_SetLocal_Phobos(index, value)
 typedef HRESULT(__stdcall* fnVariables_SetLocal)(int index, int value);
 
-// Variables_GetGlobal_Phobos(index, pValue)
 typedef HRESULT(__stdcall* fnVariables_GetGlobal)(int index, int* pValue);
 
-// Variables_SetGlobal_Phobos(index, value)
 typedef HRESULT(__stdcall* fnVariables_SetGlobal)(int index, int value);
 
-// GetInteropAPIVersion(pVersion)
 typedef HRESULT(__stdcall* fnGetInteropAPIVersion)(InteropAPIVersion* pVersion);
+
+// ============================================================================
+// Interop function list for X-macro code generation
+// Used by FOREACH_INTEROP_FN to generate static members & loading code
+// ============================================================================
+
+#define FOREACH_INTEROP_FN(FN) \
+	FN(AE_Attach,                       fnAE_Attach,           "_AE_Attach@44") \
+	FN(AE_Detach,                       fnAE_Detach,           "_AE_Detach@16") \
+	FN(AE_DetachByGroups,               fnAE_DetachByGroups,   "_AE_DetachByGroups@16") \
+	FN(AE_TransferEffects,              fnAE_TransferEffects,  "_AE_TransferEffects@8") \
+	FN(ConvertToType,                   fnConvertToType,       "_ConvertToType_Phobos@8") \
+	FN(Bullet_SetFirerOwner,            fnBullet_SetFirerOwner,"_Bullet_SetFirerOwner@8") \
+	FN(RegisterCalculateExtraThreatCallback, fnRegisterCalculateExtraThreatCallback, "_RegisterCalculateExtraThreatCallback@4") \
+	FN(RegisterCalculateSightCallback,   fnRegisterCalculateSightCallback, "_RegisterCalculateSightCallback@4") \
+	FN(EventExt_AddEvent,               fnEventExt_AddEvent,   "_EventExt_AddEvent@4") \
+	FN(Variables_GetLocal,              fnVariables_GetLocal,  "_Variables_GetLocal_Phobos@8") \
+	FN(Variables_SetLocal,              fnVariables_SetLocal,  "_Variables_SetLocal_Phobos@8") \
+	FN(Variables_GetGlobal,             fnVariables_GetGlobal, "_Variables_GetGlobal_Phobos@8") \
+	FN(Variables_SetGlobal,             fnVariables_SetGlobal, "_Variables_SetGlobal_Phobos@8")
 
 // ============================================================================
 // PhobosInterop - Static class loading Phobos & holding all function pointers
@@ -94,19 +99,9 @@ public:
 	static bool CheckVersion();
 
 	// Function pointers (initialized by Init())
-	static fnAE_Attach                               AE_Attach;
-	static fnAE_Detach                               AE_Detach;
-	static fnAE_DetachByGroups                       AE_DetachByGroups;
-	static fnAE_TransferEffects                      AE_TransferEffects;
-	static fnConvertToType                           ConvertToType;
-	static fnBullet_SetFirerOwner                    Bullet_SetFirerOwner;
-	static fnRegisterCalculateExtraThreatCallback    RegisterCalculateExtraThreatCallback;
-	static fnRegisterCalculateSightCallback          RegisterCalculateSightCallback;
-	static fnEventExt_AddEvent                       EventExt_AddEvent;
-	static fnVariables_GetLocal                      Variables_GetLocal;
-	static fnVariables_SetLocal                      Variables_SetLocal;
-	static fnVariables_GetGlobal                     Variables_GetGlobal;
-	static fnVariables_SetGlobal                     Variables_SetGlobal;
+#define GEN_STATIC_MEMBER(name, fnType, ...) static fnType name;
+	FOREACH_INTEROP_FN(GEN_STATIC_MEMBER)
+#undef GEN_STATIC_MEMBER
 
 private:
 	static bool s_phobosLoaded;

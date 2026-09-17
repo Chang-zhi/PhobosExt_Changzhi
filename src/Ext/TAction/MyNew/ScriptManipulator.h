@@ -25,6 +25,7 @@ public:
 
 	static void RestoreScriptContent(TActionClass* pThis);
 	static void RestoreAllScriptContents();
+	static void SeekTeamTypeScript(TActionClass* pThis);
 
 	static void CaptureFromINI(CCINIClass* pINI);
 
