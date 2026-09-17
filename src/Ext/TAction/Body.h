@@ -247,6 +247,9 @@ enum class PhobosTriggerAction : unsigned int
 	// 设置困难难度最佳时间
 	SetParTimeDifficult = 681,
 
+	// 设置游戏速度
+	SetGameSpeed = 682,
+
 	// 测试用
 	testAction = 1150,
 };
@@ -371,6 +374,9 @@ static bool name(TActionClass* pThis, HouseClass* pHouse, \
 	ACTION_FUNC(SetParTimeEasy);
 	ACTION_FUNC(SetParTimeMedium);
 	ACTION_FUNC(SetParTimeDifficult);
+
+	// 设置游戏速度
+	ACTION_FUNC(SetGameSpeed);
 
 	// 测试用
 	ACTION_FUNC(testAction);
