@@ -17,7 +17,7 @@ DevBuild/
 *.mo
 
 /.vscode
-/docs/
+/.docs/
 /.workbuddy/
 
 build
