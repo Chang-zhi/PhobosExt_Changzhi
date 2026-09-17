@@ -12,6 +12,8 @@ public:
 
 	//Static
 	DEFINE_REFERENCE(DynamicVectorClass<TagClass*>, Array, 0xB0E720u)
+	DEFINE_REFERENCE(DynamicVectorClass<TagClass*>, Array_unknown, 0x8B41A8u)
+	DEFINE_REFERENCE(DynamicVectorClass<TagClass*>, Array_Logic, 0x8B40C8u)
 
 	// finds an instance using the type, or creates one
 	static TagClass* __fastcall GetInstance(TagTypeClass* pType)
