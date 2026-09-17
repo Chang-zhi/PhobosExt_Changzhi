@@ -22,6 +22,12 @@ enum class PhobosScripts : unsigned int
 
 	// 分散攻击
 	ScatterAttack = 5503,
+
+	// 巡逻系
+	PatrolToEnemyBuildingNearby = 5504,    // 巡逻到敌方指定建筑物附近
+	PatrolToEnemyRally = 5505,             // 巡逻到敌方基地集结点
+	PatrolToFriendlyBuildingNearby = 5506, // 巡逻到己方指定建筑物附近
+	PatrolToFriendlyRally = 5507,          // 巡逻到己方基地集结点
 };
 
 class ScriptExt
@@ -36,6 +42,7 @@ public:
 	public:
 		ExtData(ScriptClass* OwnerObject) : Extension<ScriptClass>(OwnerObject)
 			, ScatterAttackSelectionTimer(0)
+			, LastProcessedMission(-1)
 		{ }
 
 		virtual ~ExtData() = default;
@@ -45,13 +52,9 @@ public:
 		virtual void LoadFromStream(PhobosStreamReader& Stm) override;
 		virtual void SaveToStream(PhobosStreamWriter& Stm) override;
 
-		// 分散攻击：距离下次重新选择目标的帧数（节流，避免每帧重选导致炮管乱转）
-		// 不入存档：读档后由构造函数初始化为 0，立即重新选择一次
 		int ScatterAttackSelectionTimer;
-
-		// 分散攻击：一次性分组结果（每组一个成员列表，空 = 尚未分组）。
-		// 不入存档：读档后为空，下次进入动作时重新分组。
 		std::vector<std::vector<FootClass*>> ScatterAttackGroups;
+		int LastProcessedMission;
 	};
 
 	class ExtContainer final : public Container<ScriptExt>
@@ -72,4 +75,8 @@ public:
 
 	// 分散攻击
 	static void Mission_ScatterAttack(TeamClass* pTeam);
+
+	// 巡逻系
+	static void PatrolToBuildingNearby(TeamClass* pTeam, int typeIndex, int selectionMode, bool fresh, bool wantEnemy);
+	static void PatrolToRally(TeamClass* pTeam, bool fresh, bool wantEnemy);
 };

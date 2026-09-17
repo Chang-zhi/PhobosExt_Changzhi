@@ -1,5 +1,6 @@
 #include "Body.h"
 #include "MyNew/FootPathVisualizer.h"
+#include "MyNew/PatrolService.h"
 
 #include <CellSpread.h>
 #include <Helpers/Cast.h>
@@ -10,6 +11,8 @@
 #include <HouseClass.h>
 #include <UnitClass.h>
 #include <InfantryClass.h>
+#include <BuildingClass.h>
+#include <BuildingTypeClass.h>
 
 ScriptExt::ExtContainer ScriptExt::ExtMap;
 
@@ -47,7 +50,16 @@ ScriptExt::ExtContainer::~ExtContainer() = default;
 
 void ScriptExt::ProcessAction(TeamClass* pTeam)
 {
-	const int action = pTeam->CurrentScript->Type->ScriptActions[pTeam->CurrentScript->CurrentMission].Action;
+	if (!pTeam || !pTeam->CurrentScript)
+		return;
+
+	const auto pNodeIndex = pTeam->CurrentScript->CurrentMission;
+	const auto& node = pTeam->CurrentScript->Type->ScriptActions[pNodeIndex];
+	const int action = node.Action;
+
+	auto const pExt = ExtMap.FindOrAllocate(pTeam->CurrentScript);
+	const bool fresh = (pNodeIndex != pExt->LastProcessedMission);
+	pExt->LastProcessedMission = pNodeIndex;
 
 	switch (static_cast<PhobosScripts>(action))
 	{
@@ -65,6 +77,24 @@ void ScriptExt::ProcessAction(TeamClass* pTeam)
 
 	case PhobosScripts::ScatterAttack:
 		ScriptExt::Mission_ScatterAttack(pTeam);
+		break;
+
+	case PhobosScripts::PatrolToEnemyBuildingNearby:
+		ScriptExt::PatrolToBuildingNearby(
+			pTeam, node.Argument & 0xFFFF, static_cast<unsigned>(node.Argument) >> 16, fresh, true);
+		break;
+
+	case PhobosScripts::PatrolToEnemyRally:
+		ScriptExt::PatrolToRally(pTeam, fresh, true);
+		break;
+
+	case PhobosScripts::PatrolToFriendlyBuildingNearby:
+		ScriptExt::PatrolToBuildingNearby(
+			pTeam, node.Argument & 0xFFFF, static_cast<unsigned>(node.Argument) >> 16, fresh, false);
+		break;
+
+	case PhobosScripts::PatrolToFriendlyRally:
+		ScriptExt::PatrolToRally(pTeam, fresh, false);
 		break;
 
 	default:
@@ -623,5 +653,188 @@ void ScriptExt::Mission_ScatterAttack(TeamClass* pTeam)
 	}
 
 	// 仍有可作战的目标 -> 保持在本动作，直到最后一个敌人被摧毁
+	pTeam->StepCompleted = false;
+}
+
+// ============================================================================
+// 巡逻系(动作 5504~5507)辅助与实现
+// ============================================================================
+namespace
+{
+	// 动作 Argument 编码(对齐原版动作 47):
+	//   高 16 位 = 建筑类型索引(0 = 第一个类型,如 GAPOWR;0xFFFF = 任意类型)
+	//   低 16 位 = 索敌方式:0 最小威胁 / 1 最大威胁 / 2 最近 / 3 最远
+	enum class TargetSelection : int
+	{
+		MinimumThreat = 0,
+		MaximumThreat = 1,
+		Closest = 2,
+		Farthest = 3,
+	};
+
+	// 找指定阵营的目标建筑,按索敌方式从候选集中选出。
+	// typeIndex:BuildingTypeClass::Array 索引;0xFFFF = 任意类型
+	// wantEnemy:true = 属于 HouseClass::EnemyHouseIndex 指向的敌方阵营;
+	//            false = 团队所属方自己的建筑(TeamClass::Owner)
+	static BuildingClass* FindTeamBuilding(TeamClass* pTeam, int typeIndex, TargetSelection selection, bool wantEnemy)
+	{
+		if (!pTeam || !pTeam->Owner)
+			return nullptr;
+
+		BuildingTypeClass* pType = nullptr;
+		if (typeIndex != 0xFFFF)
+		{
+			if (typeIndex < 0 || typeIndex >= BuildingTypeClass::Array.Count)
+				return nullptr; // 类型索引无效
+			pType = BuildingTypeClass::Array.GetItem(typeIndex);
+		}
+
+		HouseClass* const pOwner = pTeam->Owner;
+		CoordStruct teamPos{ 0, 0, 0 };
+		if (pTeam->FirstUnit)
+			teamPos = pTeam->FirstUnit->GetCoords();
+
+		BuildingClass* best = nullptr;
+		long long bestScore = 0;
+		bool hasBest = false;
+
+		for (BuildingClass* pBuilding : BuildingClass::Array)
+		{
+			if (!pBuilding || !pBuilding->IsAlive || pBuilding->InLimbo)
+				continue;
+			if (!pBuilding->Owner)
+				continue; 
+			if (pType && pBuilding->GetType() != static_cast<ObjectTypeClass*>(pType))
+				continue;
+
+			const bool isOwn = (pBuilding->Owner == pOwner);
+			const bool isEnemy = (pBuilding->Owner->ArrayIndex == pOwner->EnemyHouseIndex);
+			if (wantEnemy ? !isEnemy : !isOwn)
+				continue;
+
+			long long score = 0;
+			switch (selection)
+			{
+			case TargetSelection::MinimumThreat:
+				score = -pBuilding->GetThreatValue();
+				break;
+			case TargetSelection::MaximumThreat:
+				score = pBuilding->GetThreatValue();
+				break;
+			case TargetSelection::Closest:
+			default:
+			{
+				const CoordStruct pos = pBuilding->GetCoords();
+				const long long dx = pos.X - teamPos.X;
+				const long long dy = pos.Y - teamPos.Y;
+				score = -(dx * dx + dy * dy);
+				break;
+			}
+			case TargetSelection::Farthest:
+			{
+				const CoordStruct pos = pBuilding->GetCoords();
+				const long long dx = pos.X - teamPos.X;
+				const long long dy = pos.Y - teamPos.Y;
+				score = dx * dx + dy * dy;
+				break;
+			}
+			}
+
+			if (!hasBest || score > bestScore)
+			{
+				bestScore = score;
+				best = pBuilding;
+				hasBest = true;
+			}
+		}
+
+		return best;
+	}
+
+	// 敌方阵营:HouseClass::EnemyHouseIndex 指向的"当前敌人"
+	// (原版 HouseClass+0x5600;= -1 表示当前无敌人)
+	static HouseClass* FindEnemyHouse(TeamClass* pTeam)
+	{
+		if (!pTeam || !pTeam->Owner)
+			return nullptr;
+
+		const int enemyIdx = pTeam->Owner->EnemyHouseIndex;
+		if (enemyIdx < 0 || enemyIdx >= HouseClass::Array.Count)
+			return nullptr; // 当前没有敌人
+
+		HouseClass* pHouse = HouseClass::Array.GetItem(enemyIdx);
+		if (!pHouse || pHouse->ArrayIndex != enemyIdx)
+			return nullptr; // 索引与实例不一致(防御)
+
+		return pHouse;
+	}
+}
+
+void ScriptExt::PatrolToBuildingNearby(TeamClass* pTeam, int typeIndex, int selectionMode, bool fresh, bool wantEnemy)
+{
+	if (!pTeam->FirstUnit)
+	{
+		Debug::Log("[PT] skip(no member) type=%d sel=%d enemy=%d\n", typeIndex, selectionMode, wantEnemy);
+		return; // 无成员 → 保持 StepCompleted,跳过本条
+	}
+
+	BuildingClass* pTarget = FindTeamBuilding(
+		pTeam, typeIndex, static_cast<TargetSelection>(selectionMode & 0x3), wantEnemy);
+	if (!pTarget)
+	{
+		Debug::Log("[PT] skip(no target) type=%d sel=%d enemy=%d EHI=%d\n",
+			typeIndex, selectionMode, wantEnemy,
+			pTeam->Owner ? pTeam->Owner->EnemyHouseIndex : -999);
+		return; // 无目标建筑 → 保持 StepCompleted,跳过本条
+	}
+
+	if (!PatrolService::AIBuildingNearby(pTeam, pTarget, 2, fresh))
+	{
+		Debug::Log("[PT] skip(AI fail) target=%s\n",
+			static_cast<TechnoTypeClass*>(pTarget->GetType())->get_ID());
+		return; // 建筑失效 / 目标格无效 → 保持 StepCompleted,跳过本条
+	}
+
+	if (fresh)
+	{
+		Debug::Log("[PT] patrolling to building %s (type=%d sel=%d enemy=%d)\n",
+			static_cast<TechnoTypeClass*>(pTarget->GetType())->get_ID(),
+			typeIndex, selectionMode, wantEnemy);
+	}
+
+	// 巡逻进行中:留在本动作,等待就位检查完成。
+	// 落点 = 建筑格 + 向团队方向偏移 2 格(避免目标格被建筑本体占据导致寻路/异常分支)
+	pTeam->StepCompleted = false;
+}
+
+void ScriptExt::PatrolToRally(TeamClass* pTeam, bool fresh, bool wantEnemy)
+{
+	if (!pTeam->FirstUnit)
+	{
+		Debug::Log("[PT] skip(no member) rally enemy=%d\n", wantEnemy);
+		return; // 无成员 → 保持 StepCompleted,跳过本条
+	}
+
+	HouseClass* pHouse = wantEnemy ? FindEnemyHouse(pTeam) : pTeam->Owner;
+	if (!pHouse)
+	{
+		Debug::Log("[PT] skip(no house) rally enemy=%d EHI=%d\n",
+			wantEnemy, pTeam->Owner ? pTeam->Owner->EnemyHouseIndex : -999);
+		return; // 无敌方阵营(或己方无效)→ 保持 StepCompleted,跳过本条
+	}
+
+	if (!PatrolService::AIRally(pTeam, pHouse, fresh))
+	{
+		Debug::Log("[PT] skip(AI fail) rally house=%s\n", pHouse->get_ID());
+		return; // 阵营无基地 → 保持 StepCompleted,跳过本条
+	}
+
+	if (fresh)
+	{
+		Debug::Log("[PT] patrolling to rally house=%s base=(%d,%d)\n",
+			pHouse->get_ID(), pHouse->BaseCenter.X, pHouse->BaseCenter.Y);
+	}
+
+	// 巡逻进行中:留在本动作
 	pTeam->StepCompleted = false;
 }

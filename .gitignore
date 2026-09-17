@@ -27,3 +27,9 @@ out
 
 # Python virtual environment for docs
 .venv/
+
+# Agent tooling / local artifacts (kept on disk, not in repo)
+.codegraph/
+.omo/
+content.txt
+/.claude/settings.local.json
