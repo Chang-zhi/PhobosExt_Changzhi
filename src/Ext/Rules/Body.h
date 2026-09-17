@@ -35,13 +35,13 @@ public:
 		Valueable<bool> ShowTextBoxInShroud_Techno;
 
 		Valueable<bool> BerzerkRestoreClearTarget;
-		Valueable<double> RecruitRange;
+		Valueable<double> Command_RecruitRange;
 
 		ExtData(RulesClass* OwnerObject) : Extension<RulesClass>(OwnerObject)
 			, ShowTextBoxInShroud_Waypoint { true }
 			, ShowTextBoxInShroud_Techno { true }
 			, BerzerkRestoreClearTarget { false }
-			, RecruitRange { 7.5 }
+			, Command_RecruitRange { 10 }
 		{ }
 
 		virtual ~ExtData() = default;
