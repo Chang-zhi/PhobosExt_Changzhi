@@ -46,7 +46,9 @@ void RulesExt::ExtData::InitializeConstants()
 // earliest loader - can't really do much because nothing else is initialized yet, so lookups won't work
 void RulesExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 {
+	INI_EX exINI(pINI);
 
+	this->BerzerkRestoreClearTarget.Read(exINI, GameStrings::General, "BerzerkRestoreClearTarget");
 }
 
 void RulesExt::ExtData::LoadBeforeTypeData(RulesClass* pThis, CCINIClass* pINI)
@@ -85,6 +87,7 @@ void RulesExt::ExtData::Serialize(T& Stm)
 {
 	Stm
 		.Process(this->ShowWaypointLabelInShroud)
+		.Process(this->BerzerkRestoreClearTarget)
 		;
 }
 

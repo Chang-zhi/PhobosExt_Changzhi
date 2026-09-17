@@ -1,4 +1,5 @@
 #include "TemporalExclusive.h"
+#include "TemporalAOE.h"
 
 #include <TechnoClass.h>
 
@@ -86,15 +87,44 @@ void HandleTemporalExclusiveTargeting(TechnoClass* pThis)
 	// 更新新互斥超时空武器的独占逻辑
 	UpdateTemporalExclusive();
 
-	// Debug::Log("[TemporalExclusive] HandleTemporalExclusiveTargeting: %s\n", pThis->GetTechnoType()->ID);
+	// AOE 主/副目标拦截：所有超时空武器都不能选择已被其他 AOE 锁定的目标
+	{
+		TechnoClass* pTarget = abstract_cast<TechnoClass*>(pThis->Target);
+		if (pTarget)
+		{
+			WeaponTypeClass* pWeapon = TechnoExt::GetCurrentWeapon(pThis);
+			if (pWeapon && pWeapon->Warhead && pWeapon->Warhead->Temporal)
+			{
+				// 检查是否是其他 AOE 的副目标
+				auto claimIt = TemporalAOESecondaryClaims.find(pTarget);
+				if (claimIt != TemporalAOESecondaryClaims.end() && claimIt->second != pThis)
+				{
+					Debug::Log("[TemporalAOE] %s forced to abandon AOE secondary target %s\n",
+						pThis->GetTechnoType()->ID, pTarget->GetTechnoType()->ID);
+					pThis->SetTarget(nullptr);
+					return;
+				}
 
-    // 2. 如果当前单位没有独占武器，直接返回
-    if (!IsCurrentUseExclusiveTemporalWeapon(pThis))
-    {
-        return;
-    }
+				// 检查是否是其他 AOE 的主目标（其他 CLEG 正在攻击的目标）
+				auto mainIt = TemporalAOECachedMainOwners.find(pTarget);
+				if (mainIt != TemporalAOECachedMainOwners.end() && mainIt->second != pThis)
+				{
+					Debug::Log("[TemporalAOE] %s forced to abandon AOE main target %s\n",
+						pThis->GetTechnoType()->ID, pTarget->GetTechnoType()->ID);
+					pThis->SetTarget(nullptr);
+					return;
+				}
+			}
+		}
+	}
 
-    TechnoClass* pCurrentTarget = abstract_cast<TechnoClass*>(pThis->Target);
+	// 2. 如果当前单位没有独占武器，直接返回
+	if (!IsCurrentUseExclusiveTemporalWeapon(pThis))
+	{
+		return;
+	}
+
+	TechnoClass* pCurrentTarget = abstract_cast<TechnoClass*>(pThis->Target);
 
     // 情况 1: 当前单位没有目标
     if (!pCurrentTarget)
