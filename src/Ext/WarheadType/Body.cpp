@@ -27,6 +27,9 @@ void WarheadTypeExt::ExtData::LoadFromINIFile(CCINIClass* const pINI)
 	this->TemporalAOE_SecondaryWeight.Read(exINI, pSection, "TemporalAOE.SecondaryWeight");
 	this->TemporalAOE_AffectsAllies.Read(exINI, pSection, "TemporalAOE.AffectsAllies");
 
+	// BerserkReduce
+	this->BerserkReduce.Read(exINI, pSection, "c");
+
 }
 
 template <typename T>
@@ -38,6 +41,7 @@ void WarheadTypeExt::ExtData::Serialize(T& Stm)
 		.Process(this->TemporalAOE_CellSpread)
 		.Process(this->TemporalAOE_SecondaryWeight)
 		.Process(this->TemporalAOE_AffectsAllies)
+		.Process(this->BerserkReduce)
 		;
 }
 

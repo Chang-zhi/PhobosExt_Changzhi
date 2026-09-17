@@ -44,7 +44,13 @@ void BerzerkRestoreCheck(TechnoClass* pThis)
 		{
 			Debug::Log("[BerzerkRestore] %s recovered from berserk, clearing target\n",
 				pThis->GetTechnoType()->ID);
+
+			pThis->ForceMission(Mission::Guard);
 			pThis->SetTarget(nullptr);
+			if(auto pFoot = abstract_cast<FootClass*>(pThis))
+			{
+				pFoot->Locomotor->Stop_Moving();
+			}
 		}
 	}
 

@@ -10,9 +10,11 @@
 #include <Utilities/Macro.h>
 
 #include <Ext\TechnoType\Body.h>
+#include <Effects/IEffect.h>
 
 #include <vector>
 #include <set>
+#include <memory>
 
 class TechnoExt
 {
@@ -47,6 +49,9 @@ public:
 		};
 		TemporalAOEState AOEState;
 
+		// 效果系统 - 附加到此单位上的所有效果
+		std::vector<std::unique_ptr<IEffect>> Effects;
+
 		ExtData(TechnoClass* OwnerObject) : Extension<TechnoClass>(OwnerObject)
 			, TypeExtData { nullptr }
 		{ }
@@ -57,6 +62,7 @@ public:
 		virtual void SaveToStream(PhobosStreamWriter& Stm) override;
 
 		void UpdateTemporalAOE();
+		void UpdateEffects();       // 每帧更新所有附加效果并清理已死亡效果
 
 	private:
 		template <typename T>

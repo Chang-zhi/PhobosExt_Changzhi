@@ -33,6 +33,7 @@ DEFINE_HOOK(0x6F9E50, TechnoClass_AI, 0x5)
 	if (pExt)
 	{
 		pExt->UpdateTemporalAOE();
+		pExt->UpdateEffects();  // 效果系统更新
 	}
 
 	// 全局副目标合法性检测（每帧仅执行一次）
