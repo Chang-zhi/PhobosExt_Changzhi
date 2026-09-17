@@ -13,12 +13,6 @@ class PhobosStreamWriter;
 class PhobosStreamReader;
 class ChoiceBoxTypeClass;
 
-/**
- * @brief 路径点选择框（绑定到地图路径点）
- *
- * 在地图路径点（Waypoint）所在位置绘制选择框。
- * 支持路径点不存在或无效时自动跳过，以及黑幕遮挡检测。
- */
 class WaypointChoiceBoxClass final : public MapChoiceBoxClass
 {
 public:

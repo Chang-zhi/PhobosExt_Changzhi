@@ -13,12 +13,6 @@ class PhobosStreamWriter;
 class PhobosStreamReader;
 class ChoiceBoxTypeClass;
 
-/**
- * @brief 屏幕固定坐标选择框
- *
- * 在屏幕指定像素坐标位置绘制选择框，不跟随地图滚动。
- * 适合用于 UI 弹窗、确认框等需要固定位置的场景。
- */
 class ScreenChoiceBoxClass final : public MapChoiceBoxClass
 {
 public:

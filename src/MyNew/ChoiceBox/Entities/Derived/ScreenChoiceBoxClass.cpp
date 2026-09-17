@@ -12,7 +12,6 @@
 std::vector<std::shared_ptr<ScreenChoiceBoxClass>> ScreenChoiceBoxClass::Array;
 
 // ========== 构造 ==========
-
 ScreenChoiceBoxClass::ScreenChoiceBoxClass(int id, int x, int y, const char* label,
 										   const ChoiceBoxTypeClass* pType)
 	: MapChoiceBoxClass(id, label, pType)
@@ -22,7 +21,6 @@ ScreenChoiceBoxClass::ScreenChoiceBoxClass(int id, int x, int y, const char* lab
 }
 
 // ========== 虚接口实现 ==========
-
 bool ScreenChoiceBoxClass::GetDrawPosition(Point2D& outPos) const
 {
 	// 将百分比转换为实际像素坐标
@@ -68,7 +66,6 @@ ScreenChoiceBoxClass* ScreenChoiceBoxClass::FindOrCreate(int id, int x, int y,
 }
 
 // ========== 移除 ==========
-
 void ScreenChoiceBoxClass::RemoveByLabel(const char* label)
 {
 	if (!label || label[0] == '\0')

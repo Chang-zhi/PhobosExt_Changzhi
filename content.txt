@@ -18,11 +18,11 @@ Got AutoPlayMutex okay.
 [Phobos] Initialized version: Development Build #48
 [Phobos] ExceptionHandler is present
 [Phobos] Modules presumably injected by Syringe:
-Module Ares.dll  base address : 0x54D90000.
-Module Phobos.dll  base address : 0x54600000.
-Module PhobosExt.dll  base address : 0x54580000.
+Module Ares.dll  base address : 0x59AD0000.
+Module Phobos.dll  base address : 0x598E0000.
+Module PhobosExt.dll  base address : 0x59810000.
 Other modules:
-Module "AcGenral.dll"  base address : 0x54AB0000.
+Module "AcGenral.dll"  base address : 0x59DE0000.
 Module msvcrt.dll  base address : 0x767A0000.
 Module sechost.dll.mui  base address : 0x75560000.
 Module Win32u.DLL  base address : 0x76CC0000.
@@ -31,30 +31,30 @@ Module gdi32  base address : 0x762D0000.
 Module msvcp_win.dll  base address : 0x76C30000.
 Module ucrtbase.dll  base address : 0x75220000.
 Module OLEAUT32.DLL  base address : 0x756A0000.
-Module SAMCLI.DLL  base address : 0x555D0000.
+Module SAMCLI.DLL  base address : 0x6B180000.
 Module VERSION.DLL  base address : 0x74A50000.
 Module security.dll  base address : 0x71550000.
 Module CFGMGR32.DLL  base address : 0x6FB60000.
 Module SRVCLI.DLL  base address : 0x6F6C0000.
 Module NETUTILS.DLL  base address : 0x6F6B0000.
 Module imm32  base address : 0x754A0000.
-Module ddraw.dll  base address : 0x55560000.
-Module resampledmo.dll  base address : 0x55430000.
-Module WINMMbase.DLL.MUI  base address : 0x57310000.
-Module msdmo.dll  base address : 0x55420000.
-Module DBGHELP.DLL  base address : 0x68F90000.
-Module DBGCORE.DLL  base address : 0x57B80000.
+Module ddraw.dll  base address : 0x59CD0000.
+Module WINMMbase.DLL.MUI  base address : 0x6AF10000.
+Module resampledmo.dll  base address : 0x59BB0000.
+Module msdmo.dll  base address : 0x6AF00000.
+Module DBGHELP.DLL  base address : 0x666D0000.
+Module DBGCORE.DLL  base address : 0x59A60000.
 [Phobos] Detected Ares 3.0p1.
-[PhobosExt] Initialized version: Development Build 0.0.13.6
+[PhobosExt] Initialized version: Development Build 1.0.0.0
 [PhobosExt] ExceptionHandler is present
 [PhobosExt] [PhobosInterop] Init called
 [PhobosExt] [PhobosInterop] Failed
 [PhobosExt] Modules presumably injected by Syringe:
-Module Ares.dll  base address : 0x54D90000.
-Module Phobos.dll  base address : 0x54600000.
-Module PhobosExt.dll  base address : 0x54580000.
+Module Ares.dll  base address : 0x59AD0000.
+Module Phobos.dll  base address : 0x598E0000.
+Module PhobosExt.dll  base address : 0x59810000.
 Other modules:
-Module "AcGenral.dll"  base address : 0x54AB0000.
+Module "AcGenral.dll"  base address : 0x59DE0000.
 Module msvcrt.dll  base address : 0x767A0000.
 Module sechost.dll.mui  base address : 0x75560000.
 Module Win32u.DLL  base address : 0x76CC0000.
@@ -63,23 +63,23 @@ Module gdi32  base address : 0x762D0000.
 Module msvcp_win.dll  base address : 0x76C30000.
 Module ucrtbase.dll  base address : 0x75220000.
 Module OLEAUT32.DLL  base address : 0x756A0000.
-Module SAMCLI.DLL  base address : 0x555D0000.
+Module SAMCLI.DLL  base address : 0x6B180000.
 Module VERSION.DLL  base address : 0x74A50000.
 Module security.dll  base address : 0x71550000.
 Module CFGMGR32.DLL  base address : 0x6FB60000.
 Module SRVCLI.DLL  base address : 0x6F6C0000.
 Module NETUTILS.DLL  base address : 0x6F6B0000.
 Module imm32  base address : 0x754A0000.
-Module ddraw.dll  base address : 0x55560000.
-Module resampledmo.dll  base address : 0x55430000.
-Module WINMMbase.DLL.MUI  base address : 0x57310000.
-Module msdmo.dll  base address : 0x55420000.
-Module DBGHELP.DLL  base address : 0x68F90000.
-Module DBGCORE.DLL  base address : 0x57B80000.
+Module ddraw.dll  base address : 0x59CD0000.
+Module WINMMbase.DLL.MUI  base address : 0x6AF10000.
+Module resampledmo.dll  base address : 0x59BB0000.
+Module msdmo.dll  base address : 0x6AF00000.
+Module DBGHELP.DLL  base address : 0x666D0000.
+Module DBGCORE.DLL  base address : 0x59A60000.
 [Phobos] Detected Ares 3.0p1.
 Checking available disk space
 Using GetDiskFreeSpaceEx
-Free disk space is 100612 Mb
+Free disk space is 80566 Mb
 Init Encryption Keys.
 Init_Keys - declarations
 Init_Keys - Load
@@ -171,11 +171,11 @@ MessageListClass::Set_Width(624)
 Set_View_Dimensions(exit)
 Checking available disk space
 Using GetDiskFreeSpaceEx
-Free disk space is 100612 Mb
-Session one time init. UniqueID is 039ac0ca
+Free disk space is 80566 Mb
+Session one time init. UniqueID is f9e990ba
 Init Rules
 Init random number
-Seed is 0f7957b2
+Seed is 3d134fd4
 Init Commands
 Game Init Completed.
 ExceptionReturnStack = 0019D478
@@ -192,8 +192,12 @@ Default
 Default
 Default
 Default
+Default
+Default
+Default
+Default
 Init random number
-Seed is 0f796c44
+Seed is 3d13a528
 About to load a 0 player game.
 
 ----- Starting scnenario: ALL01UMD.MAP -----
@@ -262,11 +266,12 @@ Side 4: Mutant
 [PhobosExt] [Phobos] TaskForce CaptureFromINI: [TeamTypes] has 0 entries
 [PhobosExt] [Phobos] TaskForce CaptureFromINI: complete
 Processing sides.
-[PhobosExt] [Phobos] CaptureFromINI: [ScriptTypes] has 11 entries
-[PhobosExt] [Phobos] CaptureFromINI: [TeamTypes] has 9 entries
+[Phobos] [Developer warning] AITargetTypes (Count: 0): Error parsing [serw]
+[PhobosExt] [Phobos] CaptureFromINI: [ScriptTypes] has 13 entries
+[PhobosExt] [Phobos] CaptureFromINI: [TeamTypes] has 10 entries
 [PhobosExt] [Phobos] CaptureFromINI: complete
-[PhobosExt] [Phobos] TaskForce CaptureFromINI: [TaskForces] has 10 entries
-[PhobosExt] [Phobos] TaskForce CaptureFromINI: [TeamTypes] has 9 entries
+[PhobosExt] [Phobos] TaskForce CaptureFromINI: [TaskForces] has 12 entries
+[PhobosExt] [Phobos] TaskForce CaptureFromINI: [TeamTypes] has 10 entries
 [PhobosExt] [Phobos] TaskForce CaptureFromINI: complete
 Preparing Mixfiles for Side 01.
      Initilizing SIDEC02MD.MIX
@@ -337,55 +342,711 @@ ScoreRepeat is OFF
 ScoreShuffle is OFF
 IsTGrowth = 0
 IsTSpread = 1
+Default
+Default
 Tooltips are on.
 Capture_Mouse()
-Scenario Save: ElapsedTimer = 16226203
+Scenario Save: ElapsedTimer = 64043856
 SAVING GAME [ALL01UMD.sav] - Complete
 
+[Phobos] AI Scripts - ProcessAction: [01000195] [01000194] (line 0): Unknown Script Action: 5501
 Radar: TacticalMap availability is on
 Radar: ACTIVATING
+Default
+Default
+[PhobosExt] [TPV] Cell=(150,85) Unit=(38528,21888,1031) Progress=0.000 Consumed=0 Total=26 Frame=186
+[PhobosExt] [TPV] Draw seg[0->1] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(150,85) Unit=(38529,21902,1032) Progress=0.029 Consumed=0 Total=26 Frame=187
+[PhobosExt] [TPV] Draw seg[0->1] skip=0.8 progress=0.029
+[PhobosExt] [TPV] Cell=(150,85) Unit=(38535,21915,1033) Progress=0.066 Consumed=0 Total=26 Frame=188
+[PhobosExt] [TPV] Draw seg[0->1] skip=1.9 progress=0.066
+[PhobosExt] [TPV] Cell=(150,85) Unit=(38546,21925,1034) Progress=0.107 Consumed=0 Total=26 Frame=189
+[PhobosExt] [TPV] Draw seg[0->1] skip=3.2 progress=0.107
+[PhobosExt] [TPV] Cell=(150,85) Unit=(38557,21935,1035) Progress=0.148 Consumed=0 Total=26 Frame=190
+[PhobosExt] [TPV] Draw seg[0->1] skip=4.4 progress=0.148
+[PhobosExt] [TPV] Cell=(150,85) Unit=(38568,21945,1036) Progress=0.189 Consumed=0 Total=26 Frame=191
+[PhobosExt] [TPV] Draw seg[0->1] skip=5.6 progress=0.189
+[PhobosExt] [TPV] Cell=(150,85) Unit=(38579,21955,1037) Progress=0.230 Consumed=0 Total=26 Frame=192
+[PhobosExt] [TPV] Draw seg[0->1] skip=6.9 progress=0.230
+[PhobosExt] [TPV] Cell=(150,85) Unit=(38590,21965,1037) Progress=0.271 Consumed=0 Total=26 Frame=193
+[PhobosExt] [TPV] Draw seg[0->1] skip=8.1 progress=0.271
+[PhobosExt] [TPV] Cell=(150,85) Unit=(38601,21975,1037) Progress=0.312 Consumed=0 Total=26 Frame=194
+[PhobosExt] [TPV] Draw seg[0->1] skip=0.3 progress=0.312
+[PhobosExt] [TPV] Cell=(150,85) Unit=(38612,21985,1037) Progress=0.353 Consumed=0 Total=26 Frame=195
+[PhobosExt] [TPV] Draw seg[0->1] skip=1.6 progress=0.353
+[PhobosExt] [TPV] Cell=(150,85) Unit=(38623,21995,1036) Progress=0.394 Consumed=0 Total=26 Frame=196
+[PhobosExt] [TPV] Draw seg[0->1] skip=2.8 progress=0.394
+[PhobosExt] [TPV] Cell=(150,85) Unit=(38634,22005,1035) Progress=0.435 Consumed=0 Total=26 Frame=197
+[PhobosExt] [TPV] Draw seg[0->1] skip=4.0 progress=0.435
+[PhobosExt] [TPV] Cell=(150,85) Unit=(38645,22015,1034) Progress=0.476 Consumed=0 Total=26 Frame=198
+[PhobosExt] [TPV] Draw seg[0->1] skip=5.2 progress=0.476
+[PhobosExt] [TPV] Cell=(150,86) Unit=(38655,22025,1033) Progress=0.515 Consumed=0 Total=26 Frame=199
+[PhobosExt] [TPV] Draw seg[0->1] skip=6.4 progress=0.515
+[PhobosExt] [TPV] Cell=(151,86) Unit=(38666,22035,1031) Progress=0.000 Consumed=1 Total=26 Frame=200
+[PhobosExt] [TPV] Draw seg[1->2] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(151,86) Unit=(38677,22045,1029) Progress=0.000 Consumed=1 Total=26 Frame=201
+[PhobosExt] [TPV] Draw seg[1->2] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(151,86) Unit=(38688,22055,1027) Progress=0.000 Consumed=1 Total=26 Frame=202
+[PhobosExt] [TPV] Draw seg[1->2] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(151,86) Unit=(38699,22065,1025) Progress=0.000 Consumed=1 Total=26 Frame=203
+[PhobosExt] [TPV] Draw seg[1->2] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(151,86) Unit=(38709,22075,1023) Progress=0.000 Consumed=1 Total=26 Frame=204
+[PhobosExt] [TPV] Draw seg[1->2] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(151,86) Unit=(38720,22085,1021) Progress=0.000 Consumed=1 Total=26 Frame=205
+[PhobosExt] [TPV] Draw seg[1->2] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(151,86) Unit=(38731,22095,1020) Progress=0.000 Consumed=1 Total=26 Frame=206
+[PhobosExt] [TPV] Draw seg[1->2] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(151,86) Unit=(38742,22105,1019) Progress=0.000 Consumed=1 Total=26 Frame=207
+[PhobosExt] [TPV] Draw seg[1->2] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(151,86) Unit=(38752,22115,1018) Progress=0.000 Consumed=1 Total=26 Frame=208
+[PhobosExt] [TPV] Draw seg[1->2] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(151,86) Unit=(38763,22125,1017) Progress=0.000 Consumed=1 Total=26 Frame=209
+[PhobosExt] [TPV] Draw seg[1->2] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(151,86) Unit=(38774,22135,1016) Progress=0.000 Consumed=1 Total=26 Frame=210
+[PhobosExt] [TPV] Draw seg[1->2] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(151,86) Unit=(38785,22144,1015) Progress=0.000 Consumed=1 Total=26 Frame=211
+[PhobosExt] [TPV] Draw seg[1->2] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(151,86) Unit=(38795,22153,1014) Progress=0.035 Consumed=1 Total=26 Frame=212
+[PhobosExt] [TPV] Draw seg[1->2] skip=1.1 progress=0.035
+[PhobosExt] [TPV] Cell=(151,86) Unit=(38803,22165,1014) Progress=0.082 Consumed=1 Total=26 Frame=213
+[PhobosExt] [TPV] Draw seg[1->2] skip=2.7 progress=0.082
+[PhobosExt] [TPV] Cell=(151,86) Unit=(38806,22179,1014) Progress=0.136 Consumed=1 Total=26 Frame=214
+[PhobosExt] [TPV] Draw seg[1->2] skip=4.5 progress=0.136
+[PhobosExt] [TPV] Cell=(151,86) Unit=(38804,22193,1015) Progress=0.191 Consumed=1 Total=26 Frame=215
+[PhobosExt] [TPV] Draw seg[1->2] skip=6.4 progress=0.191
+[PhobosExt] [TPV] Cell=(151,86) Unit=(38802,22207,1016) Progress=0.246 Consumed=1 Total=26 Frame=216
+[PhobosExt] [TPV] Draw seg[1->2] skip=8.2 progress=0.246
+[PhobosExt] [TPV] Cell=(151,86) Unit=(38800,22221,1017) Progress=0.300 Consumed=1 Total=26 Frame=217
+[PhobosExt] [TPV] Draw seg[1->2] skip=1.0 progress=0.300
+[PhobosExt] [TPV] Cell=(151,86) Unit=(38798,22235,1018) Progress=0.355 Consumed=1 Total=26 Frame=218
+[PhobosExt] [TPV] Draw seg[1->2] skip=2.9 progress=0.355
+[PhobosExt] [TPV] Cell=(151,86) Unit=(38796,22249,1020) Progress=0.410 Consumed=1 Total=26 Frame=219
+[PhobosExt] [TPV] Draw seg[1->2] skip=4.7 progress=0.410
+[PhobosExt] [TPV] Cell=(151,86) Unit=(38794,22263,1022) Progress=0.464 Consumed=1 Total=26 Frame=220
+[PhobosExt] [TPV] Draw seg[1->2] skip=6.5 progress=0.464
+[PhobosExt] [TPV] Cell=(151,87) Unit=(38792,22277,1024) Progress=0.000 Consumed=2 Total=26 Frame=221
+[PhobosExt] [TPV] Draw seg[2->3] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(151,87) Unit=(38791,22291,1026) Progress=0.000 Consumed=2 Total=26 Frame=222
+[PhobosExt] [TPV] Draw seg[2->3] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(151,87) Unit=(38790,22305,1028) Progress=0.000 Consumed=2 Total=26 Frame=223
+[PhobosExt] [TPV] Draw seg[2->3] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(151,87) Unit=(38789,22319,1030) Progress=0.000 Consumed=2 Total=26 Frame=224
+[PhobosExt] [TPV] Draw seg[2->3] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(151,87) Unit=(38788,22333,1031) Progress=0.000 Consumed=2 Total=26 Frame=225
+[PhobosExt] [TPV] Draw seg[2->3] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(151,87) Unit=(38787,22347,1032) Progress=0.000 Consumed=2 Total=26 Frame=226
+[PhobosExt] [TPV] Draw seg[2->3] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(151,87) Unit=(38786,22361,1033) Progress=0.000 Consumed=2 Total=26 Frame=227
+[PhobosExt] [TPV] Draw seg[2->3] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(151,87) Unit=(38785,22375,1034) Progress=0.000 Consumed=2 Total=26 Frame=228
+[PhobosExt] [TPV] Draw seg[2->3] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(151,87) Unit=(38784,22389,1035) Progress=0.000 Consumed=2 Total=26 Frame=229
+[PhobosExt] [TPV] Draw seg[2->3] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(151,87) Unit=(38783,22404,1036) Progress=0.005 Consumed=2 Total=26 Frame=230
+[PhobosExt] [TPV] Draw seg[2->3] skip=0.1 progress=0.005
+[PhobosExt] [TPV] Cell=(151,87) Unit=(38782,22418,1037) Progress=0.031 Consumed=2 Total=26 Frame=231
+[PhobosExt] [TPV] Draw seg[2->3] skip=0.9 progress=0.031
+[PhobosExt] [TPV] Cell=(151,87) Unit=(38785,22432,1037) Progress=0.064 Consumed=2 Total=26 Frame=232
+[PhobosExt] [TPV] Draw seg[2->3] skip=1.9 progress=0.064
+[PhobosExt] [TPV] Cell=(151,87) Unit=(38792,22444,1037) Progress=0.101 Consumed=2 Total=26 Frame=233
+[PhobosExt] [TPV] Draw seg[2->3] skip=3.0 progress=0.101
+[PhobosExt] [TPV] Cell=(151,87) Unit=(38803,22453,1037) Progress=0.140 Consumed=2 Total=26 Frame=234
+[PhobosExt] [TPV] Draw seg[2->3] skip=4.2 progress=0.140
+[PhobosExt] [TPV] Cell=(151,87) Unit=(38814,22462,1036) Progress=0.179 Consumed=2 Total=26 Frame=235
+[PhobosExt] [TPV] Draw seg[2->3] skip=5.3 progress=0.179
+[PhobosExt] [TPV] Cell=(151,87) Unit=(38825,22471,1035) Progress=0.218 Consumed=2 Total=26 Frame=236
+[PhobosExt] [TPV] Draw seg[2->3] skip=6.5 progress=0.218
+[PhobosExt] [TPV] Cell=(151,87) Unit=(38836,22480,1034) Progress=0.257 Consumed=2 Total=26 Frame=237
+[PhobosExt] [TPV] Draw seg[2->3] skip=7.7 progress=0.257
+[PhobosExt] [TPV] Cell=(151,87) Unit=(38847,22489,1033) Progress=0.296 Consumed=2 Total=26 Frame=238
+[PhobosExt] [TPV] Draw seg[2->3] skip=8.9 progress=0.296
+[PhobosExt] [TPV] Cell=(151,87) Unit=(38858,22498,1031) Progress=0.335 Consumed=2 Total=26 Frame=239
+[PhobosExt] [TPV] Draw seg[2->3] skip=1.0 progress=0.335
+[PhobosExt] [TPV] Cell=(151,87) Unit=(38869,22507,1029) Progress=0.375 Consumed=2 Total=26 Frame=240
+[PhobosExt] [TPV] Draw seg[2->3] skip=2.2 progress=0.375
+[PhobosExt] [TPV] Cell=(151,87) Unit=(38880,22516,1027) Progress=0.414 Consumed=2 Total=26 Frame=241
+[PhobosExt] [TPV] Draw seg[2->3] skip=3.4 progress=0.414
+[PhobosExt] [TPV] Cell=(151,87) Unit=(38891,22525,1025) Progress=0.453 Consumed=2 Total=26 Frame=242
+[PhobosExt] [TPV] Draw seg[2->3] skip=4.5 progress=0.453
+[PhobosExt] [TPV] Cell=(151,88) Unit=(38902,22534,1023) Progress=1.000 Consumed=0 Total=26 Frame=243
+[PhobosExt] [TPV] Draw seg[0->1] skip=3.0 progress=1.000
+[PhobosExt] [TPV] Cell=(152,88) Unit=(38913,22543,1021) Progress=0.000 Consumed=3 Total=26 Frame=244
+[PhobosExt] [TPV] Draw seg[3->4] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(152,88) Unit=(38924,22552,1020) Progress=0.000 Consumed=3 Total=26 Frame=245
+[PhobosExt] [TPV] Draw seg[3->4] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(152,88) Unit=(38935,22561,1019) Progress=0.000 Consumed=3 Total=26 Frame=246
+[PhobosExt] [TPV] Draw seg[3->4] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(152,88) Unit=(38946,22571,1018) Progress=0.000 Consumed=3 Total=26 Frame=247
+[PhobosExt] [TPV] Draw seg[3->4] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(152,88) Unit=(38957,22581,1017) Progress=0.000 Consumed=3 Total=26 Frame=248
+[PhobosExt] [TPV] Draw seg[3->4] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(152,88) Unit=(38968,22591,1016) Progress=0.000 Consumed=3 Total=26 Frame=249
+[PhobosExt] [TPV] Draw seg[3->4] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(152,88) Unit=(38979,22600,1015) Progress=0.000 Consumed=3 Total=26 Frame=250
+[PhobosExt] [TPV] Draw seg[3->4] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(152,88) Unit=(38990,22610,1014) Progress=0.000 Consumed=3 Total=26 Frame=251
+[PhobosExt] [TPV] Draw seg[3->4] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(152,88) Unit=(39001,22620,1014) Progress=0.000 Consumed=3 Total=26 Frame=252
+[PhobosExt] [TPV] Draw seg[3->4] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(152,88) Unit=(39012,22630,1014) Progress=0.000 Consumed=3 Total=26 Frame=253
+[PhobosExt] [TPV] Draw seg[3->4] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(152,88) Unit=(39022,22640,1015) Progress=0.000 Consumed=3 Total=26 Frame=254
+[PhobosExt] [TPV] Draw seg[3->4] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(152,88) Unit=(39033,22649,1016) Progress=0.000 Consumed=3 Total=26 Frame=255
+[PhobosExt] [TPV] Draw seg[3->4] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(152,88) Unit=(39043,22659,1017) Progress=0.011 Consumed=3 Total=26 Frame=256
+[PhobosExt] [TPV] Draw seg[3->4] skip=0.3 progress=0.011
+[PhobosExt] [TPV] Cell=(152,88) Unit=(39053,22669,1018) Progress=0.050 Consumed=3 Total=26 Frame=257
+[PhobosExt] [TPV] Draw seg[3->4] skip=1.5 progress=0.050
+[PhobosExt] [TPV] Cell=(152,88) Unit=(39063,22679,1020) Progress=0.089 Consumed=3 Total=26 Frame=258
+[PhobosExt] [TPV] Draw seg[3->4] skip=2.6 progress=0.089
+[PhobosExt] [TPV] Cell=(152,88) Unit=(39073,22689,1022) Progress=0.128 Consumed=3 Total=26 Frame=259
+[PhobosExt] [TPV] Draw seg[3->4] skip=3.8 progress=0.128
+[PhobosExt] [TPV] Cell=(152,88) Unit=(39083,22699,1024) Progress=0.167 Consumed=3 Total=26 Frame=260
+[PhobosExt] [TPV] Draw seg[3->4] skip=5.0 progress=0.167
+[PhobosExt] [TPV] Cell=(152,88) Unit=(39093,22709,1026) Progress=0.207 Consumed=3 Total=26 Frame=261
+[PhobosExt] [TPV] Draw seg[3->4] skip=6.2 progress=0.207
+[PhobosExt] [TPV] Cell=(152,88) Unit=(39103,22719,1028) Progress=0.246 Consumed=3 Total=26 Frame=262
+[PhobosExt] [TPV] Draw seg[3->4] skip=7.3 progress=0.246
+[PhobosExt] [TPV] Cell=(152,88) Unit=(39113,22729,1030) Progress=0.285 Consumed=3 Total=26 Frame=263
+[PhobosExt] [TPV] Draw seg[3->4] skip=8.5 progress=0.285
+[PhobosExt] [TPV] Cell=(152,88) Unit=(39123,22739,1031) Progress=0.324 Consumed=3 Total=26 Frame=264
+[PhobosExt] [TPV] Draw seg[3->4] skip=0.7 progress=0.324
+[PhobosExt] [TPV] Cell=(152,88) Unit=(39133,22749,1032) Progress=0.363 Consumed=3 Total=26 Frame=265
+[PhobosExt] [TPV] Draw seg[3->4] skip=1.8 progress=0.363
+[PhobosExt] [TPV] Cell=(152,88) Unit=(39143,22759,1033) Progress=0.402 Consumed=3 Total=26 Frame=266
+[PhobosExt] [TPV] Draw seg[3->4] skip=3.0 progress=0.402
+[PhobosExt] [TPV] Cell=(152,88) Unit=(39153,22769,1034) Progress=0.441 Consumed=3 Total=26 Frame=267
+[PhobosExt] [TPV] Draw seg[3->4] skip=4.2 progress=0.441
+[PhobosExt] [TPV] Cell=(152,88) Unit=(39163,22779,1035) Progress=0.480 Consumed=3 Total=26 Frame=268
+[PhobosExt] [TPV] Draw seg[3->4] skip=5.4 progress=0.480
+[PhobosExt] [TPV] Cell=(153,89) Unit=(39173,22789,1036) Progress=0.000 Consumed=4 Total=26 Frame=269
+[PhobosExt] [TPV] Draw seg[4->5] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(153,89) Unit=(39183,22799,1037) Progress=0.000 Consumed=4 Total=26 Frame=270
+[PhobosExt] [TPV] Draw seg[4->5] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(153,89) Unit=(39193,22809,1037) Progress=0.000 Consumed=4 Total=26 Frame=271
+[PhobosExt] [TPV] Draw seg[4->5] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(153,89) Unit=(39203,22819,1037) Progress=0.000 Consumed=4 Total=26 Frame=272
+[PhobosExt] [TPV] Draw seg[4->5] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(153,89) Unit=(39213,22829,1037) Progress=0.000 Consumed=4 Total=26 Frame=273
+[PhobosExt] [TPV] Draw seg[4->5] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(153,89) Unit=(39223,22839,1036) Progress=0.000 Consumed=4 Total=26 Frame=274
+[PhobosExt] [TPV] Draw seg[4->5] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(153,89) Unit=(39233,22849,1035) Progress=0.000 Consumed=4 Total=26 Frame=275
+[PhobosExt] [TPV] Draw seg[4->5] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(153,89) Unit=(39243,22859,1034) Progress=0.000 Consumed=4 Total=26 Frame=276
+[PhobosExt] [TPV] Draw seg[4->5] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(153,89) Unit=(39253,22869,1033) Progress=0.000 Consumed=4 Total=26 Frame=277
+[PhobosExt] [TPV] Draw seg[4->5] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(153,89) Unit=(39263,22879,1031) Progress=0.000 Consumed=4 Total=26 Frame=278
+[PhobosExt] [TPV] Draw seg[4->5] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(153,89) Unit=(39273,22889,1029) Progress=0.000 Consumed=4 Total=26 Frame=279
+[PhobosExt] [TPV] Draw seg[4->5] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(153,89) Unit=(39283,22899,1027) Progress=0.000 Consumed=4 Total=26 Frame=280
+[PhobosExt] [TPV] Draw seg[4->5] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(153,89) Unit=(39293,22909,1025) Progress=0.000 Consumed=4 Total=26 Frame=281
+[PhobosExt] [TPV] Draw seg[4->5] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(153,89) Unit=(39303,22919,1023) Progress=0.027 Consumed=4 Total=26 Frame=282
+[PhobosExt] [TPV] Draw seg[4->5] skip=0.8 progress=0.027
+[PhobosExt] [TPV] Cell=(153,89) Unit=(39313,22929,1021) Progress=0.066 Consumed=4 Total=26 Frame=283
+[PhobosExt] [TPV] Draw seg[4->5] skip=1.9 progress=0.066
+[PhobosExt] [TPV] Cell=(153,89) Unit=(39323,22939,1020) Progress=0.105 Consumed=4 Total=26 Frame=284
+[PhobosExt] [TPV] Draw seg[4->5] skip=3.1 progress=0.105
+[PhobosExt] [TPV] Cell=(153,89) Unit=(39333,22949,1019) Progress=0.144 Consumed=4 Total=26 Frame=285
+[PhobosExt] [TPV] Draw seg[4->5] skip=4.3 progress=0.144
+[PhobosExt] [TPV] Cell=(153,89) Unit=(39343,22959,1018) Progress=0.183 Consumed=4 Total=26 Frame=286
+[PhobosExt] [TPV] Draw seg[4->5] skip=5.5 progress=0.183
+[PhobosExt] [TPV] Cell=(153,89) Unit=(39353,22969,1017) Progress=0.222 Consumed=4 Total=26 Frame=287
+[PhobosExt] [TPV] Draw seg[4->5] skip=6.6 progress=0.222
+[PhobosExt] [TPV] Cell=(153,89) Unit=(39363,22979,1016) Progress=0.261 Consumed=4 Total=26 Frame=288
+[PhobosExt] [TPV] Draw seg[4->5] skip=7.8 progress=0.261
+[PhobosExt] [TPV] Cell=(153,89) Unit=(39373,22989,1015) Progress=0.300 Consumed=4 Total=26 Frame=289
+[PhobosExt] [TPV] Draw seg[4->5] skip=0.0 progress=0.300
+[PhobosExt] [TPV] Cell=(153,89) Unit=(39383,22999,1014) Progress=0.339 Consumed=4 Total=26 Frame=290
+[PhobosExt] [TPV] Draw seg[4->5] skip=1.1 progress=0.339
+[PhobosExt] [TPV] Cell=(153,89) Unit=(39393,23009,1014) Progress=0.378 Consumed=4 Total=26 Frame=291
+[PhobosExt] [TPV] Draw seg[4->5] skip=2.3 progress=0.378
+[PhobosExt] [TPV] Cell=(153,89) Unit=(39403,23019,1014) Progress=0.417 Consumed=4 Total=26 Frame=292
+[PhobosExt] [TPV] Draw seg[4->5] skip=3.5 progress=0.417
+[PhobosExt] [TPV] Cell=(153,89) Unit=(39413,23029,1015) Progress=0.457 Consumed=4 Total=26 Frame=293
+[PhobosExt] [TPV] Draw seg[4->5] skip=4.7 progress=0.457
+[PhobosExt] [TPV] Cell=(153,89) Unit=(39423,23039,1016) Progress=0.496 Consumed=4 Total=26 Frame=294
+[PhobosExt] [TPV] Draw seg[4->5] skip=5.8 progress=0.496
+[PhobosExt] [TPV] Cell=(154,90) Unit=(39433,23049,1017) Progress=0.000 Consumed=5 Total=26 Frame=295
+[PhobosExt] [TPV] Draw seg[5->6] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(154,90) Unit=(39443,23059,1018) Progress=0.000 Consumed=5 Total=26 Frame=296
+[PhobosExt] [TPV] Draw seg[5->6] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(154,90) Unit=(39453,23069,1020) Progress=0.000 Consumed=5 Total=26 Frame=297
+[PhobosExt] [TPV] Draw seg[5->6] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(154,90) Unit=(39463,23079,1022) Progress=0.000 Consumed=5 Total=26 Frame=298
+[PhobosExt] [TPV] Draw seg[5->6] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(154,90) Unit=(39473,23089,1024) Progress=0.000 Consumed=5 Total=26 Frame=299
+[PhobosExt] [TPV] Draw seg[5->6] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(154,90) Unit=(39483,23099,1026) Progress=0.000 Consumed=5 Total=26 Frame=300
+[PhobosExt] [TPV] Draw seg[5->6] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(154,90) Unit=(39493,23109,1028) Progress=0.000 Consumed=5 Total=26 Frame=301
+[PhobosExt] [TPV] Draw seg[5->6] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(154,90) Unit=(39503,23119,1030) Progress=0.000 Consumed=5 Total=26 Frame=302
+[PhobosExt] [TPV] Draw seg[5->6] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(154,90) Unit=(39513,23129,1031) Progress=0.000 Consumed=5 Total=26 Frame=303
+[PhobosExt] [TPV] Draw seg[5->6] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(154,90) Unit=(39523,23139,1032) Progress=0.000 Consumed=5 Total=26 Frame=304
+[PhobosExt] [TPV] Draw seg[5->6] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(154,90) Unit=(39533,23149,1033) Progress=0.000 Consumed=5 Total=26 Frame=305
+[PhobosExt] [TPV] Draw seg[5->6] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(154,90) Unit=(39543,23159,1034) Progress=0.000 Consumed=5 Total=26 Frame=306
+[PhobosExt] [TPV] Draw seg[5->6] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(154,90) Unit=(39553,23169,1035) Progress=0.003 Consumed=5 Total=26 Frame=307
+[PhobosExt] [TPV] Draw seg[5->6] skip=0.1 progress=0.003
+[PhobosExt] [TPV] Cell=(154,90) Unit=(39563,23179,1036) Progress=0.042 Consumed=5 Total=26 Frame=308
+[PhobosExt] [TPV] Draw seg[5->6] skip=1.2 progress=0.042
+[PhobosExt] [TPV] Cell=(154,90) Unit=(39573,23189,1037) Progress=0.082 Consumed=5 Total=26 Frame=309
+[PhobosExt] [TPV] Draw seg[5->6] skip=2.4 progress=0.082
+[PhobosExt] [TPV] Cell=(154,90) Unit=(39583,23199,1037) Progress=0.121 Consumed=5 Total=26 Frame=310
+[PhobosExt] [TPV] Draw seg[5->6] skip=3.6 progress=0.121
+[PhobosExt] [TPV] Cell=(154,90) Unit=(39593,23209,1037) Progress=0.160 Consumed=5 Total=26 Frame=311
+[PhobosExt] [TPV] Draw seg[5->6] skip=4.8 progress=0.160
+[PhobosExt] [TPV] Cell=(154,90) Unit=(39603,23219,1037) Progress=0.199 Consumed=5 Total=26 Frame=312
+[PhobosExt] [TPV] Draw seg[5->6] skip=5.9 progress=0.199
+[PhobosExt] [TPV] Cell=(154,90) Unit=(39613,23229,1036) Progress=0.238 Consumed=5 Total=26 Frame=313
+[PhobosExt] [TPV] Draw seg[5->6] skip=7.1 progress=0.238
+[PhobosExt] [TPV] Cell=(154,90) Unit=(39623,23239,1035) Progress=0.277 Consumed=5 Total=26 Frame=314
+[PhobosExt] [TPV] Draw seg[5->6] skip=8.3 progress=0.277
+[PhobosExt] [TPV] Cell=(154,90) Unit=(39633,23249,1034) Progress=0.316 Consumed=5 Total=26 Frame=315
+[PhobosExt] [TPV] Draw seg[5->6] skip=0.4 progress=0.316
+[PhobosExt] [TPV] Cell=(154,90) Unit=(39643,23259,1033) Progress=0.355 Consumed=5 Total=26 Frame=316
+[PhobosExt] [TPV] Draw seg[5->6] skip=1.6 progress=0.355
+[PhobosExt] [TPV] Cell=(154,90) Unit=(39653,23269,1031) Progress=0.394 Consumed=5 Total=26 Frame=317
+[PhobosExt] [TPV] Draw seg[5->6] skip=2.8 progress=0.394
+[PhobosExt] [TPV] Cell=(154,90) Unit=(39663,23279,1029) Progress=0.433 Consumed=5 Total=26 Frame=318
+[PhobosExt] [TPV] Draw seg[5->6] skip=4.0 progress=0.433
+[PhobosExt] [TPV] Cell=(154,90) Unit=(39673,23289,1027) Progress=0.472 Consumed=5 Total=26 Frame=319
+[PhobosExt] [TPV] Draw seg[5->6] skip=5.1 progress=0.472
+[PhobosExt] [TPV] Cell=(155,91) Unit=(39683,23299,1025) Progress=0.000 Consumed=6 Total=26 Frame=320
+[PhobosExt] [TPV] Draw seg[6->7] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(155,91) Unit=(39693,23309,1027) Progress=0.000 Consumed=6 Total=26 Frame=321
+[PhobosExt] [TPV] Draw seg[6->7] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(155,91) Unit=(39703,23319,1030) Progress=0.000 Consumed=6 Total=26 Frame=322
+[PhobosExt] [TPV] Draw seg[6->7] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(155,91) Unit=(39713,23329,1033) Progress=0.000 Consumed=6 Total=26 Frame=323
+[PhobosExt] [TPV] Draw seg[6->7] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(155,91) Unit=(39723,23339,1037) Progress=0.000 Consumed=6 Total=26 Frame=324
+[PhobosExt] [TPV] Draw seg[6->7] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(155,91) Unit=(39733,23349,1041) Progress=0.000 Consumed=6 Total=26 Frame=325
+[PhobosExt] [TPV] Draw seg[6->7] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(155,91) Unit=(39743,23359,1045) Progress=0.000 Consumed=6 Total=26 Frame=326
+[PhobosExt] [TPV] Draw seg[6->7] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(155,91) Unit=(39753,23369,1048) Progress=0.000 Consumed=6 Total=26 Frame=327
+[PhobosExt] [TPV] Draw seg[6->7] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(155,91) Unit=(39763,23379,1051) Progress=0.000 Consumed=6 Total=26 Frame=328
+[PhobosExt] [TPV] Draw seg[6->7] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(155,91) Unit=(39773,23389,1054) Progress=0.000 Consumed=6 Total=26 Frame=329
+[PhobosExt] [TPV] Draw seg[6->7] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(155,91) Unit=(39783,23399,1058) Progress=0.000 Consumed=6 Total=26 Frame=330
+[PhobosExt] [TPV] Draw seg[6->7] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(155,91) Unit=(39793,23409,1062) Progress=0.000 Consumed=6 Total=26 Frame=331
+[PhobosExt] [TPV] Draw seg[6->7] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(155,91) Unit=(39803,23419,1067) Progress=0.000 Consumed=6 Total=26 Frame=332
+[PhobosExt] [TPV] Draw seg[6->7] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(155,91) Unit=(39813,23429,1072) Progress=0.019 Consumed=6 Total=26 Frame=333
+[PhobosExt] [TPV] Draw seg[6->7] skip=0.2 progress=0.019
+[PhobosExt] [TPV] Cell=(155,91) Unit=(39823,23439,1077) Progress=0.058 Consumed=6 Total=26 Frame=334
+[PhobosExt] [TPV] Draw seg[6->7] skip=0.8 progress=0.058
+[PhobosExt] [TPV] Cell=(155,91) Unit=(39833,23449,1081) Progress=0.097 Consumed=6 Total=26 Frame=335
+[PhobosExt] [TPV] Draw seg[6->7] skip=1.4 progress=0.097
+[PhobosExt] [TPV] Cell=(155,91) Unit=(39843,23459,1086) Progress=0.136 Consumed=6 Total=26 Frame=336
+[PhobosExt] [TPV] Draw seg[6->7] skip=2.0 progress=0.136
+[PhobosExt] [TPV] Cell=(155,91) Unit=(39853,23469,1091) Progress=0.175 Consumed=6 Total=26 Frame=337
+[PhobosExt] [TPV] Draw seg[6->7] skip=2.6 progress=0.175
+[PhobosExt] [TPV] Cell=(155,91) Unit=(39863,23479,1095) Progress=0.214 Consumed=6 Total=26 Frame=338
+[PhobosExt] [TPV] Draw seg[6->7] skip=3.2 progress=0.214
+[PhobosExt] [TPV] Cell=(155,91) Unit=(39873,23489,1099) Progress=0.253 Consumed=6 Total=26 Frame=339
+[PhobosExt] [TPV] Draw seg[6->7] skip=3.8 progress=0.253
+[PhobosExt] [TPV] Cell=(155,91) Unit=(39883,23499,1102) Progress=0.292 Consumed=6 Total=26 Frame=340
+[PhobosExt] [TPV] Draw seg[6->7] skip=4.3 progress=0.292
+[PhobosExt] [TPV] Cell=(155,91) Unit=(39893,23509,1105) Progress=0.332 Consumed=6 Total=26 Frame=341
+[PhobosExt] [TPV] Draw seg[6->7] skip=4.9 progress=0.332
+[PhobosExt] [TPV] Cell=(155,91) Unit=(39903,23519,1108) Progress=0.371 Consumed=6 Total=26 Frame=342
+[PhobosExt] [TPV] Draw seg[6->7] skip=5.5 progress=0.371
+[PhobosExt] [TPV] Cell=(155,91) Unit=(39913,23529,1111) Progress=0.410 Consumed=6 Total=26 Frame=343
+[PhobosExt] [TPV] Draw seg[6->7] skip=6.1 progress=0.410
+[PhobosExt] [TPV] Cell=(155,91) Unit=(39923,23539,1114) Progress=0.449 Consumed=6 Total=26 Frame=344
+[PhobosExt] [TPV] Draw seg[6->7] skip=6.7 progress=0.449
+[PhobosExt] [TPV] Cell=(155,91) Unit=(39933,23549,1117) Progress=0.488 Consumed=6 Total=26 Frame=345
+[PhobosExt] [TPV] Draw seg[6->7] skip=7.3 progress=0.488
+[PhobosExt] [TPV] Cell=(156,92) Unit=(39943,23559,1120) Progress=0.000 Consumed=7 Total=26 Frame=346
+[PhobosExt] [TPV] Draw seg[7->8] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(156,92) Unit=(39953,23569,1123) Progress=0.000 Consumed=7 Total=26 Frame=347
+[PhobosExt] [TPV] Draw seg[7->8] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(156,92) Unit=(39963,23579,1126) Progress=0.000 Consumed=7 Total=26 Frame=348
+[PhobosExt] [TPV] Draw seg[7->8] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(156,92) Unit=(39973,23589,1128) Progress=0.000 Consumed=7 Total=26 Frame=349
+[PhobosExt] [TPV] Draw seg[7->8] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(156,92) Unit=(39983,23599,1130) Progress=0.000 Consumed=7 Total=26 Frame=350
+[PhobosExt] [TPV] Draw seg[7->8] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(156,92) Unit=(39993,23609,1132) Progress=0.000 Consumed=7 Total=26 Frame=351
+[PhobosExt] [TPV] Draw seg[7->8] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(156,92) Unit=(40003,23619,1134) Progress=0.000 Consumed=7 Total=26 Frame=352
+[PhobosExt] [TPV] Draw seg[7->8] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(156,92) Unit=(40013,23629,1137) Progress=0.000 Consumed=7 Total=26 Frame=353
+[PhobosExt] [TPV] Draw seg[7->8] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(156,92) Unit=(40023,23639,1140) Progress=0.000 Consumed=7 Total=26 Frame=354
+[PhobosExt] [TPV] Draw seg[7->8] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(156,92) Unit=(40033,23649,1143) Progress=0.000 Consumed=7 Total=26 Frame=355
+[PhobosExt] [TPV] Draw seg[7->8] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(156,92) Unit=(40043,23659,1146) Progress=0.000 Consumed=7 Total=26 Frame=356
+[PhobosExt] [TPV] Draw seg[7->8] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(156,92) Unit=(40053,23669,1149) Progress=0.000 Consumed=7 Total=26 Frame=357
+[PhobosExt] [TPV] Draw seg[7->8] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(156,92) Unit=(40063,23679,1152) Progress=0.000 Consumed=7 Total=26 Frame=358
+[PhobosExt] [TPV] Draw seg[7->8] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(156,92) Unit=(40073,23689,1155) Progress=0.035 Consumed=7 Total=26 Frame=359
+[PhobosExt] [TPV] Draw seg[7->8] skip=1.0 progress=0.035
+[PhobosExt] [TPV] Cell=(156,92) Unit=(40083,23699,1155) Progress=0.074 Consumed=7 Total=26 Frame=360
+[PhobosExt] [TPV] Draw seg[7->8] skip=2.2 progress=0.074
+[PhobosExt] [TPV] Cell=(156,92) Unit=(40093,23709,1154) Progress=0.113 Consumed=7 Total=26 Frame=361
+[PhobosExt] [TPV] Draw seg[7->8] skip=3.3 progress=0.113
+[PhobosExt] [TPV] Cell=(156,92) Unit=(40103,23719,1152) Progress=0.152 Consumed=7 Total=26 Frame=362
+[PhobosExt] [TPV] Draw seg[7->8] skip=4.5 progress=0.152
+[PhobosExt] [TPV] Cell=(156,92) Unit=(40113,23729,1150) Progress=0.191 Consumed=7 Total=26 Frame=363
+[PhobosExt] [TPV] Draw seg[7->8] skip=5.7 progress=0.191
+[PhobosExt] [TPV] Cell=(156,92) Unit=(40123,23739,1148) Progress=0.230 Consumed=7 Total=26 Frame=364
+[PhobosExt] [TPV] Draw seg[7->8] skip=6.9 progress=0.230
+[PhobosExt] [TPV] Cell=(156,92) Unit=(40133,23749,1146) Progress=0.269 Consumed=7 Total=26 Frame=365
+[PhobosExt] [TPV] Draw seg[7->8] skip=8.0 progress=0.269
+[PhobosExt] [TPV] Cell=(156,92) Unit=(40143,23759,1144) Progress=0.308 Consumed=7 Total=26 Frame=366
+[PhobosExt] [TPV] Draw seg[7->8] skip=0.2 progress=0.308
+[PhobosExt] [TPV] Cell=(156,92) Unit=(40153,23769,1142) Progress=0.347 Consumed=7 Total=26 Frame=367
+[PhobosExt] [TPV] Draw seg[7->8] skip=1.4 progress=0.347
+[PhobosExt] [TPV] Cell=(156,92) Unit=(40163,23779,1140) Progress=0.386 Consumed=7 Total=26 Frame=368
+[PhobosExt] [TPV] Draw seg[7->8] skip=2.6 progress=0.386
+[PhobosExt] [TPV] Cell=(156,92) Unit=(40173,23789,1139) Progress=0.425 Consumed=7 Total=26 Frame=369
+[PhobosExt] [TPV] Draw seg[7->8] skip=3.7 progress=0.425
+[PhobosExt] [TPV] Cell=(156,92) Unit=(40183,23799,1138) Progress=0.464 Consumed=7 Total=26 Frame=370
+[PhobosExt] [TPV] Draw seg[7->8] skip=4.9 progress=0.464
+[PhobosExt] [TPV] Cell=(157,93) Unit=(40193,23809,1138) Progress=0.000 Consumed=8 Total=26 Frame=371
+[PhobosExt] [TPV] Draw seg[8->9] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(157,93) Unit=(40203,23819,1138) Progress=0.000 Consumed=8 Total=26 Frame=372
+[PhobosExt] [TPV] Draw seg[8->9] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(157,93) Unit=(40213,23829,1138) Progress=0.000 Consumed=8 Total=26 Frame=373
+[PhobosExt] [TPV] Draw seg[8->9] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(157,93) Unit=(40223,23839,1138) Progress=0.000 Consumed=8 Total=26 Frame=374
+[PhobosExt] [TPV] Draw seg[8->9] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(157,93) Unit=(40233,23849,1139) Progress=0.000 Consumed=8 Total=26 Frame=375
+[PhobosExt] [TPV] Draw seg[8->9] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(157,93) Unit=(40243,23859,1140) Progress=0.000 Consumed=8 Total=26 Frame=376
+[PhobosExt] [TPV] Draw seg[8->9] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(157,93) Unit=(40253,23869,1141) Progress=0.000 Consumed=8 Total=26 Frame=377
+[PhobosExt] [TPV] Draw seg[8->9] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(157,93) Unit=(40263,23879,1142) Progress=0.000 Consumed=8 Total=26 Frame=378
+[PhobosExt] [TPV] Draw seg[8->9] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(157,93) Unit=(40273,23889,1143) Progress=0.000 Consumed=8 Total=26 Frame=379
+[PhobosExt] [TPV] Draw seg[8->9] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(157,93) Unit=(40283,23899,1144) Progress=0.000 Consumed=8 Total=26 Frame=380
+[PhobosExt] [TPV] Draw seg[8->9] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(157,93) Unit=(40293,23909,1145) Progress=0.000 Consumed=8 Total=26 Frame=381
+[PhobosExt] [TPV] Draw seg[8->9] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(157,93) Unit=(40303,23919,1146) Progress=0.000 Consumed=8 Total=26 Frame=382
+[PhobosExt] [TPV] Draw seg[8->9] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(157,93) Unit=(40313,23929,1147) Progress=0.000 Consumed=8 Total=26 Frame=383
+[PhobosExt] [TPV] Draw seg[8->9] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(157,93) Unit=(40323,23939,1148) Progress=0.011 Consumed=8 Total=26 Frame=384
+[PhobosExt] [TPV] Draw seg[8->9] skip=0.3 progress=0.011
+[PhobosExt] [TPV] Cell=(157,93) Unit=(40333,23948,1149) Progress=0.046 Consumed=8 Total=26 Frame=385
+[PhobosExt] [TPV] Draw seg[8->9] skip=1.5 progress=0.046
+[PhobosExt] [TPV] Cell=(157,93) Unit=(40340,23960,1150) Progress=0.093 Consumed=8 Total=26 Frame=386
+[PhobosExt] [TPV] Draw seg[8->9] skip=3.1 progress=0.093
+[PhobosExt] [TPV] Cell=(157,93) Unit=(40343,23974,1151) Progress=0.148 Consumed=8 Total=26 Frame=387
+[PhobosExt] [TPV] Draw seg[8->9] skip=4.9 progress=0.148
+[PhobosExt] [TPV] Cell=(157,93) Unit=(40341,23988,1151) Progress=0.203 Consumed=8 Total=26 Frame=388
+[PhobosExt] [TPV] Draw seg[8->9] skip=6.8 progress=0.203
+[PhobosExt] [TPV] Cell=(157,93) Unit=(40339,24002,1151) Progress=0.257 Consumed=8 Total=26 Frame=389
+[PhobosExt] [TPV] Draw seg[8->9] skip=8.6 progress=0.257
+[PhobosExt] [TPV] Cell=(157,93) Unit=(40337,24016,1151) Progress=0.312 Consumed=8 Total=26 Frame=390
+[PhobosExt] [TPV] Draw seg[8->9] skip=1.4 progress=0.312
+[PhobosExt] [TPV] Cell=(157,93) Unit=(40335,24030,1150) Progress=0.367 Consumed=8 Total=26 Frame=391
+[PhobosExt] [TPV] Draw seg[8->9] skip=3.3 progress=0.367
+[PhobosExt] [TPV] Cell=(157,93) Unit=(40333,24044,1149) Progress=0.421 Consumed=8 Total=26 Frame=392
+[PhobosExt] [TPV] Draw seg[8->9] skip=5.1 progress=0.421
+[PhobosExt] [TPV] Cell=(157,93) Unit=(40331,24058,1148) Progress=0.476 Consumed=8 Total=26 Frame=393
+[PhobosExt] [TPV] Draw seg[8->9] skip=6.9 progress=0.476
+[PhobosExt] [TPV] Cell=(157,94) Unit=(40329,24072,1147) Progress=0.000 Consumed=9 Total=26 Frame=394
+[PhobosExt] [TPV] Draw seg[9->10] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(157,94) Unit=(40327,24086,1145) Progress=0.000 Consumed=9 Total=26 Frame=395
+[PhobosExt] [TPV] Draw seg[9->10] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(157,94) Unit=(40326,24100,1143) Progress=0.000 Consumed=9 Total=26 Frame=396
+[PhobosExt] [TPV] Draw seg[9->10] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(157,94) Unit=(40325,24114,1141) Progress=0.000 Consumed=9 Total=26 Frame=397
+[PhobosExt] [TPV] Draw seg[9->10] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(157,94) Unit=(40324,24128,1139) Progress=0.000 Consumed=9 Total=26 Frame=398
+[PhobosExt] [TPV] Draw seg[9->10] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(157,94) Unit=(40323,24142,1137) Progress=0.000 Consumed=9 Total=26 Frame=399
+[PhobosExt] [TPV] Draw seg[9->10] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(157,94) Unit=(40322,24156,1135) Progress=0.000 Consumed=9 Total=26 Frame=400
+[PhobosExt] [TPV] Draw seg[9->10] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(157,94) Unit=(40321,24170,1133) Progress=0.000 Consumed=9 Total=26 Frame=401
+[PhobosExt] [TPV] Draw seg[9->10] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(157,94) Unit=(40320,24184,1131) Progress=0.000 Consumed=9 Total=26 Frame=402
+[PhobosExt] [TPV] Draw seg[9->10] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(157,94) Unit=(40319,24199,1129) Progress=0.011 Consumed=9 Total=26 Frame=403
+[PhobosExt] [TPV] Draw seg[9->10] skip=0.3 progress=0.011
+[PhobosExt] [TPV] Cell=(157,94) Unit=(40318,24213,1127) Progress=0.037 Consumed=9 Total=26 Frame=404
+[PhobosExt] [TPV] Draw seg[9->10] skip=1.1 progress=0.037
+[PhobosExt] [TPV] Cell=(157,94) Unit=(40322,24227,1125) Progress=0.072 Consumed=9 Total=26 Frame=405
+[PhobosExt] [TPV] Draw seg[9->10] skip=2.1 progress=0.072
+[PhobosExt] [TPV] Cell=(157,94) Unit=(40329,24239,1124) Progress=0.109 Consumed=9 Total=26 Frame=406
+[PhobosExt] [TPV] Draw seg[9->10] skip=3.2 progress=0.109
+[PhobosExt] [TPV] Cell=(157,94) Unit=(40340,24248,1123) Progress=0.148 Consumed=9 Total=26 Frame=407
+[PhobosExt] [TPV] Draw seg[9->10] skip=4.4 progress=0.148
+[PhobosExt] [TPV] Cell=(157,94) Unit=(40351,24257,1123) Progress=0.187 Consumed=9 Total=26 Frame=408
+[PhobosExt] [TPV] Draw seg[9->10] skip=5.6 progress=0.187
+[PhobosExt] [TPV] Cell=(157,94) Unit=(40362,24266,1123) Progress=0.226 Consumed=9 Total=26 Frame=409
+[PhobosExt] [TPV] Draw seg[9->10] skip=6.7 progress=0.226
+[PhobosExt] [TPV] Cell=(157,94) Unit=(40373,24275,1124) Progress=0.265 Consumed=9 Total=26 Frame=410
+[PhobosExt] [TPV] Draw seg[9->10] skip=7.9 progress=0.265
+[PhobosExt] [TPV] Cell=(157,94) Unit=(40384,24284,1125) Progress=0.304 Consumed=9 Total=26 Frame=411
+[PhobosExt] [TPV] Draw seg[9->10] skip=0.1 progress=0.304
+[PhobosExt] [TPV] Cell=(157,94) Unit=(40395,24293,1126) Progress=0.343 Consumed=9 Total=26 Frame=412
+[PhobosExt] [TPV] Draw seg[9->10] skip=1.3 progress=0.343
+[PhobosExt] [TPV] Cell=(157,94) Unit=(40406,24302,1127) Progress=0.382 Consumed=9 Total=26 Frame=413
+[PhobosExt] [TPV] Draw seg[9->10] skip=2.4 progress=0.382
+[PhobosExt] [TPV] Cell=(157,94) Unit=(40417,24311,1129) Progress=0.421 Consumed=9 Total=26 Frame=414
+[PhobosExt] [TPV] Draw seg[9->10] skip=3.6 progress=0.421
+[PhobosExt] [TPV] Cell=(157,95) Unit=(40428,24320,1131) Progress=1.000 Consumed=0 Total=26 Frame=415
+[PhobosExt] [TPV] Draw seg[0->1] skip=3.0 progress=1.000
+[PhobosExt] [TPV] Cell=(157,95) Unit=(40439,24329,1133) Progress=1.000 Consumed=0 Total=26 Frame=416
+[PhobosExt] [TPV] Draw seg[0->1] skip=3.0 progress=1.000
+[PhobosExt] [TPV] Cell=(158,95) Unit=(40450,24338,1135) Progress=0.000 Consumed=10 Total=26 Frame=417
+[PhobosExt] [TPV] Draw seg[10->11] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(158,95) Unit=(40461,24347,1136) Progress=0.000 Consumed=10 Total=26 Frame=418
+[PhobosExt] [TPV] Draw seg[10->11] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(158,95) Unit=(40472,24356,1137) Progress=0.000 Consumed=10 Total=26 Frame=419
+[PhobosExt] [TPV] Draw seg[10->11] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(158,95) Unit=(40483,24365,1138) Progress=0.000 Consumed=10 Total=26 Frame=420
+[PhobosExt] [TPV] Draw seg[10->11] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(158,95) Unit=(40494,24374,1139) Progress=0.000 Consumed=10 Total=26 Frame=421
+[PhobosExt] [TPV] Draw seg[10->11] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(158,95) Unit=(40505,24383,1140) Progress=0.000 Consumed=10 Total=26 Frame=422
+[PhobosExt] [TPV] Draw seg[10->11] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(158,95) Unit=(40516,24393,1141) Progress=0.000 Consumed=10 Total=26 Frame=423
+[PhobosExt] [TPV] Draw seg[10->11] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(158,95) Unit=(40527,24403,1142) Progress=0.000 Consumed=10 Total=26 Frame=424
+[PhobosExt] [TPV] Draw seg[10->11] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(158,95) Unit=(40538,24413,1143) Progress=0.000 Consumed=10 Total=26 Frame=425
+[PhobosExt] [TPV] Draw seg[10->11] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(158,95) Unit=(40549,24423,1144) Progress=0.000 Consumed=10 Total=26 Frame=426
+[PhobosExt] [TPV] Draw seg[10->11] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(158,95) Unit=(40560,24433,1144) Progress=0.000 Consumed=10 Total=26 Frame=427
+[PhobosExt] [TPV] Draw seg[10->11] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(158,95) Unit=(40570,24443,1144) Progress=0.000 Consumed=10 Total=26 Frame=428
+[PhobosExt] [TPV] Draw seg[10->11] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(158,95) Unit=(40581,24452,1144) Progress=0.017 Consumed=10 Total=26 Frame=429
+[PhobosExt] [TPV] Draw seg[10->11] skip=0.5 progress=0.017
+[PhobosExt] [TPV] Cell=(158,95) Unit=(40591,24462,1143) Progress=0.056 Consumed=10 Total=26 Frame=430
+[PhobosExt] [TPV] Draw seg[10->11] skip=1.6 progress=0.056
+[PhobosExt] [TPV] Cell=(158,95) Unit=(40601,24472,1142) Progress=0.095 Consumed=10 Total=26 Frame=431
+[PhobosExt] [TPV] Draw seg[10->11] skip=2.8 progress=0.095
+[PhobosExt] [TPV] Cell=(158,95) Unit=(40611,24482,1141) Progress=0.134 Consumed=10 Total=26 Frame=432
+[PhobosExt] [TPV] Draw seg[10->11] skip=4.0 progress=0.134
+[PhobosExt] [TPV] Cell=(158,95) Unit=(40621,24492,1140) Progress=0.173 Consumed=10 Total=26 Frame=433
+[PhobosExt] [TPV] Draw seg[10->11] skip=5.2 progress=0.173
+[PhobosExt] [TPV] Cell=(158,95) Unit=(40631,24502,1138) Progress=0.212 Consumed=10 Total=26 Frame=434
+[PhobosExt] [TPV] Draw seg[10->11] skip=6.3 progress=0.212
+[PhobosExt] [TPV] Cell=(158,95) Unit=(40641,24512,1136) Progress=0.251 Consumed=10 Total=26 Frame=435
+[PhobosExt] [TPV] Draw seg[10->11] skip=7.5 progress=0.251
+[PhobosExt] [TPV] Cell=(158,95) Unit=(40651,24522,1134) Progress=0.291 Consumed=10 Total=26 Frame=436
+[PhobosExt] [TPV] Draw seg[10->11] skip=8.7 progress=0.291
+[PhobosExt] [TPV] Cell=(158,95) Unit=(40661,24532,1132) Progress=0.330 Consumed=10 Total=26 Frame=437
+[PhobosExt] [TPV] Draw seg[10->11] skip=0.9 progress=0.330
+[PhobosExt] [TPV] Cell=(158,95) Unit=(40671,24542,1130) Progress=0.369 Consumed=10 Total=26 Frame=438
+[PhobosExt] [TPV] Draw seg[10->11] skip=2.0 progress=0.369
+[PhobosExt] [TPV] Cell=(158,95) Unit=(40681,24552,1128) Progress=0.408 Consumed=10 Total=26 Frame=439
+[PhobosExt] [TPV] Draw seg[10->11] skip=3.2 progress=0.408
+[PhobosExt] [TPV] Cell=(158,95) Unit=(40691,24562,1126) Progress=0.447 Consumed=10 Total=26 Frame=440
+[PhobosExt] [TPV] Draw seg[10->11] skip=4.4 progress=0.447
+[PhobosExt] [TPV] Cell=(158,95) Unit=(40701,24572,1125) Progress=0.486 Consumed=10 Total=26 Frame=441
+[PhobosExt] [TPV] Draw seg[10->11] skip=5.5 progress=0.486
+[PhobosExt] [TPV] Cell=(159,96) Unit=(40711,24582,1124) Progress=0.000 Consumed=11 Total=26 Frame=442
+[PhobosExt] [TPV] Draw seg[11->12] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(159,96) Unit=(40721,24592,1123) Progress=0.000 Consumed=11 Total=26 Frame=443
+[PhobosExt] [TPV] Draw seg[11->12] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(159,96) Unit=(40731,24602,1122) Progress=0.000 Consumed=11 Total=26 Frame=444
+[PhobosExt] [TPV] Draw seg[11->12] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(159,96) Unit=(40741,24612,1121) Progress=0.000 Consumed=11 Total=26 Frame=445
+[PhobosExt] [TPV] Draw seg[11->12] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(159,96) Unit=(40751,24622,1120) Progress=0.000 Consumed=11 Total=26 Frame=446
+[PhobosExt] [TPV] Draw seg[11->12] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(159,96) Unit=(40761,24632,1120) Progress=0.000 Consumed=11 Total=26 Frame=447
+[PhobosExt] [TPV] Draw seg[11->12] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(159,96) Unit=(40771,24642,1120) Progress=0.000 Consumed=11 Total=26 Frame=448
+[PhobosExt] [TPV] Draw seg[11->12] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(159,96) Unit=(40781,24652,1121) Progress=0.000 Consumed=11 Total=26 Frame=449
+[PhobosExt] [TPV] Draw seg[11->12] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(159,96) Unit=(40791,24662,1122) Progress=0.000 Consumed=11 Total=26 Frame=450
+[PhobosExt] [TPV] Draw seg[11->12] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(159,96) Unit=(40801,24672,1123) Progress=0.000 Consumed=11 Total=26 Frame=451
+[PhobosExt] [TPV] Draw seg[11->12] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(159,96) Unit=(40811,24682,1124) Progress=0.000 Consumed=11 Total=26 Frame=452
+[PhobosExt] [TPV] Draw seg[11->12] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(159,96) Unit=(40821,24692,1126) Progress=0.000 Consumed=11 Total=26 Frame=453
+[PhobosExt] [TPV] Draw seg[11->12] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(159,96) Unit=(40831,24702,1128) Progress=0.000 Consumed=11 Total=26 Frame=454
+[PhobosExt] [TPV] Draw seg[11->12] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(159,96) Unit=(40841,24712,1130) Progress=0.033 Consumed=11 Total=26 Frame=455
+[PhobosExt] [TPV] Draw seg[11->12] skip=0.9 progress=0.033
+[PhobosExt] [TPV] Cell=(159,96) Unit=(40847,24725,1132) Progress=0.070 Consumed=11 Total=26 Frame=456
+[PhobosExt] [TPV] Draw seg[11->12] skip=2.1 progress=0.070
+[PhobosExt] [TPV] Cell=(159,96) Unit=(40857,24735,1134) Progress=0.109 Consumed=11 Total=26 Frame=457
+[PhobosExt] [TPV] Draw seg[11->12] skip=3.2 progress=0.109
+[PhobosExt] [TPV] Cell=(159,96) Unit=(40867,24745,1135) Progress=0.148 Consumed=11 Total=26 Frame=458
+[PhobosExt] [TPV] Draw seg[11->12] skip=4.4 progress=0.148
+[PhobosExt] [TPV] Cell=(159,96) Unit=(40877,24755,1136) Progress=0.187 Consumed=11 Total=26 Frame=459
+[PhobosExt] [TPV] Draw seg[11->12] skip=5.6 progress=0.187
+[PhobosExt] [TPV] Cell=(159,96) Unit=(40887,24765,1137) Progress=0.226 Consumed=11 Total=26 Frame=460
+[PhobosExt] [TPV] Draw seg[11->12] skip=6.7 progress=0.226
+[PhobosExt] [TPV] Cell=(159,96) Unit=(40897,24775,1138) Progress=0.265 Consumed=11 Total=26 Frame=461
+[PhobosExt] [TPV] Draw seg[11->12] skip=7.9 progress=0.265
+[PhobosExt] [TPV] Cell=(159,96) Unit=(40907,24785,1139) Progress=0.304 Consumed=11 Total=26 Frame=462
+[PhobosExt] [TPV] Draw seg[11->12] skip=0.1 progress=0.304
+[PhobosExt] [TPV] Cell=(159,96) Unit=(40917,24795,1140) Progress=0.343 Consumed=11 Total=26 Frame=463
+[PhobosExt] [TPV] Draw seg[11->12] skip=1.3 progress=0.343
+[PhobosExt] [TPV] Cell=(159,96) Unit=(40927,24805,1141) Progress=0.382 Consumed=11 Total=26 Frame=464
+[PhobosExt] [TPV] Draw seg[11->12] skip=2.4 progress=0.382
+[PhobosExt] [TPV] Cell=(159,96) Unit=(40937,24815,1142) Progress=0.421 Consumed=11 Total=26 Frame=465
+[PhobosExt] [TPV] Draw seg[11->12] skip=3.6 progress=0.421
+[PhobosExt] [TPV] Cell=(159,96) Unit=(40947,24825,1142) Progress=0.460 Consumed=11 Total=26 Frame=466
+[PhobosExt] [TPV] Draw seg[11->12] skip=4.8 progress=0.460
+[PhobosExt] [TPV] Cell=(159,97) Unit=(40957,24835,1142) Progress=1.000 Consumed=0 Total=26 Frame=467
+[PhobosExt] [TPV] Draw seg[0->1] skip=3.0 progress=1.000
+[PhobosExt] [TPV] Cell=(160,97) Unit=(40967,24845,1142) Progress=0.000 Consumed=12 Total=26 Frame=468
+[PhobosExt] [TPV] Draw seg[12->13] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(160,97) Unit=(40977,24855,1141) Progress=0.000 Consumed=12 Total=26 Frame=469
+[PhobosExt] [TPV] Draw seg[12->13] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(160,97) Unit=(40987,24865,1140) Progress=0.000 Consumed=12 Total=26 Frame=470
+[PhobosExt] [TPV] Draw seg[12->13] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(160,97) Unit=(40997,24875,1139) Progress=0.000 Consumed=12 Total=26 Frame=471
+[PhobosExt] [TPV] Draw seg[12->13] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(160,97) Unit=(41007,24885,1138) Progress=0.000 Consumed=12 Total=26 Frame=472
+[PhobosExt] [TPV] Draw seg[12->13] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(160,97) Unit=(41018,24895,1136) Progress=0.000 Consumed=12 Total=26 Frame=473
+[PhobosExt] [TPV] Draw seg[12->13] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(160,97) Unit=(41028,24905,1134) Progress=0.000 Consumed=12 Total=26 Frame=474
+[PhobosExt] [TPV] Draw seg[12->13] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(160,97) Unit=(41039,24915,1132) Progress=0.000 Consumed=12 Total=26 Frame=475
+[PhobosExt] [TPV] Draw seg[12->13] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(160,97) Unit=(41050,24925,1130) Progress=0.000 Consumed=12 Total=26 Frame=476
+[PhobosExt] [TPV] Draw seg[12->13] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(160,97) Unit=(41061,24935,1128) Progress=0.000 Consumed=12 Total=26 Frame=477
+[PhobosExt] [TPV] Draw seg[12->13] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(160,97) Unit=(41072,24945,1126) Progress=0.000 Consumed=12 Total=26 Frame=478
+[PhobosExt] [TPV] Draw seg[12->13] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(160,97) Unit=(41082,24955,1125) Progress=0.000 Consumed=12 Total=26 Frame=479
+[PhobosExt] [TPV] Draw seg[12->13] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(160,97) Unit=(41093,24964,1124) Progress=0.019 Consumed=12 Total=26 Frame=480
+[PhobosExt] [TPV] Draw seg[12->13] skip=0.6 progress=0.019
+[PhobosExt] [TPV] Cell=(160,97) Unit=(41104,24973,1123) Progress=0.062 Consumed=12 Total=26 Frame=481
+[PhobosExt] [TPV] Draw seg[12->13] skip=2.0 progress=0.062
+[PhobosExt] [TPV] Cell=(160,97) Unit=(41118,24978,1122) Progress=0.117 Consumed=12 Total=26 Frame=482
+[PhobosExt] [TPV] Draw seg[12->13] skip=3.9 progress=0.117
+[PhobosExt] [TPV] Cell=(160,97) Unit=(41132,24976,1121) Progress=0.171 Consumed=12 Total=26 Frame=483
+[PhobosExt] [TPV] Draw seg[12->13] skip=5.7 progress=0.171
+[PhobosExt] [TPV] Cell=(160,97) Unit=(41146,24974,1120) Progress=0.226 Consumed=12 Total=26 Frame=484
+[PhobosExt] [TPV] Draw seg[12->13] skip=7.5 progress=0.226
+[PhobosExt] [TPV] Cell=(160,97) Unit=(41160,24973,1119) Progress=0.281 Consumed=12 Total=26 Frame=485
+[PhobosExt] [TPV] Draw seg[12->13] skip=0.4 progress=0.281
+[PhobosExt] [TPV] Cell=(160,97) Unit=(41174,24972,1119) Progress=0.335 Consumed=12 Total=26 Frame=486
+[PhobosExt] [TPV] Draw seg[12->13] skip=2.2 progress=0.335
+[PhobosExt] [TPV] Cell=(160,97) Unit=(41188,24971,1119) Progress=0.390 Consumed=12 Total=26 Frame=487
+[PhobosExt] [TPV] Draw seg[12->13] skip=4.1 progress=0.390
+[PhobosExt] [TPV] Cell=(160,97) Unit=(41202,24970,1120) Progress=0.445 Consumed=12 Total=26 Frame=488
+[PhobosExt] [TPV] Draw seg[12->13] skip=5.9 progress=0.445
+[PhobosExt] [TPV] Cell=(161,97) Unit=(41216,24969,1121) Progress=0.000 Consumed=13 Total=26 Frame=489
+[PhobosExt] [TPV] Draw seg[13->14] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(161,97) Unit=(41230,24968,1122) Progress=0.000 Consumed=13 Total=26 Frame=490
+[PhobosExt] [TPV] Draw seg[13->14] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(161,97) Unit=(41244,24967,1123) Progress=0.000 Consumed=13 Total=26 Frame=491
+[PhobosExt] [TPV] Draw seg[13->14] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(161,97) Unit=(41258,24966,1125) Progress=0.000 Consumed=13 Total=26 Frame=492
+[PhobosExt] [TPV] Draw seg[13->14] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(161,97) Unit=(41272,24965,1127) Progress=0.000 Consumed=13 Total=26 Frame=493
+[PhobosExt] [TPV] Draw seg[13->14] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(161,97) Unit=(41286,24964,1129) Progress=0.000 Consumed=13 Total=26 Frame=494
+[PhobosExt] [TPV] Draw seg[13->14] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(161,97) Unit=(41300,24963,1131) Progress=0.000 Consumed=13 Total=26 Frame=495
+[PhobosExt] [TPV] Draw seg[13->14] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(161,97) Unit=(41314,24962,1133) Progress=0.000 Consumed=13 Total=26 Frame=496
+[PhobosExt] [TPV] Draw seg[13->14] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(161,97) Unit=(41328,24961,1135) Progress=0.000 Consumed=13 Total=26 Frame=497
+[PhobosExt] [TPV] Draw seg[13->14] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(161,97) Unit=(41342,24960,1136) Progress=0.000 Consumed=13 Total=26 Frame=498
+[PhobosExt] [TPV] Draw seg[13->14] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(161,97) Unit=(41357,24960,1137) Progress=0.025 Consumed=13 Total=26 Frame=499
+[PhobosExt] [TPV] Draw seg[13->14] skip=0.7 progress=0.025
+[PhobosExt] [TPV] Cell=(161,97) Unit=(41371,24960,1138) Progress=0.052 Consumed=13 Total=26 Frame=500
+[PhobosExt] [TPV] Draw seg[13->14] skip=1.5 progress=0.052
+[PhobosExt] [TPV] Cell=(161,97) Unit=(41385,24963,1139) Progress=0.085 Consumed=13 Total=26 Frame=501
+[PhobosExt] [TPV] Draw seg[13->14] skip=2.5 progress=0.085
+[PhobosExt] [TPV] Cell=(161,97) Unit=(41397,24970,1140) Progress=0.123 Consumed=13 Total=26 Frame=502
+[PhobosExt] [TPV] Draw seg[13->14] skip=3.6 progress=0.123
+[PhobosExt] [TPV] Cell=(161,97) Unit=(41406,24981,1141) Progress=0.162 Consumed=13 Total=26 Frame=503
+[PhobosExt] [TPV] Draw seg[13->14] skip=4.8 progress=0.162
+[PhobosExt] [TPV] Cell=(161,97) Unit=(41415,24992,1142) Progress=0.201 Consumed=13 Total=26 Frame=504
+[PhobosExt] [TPV] Draw seg[13->14] skip=6.0 progress=0.201
+[PhobosExt] [TPV] Cell=(161,97) Unit=(41424,25003,1142) Progress=0.240 Consumed=13 Total=26 Frame=505
+[PhobosExt] [TPV] Draw seg[13->14] skip=7.2 progress=0.240
+[PhobosExt] [TPV] Cell=(161,97) Unit=(41433,25014,1142) Progress=0.279 Consumed=13 Total=26 Frame=506
+[PhobosExt] [TPV] Draw seg[13->14] skip=8.3 progress=0.279
+[PhobosExt] [TPV] Cell=(161,97) Unit=(41442,25025,1142) Progress=0.318 Consumed=13 Total=26 Frame=507
+[PhobosExt] [TPV] Draw seg[13->14] skip=0.5 progress=0.318
+[PhobosExt] [TPV] Cell=(161,97) Unit=(41451,25036,1141) Progress=0.357 Consumed=13 Total=26 Frame=508
+[PhobosExt] [TPV] Draw seg[13->14] skip=1.7 progress=0.357
+[PhobosExt] [TPV] Cell=(161,97) Unit=(41460,25047,1140) Progress=0.396 Consumed=13 Total=26 Frame=509
+[PhobosExt] [TPV] Draw seg[13->14] skip=2.8 progress=0.396
+[PhobosExt] [TPV] Cell=(161,97) Unit=(41469,25058,1139) Progress=0.435 Consumed=13 Total=26 Frame=510
+[PhobosExt] [TPV] Draw seg[13->14] skip=4.0 progress=0.435
+[PhobosExt] [TPV] Cell=(162,97) Unit=(41478,25069,1138) Progress=1.000 Consumed=0 Total=26 Frame=511
+[PhobosExt] [TPV] Draw seg[0->1] skip=3.0 progress=1.000
+[PhobosExt] [TPV] Cell=(162,97) Unit=(41487,25080,1136) Progress=1.000 Consumed=0 Total=26 Frame=512
+[PhobosExt] [TPV] Draw seg[0->1] skip=3.0 progress=1.000
+[PhobosExt] [TPV] Cell=(162,98) Unit=(41496,25091,1134) Progress=0.000 Consumed=14 Total=26 Frame=513
+[PhobosExt] [TPV] Draw seg[14->15] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(162,98) Unit=(41505,25102,1132) Progress=0.000 Consumed=14 Total=26 Frame=514
+[PhobosExt] [TPV] Draw seg[14->15] skip=0.0 progress=0.000
+Adding event PLANCOMMIT
+[PhobosExt] [TPV] Cell=(162,98) Unit=(41514,25113,1130) Progress=0.000 Consumed=14 Total=26 Frame=515
+[PhobosExt] [TPV] Draw seg[14->15] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(162,98) Unit=(41523,25124,1128) Progress=0.000 Consumed=14 Total=26 Frame=516
+[PhobosExt] [TPV] Draw seg[14->15] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(162,98) Unit=(41532,25135,1126) Progress=0.000 Consumed=14 Total=26 Frame=517
+[PhobosExt] [TPV] Draw seg[14->15] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(162,98) Unit=(41541,25146,1125) Progress=0.000 Consumed=14 Total=26 Frame=518
+[PhobosExt] [TPV] Draw seg[14->15] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(162,98) Unit=(41550,25157,1124) Progress=0.000 Consumed=14 Total=26 Frame=519
+[PhobosExt] [TPV] Draw seg[14->15] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(162,98) Unit=(41559,25168,1123) Progress=0.000 Consumed=14 Total=26 Frame=520
+[PhobosExt] [TPV] Draw seg[14->15] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(162,98) Unit=(41568,25179,1122) Progress=0.000 Consumed=14 Total=26 Frame=521
+[PhobosExt] [TPV] Draw seg[14->15] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(162,98) Unit=(41577,25190,1121) Progress=0.000 Consumed=14 Total=26 Frame=522
+[PhobosExt] [TPV] Draw seg[14->15] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(162,98) Unit=(41586,25201,1120) Progress=0.000 Consumed=14 Total=26 Frame=523
+[PhobosExt] [TPV] Draw seg[14->15] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(162,98) Unit=(41596,25211,1119) Progress=0.000 Consumed=14 Total=26 Frame=524
+[PhobosExt] [TPV] Draw seg[14->15] skip=0.0 progress=0.000
+[PhobosExt] [TPV] Cell=(162,98) Unit=(41605,25222,1119) Progress=0.021 Consumed=14 Total=26 Frame=525
+[PhobosExt] [TPV] Draw seg[14->15] skip=0.6 progress=0.021
+[PhobosExt] [TPV] Cell=(162,98) Unit=(41615,25232,1119) Progress=0.060 Consumed=14 Total=26 Frame=526
+[PhobosExt] [TPV] Draw seg[14->15] skip=1.8 progress=0.060
+[PhobosExt] [TPV] Cell=(162,98) Unit=(41625,25242,1120) Progress=0.099 Consumed=14 Total=26 Frame=527
+[PhobosExt] [TPV] Draw seg[14->15] skip=2.9 progress=0.099
+[PhobosExt] [TPV] Cell=(162,98) Unit=(41635,25252,1121) Progress=0.138 Consumed=14 Total=26 Frame=528
+[PhobosExt] [TPV] Draw seg[14->15] skip=4.1 progress=0.138
 Adding event OPTIONS
-Paused ElapsedTimer = 30
+[PhobosExt] [TPV] Cell=(162,98) Unit=(41645,25262,1122) Progress=0.177 Consumed=14 Total=26 Frame=529
+[PhobosExt] [TPV] Draw seg[14->15] skip=5.3 progress=0.177
+Paused ElapsedTimer = 1072
 Tooltips are off.
-Release_Mouse()
-Default
-Default
-GameControls: GameSpeed = 2, ScrollRate = 3, Detail = 2
-Default
-Tooltips are on.
-Saving game settings
-Default
-GameControls: GameSpeed = 1, ScrollRate = 3, Detail = 2
-Default
-Default
-Capture_Mouse()
-Resume ElapsedTimer = 30
-[PhobosExt] Executing TAction on object: CARUFGL
-[Phobos] AI Scripts - ProcessAction: [01000183] [01000182] (line 2): Unknown Script Action: 5500
-[PhobosExt] [ScriptExt] LoadIntoTransportsDistributed called for team 2498C280
-[PhobosExt] [ScriptExt]   Transport: 23CDF050 used=0 max=5
-[PhobosExt] [ScriptExt]   Transport: 23CE1D78 used=0 max=5
-[PhobosExt] [ScriptExt]   Unit 23CE5CB0: mission=5 hasDest=0
-[PhobosExt] [ScriptExt]   Unit 23CE65B8: mission=5 hasDest=0
-[PhobosExt] [ScriptExt]   Unit 23CE4198: mission=5 hasDest=0
-[PhobosExt] [ScriptExt]   Unit 23CE2F88: mission=5 hasDest=0
-[PhobosExt] [ScriptExt]   Unit 23F43980: mission=5 hasDest=0
-[PhobosExt] [ScriptExt]   Unit 23F471C0: mission=5 hasDest=0
-[PhobosExt] [ScriptExt]   Unit 23F463B0: mission=5 hasDest=0
-[PhobosExt] [ScriptExt]   Unit 23D1C960: mission=5 hasDest=0
-[PhobosExt] [ScriptExt]   Unit 23D1C258: mission=5 hasDest=0
-[PhobosExt] [ScriptExt]   Unit 23D1BB50: mission=5 hasDest=0
-[PhobosExt] [ScriptExt]   Unit 23D1B448: mission=5 hasDest=0
-[PhobosExt] [ScriptExt]   Unit 23D1D068: mission=5 hasDest=0
-[PhobosExt] [ScriptExt]   Unit 23D17500: mission=5 hasDest=0
-[PhobosExt] [ScriptExt]   Unit 23D1AD40: mission=5 hasDest=0
-[PhobosExt] [ScriptExt]   Unit 23CDF050: mission=5 hasDest=0
-[PhobosExt] [ScriptExt]   Unit 23CE1D78: mission=5 hasDest=0
-[PhobosExt] [ScriptExt]   Assigning 23D1C258 to transport 23CDF050 (dist=1 size=1, curMission=5, hasDest=0)
-[PhobosExt] [ScriptExt]   After assign: mission=7 dest=23CDF050 target=00000000
-[PhobosExt] [ScriptExt]   One unit assigned this frame, will continue next frame
-Adding event OPTIONS
-Paused ElapsedTimer = 801
-Tooltips are off.
+[PhobosExt] [TPV] Cell=(162,98) Unit=(41655,25272,1123) Progress=0.216 Consumed=14 Total=26 Frame=530
+[PhobosExt] [TPV] Draw seg[14->15] skip=6.5 progress=0.216
 Release_Mouse()
 Default

@@ -14,27 +14,18 @@
 class PhobosStreamWriter;
 class PhobosStreamReader;
 
-/**
- * @brief 选择框按钮模式
- */
 enum ChoiceBoxButtonMode : int
 {
 	Normal = 0,	    /// 普通模式
 	Bounce = 1, 	/// 回弹模式
 };
 
-/**
- * @brief 选择框按钮模式
- */
 enum ChoiceBoxButtonLayout : int
 {
 	Horizontal = 0, // 横向
 	Vertical = 1, 	// 纵向
 };
 
-/**
- * @brief 选择框按钮数据
- */
 struct ChoiceBoxButton
 {
 	std::string Text;             ///< CSF 标签（INI: Button.TextN）
@@ -43,13 +34,6 @@ struct ChoiceBoxButton
 	bool Save(PhobosStreamWriter& Stm) const;
 };
 
-/**
- * @brief 选择框样式类型（预定义配置）
- *
- * 在 rulesmd.ini 的 [ChoiceBoxTypes] 段中定义，用于预配置选择框的
- * 外观（颜色、不透明度）、按钮配置（数量、文字、模式、尺寸）以及
- * 标题、描述等文本内容。选择框在创建时引用此类型以获取完整参数。
- */
 class ChoiceBoxTypeClass final : public Enumerable<ChoiceBoxTypeClass>
 {
 public:

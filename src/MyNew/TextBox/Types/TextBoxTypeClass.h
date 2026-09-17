@@ -14,14 +14,6 @@
 class PhobosStreamWriter;
 class PhobosStreamReader;
 
-/**
- * @brief 文本框样式类型（预定义配置）
- *
- * 该类型在 rulesmd.ini 的 [TextBoxTypes] 段中定义，
- * 用于预配置文本框的外观（最大宽度、不透明度、颜色）和
- * 自动移除时长。
- * 文本框在创建时引用此类型以获取样式参数。
- */
 class TextBoxTypeClass final : public Enumerable<TextBoxTypeClass>
 {
 public:
