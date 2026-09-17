@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PhobosExt 文档</title>
+    <title>PhobosExt 说明文档</title>
     <style>
         /* 全局重置 */
         * {
@@ -148,7 +148,7 @@
             padding: 0.15rem 0.4rem;
             font-size: 0.9em;
             color: #d92929;
-            background: #f1dfdf;
+            background: #f7dfdf;
         }
         .doc-code--block {
             padding: 1rem;
@@ -314,6 +314,13 @@
         <h2 id="known-issues" class="doc-heading--secondary">已知问题</h2>
         <p>当单位当前正在使用带有 <code class="doc-code--inline">Temporal=yes</code> 和 <code class="doc-code--inline">TemporalExclusive=yes</code> 弹头的武器时, 会强制改变单位的索敌逻辑, 可能会产生bug。</p>
         <p>当科技类型的 <code class="doc-code--inline">LegalTargetWhenAIOwner=no</code> 且不由人类玩家控制时, 会强制改变其他单位的索敌逻辑, 可能会产生bug。</p>
+        <br>
+        <p><strong>如果遇到bug或兼容性问题可以我发私信, 我会尽量解决。</strong></p> 
+        <p>我的 <a href="https://space.bilibili.com/423792550" 
+               target="_blank" 
+               class="doc-link" 
+               style="border-bottom: none;">@B站主页</a></p>
+        <p>我的 QQ邮箱: 3071564490@qq.com</p>
 
         <!-- 致谢 -->
         <h2 id="thanks" class="doc-heading--secondary">致谢</h2>
@@ -467,7 +474,8 @@ ShowWaypointLabelInShroud=                  ; boolean（布尔值），默认 tr
 
         <!-- 3. 金钱操作功能 -->
         <h3 id="money-op" class="doc-heading--tertiary">3. 金钱操作功能</h3>
-        <p>允许动态调整指定所属方的资金数额。所有操作均以所属方国家索引作为目标标识，金额单位为游戏内货币单位（即“钱”）。</p>
+        <p>允许动态调整指定所属方的资金数额。</p>
+        <p>所有操作均以所属方国家索引作为目标标识，金额单位为游戏内货币单位（即“钱”）。</p>
         <p><strong>触发动作说明：</strong></p>
         <ul class="doc-list--content">
             <li><code class="doc-code--inline">557</code> – 为指定所属方添加金钱数额...（参数：所属方国家索引，金额数额）</li>
