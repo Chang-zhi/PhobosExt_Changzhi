@@ -83,6 +83,16 @@ enum class PhobosTriggerAction : unsigned int
 	// 为路径点范围内触发所属方的除指定类型外的所有科技类型绑定标签...
 	BindTagsToAllTechTypesOfTriggerOwnerInWaypointRangeExceptSpecified = 573,
 
+	// 更新所有建筑的动画
+	UpdateAllBuildingAnims = 574,
+
+	// 更新关联建筑的动画
+	UpdateAssociatedBuildingsAnims = 575,
+
+	// 更新指定所属方所有建筑的动画
+	UpdateOwnerBuildingsAnimations = 576,
+
+
 
 
 	// 清除指定所属方尝试次数超过指定数值的基地节点...
@@ -91,6 +101,7 @@ enum class PhobosTriggerAction : unsigned int
 	// SetObjectRecruitable = 566,
 
 	// 测试用
+	// testAction = 1150,
 };
 
 class TActionExt
@@ -150,10 +161,14 @@ public:
 	ACTION_FUNC(SetRecruitableForFoot);
 	ACTION_FUNC(BindTagsToAllTechTypesInWaypointRangeExceptSpecified);
 	ACTION_FUNC(BindTagsToAllTechTypesOfTriggerOwnerInWaypointRangeExceptSpecified);
+	ACTION_FUNC(UpdateAllBuildingAnims);
+	ACTION_FUNC(UpdateAssociatedBuildingsAnims);
+	ACTION_FUNC(UpdateOwnerBuildingsAnimations);
 
 
 	// ACTION_FUNC(RemoveBaseNodesExceedingAttemptCountForHouse);
 	// ACTION_FUNC(SetObjectRecruitable);
+	// ACTION_FUNC(testAction);
 
 
 #undef ACTION_FUNC

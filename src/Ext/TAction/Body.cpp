@@ -106,12 +106,20 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 		return TActionExt::BindTagsToAllTechTypesInWaypointRangeExceptSpecified(pThis, pHouse, pObject, pTrigger, location);
 	case PhobosTriggerAction::BindTagsToAllTechTypesOfTriggerOwnerInWaypointRangeExceptSpecified:
 		return TActionExt::BindTagsToAllTechTypesOfTriggerOwnerInWaypointRangeExceptSpecified(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::UpdateAllBuildingAnims:
+		return TActionExt::UpdateAllBuildingAnims(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::UpdateAssociatedBuildingsAnims:
+		return TActionExt::UpdateAssociatedBuildingsAnims(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::UpdateOwnerBuildingsAnimations:
+		return TActionExt::UpdateOwnerBuildingsAnimations(pThis, pHouse, pObject, pTrigger, location);
 
 
 	//case PhobosTriggerAction::RemoveBaseNodesExceedingAttemptCountForHouse:
 	//	return TActionExt::RemoveBaseNodesExceedingAttemptCountForHouse(pThis, pHouse, pObject, pTrigger, location);
 	//case PhobosTriggerAction::SetObjectRecruitable:
 	//	return TActionExt::SetObjectRecruitable(pThis, pHouse, pObject, pTrigger, location);
+	// case PhobosTriggerAction::testAction:
+	// 	return TActionExt::testAction(pThis, pHouse, pObject, pTrigger, location);
 
 	default:
 		bHandled = false;
@@ -642,30 +650,6 @@ bool TActionExt::BindTagToTechnoTypeOfHouseAtWaypoint(TActionClass* pThis, House
 	return true;
 }
 
-// bool TActionExt::SetObjectRecruitable(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
-// {
-// 		bool recruitableA = pThis->Param3;
-// 		bool recruitableB = pThis->Param4;
-// 
-// 		if(pThis->TagType)
-// 		{
-// 			Debug::Log("This TagType is \"%s\".\n", pThis->TagType);
-// 		}
-// 
-// 		if (pObject)
-// 		{
-// 			Debug::Log("Object \"%s\" is being processed.\n", pObject->GetTechnoType()->ID);
-// 		}
-// 
-// 		if(auto pTechno = abstract_cast<TechnoClass*>(pObject))
-// 		{
-// 			pTechno->RecruitableA = recruitableA;
-// 			pTechno->RecruitableB = recruitableB;
-// 		}
-// 
-// 		return true;
-// }
-
 bool TActionExt::BindTagToSpecificTechnoTypeWithinWaypointRange(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {
 	const char* techno = pThis->Text;
@@ -920,6 +904,57 @@ bool TActionExt::BindTagsToAllTechTypesOfTriggerOwnerInWaypointRangeExceptSpecif
 	}
 	return true;
 }
+
+bool TActionExt::UpdateAllBuildingAnims(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	for(BuildingClass* pBuilding : BuildingClass::Array)
+	{
+		if (!pBuilding) continue;
+		pBuilding->DisableStuff();
+		pBuilding->EnableStuff();
+	}
+
+	return true;
+}
+
+bool TActionExt::UpdateAssociatedBuildingsAnims(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	for (BuildingClass* pBuilding : BuildingClass::Array)
+	{
+		if (!pBuilding) continue;
+		if (!pBuilding->AttachedTag) continue;
+
+		if(pBuilding->AttachedTag->ContainsTrigger(pTrigger))
+		{
+			pBuilding->DisableStuff();
+			pBuilding->EnableStuff();
+		}
+	}
+
+	return true;
+}
+
+bool TActionExt::UpdateOwnerBuildingsAnimations(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	int houseIndex = pThis->Param3;
+
+	HouseClass* pOwner = HouseClass::FindByCountryIndex(houseIndex);
+	if (!pOwner) return false;
+
+	for (BuildingClass* pBuilding : BuildingClass::Array)
+	{
+		if (!pBuilding) continue;
+
+		if(pBuilding->Owner == pOwner)
+		{
+			pBuilding->DisableStuff();
+			pBuilding->EnableStuff();
+		}
+	}
+
+	return true;
+}
+
 
 // =============================
 // container
