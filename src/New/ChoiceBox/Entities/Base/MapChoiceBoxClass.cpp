@@ -888,7 +888,11 @@ static void DrawChoiceBoxList(std::vector<std::shared_ptr<T>>& boxes)
 			continue;
 
 		// 隐藏期：点击后暂不绘制，保留对象供 TEvent 检测
-		if (ptr->ClickExpireCounter >= 0)
+		// 回弹模式例外：保持可见，靠选中高亮（红框）反馈点击，
+		// 否则隐藏期结束又重新出现，表现为"突然消失一下"的闪烁
+		const bool isBounceClicked = (ptr->ClickedIndex >= 0 && ptr->Type
+			&& ptr->Type->Button_Mode == static_cast<int>(ChoiceBoxButtonMode::Bounce));
+		if (ptr->ClickExpireCounter >= 0 && !isBounceClicked)
 			continue;
 
 		Point2D drawPos;
