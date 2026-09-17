@@ -23,10 +23,10 @@ public:
 	public:
 
 		ExtData(TechnoClass* OwnerObject) : Extension<TechnoClass>(OwnerObject)
-		
 		{ }
 
 		virtual ~ExtData() override;
+		virtual void InvalidatePointer(void* ptr, bool bRemoved) override;
 		virtual void LoadFromStream(PhobosStreamReader& Stm) override;
 		virtual void SaveToStream(PhobosStreamWriter& Stm) override;
 
@@ -61,15 +61,6 @@ public:
 	static bool SaveGlobals(PhobosStreamWriter& Stm);
 
 	// WeaponHelpers.cpp
-	static int PickWeaponIndex(TechnoClass* pThis, TechnoClass* pTargetTechno, AbstractClass* pTarget, int weaponIndexOne, int weaponIndexTwo, bool allowFallback = true, bool allowAAFallback = true);
-	static void FireWeaponAtSelf(TechnoClass* pThis, WeaponTypeClass* pWeaponType);
-	static bool CanFireNoAmmoWeapon(TechnoClass* pThis, int weaponIndex);
-	static WeaponTypeClass* GetDeployFireWeapon(TechnoClass* pThis, int& weaponIndex);
-	static WeaponTypeClass* GetDeployFireWeapon(TechnoClass* pThis);
 	static WeaponTypeClass* GetCurrentWeapon(TechnoClass* pThis, int& weaponIndex, bool getSecondary = false);
 	static WeaponTypeClass* GetCurrentWeapon(TechnoClass* pThis, bool getSecondary = false);
-	static int GetWeaponIndexAgainstWall(TechnoClass* pThis, OverlayTypeClass* pWallOverlayType);
-	static void ApplyKillWeapon(TechnoClass* pThis, TechnoClass* pSource, WarheadTypeClass* pWH);
-	static void ApplyRevengeWeapon(TechnoClass* pThis, TechnoClass* pSource, WarheadTypeClass* pWH);
-	static bool MultiWeaponCanFire(TechnoClass* const pThis, AbstractClass* const pTarget, WeaponTypeClass* const pWeaponType);
 };

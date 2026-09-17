@@ -4,9 +4,7 @@
 #include <ScenarioClass.h>
 #include <BitFont.h>
 
-#include <Ext/Rules/Body.h>
 #include <Ext/Techno/Body.h>
-#include <Misc/FlyingStrings.h>
 #include <Utilities/Constructs.h>
 #include "AresHelper.h"
 
@@ -98,10 +96,6 @@ const double GeneralUtils::GetWarheadVersusArmor(WarheadTypeClass* pWH, TechnoCl
 		pType = pThis->GetTechnoType();
 
 	auto armorType = pType->Armor;
-	auto const pShield = TechnoExt::ExtMap.Find(pThis)->Shield.get();
-
-	if (pShield && pShield->IsActive() && !pShield->CanBePenetrated(pWH))
-		armorType = pShield->GetArmorType(pType);
 
 	return GeneralUtils::GetWarheadVersusArmor(pWH, armorType);
 }
@@ -249,8 +243,6 @@ void GeneralUtils::DisplayDamageNumberString(int damage, DamageDisplayType type,
 	if (offset >= maxOffset || offset == INT32_MIN)
 		offset = -maxOffset;
 
-	FlyingStrings::Add(damageStr, coords, color, Point2D { offset - (width / 2), 0 });
-
 	offset = offset + width;
 }
 
@@ -278,9 +270,6 @@ int GeneralUtils::GetColorFromColorAdd(int colorIndex)
 		return colorValue;
 
 	auto const& color = colorAdd[colorIndex];
-
-	if (RulesExt::Global()->ColorAddUse8BitRGB)
-		return Drawing::RGB_To_Int(color);
 
 	const int red = color.R;
 	const int green = color.G;

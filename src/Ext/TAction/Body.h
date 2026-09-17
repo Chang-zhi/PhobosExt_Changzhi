@@ -11,7 +11,9 @@ class HouseClass;
 
 enum class PhobosTriggerAction : unsigned int
 {
-
+	SetWaypointLabel = 550,
+	ClearWaypointLabel = 551,
+	ClearAllWaypointLabels = 552,
 };
 
 class TActionExt
@@ -47,6 +49,9 @@ public:
 	static bool name(TActionClass* pThis, HouseClass* pHouse, \
 		ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 
+	ACTION_FUNC(SetWaypointLabel);
+	ACTION_FUNC(ClearWaypointLabel);
+	ACTION_FUNC(ClearAllWaypointLabels);
 
 #undef ACTION_FUNC
 #pragma pop_macro("ACTION_FUNC")
