@@ -23,7 +23,7 @@ enum class PhobosTriggerAction : unsigned int
 	// 将指定小队全部成员关联到指定标签...
 	BindAllTeamMemberToTag = 553,
 
-    // 将指定所属方的指定小队全部成员关联到指定标签...
+	// 将指定所属方的指定小队全部成员关联到指定标签...
 	BindOwnerTeamMemberToTag = 554,
 
 	// 将特定科技类型全部关联到指定标签...
@@ -37,9 +37,15 @@ enum class PhobosTriggerAction : unsigned int
 
 	// 为向指定所属方扣除金钱数额...
 	TakeHouseMoney = 558,
-	
+
 	// 设置指定所属方的金钱数额...
 	SetHouseMoney = 559,
+
+	// 在指定路径点添加指定所属方的基地节点...
+	AddBaseNodeForHouseAtWaypoint = 560,
+
+	// 移除指定路径点的指定所属方的所有基地节点...
+	RemoveAllBaseNodeForHouseAtWaypoint = 561
 
 };
 
@@ -86,6 +92,8 @@ public:
 	ACTION_FUNC(GiveHouseMoney);
 	ACTION_FUNC(TakeHouseMoney);
 	ACTION_FUNC(SetHouseMoney);
+	ACTION_FUNC(AddBaseNodeForHouseAtWaypoint);
+	ACTION_FUNC(RemoveAllBaseNodeForHouseAtWaypoint);
 
 #undef ACTION_FUNC
 #pragma pop_macro("ACTION_FUNC")

@@ -76,6 +76,10 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 		return TActionExt::TakeHouseMoney(pThis, pHouse, pObject, pTrigger, location);
 	case PhobosTriggerAction::SetHouseMoney:
 		return TActionExt::SetHouseMoney(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::AddBaseNodeForHouseAtWaypoint:
+		return TActionExt::AddBaseNodeForHouseAtWaypoint(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::RemoveAllBaseNodeForHouseAtWaypoint:
+		return TActionExt::RemoveAllBaseNodeForHouseAtWaypoint(pThis, pHouse, pObject, pTrigger, location);
 
 	default:
 		bHandled = false;
@@ -302,6 +306,47 @@ bool TActionExt::SetHouseMoney(TActionClass* pThis, HouseClass* pHouse, ObjectCl
 	return true;
 }
 
+bool TActionExt::AddBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	int houseIndex = pThis->Param3;
+	int waypointIndex = pThis->Param4;
+	int buildTypeIndex = pThis->Param5;
+
+	HouseClass* pOwner = HouseClass::FindByCountryIndex(houseIndex);
+	if (!pOwner) return false;
+
+	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
+	if (cell.X < 0 || cell.Y < 0) return false;
+
+	if (pOwner->Base.BaseNodes.AddItem({ buildTypeIndex, cell, false, 0 }))
+	{
+		Debug::Log("Added a base node for house %d at waypoint %d with building type index %d.", houseIndex, waypointIndex, buildTypeIndex);
+	}
+
+	return true;
+}
+
+bool TActionExt::RemoveAllBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	int houseIndex = pThis->Param3;
+	int waypointIndex = pThis->Param4;
+
+	HouseClass* pOwner = HouseClass::FindByCountryIndex(houseIndex);
+	if (!pOwner) return false;
+
+	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
+	if (cell.X < 0 || cell.Y < 0) return false;
+
+	for(auto it : pOwner->Base.BaseNodes)
+	{
+		if(it.MapCoords == cell)
+		{
+			pOwner->Base.BaseNodes.Remove(it);
+		}
+	}
+
+	return true;
+}
 
 // =============================
 // container
