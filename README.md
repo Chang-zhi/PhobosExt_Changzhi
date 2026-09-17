@@ -11,9 +11,9 @@
 
 ### 兼容性说明
 
-与 Ares 或 Phobos 共存时，本 DLL 已避免使用 ExtPointerOffset，改用独立 unordered_map 存储扩展数据，不会与它们的原生扩展数据冲突。（严格来说可能变慢, 但对现代cpu的影响应该可以忽略不计）
-
 需保证游戏版本为 YR 1.001。
+
+与 Ares 或 Phobos 共存时，本 DLL 已避免使用 ExtPointerOffset，改用独立 unordered_map 存储扩展数据，不会与它们的原生扩展数据冲突。（严格来说可能变慢, 但对现代cpu的影响应该可以忽略不计）
 
 ---
 
@@ -77,7 +77,7 @@ AutoHunt=                       ; boolean（布尔值），默认 false
 主动搜索并攻击敌方目标，且不受玩家直接操控。  
 （即玩家无法通过鼠标点击控制该单位的移动、攻击等行为）  
 
-<span style="color: gray;">当玩家操控时可以用Phobos的`Convert.ComputerToHuman=`变形成换皮单位来避免强制索敌。</span>
+<span style="color: gray;">当玩家操控时, 可以用Phobos的`Convert.ComputerToHuman=`变形成换皮单位来避免强制索敌。</span>
 
 ---
 
