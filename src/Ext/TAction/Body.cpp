@@ -4,6 +4,7 @@
 #include <TagClass.h>
 #include <TagTypeClass.h>
 #include <TechnoClass.h>
+#include <HouseClass.h>
 #include <ArrayClasses.h>
 #include <MessageListClass.h>
 
@@ -80,6 +81,8 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 		return TActionExt::AddBaseNodeForHouseAtWaypoint(pThis, pHouse, pObject, pTrigger, location);
 	case PhobosTriggerAction::RemoveAllBaseNodeForHouseAtWaypoint:
 		return TActionExt::RemoveAllBaseNodeForHouseAtWaypoint(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosTriggerAction::RemoveBaseNodesOfBuildingTypeForHouse:
+		return TActionExt::RemoveBaseNodesOfBuildingTypeForHouse(pThis, pHouse, pObject, pTrigger, location);
 
 	default:
 		bHandled = false;
@@ -308,9 +311,9 @@ bool TActionExt::SetHouseMoney(TActionClass* pThis, HouseClass* pHouse, ObjectCl
 
 bool TActionExt::AddBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {
-	int houseIndex = pThis->Param3;
-	int waypointIndex = pThis->Param4;
-	int buildTypeIndex = pThis->Param5;
+	const int houseIndex = pThis->Param3;
+	const int waypointIndex = pThis->Param4;
+	const int buildTypeIndex = pThis->Param5;
 
 	HouseClass* pOwner = HouseClass::FindByCountryIndex(houseIndex);
 	if (!pOwner) return false;
@@ -328,8 +331,8 @@ bool TActionExt::AddBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseClass* 
 
 bool TActionExt::RemoveAllBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {
-	int houseIndex = pThis->Param3;
-	int waypointIndex = pThis->Param4;
+	const int houseIndex = pThis->Param3;
+	const int waypointIndex = pThis->Param4;
 
 	HouseClass* pOwner = HouseClass::FindByCountryIndex(houseIndex);
 	if (!pOwner) return false;
@@ -337,14 +340,163 @@ bool TActionExt::RemoveAllBaseNodeForHouseAtWaypoint(TActionClass* pThis, HouseC
 	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(waypointIndex);
 	if (cell.X < 0 || cell.Y < 0) return false;
 
-	for(auto it : pOwner->Base.BaseNodes)
+	// 1. 收集该路径点上所有基地节点的建筑类型索引（用于工厂清理）
+	std::vector<int> typesToClean;
+	for (const auto& node : pOwner->Base.BaseNodes)
 	{
-		if(it.MapCoords == cell)
+		if (node.MapCoords == cell)
 		{
-			pOwner->Base.BaseNodes.Remove(it);
+			typesToClean.push_back(node.BuildingTypeIndex);
 		}
 	}
 
+	// 2. 对每个涉及到的建筑类型，清理正在进行的生产（仿照第二个函数）
+	for (int buildTypeIndex : typesToClean)
+	{
+		if (buildTypeIndex < 0 || buildTypeIndex >= BuildingTypeClass::Array.Count)
+		{
+			Debug::Log("Invalid buildTypeIndex %d at waypoint %d\n", buildTypeIndex, waypointIndex);
+			continue;
+		}
+		const char* buildTypeID = BuildingTypeClass::Array[buildTypeIndex]->get_ID();
+		Debug::Log("[Factory clean]: Removing production for type \"%s\" due to waypoint node removal.\n", buildTypeID);
+
+		// 遍历所有建筑，清理匹配的工厂生产
+		for (auto it : BuildingClass::Array)
+		{
+			if (!it) continue;
+			if (it->WhatAmI() != AbstractType::Building) continue;
+			TechnoTypeClass* pType = it->GetTechnoType();
+			if (!pType) continue;
+
+			if (it->Owner == pOwner && it->Factory)
+			{
+				FactoryClass* pFact = it->Factory;
+				if (pFact->Object && pFact->Object->WhatAmI() == AbstractType::Building)
+				{
+					TechnoTypeClass* pFactObjType = pFact->Object->GetTechnoType();
+					if (pFactObjType && strcmp(pFactObjType->get_ID(), buildTypeID) == 0)
+					{
+						Debug::Log("[Factory clean]: AbandonProduction for %s\n", buildTypeID);
+						pFact->AbandonProduction();
+					}
+					pFact->QueuedObjects.Clear();
+				}
+			}
+		}
+	}
+
+	// 3. 重建容器，过滤掉该路径点上的所有基地节点
+	// 太 TM 容易崩了, 气得我直接重建一个新的容器来过滤掉不需要的节点
+	DynamicVectorClass<BaseNodeClass> newNodes;
+	for (const auto& node : pOwner->Base.BaseNodes)
+	{
+		if (!(node.MapCoords == cell))
+		{  // 保留不匹配的节点
+			newNodes.AddItem(node);
+		}
+		else
+		{
+			Debug::Log("[Filter]: Removed node at (%d,%d) type index %d\n",
+				node.MapCoords.X, node.MapCoords.Y, node.BuildingTypeIndex);
+		}
+	}
+
+	// 替换容器, 不能用std::move, 读档会崩
+	pOwner->Base.BaseNodes.Clear();
+	for (const auto& node : newNodes)
+	{
+		pOwner->Base.BaseNodes.AddItem(node);
+	}
+
+	Debug::Log("[End]: Removed all base nodes at waypoint %d (cell %d,%d). New node count: %d\n",
+		waypointIndex, cell.X, cell.Y, pOwner->Base.BaseNodes.Count);
+	return true;
+}
+
+bool TActionExt::RemoveBaseNodesOfBuildingTypeForHouse(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
+{
+	const int houseIndex = pThis->Param3;
+	const int buildTypeIndex = pThis->Param4;
+
+	HouseClass* pOwner = HouseClass::FindByCountryIndex(houseIndex);
+	if (!pOwner) return false;
+
+	// 检查建筑类型索引有效性
+	if (buildTypeIndex < 0 || buildTypeIndex >= BuildingTypeClass::Array.Count)
+	{
+		Debug::Log("Invalid buildTypeIndex %d\n", buildTypeIndex);
+		return false;
+	}
+
+	const char* buildTypeID = BuildingTypeClass::Array[buildTypeIndex]->get_ID();
+	Debug::Log("[Start]: Removing base nodes for building type \"%s\".\n", buildTypeID);
+
+	// ===== 清理工厂部分 - 增加安全检查 =====
+	for (auto it : BuildingClass::Array)
+	{
+		// 基本有效性检查
+		if (!it) continue;
+		// 确保 it 确实是建筑对象
+		if (it->WhatAmI() != AbstractType::Building) continue;
+
+		TechnoTypeClass* pType = it->GetTechnoType();
+		if (!pType) continue;
+
+		Debug::Log("[Before]: Building check \"%s\".\n", pType->get_ID());
+
+		if (it->Owner == pOwner && it->Factory)
+		{
+			FactoryClass* pFact = it->Factory;
+			if (pFact->Object && pFact->Object->WhatAmI() == AbstractType::Building)
+			{
+				TechnoTypeClass* pFactObjType = pFact->Object->GetTechnoType();
+				if (!pFactObjType) continue;
+
+				Debug::Log("[Before]: Enter Factory check., Factory is \"%s\".\n", pType->get_ID());
+				Debug::Log("[Before]: Clear factory for building type \"%s\".\n", pFactObjType->get_ID());
+
+				if (strcmp(pFactObjType->get_ID(), buildTypeID) == 0)
+				{
+					Debug::Log("[Before]: Clear it->Factory->Object \"%s\".\n", buildTypeID);
+					pFact->AbandonProduction();
+				}
+
+				pFact->QueuedObjects.Clear();
+			}
+		}
+	}
+	Debug::Log("[Inter]: Finished checking factories.\n");
+
+	// ===== 重建容器，安全过滤 =====
+	// 太 TM 容易崩了, 气得我直接重建一个新的容器来过滤掉不需要的节点
+	Debug::Log("[Inter]: Start filtering base nodes (rebuild container).\n");
+
+	DynamicVectorClass<BaseNodeClass> newNodes;
+	newNodes.Reserve(pOwner->Base.BaseNodes.Count);
+
+	for (const auto& node : pOwner->Base.BaseNodes)
+	{
+		if (node.BuildingTypeIndex != buildTypeIndex)
+		{
+			newNodes.AddItem(node);
+		}
+		else
+		{
+			Debug::Log("[Inter]: Filtered out node with type index %d, X=%d, Y=%d\n",
+				node.BuildingTypeIndex, node.MapCoords.X, node.MapCoords.Y);
+		}
+	}
+
+	// 替换容器, 不能用std::move, 读档会崩
+	pOwner->Base.BaseNodes.Clear();
+	for (const auto& node : newNodes)
+	{
+		pOwner->Base.BaseNodes.AddItem(node);
+	}
+	Debug::Log("[Inter]: New base nodes count = %d\n", pOwner->Base.BaseNodes.Count);
+
+	Debug::Log("[End]: Finished removing base nodes for building type \"%s\".\n", buildTypeID);
 	return true;
 }
 

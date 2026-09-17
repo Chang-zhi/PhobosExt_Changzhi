@@ -45,7 +45,10 @@ enum class PhobosTriggerAction : unsigned int
 	AddBaseNodeForHouseAtWaypoint = 560,
 
 	// 移除指定路径点的指定所属方的所有基地节点...
-	RemoveAllBaseNodeForHouseAtWaypoint = 561
+	RemoveAllBaseNodeForHouseAtWaypoint = 561,
+
+	// 移除指定所属方的指定建筑类型的所有基地节点...
+	RemoveBaseNodesOfBuildingTypeForHouse = 562
 
 };
 
@@ -94,6 +97,7 @@ public:
 	ACTION_FUNC(SetHouseMoney);
 	ACTION_FUNC(AddBaseNodeForHouseAtWaypoint);
 	ACTION_FUNC(RemoveAllBaseNodeForHouseAtWaypoint);
+	ACTION_FUNC(RemoveBaseNodesOfBuildingTypeForHouse);
 
 #undef ACTION_FUNC
 #pragma pop_macro("ACTION_FUNC")
