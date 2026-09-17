@@ -12,7 +12,7 @@
 #define VERSION_MAJOR 0          // 主版本号
 #define VERSION_MINOR 0          // 次版本号
 #define VERSION_REVISION 13       // 修订号
-#define VERSION_PATCH 0          // 补丁号
+#define VERSION_PATCH 1          // 补丁号
 
 #define BUILD_NUMBER 48           // 构建号（每次发布递增）
 
