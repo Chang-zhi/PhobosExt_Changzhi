@@ -35,10 +35,9 @@ DEFINE_HOOK(0x6F9E50, TechnoClass_AI, 0x5)
 		pExt->UpdateEffects();
 	}
 
-	// 全局副目标合法性检测（每帧仅执行一次）
 	{
-		static DWORD lastFrame = 0;
-		if ((DWORD)Unsorted::CurrentFrame != lastFrame)
+		static int lastFrame = 0;
+		if (Unsorted::CurrentFrame != lastFrame)
 		{
 			lastFrame = Unsorted::CurrentFrame;
 			TemporalAOE::ValidateGlobals();
