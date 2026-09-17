@@ -42,6 +42,7 @@ TechnoTextBoxClass::TechnoTextBoxClass(TechnoClass* pTarget, const char* csfLabe
 	this->ColorR = pType->ColorR;
 	this->ColorG = pType->ColorG;
 	this->ColorB = pType->ColorB;
+	this->RemainingFrames = pType->Duration;
 	Debug::Log("[TechnoTextBoxClass] ctor: colors set to R=%d G=%d B=%d (from type %s)\n",
 		this->ColorR, this->ColorG, this->ColorB, typeName);
 }
@@ -116,6 +117,7 @@ TechnoTextBoxClass* TechnoTextBoxClass::FindOrCreate(TechnoClass* pTarget,
 		pLabel->ColorR = pType->ColorR;
 		pLabel->ColorG = pType->ColorG;
 		pLabel->ColorB = pType->ColorB;
+		pLabel->RemainingFrames = pType->Duration;
 		pLabel->UpdateLayout();
 		return pLabel;
 	}
@@ -342,6 +344,7 @@ bool TechnoTextBoxClass::Serialize(T& Stm)
 		.Process(this->ColorR)
 		.Process(this->ColorG)
 		.Process(this->ColorB)
+		.Process(this->RemainingFrames)
 		.Success();
 }
 

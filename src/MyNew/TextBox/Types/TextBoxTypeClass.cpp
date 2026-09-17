@@ -26,6 +26,7 @@ void TextBoxTypeClass::LoadFromINI(CCINIClass* pINI)
 
 	this->MaxWidth.Read(exINI, section, "MaxWidth");
 	this->BackgroundOpacity.Read(exINI, section, "BackgroundOpacity");
+	this->Duration.Read(exINI, section, "Duration");
 
 	// Color=255,215,0  format
 	if (pINI->ReadString(section, "Color", "", Phobos::readBuffer))
@@ -50,6 +51,7 @@ void TextBoxTypeClass::Serialize(T& Stm)
 		.Process(this->ColorR)
 		.Process(this->ColorG)
 		.Process(this->ColorB)
+		.Process(this->Duration)
 		;
 }
 

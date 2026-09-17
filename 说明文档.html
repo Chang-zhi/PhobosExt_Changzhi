@@ -112,6 +112,7 @@
 MaxWidth=300                ;integer - 最大像素宽度(1-1000)，文本超出自动换行，默认250
 BackgroundOpacity=55        ;integer - 背景不透明度百分比(0-100)。默认75
 Color=255,215,0             ;integer,integer,integer - 文本和边框颜色，RGB格式。默认255,215,0(金色)
+Duration=300                ;integer - 自动移除帧数。默认-1(无限显示)
 </code></pre>
 
 <h4>路径点文本框</h4>
@@ -149,6 +150,13 @@ Color=255,215,0             ;integer,integer,integer - 文本和边框颜色，R
 ShowTextBoxInShroud.Waypoint=           ; boolean，默认 true — 路径点文本框在黑幕中是否显示
 ShowTextBoxInShroud.Techno=             ; boolean，默认 true — 单位文本框在黑幕中是否显示</code></pre>
 <p><strong>注:</strong> 仅检测路径点格子或单位所在单元格是否被黑幕遮挡, 不检测整个文本框区域。</p>
+<br>
+<p><strong>关于文本框持续时长：</strong></p>
+<ul class="doc-list--content">
+<li>在 <code class="doc-code--inline">[TextBoxTypes]</code> 中设置 <code class="doc-code--inline">Duration=</code> 可控制文本框自动移除的帧数。</li>
+<li><code class="doc-code--inline">Duration=-1</code>（默认）表示无限显示，需通过触发动作手动清除。</li>
+<li>仅通过类型创建时有效；通过数据创建时需由用户手动控制。</li>
+</ul>
 </div>
 
 <hr class="sec-divider--double">

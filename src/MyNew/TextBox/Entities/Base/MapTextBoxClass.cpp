@@ -272,6 +272,7 @@ bool MapTextBoxClass::Serialize(T& Stm)
 		.Process(this->ColorR)
 		.Process(this->ColorG)
 		.Process(this->ColorB)
+		.Process(this->RemainingFrames)
 		.Success();
 }
 
@@ -296,10 +297,20 @@ bool MapTextBoxClass::Save(PhobosStreamWriter& Stm) const
 
 void MapTextBoxClass::DrawAll()
 {
+	std::vector<std::shared_ptr<MapTextBoxClass>> expired;
+
 	for (auto& pLabel : Array)
 	{
 		if (!pLabel)
 			continue;
+
+		// Duration countdown
+		if (pLabel->RemainingFrames >= 0)
+		{
+			if (--pLabel->RemainingFrames <= 0)
+				expired.push_back(pLabel);
+		}
+
 		if (!pLabel->CanDraw())
 			continue;
 
@@ -310,7 +321,36 @@ void MapTextBoxClass::DrawAll()
 		pLabel->DrawAt(pos);
 	}
 
-	// ÿ֡������������λ�ı�ǩ
+	// Remove expired entries from both base and derived arrays
+	for (auto& pExpired : expired)
+	{
+		auto const marker = pExpired->GetTypeMarker();
+
+		if (std::strcmp(marker, "WaypointTextBoxClass") == 0)
+		{
+			auto* pRaw = static_cast<WaypointTextBoxClass*>(pExpired.get());
+			auto& derived = WaypointTextBoxClass::Array;
+			auto it = std::find_if(derived.begin(), derived.end(),
+				[pRaw](const auto& sp) { return sp.get() == pRaw; });
+			if (it != derived.end())
+				derived.erase(it);
+		}
+		else if (std::strcmp(marker, "TechnoTextBoxClass") == 0)
+		{
+			auto* pRaw = static_cast<TechnoTextBoxClass*>(pExpired.get());
+			auto& derived = TechnoTextBoxClass::Array;
+			auto it = std::find_if(derived.begin(), derived.end(),
+				[pRaw](const auto& sp) { return sp.get() == pRaw; });
+			if (it != derived.end())
+				derived.erase(it);
+		}
+
+		auto baseIt = std::find(Array.begin(), Array.end(), pExpired);
+		if (baseIt != Array.end())
+			Array.erase(baseIt);
+	}
+
+	// 每帧清理已摧毁单位/已移除的标签
 	TechnoTextBoxClass::CleanupDeadLabels();
 }
 
@@ -334,7 +374,7 @@ bool MapTextBoxClass::SaveGlobals(PhobosStreamWriter& Stm)
 
 bool MapTextBoxClass::LoadGlobals(PhobosStreamReader& Stm)
 {
-	// ����ǰ���������ʵ������
+	// 清除当前所有已存在的实例
 	Clear();
 
 	size_t Count = 0;
@@ -358,7 +398,7 @@ bool MapTextBoxClass::LoadGlobals(PhobosStreamReader& Stm)
 			WaypointTextBoxClass::Array.push_back(newObj);
 			Array.push_back(std::move(newObj));
 		}
-		// TechnoTextBoxClass �������л���������ָ�
+		// TechnoTextBoxClass 反序列化后重建指针
 		else if (std::strcmp(typeMarker.data(), "TechnoTextBoxClass") == 0)
 		{
 			auto newObj = std::make_shared<TechnoTextBoxClass>();

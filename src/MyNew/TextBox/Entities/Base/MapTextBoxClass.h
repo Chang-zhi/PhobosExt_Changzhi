@@ -53,6 +53,9 @@ protected:
 
 	int VerticalOffset { 0 };
 
+	// Remaining display frames (-1 = manual control, 0 = expired)
+	int RemainingFrames { -1 };
+
 	template <typename T>
 	bool Serialize(T& Stm);
 

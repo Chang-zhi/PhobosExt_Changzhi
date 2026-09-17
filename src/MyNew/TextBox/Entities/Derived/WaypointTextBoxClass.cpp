@@ -44,6 +44,7 @@ WaypointTextBoxClass::WaypointTextBoxClass(int wpIndex, const char* csfLabel,
 	this->ColorG = pType->ColorG;
 	this->ColorB = pType->ColorB;
 	this->Type = pType;
+	this->RemainingFrames = pType->Duration;
 }
 
 bool WaypointTextBoxClass::CanDraw() const
@@ -109,6 +110,7 @@ WaypointTextBoxClass* WaypointTextBoxClass::FindOrCreate(int wpIndex,
 		pWp->ColorG = pType->ColorG;
 		pWp->ColorB = pType->ColorB;
 		pWp->Type = pType;
+		pWp->RemainingFrames = pType->Duration;
 		pWp->UpdateLayout();
 		return pWp;
 	}
@@ -118,7 +120,7 @@ WaypointTextBoxClass* WaypointTextBoxClass::FindOrCreate(int wpIndex,
 		auto newLabel = std::make_shared<WaypointTextBoxClass>(
 			wpIndex, csfLabel, typeName);
 		newLabel->UpdateLayout();
-		Array.push_back(newLabel);                          // 派生类数数组
+		Array.push_back(newLabel);                          // 派生类数组
 		MapTextBoxClass::Array.push_back(std::move(newLabel)); // 基类数组
 		return static_cast<WaypointTextBoxClass*>(
 			MapTextBoxClass::Array.back().get());
@@ -210,6 +212,7 @@ bool WaypointTextBoxClass::Serialize(T& Stm)
 		.Process(this->ColorR)
 		.Process(this->ColorG)
 		.Process(this->ColorB)
+		.Process(this->RemainingFrames)
 		.Success();
 }
 

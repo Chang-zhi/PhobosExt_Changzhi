@@ -1428,7 +1428,7 @@ bool TActionExt::ClearAllTextBoxs(TActionClass* pThis, HouseClass* pHouse, Objec
 }
 
 // =============================
-// Script Manipulation Actions (650-659)
+// Script Manipulation Actions (650-660)
 
 bool TActionExt::ClearScript(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {
@@ -1499,7 +1499,7 @@ bool TActionExt::SeekTeamTypeScript(TActionClass* pThis, HouseClass* pHouse, Obj
 }
 
 // =============================
-// TaskForce Editing Actions (670-675)
+// TaskForce Editing Actions (670-677)
 
 bool TActionExt::ClearTaskForce(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {

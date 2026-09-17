@@ -28,12 +28,16 @@ public:
 	Valueable<int> ColorG;
 	Valueable<int> ColorB;
 
+	// Auto-remove duration in frames (-1 = infinite)
+	Valueable<int> Duration;
+
 	TextBoxTypeClass(const char* const pTitle) : Enumerable(pTitle)
 		, MaxWidth { 250 }
 		, BackgroundOpacity { 75 }
 		, ColorR { 255 }
 		, ColorG { 215 }
 		, ColorB { 0 }
+		, Duration { -1 }
 	{ }
 
 	virtual void LoadFromINI(CCINIClass* pINI);
