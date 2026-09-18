@@ -1054,6 +1054,64 @@ namespace detail
 	}
 
 	template <>
+	inline bool read<ChoiceBoxButtonLayout>(ChoiceBoxButtonLayout& value, INI_EX& parser, const char* pSection, const char* pKey)
+	{
+		if (parser.ReadString(pSection, pKey))
+		{
+			auto parsed = ChoiceBoxButtonLayout::Horizontal;
+
+			if (_strcmpi(parser.value(), "Horizontal") == 0)
+			{
+				parsed = ChoiceBoxButtonLayout::Horizontal;
+			}
+			else if (_strcmpi(parser.value(), "Vertical") == 0)
+			{
+				parsed = ChoiceBoxButtonLayout::Vertical;
+			}
+			else
+			{
+				Debug::INIParseFailed(pSection, pKey, parser.value(),
+					"ChoiceBox Button.Layout can be either Horizontal or Vertical");
+				return false;
+			}
+
+			value = parsed;
+			return true;
+		}
+
+		return false;
+	}
+
+	template <>
+	inline bool read<ChoiceBoxButtonMode>(ChoiceBoxButtonMode& value, INI_EX& parser, const char* pSection, const char* pKey)
+	{
+		if (parser.ReadString(pSection, pKey))
+		{
+			auto parsed = ChoiceBoxButtonMode::Normal;
+
+			if (_strcmpi(parser.value(), "Normal") == 0)
+			{
+				parsed = ChoiceBoxButtonMode::Normal;
+			}
+			else if (_strcmpi(parser.value(), "Bounce") == 0)
+			{
+				parsed = ChoiceBoxButtonMode::Bounce;
+			}
+			else
+			{
+				Debug::INIParseFailed(pSection, pKey, parser.value(),
+					"ChoiceBox Button.Mode can be either Normal or Bounce");
+				return false;
+			}
+
+			value = parsed;
+			return true;
+		}
+
+		return false;
+	}
+
+	template <>
 	inline bool read<ChronoSparkleDisplayPosition>(ChronoSparkleDisplayPosition& value, INI_EX& parser, const char* pSection, const char* pKey)
 	{
 		if (parser.ReadString(pSection, pKey))

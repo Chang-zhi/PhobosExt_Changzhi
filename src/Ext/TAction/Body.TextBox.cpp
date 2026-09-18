@@ -67,9 +67,9 @@ bool TActionExt::SetWaypointTextBoxByData(TActionClass* pThis, HouseClass* pHous
 	int opacityPercent = pThis->Param5;
 	opacityPercent = std::clamp(opacityPercent, 0, 100);
 
-	int r = 255, g = 215, b = 0;
+	ColorStruct color { 255, 215, 0 };
 	if (pThis->Param6 >= 0 && pThis->Param6 < 9)
-		WaypointTextBoxClass::ConvertColorEnum(pThis->Param6, r, g, b);
+		color = WaypointTextBoxClass::ConvertColorEnum(pThis->Param6);
 
 	if (wpIndex >= 0 && csfLabel && csfLabel[0])
 	{
@@ -81,9 +81,7 @@ bool TActionExt::SetWaypointTextBoxByData(TActionClass* pThis, HouseClass* pHous
 		TextBoxTypeClass* pType = TextBoxTypeClass::FindOrAllocate(typeName);
 		pType->MaxWidth = maxWidth;
 		pType->BackgroundOpacity = opacityPercent;
-		pType->ColorR = r;
-		pType->ColorG = g;
-		pType->ColorB = b;
+		pType->Color = color;
 
 		// 创建/更新标签
 		WaypointTextBoxClass::FindOrCreate(wpIndex, csfLabel, typeName);
@@ -148,9 +146,9 @@ bool TActionExt::SetUnitTextBoxByTriggerData(TActionClass* pThis, HouseClass* pH
 	if (maxWidth == 0) maxWidth = 250;
 	opacityPercent = std::clamp(opacityPercent, 0, 100);
 
-	int r = 255, g = 215, b = 0;
+	ColorStruct color { 255, 215, 0 };
 	if (colorEnum >= 0 && colorEnum < 9)
-		WaypointTextBoxClass::ConvertColorEnum(colorEnum, r, g, b);
+		color = WaypointTextBoxClass::ConvertColorEnum(colorEnum);
 
 	for (auto pTechno : TechnoClass::Array)
 	{
@@ -165,9 +163,7 @@ bool TActionExt::SetUnitTextBoxByTriggerData(TActionClass* pThis, HouseClass* pH
 		TextBoxTypeClass* pType = TextBoxTypeClass::FindOrAllocate(typeName);
 		pType->MaxWidth = maxWidth;
 		pType->BackgroundOpacity = opacityPercent;
-		pType->ColorR = r;
-		pType->ColorG = g;
-		pType->ColorB = b;
+		pType->Color = color;
 
 		TechnoTextBoxClass::FindOrCreate(pTechno, csfLabel, typeName);
 	}
@@ -230,9 +226,9 @@ bool TActionExt::SetUnitTextBoxByTeamData(TActionClass* pThis, HouseClass* pHous
 	if (maxWidth == 0) maxWidth = 250;
 	opacityPercent = std::clamp(opacityPercent, 0, 100);
 
-	int r = 255, g = 215, b = 0;
+	ColorStruct color { 255, 215, 0 };
 	if (colorEnum >= 0 && colorEnum < 9)
-		WaypointTextBoxClass::ConvertColorEnum(colorEnum, r, g, b);
+		color = WaypointTextBoxClass::ConvertColorEnum(colorEnum);
 
 	std::string teamTypeID = "0" + std::to_string(teamIndex);
 
@@ -252,9 +248,7 @@ bool TActionExt::SetUnitTextBoxByTeamData(TActionClass* pThis, HouseClass* pHous
 				TextBoxTypeClass* pType = TextBoxTypeClass::FindOrAllocate(typeName);
 				pType->MaxWidth = maxWidth;
 				pType->BackgroundOpacity = opacityPercent;
-				pType->ColorR = r;
-				pType->ColorG = g;
-				pType->ColorB = b;
+				pType->Color = color;
 
 				TechnoTextBoxClass::FindOrCreate(pCurFoot, csfLabel, typeName);
 			}

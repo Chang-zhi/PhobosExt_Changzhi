@@ -37,9 +37,7 @@ WaypointTextBoxClass::WaypointTextBoxClass(int wpIndex, const char* csfLabel,
 	this->CurrentLabel = csfLabel ? csfLabel : "";
 	this->MaxLineWidth = pType->MaxWidth;
 	this->BackgroundOpacity = pType->BackgroundOpacity;
-	this->ColorR = pType->ColorR;
-	this->ColorG = pType->ColorG;
-	this->ColorB = pType->ColorB;
+	this->Color = pType->Color;
 	this->Type = pType;                // 保存类型指针（供后续匹配用）
 	this->RemainingFrames = pType->Duration;
 }
@@ -112,9 +110,7 @@ WaypointTextBoxClass* WaypointTextBoxClass::FindOrCreate(int wpIndex,
 		pWp->CurrentLabel = csfLabel ? csfLabel : "";
 		pWp->MaxLineWidth = pType->MaxWidth;
 		pWp->BackgroundOpacity = pType->BackgroundOpacity;
-		pWp->ColorR = pType->ColorR;
-		pWp->ColorG = pType->ColorG;
-		pWp->ColorB = pType->ColorB;
+		pWp->Color = pType->Color;
 		pWp->Type = pType;
 		pWp->RemainingFrames = pType->Duration;
 		pWp->UpdateLayout();
@@ -191,20 +187,20 @@ void WaypointTextBoxClass::Clear()
 }
 
 // ========== 工具函数 ==========
-void WaypointTextBoxClass::ConvertColorEnum(int enumVal, int& r, int& g, int& b)
+ColorStruct WaypointTextBoxClass::ConvertColorEnum(int enumVal)
 {
 	switch (enumVal)
 	{
-	case 0:  r = 255; g = 215; b = 0;   break;  // gold（金色）
-	case 1:  r = 255; g = 255; b = 255; break;  // white（白色）
-	case 2:  r = 255; g = 0;   b = 0;   break;  // red（红色）
-	case 3:  r = 0;   g = 0;   b = 255; break;  // blue（蓝色）
-	case 4:  r = 0;   g = 128; b = 0;   break;  // green（绿色）
-	case 5:  r = 255; g = 255; b = 0;   break;  // yellow（黄色）
-	case 6:  r = 128; g = 0;   b = 128; break;  // purple（紫色）
-	case 7:  r = 255; g = 192; b = 203; break;  // pink（粉色）
-	case 8:  r = 173; g = 216; b = 230; break;  // lightblue（浅蓝）
-	default: r = 255; g = 215; b = 0;   break;  // 默认金色
+	case 0:  return { 255, 215, 0 };   // gold（金色）
+	case 1:  return { 255, 255, 255 }; // white（白色）
+	case 2:  return { 255, 0,   0 };   // red（红色）
+	case 3:  return { 0,   0,   255 }; // blue（蓝色）
+	case 4:  return { 0,   128, 0 };   // green（绿色）
+	case 5:  return { 255, 255, 0 };   // yellow（黄色）
+	case 6:  return { 128, 0,   128 }; // purple（紫色）
+	case 7:  return { 255, 192, 203 }; // pink（粉色）
+	case 8:  return { 173, 216, 230 }; // lightblue（浅蓝）
+	default: return { 255, 215, 0 };   // 默认金色
 	}
 }
 
@@ -217,9 +213,7 @@ bool WaypointTextBoxClass::Serialize(T& Stm)
 		.Process(this->CurrentLabel)        // CSF 标签名
 		.Process(this->MaxLineWidth)        // 最大行宽
 		.Process(this->BackgroundOpacity)   // 背景不透明度
-		.Process(this->ColorR)              // 颜色 R
-		.Process(this->ColorG)              // 颜色 G
-		.Process(this->ColorB)              // 颜色 B
+		.Process(this->Color)               // 文字/边框颜色
 		.Process(this->RemainingFrames)     // 剩余显示帧数
 		.Success();
 }

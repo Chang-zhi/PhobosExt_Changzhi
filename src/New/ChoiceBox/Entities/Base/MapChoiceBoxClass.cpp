@@ -297,7 +297,7 @@ void MapChoiceBoxClass::DrawAt(Point2D centerPos)
 	// ===== 测量按钮尺寸 =====
 	int btnFixedW = type.Button_Width;   // >0 固定宽度（文字自动换行适配）
 	int btnFixedH = type.Button_Height;  // >0 固定高度（文字超出截断）
-	bool isVertical = (type.Button_Layout != 0);
+	bool isVertical = (type.Button_Layout == ChoiceBoxButtonLayout::Vertical);
 
 	// 存储每个按钮的元数据
 	std::vector<BtnLayoutItem> btnItems;
@@ -532,10 +532,7 @@ void MapChoiceBoxClass::DrawAt(Point2D centerPos)
 	DSurface::Composite->FillRectTrans(&bgRect, &bgColor, type.BackgroundOpacity);
 
 	// 颜色整数值
-	int colorInt = Drawing::RGB_To_Int(ColorStruct(
-		static_cast<BYTE>(type.ColorR),
-		static_cast<BYTE>(type.ColorG),
-		static_cast<BYTE>(type.ColorB)));
+	int colorInt = Drawing::RGB_To_Int(type.Color);
 
 	Point2D p1, p2;
 
@@ -670,11 +667,9 @@ void MapChoiceBoxClass::DrawAt(Point2D centerPos)
 		}
 		else if (isHover)
 		{
-			ColorStruct brightColor = {
-				static_cast<BYTE>(std::min(255, type.ColorR + 100)),
-				static_cast<BYTE>(std::min(255, type.ColorG + 100)),
-				static_cast<BYTE>(std::min(255, type.ColorB + 100))
-			};
+			// 悬停加亮：各分量 +100（ColorStruct::operator+= 内部截断到 255）
+			ColorStruct brightColor = type.Color;
+			brightColor += ColorStruct { 100, 100, 100 };
 			btnHighlightColor = Drawing::RGB_To_Int(brightColor);
 		}
 
@@ -741,7 +736,7 @@ void MapChoiceBoxClass::UpdateButtonRects(Point2D topLeft, int bgWidth, int butt
 {
 	this->m_buttonRects.clear();
 
-	bool isVertical = (this->Type) ? (this->Type->Button_Layout != 0) : false;
+	bool isVertical = (this->Type) ? (this->Type->Button_Layout == ChoiceBoxButtonLayout::Vertical) : false;
 	int btnCount = static_cast<int>(btnItems.size());
 
 	if (isVertical)
@@ -891,7 +886,7 @@ static void DrawChoiceBoxList(std::vector<std::shared_ptr<T>>& boxes)
 		// 回弹模式例外：保持可见，靠选中高亮（红框）反馈点击，
 		// 否则隐藏期结束又重新出现，表现为"突然消失一下"的闪烁
 		const bool isBounceClicked = (ptr->ClickedIndex >= 0 && ptr->Type
-			&& ptr->Type->Button_Mode == static_cast<int>(ChoiceBoxButtonMode::Bounce));
+			&& ptr->Type->Button_Mode == ChoiceBoxButtonMode::Bounce);
 		if (ptr->ClickExpireCounter >= 0 && !isBounceClicked)
 			continue;
 
@@ -918,7 +913,7 @@ static void DrawChoiceBoxList(std::vector<std::shared_ptr<T>>& boxes)
 		if (--ptr->ClickExpireCounter <= 0)
 		{
 			const bool isBounce = (ptr->ClickedIndex >= 0 && ptr->Type
-				&& ptr->Type->Button_Mode == static_cast<int>(ChoiceBoxButtonMode::Bounce));
+				&& ptr->Type->Button_Mode == ChoiceBoxButtonMode::Bounce);
 
 			if (isBounce)
 			{

@@ -130,13 +130,7 @@ void TechnoExt::ExtData::SaveToStream(PhobosExtStreamWriter& Stm)
 
 bool TechnoExt::LoadGlobals(PhobosExtStreamReader& Stm)
 {
-	// ⚠ 此时引擎指针修复尚未完成，不能访问任何游戏对象指针
-
-	// 清理全局 maps（旧会话的指针在新会话中无效）
 	TemporalAOE::FakeTemporals.clear();
-	// 必须与 FakeTemporals 成对清理：FakeTemporals 是正向表，SecondariesByAttacker
-	// 是其反向索引，二者必须时刻一致。否则残留的陈旧索引会让 DestroyFakeTemporalsByAttacker
-	// 和每帧心跳拿到上一会话的野指针去查表。
 	TemporalAOE::SecondariesByAttacker.clear();
 	TemporalAOE::SecondaryClaims.clear();
 	TemporalAOE::WarpingOutTargets.clear();
@@ -144,7 +138,6 @@ bool TechnoExt::LoadGlobals(PhobosExtStreamReader& Stm)
 	TemporalExclusiveTargetsMap.clear();
 	BerzerkRestoreClearCache();
 
-	// 标记：指针修复完成后在第一帧执行深度清理
 	TemporalAOE::s_PostLoadCleanupNeeded = true;
 
 	return Stm

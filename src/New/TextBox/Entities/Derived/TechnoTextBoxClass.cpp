@@ -43,12 +43,10 @@ TechnoTextBoxClass::TechnoTextBoxClass(
 	this->CurrentLabel = csfLabel ? csfLabel : "";
 	this->MaxLineWidth = pType->MaxWidth;
 	this->BackgroundOpacity = pType->BackgroundOpacity;
-	this->ColorR = pType->ColorR;
-	this->ColorG = pType->ColorG;
-	this->ColorB = pType->ColorB;
+	this->Color = pType->Color;
 	this->RemainingFrames = pType->Duration;
 	Debug::Log("[TechnoTextBoxClass] ctor: colors set to R=%d G=%d B=%d (from type %s)\n",
-		this->ColorR, this->ColorG, this->ColorB, typeName);
+		this->Color.R, this->Color.G, this->Color.B, typeName);
 }
 
 // ========== 虚接口实现 ==========
@@ -125,9 +123,7 @@ TechnoTextBoxClass* TechnoTextBoxClass::FindOrCreate(TechnoClass* pTarget,
 		pLabel->CurrentLabel = csfLabel ? csfLabel : "";
 		pLabel->MaxLineWidth = pType->MaxWidth;
 		pLabel->BackgroundOpacity = pType->BackgroundOpacity;
-		pLabel->ColorR = pType->ColorR;
-		pLabel->ColorG = pType->ColorG;
-		pLabel->ColorB = pType->ColorB;
+		pLabel->Color = pType->Color;
 		pLabel->RemainingFrames = pType->Duration;
 		pLabel->UpdateLayout();
 		return pLabel;
@@ -195,9 +191,7 @@ void TechnoTextBoxClass::RemoveByType(int typeIndex)
 		if (pType &&
 			pLabel->MaxLineWidth == pType->MaxWidth &&
 			pLabel->BackgroundOpacity == pType->BackgroundOpacity &&
-			pLabel->ColorR == pType->ColorR &&
-			pLabel->ColorG == pType->ColorG &&
-			pLabel->ColorB == pType->ColorB)
+			pLabel->Color == pType->Color.Get())
 		{
 			TechnoTextBoxClass* pTargetLabel = pLabel.get();
 			it = Array.erase(it);
@@ -365,9 +359,7 @@ bool TechnoTextBoxClass::Serialize(T& Stm)
 		.Process(this->CurrentLabel)
 		.Process(this->MaxLineWidth)
 		.Process(this->BackgroundOpacity)
-		.Process(this->ColorR)
-		.Process(this->ColorG)
-		.Process(this->ColorB)
+		.Process(this->Color)
 		.Process(this->RemainingFrames)
 		.Success();
 }

@@ -415,7 +415,7 @@ pre code { padding: 0; font-size: inherit; color: inherit; background: none; bor
   <div class="nav__item nav__item--parent" page="commands">新增按键命令<span class="nav__caret" title="展开 / 收起子目录（不切换页面）"><svg viewBox="0 0 24 24" width="14" height="14" xmlns="http://www.w3.org/2000/svg"><polygon points="9,5 18,12 9,19"/></svg></span></div>
   <ul class="nav__sub">
     <li class="nav__subitem" data-target="commands_csf" data-page="commands" title="按键文本自定义（CSF）">按键文本自定义（CSF）</li>
-    <li class="nav__subitem" data-target="commands_1" data-page="commands" title="自动装载">1. 自动装载</li>
+    <li class="nav__subitem" data-target="commands_1" data-page="commands" title="自动装载 · Auto_passengers_load">1. 自动装载</li>
   </ul>
 </li>
 
@@ -490,7 +490,7 @@ pre code { padding: 0; font-size: inherit; color: inherit; background: none; bor
 
 <p>为《红色警戒2：尤里的复仇》扩展游戏功能的 DLL，面向任务与地图作者，可自由用于任务包与模组。<br>
   作者 <a href="https://space.bilibili.com/423792550" target="_blank" class="doc-link"><strong>Chang_zhi</strong></a>。</p>
-<p>仅部分功能依赖 <strong>Phobos</strong>：不安装 Phobos 也可独立使用，推荐与 Phobos 一同使用。</p>
+<p>仅部分功能依赖 <strong>Phobos</strong>：不安装 Phobos 也可独立使用，但推荐一同使用。</p>
 <p class="doc-text--gray">左侧导航栏可展开各页子目录跳转至对应条目；顶部搜索框可直接搜功能名、编号或键名。</p>
 
 <h2 class="doc-heading--secondary">兼容性</h2>
@@ -845,7 +845,7 @@ SmartVHPScan=FullHealth</code></pre>
 <tbody>
 <tr><td class="doc-table__td"><code>CMND:UICATEGORY_PHOBOSEXT</code></td><td class="doc-table__td">分类</td><td class="doc-table__td">PhobosExt</td></tr>
 <tr><td class="doc-table__td"><code>CMND:UINAME_AUTOLOAD</code></td><td class="doc-table__td">名称</td><td class="doc-table__td">自动装载 Auto passengers load</td></tr>
-<tr><td class="doc-table__td"><code>CMND:UIDESCR_AUTOLOAD</code></td><td class="doc-table__td">描述</td><td class="doc-table__td">选中空载具按指定按键，自动招募附近单位上车</td></tr>
+<tr><td class="doc-table__td"><code>CMND:UIDESCR_AUTOLOAD</code></td><td class="doc-table__td">描述</td><td class="doc-table__td">选中空载具按指定按键，自动招募附近单位上车\nRecruit nearby units to board selected empty transports</td></tr>
 </tbody>
 </table>
 </div>
@@ -853,7 +853,7 @@ SmartVHPScan=FullHealth</code></pre>
 <hr class="sec-divider--double">
 
 <div id="commands_1">
-<h3 class="doc-heading--tertiary">1. 自动装载</h3>
+<h3 class="doc-heading--tertiary">1. 自动装载（Auto_passengers_load）</h3>
 <p>选中空载具后按快捷键，附近单位会自动上车。招募半径可自定义：</p>
 <pre class="doc-code--block"><code>[General]
 Command.RecruitRange=            ; double - 自动装载的招募半径 - (默认 10.0)</code></pre>

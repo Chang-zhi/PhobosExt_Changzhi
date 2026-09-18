@@ -99,19 +99,15 @@ MapTextBoxClass::~MapTextBoxClass() = default;
  * @param csfLabel       CSF 标签名（用于从 StringTable 中查找本地化文本）
  * @param maxWidth       单行最大像素宽度（<=0 时默认 250）
  * @param opacityPercent 背景不透明度（0-100，自动 clamp）
- * @param colorR         颜色 R 分量
- * @param colorG         颜色 G 分量
- * @param colorB         颜色 B 分量
+ * @param color          文字/边框颜色
  */
 MapTextBoxClass::MapTextBoxClass(const char* csfLabel,
 							 int maxWidth, int opacityPercent,
-							 int colorR, int colorG, int colorB)
+							 ColorStruct const& color)
 	: CurrentLabel(csfLabel ? csfLabel : "")
 	, MaxLineWidth(maxWidth > 0 ? maxWidth : 250)
 	, BackgroundOpacity(std::clamp(opacityPercent, 0, 100))
-	, ColorR(colorR)
-	, ColorG(colorG)
-	, ColorB(colorB)
+	, Color(color)
 	, m_cache(std::make_unique<Cache>()) // 缓存对象，延迟到首次绘制时初始化
 {}
 
@@ -260,11 +256,8 @@ void MapTextBoxClass::DrawAt(Point2D centerPos)
 	ColorStruct bgColor = { 0, 0, 0 };
 	DSurface::Composite->FillRectTrans(&bgRect, &bgColor, this->BackgroundOpacity);
 
-	// 将 RGB 分量转为游戏引擎所需的颜色整数值
-	int colorInt = Drawing::RGB_To_Int(ColorStruct(
-		static_cast<unsigned char>(this->ColorR),
-		static_cast<unsigned char>(this->ColorG),
-		static_cast<unsigned char>(this->ColorB)));
+	// 将颜色转为游戏引擎所需的颜色整数值
+	int colorInt = Drawing::RGB_To_Int(this->Color);
 	Point2D p1, p2;
 
 	// ===== 绘制边框（上、左、右、下） =====
@@ -322,9 +315,7 @@ bool MapTextBoxClass::Serialize(T& Stm)
 		.Process(this->CurrentLabel)        // CSF 标签名
 		.Process(this->MaxLineWidth)        // 最大行宽
 		.Process(this->BackgroundOpacity)   // 背景不透明度
-		.Process(this->ColorR)              // 颜色 R
-		.Process(this->ColorG)              // 颜色 G
-		.Process(this->ColorB)              // 颜色 B
+		.Process(this->Color)               // 文字/边框颜色
 		.Process(this->RemainingFrames)     // 剩余显示帧数
 		.Success();
 }

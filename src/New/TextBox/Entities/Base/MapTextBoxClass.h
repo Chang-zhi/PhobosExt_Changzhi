@@ -18,9 +18,7 @@ public:
 	std::string CurrentLabel;       // CSF 标签名（用于查找本地化文本，或直接作为显示文本）
 	int MaxLineWidth { 250 };       // 单行最大像素宽度
 	int BackgroundOpacity { 75 };   // 背景不透明度 (0-100)
-	int ColorR { 255 };             // 文字/边框颜色 — R 分量
-	int ColorG { 215 };             // 文字/边框颜色 — G 分量
-	int ColorB { 0 };               // 文字/边框颜色 — B 分量
+	ColorStruct Color { 255, 215, 0 };  // 文字/边框颜色
 
 	// 禁止拷贝
 	MapTextBoxClass(const MapTextBoxClass&) = delete;
@@ -59,7 +57,7 @@ protected:
 	MapTextBoxClass() = default;    // 默认构造（供反序列化使用）
 	MapTextBoxClass(const char* csfLabel,
 				  int maxWidth = 250, int opacityPercent = 75,
-				  int colorR = 255, int colorG = 215, int colorB = 0);
+				  ColorStruct const& color = ColorStruct { 255, 215, 0 });
 
 	int VerticalOffset { 0 };       // 垂直偏移量（预留，暂未使用）
 

@@ -29,18 +29,8 @@ void TextBoxTypeClass::LoadFromINI(CCINIClass* pINI)
 	this->BackgroundOpacity.Read(exINI, section, "BackgroundOpacity");
 	this->Duration.Read(exINI, section, "Duration");
 
-	// Color 格式：Color=255,215,0  （RGB 逗号分隔）
-	if (pINI->ReadString(section, "Color", "", PhobosExt::readBuffer))
-	{
-		const char* pColor = PhobosExt::readBuffer;
-		int r = 255, g = 215, b = 0;
-		if (std::sscanf(pColor, "%d,%d,%d", &r, &g, &b) >= 3)
-		{
-			this->ColorR = std::clamp(r, 0, 255);
-			this->ColorG = std::clamp(g, 0, 255);
-			this->ColorB = std::clamp(b, 0, 255);
-		}
-	}
+	// Color 格式：Color=R,G,B  （默认 255,215,0）
+	this->Color.Read(exINI, section, "Color");
 }
 
 // ========== 序列化模板 ==========
@@ -50,9 +40,7 @@ void TextBoxTypeClass::Serialize(T& Stm)
 	Stm
 		.Process(this->MaxWidth)            // 最大像素宽度
 		.Process(this->BackgroundOpacity)   // 背景不透明度
-		.Process(this->ColorR)              // 颜色 R
-		.Process(this->ColorG)              // 颜色 G
-		.Process(this->ColorB)              // 颜色 B
+		.Process(this->Color)               // 文字/边框颜色
 		.Process(this->Duration)            // 自动移除帧数
 		;
 }

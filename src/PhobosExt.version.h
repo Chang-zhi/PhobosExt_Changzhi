@@ -7,13 +7,13 @@
 #define _STR(x) _STR_(x)
 #define _STR_(x) #x
 
-// ======================== DLL 版本号 ========================
+// ======================== 版本号 ========================
 #define VERSION_MAJOR 1          // 主版本号
 #define VERSION_MINOR 0          // 次版本号
 #define VERSION_REVISION 2      // 修订号
 #define VERSION_PATCH 0          // 补丁号
 
-#define BUILD_NUMBER 48          // 构建号（每次发布递增）
+#define BUILD_NUMBER 48          // 构建号
 
 // ------------------------ 编译配置 ------------------------
 

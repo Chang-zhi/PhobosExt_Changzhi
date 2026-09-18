@@ -232,6 +232,18 @@ enum class SmartVHPScanType
 	Count = 3,
 };
 
+enum class ChoiceBoxButtonLayout : int
+{
+	Horizontal = 0, // 横向：一行放不下自动折行（默认）
+	Vertical = 1    // 纵向：单列排布
+};
+
+enum class ChoiceBoxButtonMode : int
+{
+	Normal = 0, // 普通：点击后立即消失并清理（默认）
+	Bounce = 1  // 回弹：点击后回弹，可反复点击
+};
+
 enum class DamageDisplayType
 {
 	Regular = 0,

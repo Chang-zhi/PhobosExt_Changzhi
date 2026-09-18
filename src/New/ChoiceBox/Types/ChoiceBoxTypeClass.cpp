@@ -49,36 +49,10 @@ void ChoiceBoxTypeClass::LoadFromINI(CCINIClass* pINI)
 	this->Button_Count.Read(exINI, section, "Button.Count");
 
 	// Button.Layout - 枚举字符串 Horizontal/Vertical
-	if (pINI->ReadString(section, "Button.Layout", "", PhobosExt::readBuffer))
-	{
-		const char* layoutStr = PhobosExt::readBuffer;
-		if (_stricmp(layoutStr, "Vertical") == 0)
-		{
-			this->Button_Layout = ChoiceBoxButtonLayout::Vertical;
-		}
-		else if (_stricmp(layoutStr, "Horizontal") == 0)
-		{
-			this->Button_Layout = ChoiceBoxButtonLayout::Horizontal;
-		}
-		else
-			this->Button_Layout.Read(exINI, section, "Button.Layout");
-	}
+	this->Button_Layout.Read(exINI, section, "Button.Layout");
 
 	// Button.Mode - 枚举字符串 Normal/Bounce
-	if (pINI->ReadString(section, "Button.Mode", "", PhobosExt::readBuffer))
-	{
-		const char* modeStr = PhobosExt::readBuffer;
-		if (_stricmp(modeStr, "Bounce") == 0)
-		{
-			this->Button_Mode = ChoiceBoxButtonMode::Bounce;
-		}
-		else if (_stricmp(modeStr, "Normal") == 0)
-		{
-			this->Button_Mode = ChoiceBoxButtonMode::Normal;
-		}
-		else
-			this->Button_Mode.Read(exINI, section, "Button.Mode");
-	}
+	this->Button_Mode.Read(exINI, section, "Button.Mode");
 
 	// Button.Width - 固定宽度（0=自动）
 	this->Button_Width.Read(exINI, section, "Button.Width");
@@ -95,26 +69,16 @@ void ChoiceBoxTypeClass::LoadFromINI(CCINIClass* pINI)
 
 		ChoiceBoxButton btn;
 
-		if (pINI->ReadString(section, key, "", PhobosExt::readBuffer))
+		if (exINI.ReadString(section, key))
 		{
-			btn.Text = PhobosExt::readBuffer;
+			btn.Text = exINI.value();
 		}
 
 		this->Buttons.push_back(btn);
 	}
 
-	// Color 格式：Color=255,215,0  （RGB 逗号分隔）
-	if (pINI->ReadString(section, "Color", "", PhobosExt::readBuffer))
-	{
-		const char* pColor = PhobosExt::readBuffer;
-		int r = 255, g = 215, b = 0;
-		if (std::sscanf(pColor, "%d,%d,%d", &r, &g, &b) >= 3)
-		{
-			this->ColorR = std::clamp(r, 0, 255);
-			this->ColorG = std::clamp(g, 0, 255);
-			this->ColorB = std::clamp(b, 0, 255);
-		}
-	}
+	// Color 格式：Color=R,G,B  （默认 255,215,0）
+	this->Color.Read(exINI, section, "Color");
 }
 
 // ========== 序列化模板 ==========
@@ -133,9 +97,7 @@ void ChoiceBoxTypeClass::Serialize(T& Stm)
 		.Process(this->Buttons)
 		.Process(this->MaxWidth)
 		.Process(this->BackgroundOpacity)
-		.Process(this->ColorR)
-		.Process(this->ColorG)
-		.Process(this->ColorB)
+		.Process(this->Color)
 		.Process(this->Duration)
 		;
 }

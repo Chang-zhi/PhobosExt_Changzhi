@@ -20,17 +20,13 @@ public:
 	// ===== 样式参数 =====
 	Valueable<int> MaxWidth;            // 单行最大像素宽度 (1-1000)，文字超出后自动换行
 	Valueable<int> BackgroundOpacity;   // 背景不透明度 (0-100)，0=全透明，100=纯黑
-	Valueable<int> ColorR;              // 文字/边框颜色 — R 分量
-	Valueable<int> ColorG;              // 文字/边框颜色 — G 分量
-	Valueable<int> ColorB;              // 文字/边框颜色 — B 分量
+	Valueable<ColorStruct> Color;       // 文字/边框颜色（INI: Color=R,G,B，默认 255,215,0）
 	Valueable<int> Duration;            // 自动移除帧数，-1=无限显示，需手动清除
 
 	TextBoxTypeClass(const char* const pTitle) : Enumerable(pTitle)
 		, MaxWidth { 250 }
 		, BackgroundOpacity { 75 }
-		, ColorR { 255 }
-		, ColorG { 215 }
-		, ColorB { 0 }
+		, Color { { 255, 215, 0 } }
 		, Duration { -1 }
 	{ }
 

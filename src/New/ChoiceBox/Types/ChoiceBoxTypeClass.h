@@ -2,6 +2,7 @@
 
 #include <PhobosExt.h>
 #include <GeneralStructures.h>
+#include <Utilities/Enum.h>
 #include <Utilities/SavegameDef.h>
 #include <Utilities/Template.h>
 #include <Utilities/Enumerable.h>
@@ -13,18 +14,6 @@
 
 class PhobosExtStreamWriter;
 class PhobosExtStreamReader;
-
-enum ChoiceBoxButtonMode : int
-{
-	Normal = 0,	    /// 普通模式
-	Bounce = 1, 	/// 回弹模式
-};
-
-enum ChoiceBoxButtonLayout : int
-{
-	Horizontal = 0, // 横向
-	Vertical = 1, 	// 纵向
-};
 
 struct ChoiceBoxButton
 {
@@ -43,9 +32,9 @@ public:
 	Valueable<CSFText> Description;              // 描述 CSF 标签
 
 	// ===== 按钮配置 =====
-	Valueable<int> Button_Count;                 // 按钮数量（INI: Button.Count）
-	Valueable<int> Button_Layout;                // 布局方向 0=横向 1=纵向（INI: Button.Layout=Horizontal/Vertical）
-	Valueable<int> Button_Mode;                  // 按钮模式 0=普通 1=回弹（INI: Button.Mode）
+	Valueable<int> Button_Count;                     // 按钮数量（INI: Button.Count）
+	Valueable<ChoiceBoxButtonLayout> Button_Layout;  // 布局方向（INI: Button.Layout=Horizontal/Vertical）
+	Valueable<ChoiceBoxButtonMode> Button_Mode;      // 按钮模式（INI: Button.Mode=Normal/Bounce）
 	Valueable<int> Button_Width;                 // 按钮固定宽度，0=自动（INI: Button.Width）
 	Valueable<int> Button_Height;                // 按钮固定高度，0=自动撑高（INI: Button.Height）
 	ValueableVector<ChoiceBoxButton> Buttons;    // 按钮文字列表（INI: Button.TextN）
@@ -53,23 +42,19 @@ public:
 	// ===== 外观参数 =====
 	Valueable<int> MaxWidth;                     // 文本最大像素宽度，≤0 时默认 250（INI: MaxWidth）
 	Valueable<int> BackgroundOpacity;            // 背景不透明度 0-100（INI: BackgroundOpacity）
-	Valueable<int> ColorR;                       // 文字/边框颜色 R 分量（INI: Color=R,G,B）
-	Valueable<int> ColorG;                       // 文字/边框颜色 G 分量
-	Valueable<int> ColorB;                       // 文字/边框颜色 B 分量
+	Valueable<ColorStruct> Color;                // 文字/边框颜色（INI: Color=R,G,B，默认 255,215,0）
 	Valueable<int> Duration;                     // 自动移除帧数，-1=无限显示（INI: Duration）
 
 	ChoiceBoxTypeClass(const char* const pTitle) : Enumerable(pTitle)
 		, Title_Center { false }
 		, Button_Count { 0 }
-		, Button_Layout { 0 }
-		, Button_Mode { 0 }
+		, Button_Layout { ChoiceBoxButtonLayout::Horizontal }
+		, Button_Mode { ChoiceBoxButtonMode::Normal }
 		, Button_Width { 0 }
 		, Button_Height { 0 }
 		, MaxWidth { 250 }
 		, BackgroundOpacity { 75 }
-		, ColorR { 255 }
-		, ColorG { 215 }
-		, ColorB { 0 }
+		, Color { { 255, 215, 0 } }
 		, Duration { -1 }
 	{ }
 

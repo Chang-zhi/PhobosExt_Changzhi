@@ -7,8 +7,8 @@
 #include <FPSCounter.h>
 #include <GameOptionsClass.h>
 #include <Ext/TechnoType/Body.h>
-#include <New/TextBox/Types/TextBoxTypeClass.h>
 #include <New/ChoiceBox/Types/ChoiceBoxTypeClass.h>
+#include <New/TextBox/Types/TextBoxTypeClass.h>
 #include <Ext/TAction/ScriptManipulator.h>
 #include <Ext/TAction/TaskForceManipulator.h>
 #include <Utilities/Patch.h>
@@ -80,10 +80,6 @@ void RulesExt::ExtData::LoadAfterTypeData(RulesClass* pThis, CCINIClass* pINI)
 {
 	INI_EX exINI(pINI);
 
-	// Section AITargetTypes : 自定义索敌类型列表（索引 -> TechnoType 列表），供 5508 等脚本动作使用
-	// 注意：本钩子整局会以不同 INI（纯 rules / 地图小节）调用多次，
-	// 只有当前 INI 真的含有该小节时才整体替换，否则保留之前解析的结果，
-	// 避免地图小节里没有该段时把 rules 解析好的列表清空。
 	if (pINI->GetSection("AITargetTypes"))
 	{
 		std::vector<std::vector<TechnoTypeClass*>> lists;

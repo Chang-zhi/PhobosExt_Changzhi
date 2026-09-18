@@ -37,7 +37,7 @@ public:
 	const char* GetTypeMarker() const override { return "WaypointTextBoxClass"; }
 
 	// ===== 工具函数 =====
-	static void ConvertColorEnum(int enumVal, int& r, int& g, int& b); // 枚举值(0-8)转 RGB
+	static ColorStruct ConvertColorEnum(int enumVal);   // 枚举值(0-8)转颜色
 
 	// ===== 查找/创建/移除 =====
 	static WaypointTextBoxClass* FindOrCreate(int wpIndex,                // 查找或创建
