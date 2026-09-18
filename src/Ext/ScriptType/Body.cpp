@@ -28,14 +28,14 @@ void ScriptTypeExt::ExtData::Serialize(T& Stm)
 		int count = this->OwnerObject()->ActionsCount;
 		Stm.Process(count);
 
-		for (int i = 0; i < 50; ++i)
+		for (int i = 0; i < ScriptTypeExt::ScriptActionCount; ++i)
 		{
 			Stm.Process(this->OwnerObject()->ScriptActions[i].Action);
 			Stm.Process(this->OwnerObject()->ScriptActions[i].Argument);
 		}
 	}
 
-	for (int i = 0; i < 50; ++i)
+	for (int i = 0; i < ScriptTypeExt::ScriptActionCount; ++i)
 	{
 		Stm.Process(this->OriginalActions[i].Action);
 		Stm.Process(this->OriginalActions[i].Argument);
@@ -72,7 +72,7 @@ void ScriptTypeExt::ExtData::CaptureOriginal()
 
 	this->OriginalActionsCount = pType->ActionsCount;
 
-	for (int i = 0; i < this->OriginalActionsCount && i < 50; ++i)
+	for (int i = 0; i < this->OriginalActionsCount && i < ScriptTypeExt::ScriptActionCount; ++i)
 	{
 		this->OriginalActions[i] = pType->ScriptActions[i];
 	}
@@ -88,7 +88,7 @@ void ScriptTypeExt::ExtData::RestoreOriginal()
 
 	pType->ActionsCount = this->OriginalActionsCount;
 
-	for (int i = 0; i < 50; ++i)
+	for (int i = 0; i < ScriptTypeExt::ScriptActionCount; ++i)
 	{
 		pType->ScriptActions[i] = this->OriginalActions[i];
 	}

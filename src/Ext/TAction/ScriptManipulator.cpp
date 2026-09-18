@@ -1,14 +1,12 @@
 #include "ScriptManipulator.h"
 
-#include <Interop/PhobosExtInterop.h>
-
 #include <Ext/ScriptType/Body.h>
 #include <Ext/TeamType/Body.h>
 
 #include <TeamClass.h>
 #include <ScriptClass.h>
-#include <ScenarioClass.h>
 
+#include <Interop/ScenarioVariables.h>
 #include <Utilities/Debug.h>
 
 #include <string>
@@ -21,35 +19,6 @@ static std::string MakeID(int param) { return "0" + std::to_string(param); }
 static ScriptTypeClass* FindScript(int param) { return ScriptTypeClass::Find(MakeID(param).c_str()); }
 static ScriptTypeClass* FindScript(const char* text) { return text && text[0] ? ScriptTypeClass::Find(text) : nullptr; }
 static TeamTypeClass* FindTeam(int param) { return TeamTypeClass::Find(MakeID(param).c_str()); }
-
-// ============================================================================
-// Helper: read a variable via Interop API with Direct fallback
-// ============================================================================
-static int ReadVar(bool bGlobal, int index)
-{
-	int value = 0;
-	int maxIndex = bGlobal ? 50 : 100;
-
-	if (index < 0 || index >= maxIndex)
-		return 0;
-
-	if (PhobosExtInterop::IsAvailable())
-	{
-		if (bGlobal)
-			PhobosExtInterop::Variables_GetGlobal(index, &value);
-		else
-			PhobosExtInterop::Variables_GetLocal(index, &value);
-	}
-	else if (ScenarioClass::Instance)
-	{
-		if (bGlobal)
-			value = ScenarioClass::Instance->GlobalVariables[index].Value;
-		else
-			value = ScenarioClass::Instance->LocalVariables[index].Value;
-	}
-
-	return value;
-}
 
 // ============================================================================
 // Capture original ScriptType actions and TeamType Script bindings from INI.
@@ -78,7 +47,8 @@ void ScriptManipulator::CaptureFromINI(CCINIClass* pINI)
 
 		auto const pExt = ScriptTypeExt::ExtMap.FindOrAllocate(pScript);
 		int const nActions = pINI->GetKeyCount(scriptID);
-		pExt->OriginalActionsCount = (nActions > 50) ? 50 : nActions;
+		pExt->OriginalActionsCount = (nActions > ScriptTypeExt::ScriptActionCount)
+			? ScriptTypeExt::ScriptActionCount : nActions;
 
 		for (int j = 0; j < pExt->OriginalActionsCount; ++j)
 		{
@@ -203,7 +173,7 @@ void ScriptManipulator::ClearScript(TActionClass* pThis)
 	Debug::Log("[PhobosExt] ClearScript: Script [%s] Param3=%d ActionsCount=%d IsModified=%d\n",
 		pScript->ID, pThis->Param3, pScript->ActionsCount, pExt->IsModified);
 	pScript->ActionsCount = 0;
-	for (int i = 0; i < 50; ++i)
+	for (int i = 0; i < ScriptTypeExt::ScriptActionCount; ++i)
 		pScript->ScriptActions[i] = { 0, 0 };
 	pExt->IsModified = true;
 
@@ -227,8 +197,8 @@ void ScriptManipulator::CopyScript(TActionClass* pThis)
 	auto const pDstExt = CaptureOriginalScriptContent(pDst);
 
 	int count = pSrc->ActionsCount;
-	if (count > 50)
-		count = 50;
+	if (count > ScriptTypeExt::ScriptActionCount)
+		count = ScriptTypeExt::ScriptActionCount;
 
 	Debug::Log("[PhobosExt] CopyScript: Src=[%s](%d actions) Dst=[%s] Param3=%d Param4=%d\n",
 		pSrc->ID, pSrc->ActionsCount, pDst->ID, pThis->Param3, pThis->Param4);
@@ -239,7 +209,7 @@ void ScriptManipulator::CopyScript(TActionClass* pThis)
 		pDst->ScriptActions[i] = pSrc->ScriptActions[i];
 	}
 	// Clear remaining slots to prevent stale data leaks
-	for (int i = count; i < 50; ++i)
+	for (int i = count; i < ScriptTypeExt::ScriptActionCount; ++i)
 	{
 		pDst->ScriptActions[i] = { 0, 0 };
 	}
@@ -264,12 +234,13 @@ void ScriptManipulator::ModifyScriptByParam(TActionClass* pThis)
 	int param1 = pThis->Param5;
 	int param2 = pThis->Param6;
 
-	if (lineNum < 0 || lineNum >= 50)
+	if (lineNum < 0 || lineNum >= ScriptTypeExt::ScriptActionCount)
 		return;
 
 	auto const pExt = CaptureOriginalScriptContent(pScript);
 
-	int encodedArg = (param2 << 16) | (param1 & 0xFFFF);
+	// Argument 以 16 位高/低半区分别打包 param2 / param1, 显式掩码表明只取低 16 位。
+	int encodedArg = ((param2 & 0xFFFF) << 16) | (param1 & 0xFFFF);
 
 	pScript->ScriptActions[lineNum] = { actionType, encodedArg };
 
@@ -292,18 +263,38 @@ void ScriptManipulator::ModifyScriptByLocalVar(TActionClass* pThis)
 	if (!pScript)
 		return;
 
-	// 行号同样取自变量（局部变量），与 Param4~Param6 一致
-	int lineNum = ReadVar(false, pThis->Param3);
-	if (lineNum < 0 || lineNum >= 50)
+	// 行号同样取自变量（局部变量），与 Param4~Param6 一致。
+	// 变量索引越界等失败情形显式中止, 避免越界索引静默读成 0 后被当作脚本第 0 行。
+	constexpr auto scope = ScenarioVariables::Scope::Local;
+
+	int lineNum = 0;
+	if (!ScenarioVariables::TryRead(scope, pThis->Param3, lineNum))
+	{
+		Debug::Log("[PhobosExt] ModifyScriptByLocalVar: 行号变量读取失败 Param3=%d(需索引在 [0, %d) 且变量存储可用)\n",
+			pThis->Param3, ScenarioVariables::LocalCount);
+		return;
+	}
+
+	if (lineNum < 0 || lineNum >= ScriptTypeExt::ScriptActionCount)
 		return;
 
 	auto const pExt = CaptureOriginalScriptContent(pScript);
 
-	int actionType = ReadVar(false, pThis->Param4);
-	int param1 = ReadVar(false, pThis->Param5);
-	int param2Val = ReadVar(false, pThis->Param6);
+	int actionType = 0;
+	int param1 = 0;
+	int param2Val = 0;
 
-	int encodedArg = (param2Val << 16) | (param1 & 0xFFFF);
+	if (!ScenarioVariables::TryRead(scope, pThis->Param4, actionType)
+		|| !ScenarioVariables::TryRead(scope, pThis->Param5, param1)
+		|| !ScenarioVariables::TryRead(scope, pThis->Param6, param2Val))
+	{
+		Debug::Log("[PhobosExt] ModifyScriptByLocalVar: 变量读取失败 Param4~6=%d/%d/%d(需索引在 [0, %d) 且变量存储可用)\n",
+			pThis->Param4, pThis->Param5, pThis->Param6, ScenarioVariables::LocalCount);
+		return;
+	}
+
+	// Argument 以 16 位高/低半区分别打包 param2 / param1, 显式掩码表明只取低 16 位。
+	int encodedArg = ((param2Val & 0xFFFF) << 16) | (param1 & 0xFFFF);
 
 	pScript->ScriptActions[lineNum] = { actionType, encodedArg };
 
@@ -326,18 +317,38 @@ void ScriptManipulator::ModifyScriptByGlobalVar(TActionClass* pThis)
 	if (!pScript)
 		return;
 
-	// 行号同样取自变量（全局变量），与 Param4~Param6 一致
-	int lineNum = ReadVar(true, pThis->Param3);
-	if (lineNum < 0 || lineNum >= 50)
+	// 行号同样取自变量（全局变量），与 Param4~Param6 一致。
+	// 变量索引越界等失败情形显式中止, 避免越界索引静默读成 0 后被当作脚本第 0 行。
+	constexpr auto scope = ScenarioVariables::Scope::Global;
+
+	int lineNum = 0;
+	if (!ScenarioVariables::TryRead(scope, pThis->Param3, lineNum))
+	{
+		Debug::Log("[PhobosExt] ModifyScriptByGlobalVar: 行号变量读取失败 Param3=%d(需索引在 [0, %d) 且变量存储可用)\n",
+			pThis->Param3, ScenarioVariables::GlobalCount);
+		return;
+	}
+
+	if (lineNum < 0 || lineNum >= ScriptTypeExt::ScriptActionCount)
 		return;
 
 	auto const pExt = CaptureOriginalScriptContent(pScript);
 
-	int actionType = ReadVar(true, pThis->Param4);
-	int param1 = ReadVar(true, pThis->Param5);
-	int param2Val = ReadVar(true, pThis->Param6);
+	int actionType = 0;
+	int param1 = 0;
+	int param2Val = 0;
 
-	int encodedArg = (param2Val << 16) | (param1 & 0xFFFF);
+	if (!ScenarioVariables::TryRead(scope, pThis->Param4, actionType)
+		|| !ScenarioVariables::TryRead(scope, pThis->Param5, param1)
+		|| !ScenarioVariables::TryRead(scope, pThis->Param6, param2Val))
+	{
+		Debug::Log("[PhobosExt] ModifyScriptByGlobalVar: 变量读取失败 Param4~6=%d/%d/%d(需索引在 [0, %d) 且变量存储可用)\n",
+			pThis->Param4, pThis->Param5, pThis->Param6, ScenarioVariables::GlobalCount);
+		return;
+	}
+
+	// Argument 以 16 位高/低半区分别打包 param2 / param1, 显式掩码表明只取低 16 位。
+	int encodedArg = ((param2Val & 0xFFFF) << 16) | (param1 & 0xFFFF);
 
 	pScript->ScriptActions[lineNum] = { actionType, encodedArg };
 

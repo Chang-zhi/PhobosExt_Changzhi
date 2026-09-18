@@ -2,8 +2,6 @@
 #include "ScriptManipulator.h"
 #include "TaskForceManipulator.h"
 
-#include <Interop/PhobosExtInterop.h>
-
 #include <YRpp.h>
 #include <TagClass.h>
 #include <TagTypeClass.h>
@@ -13,10 +11,8 @@
 #include <HouseClass.h>
 #include <Ext/House/Body.h>
 #include <New/FootPath/FootPathVisualizer.h>
-#include <Ext/Scenario/Body.h>
 #include <ArrayClasses.h>
 #include <MessageListClass.h>
-#include <ScenarioClass.h>
 #include <GameOptionsClass.h>
 #include <DisplayClass.h>
 
@@ -274,91 +270,6 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 	}
 }
 
-
-// test helper
-static int testReadVar(bool bGlobal, int index)
-{
-	int value = 0;
-	int maxIndex = bGlobal ? 50 : 100;
-
-	if (index < 0 || index >= maxIndex)
-		return 0;
-
-	if (PhobosExtInterop::IsAvailable())
-	{
-		if (bGlobal)
-		{
-			PhobosExtInterop::Variables_GetGlobal(index, &value);
-			Debug::LogAndMessage("[OtherDll] [testReadVar] PhobosExtInterop Global[%d] = %d\n", index, value);
-		}
-		else
-		{
-			PhobosExtInterop::Variables_GetLocal(index, &value);
-			Debug::LogAndMessage("[OtherDll] [testReadVar] PhobosExtInterop Local[%d] = %d\n", index, value);
-		}
-	}
-	else if (ScenarioClass::Instance)
-	{
-		if (bGlobal)
-		{
-			value = ScenarioClass::Instance->GlobalVariables[index].Value;
-			Debug::LogAndMessage("[OtherDll] [testReadVar] ScenarioClass Global[%d] = %d\n", index, value);
-		}
-		else
-		{
-			value = ScenarioClass::Instance->LocalVariables[index].Value;
-			Debug::LogAndMessage("[OtherDll] [testReadVar] ScenarioClass Local[%d] = %d\n", index, value);
-		}
-	}
-
-	return value;
-}
-
-static int testChangeVar(bool bGlobal, int index, int value)
-{
-	int maxIndex = bGlobal ? 50 : 100;
-
-	if (index < 0 || index >= maxIndex)
-		return 0;
-
-	if (PhobosExtInterop::IsAvailable())
-	{
-		if (bGlobal)
-		{
-			PhobosExtInterop::Variables_SetGlobal(index, value);
-			Debug::LogAndMessage("[OtherDll] [testChangeVar] PhobosExtInterop Global[%d] := %d\n", index, value);
-		}
-		else
-		{
-			PhobosExtInterop::Variables_SetLocal(index, value);
-			Debug::LogAndMessage("[OtherDll] [testChangeVar] PhobosExtInterop Local[%d] := %d\n", index, value);
-		}
-	}
-	else if (ScenarioClass::Instance)
-	{
-		if (bGlobal)
-		{
-			ScenarioClass::Instance->GlobalVariables[index].Value = (char)value;
-			Debug::LogAndMessage("[OtherDll] [testChangeVar] ScenarioClass Global[%d] := %d\n", index, value);
-		}
-		else
-		{
-			ScenarioClass::Instance->LocalVariables[index].Value = (char)value;
-			Debug::LogAndMessage("[OtherDll] [testChangeVar] ScenarioClass Local[%d] := %d\n", index, value);
-		}
-	}
-
-	return value;
-}
-
-// bool TActionExt::testAction(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
-// {
-// 	ScenarioClass* pScenario = ScenarioClass::Instance;
-// 	if (!pScenario)
-// 		return false;
-
-// 	return true;
-// }
 
 // =============================
 // container

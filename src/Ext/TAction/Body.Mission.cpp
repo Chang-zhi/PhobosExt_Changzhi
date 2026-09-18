@@ -2,8 +2,6 @@
 #include "ScriptManipulator.h"
 #include "TaskForceManipulator.h"
 
-#include <Interop/PhobosExtInterop.h>
-
 #include <YRpp.h>
 #include <TagClass.h>
 #include <TagTypeClass.h>

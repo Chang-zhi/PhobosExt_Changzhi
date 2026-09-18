@@ -89,6 +89,7 @@
     <ClCompile Include="src\Interop\InteropApiTable.cpp" />
     <ClCompile Include="src\Interop\InteropModule.cpp" />
     <ClCompile Include="src\Interop\PhobosExtInterop.cpp" />
+    <ClCompile Include="src\Interop\ScenarioVariables.cpp" />
     <ClCompile Include="src\Utilities\ShapeTextPrinter.cpp" />
     <ClCompile Include="src\Utilities\SpawnerHelper.cpp" />
     <ClCompile Include="src\Utilities\Stream.cpp" />
@@ -149,6 +150,7 @@
     <ClInclude Include="src\Interop\InteropApiTable.h" />
     <ClInclude Include="src\Interop\InteropModule.h" />
     <ClInclude Include="src\Interop\PhobosExtInterop.h" />
+    <ClInclude Include="src\Interop\ScenarioVariables.h" />
     <ClInclude Include="src\Utilities\Enum.h" />
     <ClInclude Include="src\Utilities\EnumFunctions.h" />
     <ClInclude Include="src\Utilities\GeneralUtils.h" />
