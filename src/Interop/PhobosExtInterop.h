@@ -1,117 +1,48 @@
 #pragma once
 
-#include <Windows.h>
+#include <Interop/InteropApi.h>
 
 // =============================================================================
-// PhobosExt Interop - Auto-detect and load PhobosExt module
-// Identified via GetInteropAPIVersion export
+// PhobosExtInterop - Interop API 提供方的外观（Facade）
+//
+// 启动阶段调用一次 Init()，之后所有对下列函数指针的使用都必须先经过
+// IsAvailable() 判断。
+//
+// 提供方通常是 Phobos.dll。本 DLL 只有在离开提供方就无法实现的功能上才需要它，
+// 例如触发动作 653/654 所使用的 int 范围剧本变量。当提供方不存在时，整个 API
+// 保持禁用，调用方回退到原版行为。
+//
+// 本类刻意保持为薄外观：模块发现放在 InteropModule，指针表放在 InteropApiTable，
+// ABI 定义放在 InteropApi.h。
 // =============================================================================
-
-// Interop API version info (SemVer 2.0.0)
-struct InteropAPIVersion
-{
-	unsigned int major;
-	unsigned int minor;
-	unsigned int patch;
-};
-
-// Version supported by this DLL
-//   Major: breaking changes → mismatch disables API
-//   Minor: new features, backward compatible → warns but works
-//   Patch: bug fixes, no API change → same as minor
-constexpr InteropAPIVersion INTEROP_VERSION_CURRENT = { 1, 1, 0 };
-
-// ============================================================================
-// Exported function type definitions
-// Matches declarations in Interop/*.h for GetProcAddress casting
-// All game pointers are typed as void*; cast as needed by caller
-// ============================================================================
-
-typedef HRESULT(__stdcall* fnAE_Attach)(
-	void* pTarget, void* pInvokerHouse, void* pInvoker, void* pSource,
-	const char** effectTypeNames, int typeCount,
-	int durationOverride, int delay, int initialDelay, int recreationDelay,
-	int* pAttachedCount
-);
-
-typedef HRESULT(__stdcall* fnAE_Detach)(
-	void* pTarget, const char** effectTypeNames, int typeCount, int* pRemovedCount
-);
-
-typedef HRESULT(__stdcall* fnAE_DetachByGroups)(
-	void* pTarget, const char** groupNames, int groupCount, int* pRemovedCount
-);
-
-typedef HRESULT(__stdcall* fnAE_TransferEffects)(void* pSource, void* pTarget);
-
-typedef HRESULT(__stdcall* fnConvertToType)(void* pThis, void* pToType);
-
-typedef HRESULT(__stdcall* fnBullet_SetFirerOwner)(void* pBullet, void* pHouse);
-
-typedef double(__stdcall* fnCalculateExtraThreatCallback)(
-	void* pThis, void* pTarget, double originalThreat
-);
-
-typedef double(__stdcall* fnCalculateSightCallback)(
-	void* pThis, double originalSight
-);
-
-typedef HRESULT(__stdcall* fnRegisterCalculateExtraThreatCallback)(fnCalculateExtraThreatCallback callback);
-
-typedef HRESULT(__stdcall* fnRegisterCalculateSightCallback)(fnCalculateSightCallback callback);
-
-typedef HRESULT(__stdcall* fnEventExt_AddEvent)(void* pEventExt);
-
-typedef HRESULT(__stdcall* fnVariables_GetLocal)(int index, int* pValue);
-
-typedef HRESULT(__stdcall* fnVariables_SetLocal)(int index, int value);
-
-typedef HRESULT(__stdcall* fnVariables_GetGlobal)(int index, int* pValue);
-
-typedef HRESULT(__stdcall* fnVariables_SetGlobal)(int index, int value);
-
-typedef HRESULT(__stdcall* fnGetInteropAPIVersion)(InteropAPIVersion* pVersion);
-
-// ============================================================================
-// Interop function list for X-macro code generation
-// Used by FOREACH_INTEROP_FN to generate static members & loading code
-// ============================================================================
-
-#define FOREACH_INTEROP_FN(FN) \
-	FN(AE_Attach,                       fnAE_Attach,           "_AE_Attach@44") \
-	FN(AE_Detach,                       fnAE_Detach,           "_AE_Detach@16") \
-	FN(AE_DetachByGroups,               fnAE_DetachByGroups,   "_AE_DetachByGroups@16") \
-	FN(AE_TransferEffects,              fnAE_TransferEffects,  "_AE_TransferEffects@8") \
-	FN(ConvertToType,                   fnConvertToType,       "_ConvertToType_Phobos@8") \
-	FN(Bullet_SetFirerOwner,            fnBullet_SetFirerOwner,"_Bullet_SetFirerOwner@8") \
-	FN(RegisterCalculateExtraThreatCallback, fnRegisterCalculateExtraThreatCallback, "_RegisterCalculateExtraThreatCallback@4") \
-	FN(RegisterCalculateSightCallback,   fnRegisterCalculateSightCallback, "_RegisterCalculateSightCallback@4") \
-	FN(EventExt_AddEvent,               fnEventExt_AddEvent,   "_EventExt_AddEvent@4") \
-	FN(Variables_GetLocal,              fnVariables_GetLocal,  "_Variables_GetLocal_Phobos@8") \
-	FN(Variables_SetLocal,              fnVariables_SetLocal,  "_Variables_SetLocal_Phobos@8") \
-	FN(Variables_GetGlobal,             fnVariables_GetGlobal, "_Variables_GetGlobal_Phobos@8") \
-	FN(Variables_SetGlobal,             fnVariables_SetGlobal, "_Variables_SetGlobal_Phobos@8")
-
-// ============================================================================
-// PhobosExtInterop - Static class loading PhobosExt & holding all function pointers
-// Call Init() once, then use static function pointers directly
-// ============================================================================
-
 class PhobosExtInterop
 {
 public:
+	// 定位提供方、解析函数指针并校验 API 版本。未安装提供方时调用也是安全的。
+	// 任一环节失败都会回滚整张表，使 IsAvailable() 返回 false。
 	static void Init();
-	static bool IsAvailable() { return s_phobosLoaded; }
-	static HMODULE GetModuleHandle() { return s_hPhobosExt; }
+
+	static bool IsAvailable() { return s_available; }
+	static HMODULE GetProviderModule() { return s_hProvider; }
+
+	// 读取提供方对外声明的 API 版本。
 	static bool GetVersion(InteropAPIVersion& version);
+
+	// 将提供方的 API 版本与 INTEROP_VERSION_CURRENT 做校验。
+	// 主版本号不一致视为致命错误；次版本号/修订号差异仅告警，因为提供方承诺在同一
+	// 主版本号内保持向后兼容。
 	static bool CheckVersion();
 
-	// Function pointers (initialized by Init())
-#define GEN_STATIC_MEMBER(name, fnType, ...) static fnType name;
+	// 函数指针，由 Init() 填充。当 IsAvailable() 返回 false 时全部为 nullptr，
+	// 包括那些解析失败的可选条目。
+#define GEN_STATIC_MEMBER(isRequired, member, fnType, exportName) static fnType member;
 	FOREACH_INTEROP_FN(GEN_STATIC_MEMBER)
 #undef GEN_STATIC_MEMBER
 
 private:
-	static bool s_phobosLoaded;
-	static HMODULE s_hPhobosExt;
+	// 回滚整张表并清除提供方引用。
+	static void Reset();
+
+	static bool s_available;
+	static HMODULE s_hProvider;
 };

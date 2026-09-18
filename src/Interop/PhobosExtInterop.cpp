@@ -1,132 +1,83 @@
 #include "PhobosExtInterop.h"
+
+#include "InteropApiTable.h"
+#include "InteropModule.h"
+
 #include <Utilities/Debug.h>
-#include <tlhelp32.h>
 
 // ============================================================================
-// Static member initialization
+// 静态成员初始化
 // ============================================================================
 
-bool PhobosExtInterop::s_phobosLoaded = false;
-HMODULE PhobosExtInterop::s_hPhobosExt = nullptr;
+bool PhobosExtInterop::s_available = false;
+HMODULE PhobosExtInterop::s_hProvider = nullptr;
 
-#define GEN_STATIC_INIT(name, fnType, ...) fnType PhobosExtInterop::name = nullptr;
+#define GEN_STATIC_INIT(isRequired, member, fnType, exportName) fnType PhobosExtInterop::member = nullptr;
 FOREACH_INTEROP_FN(GEN_STATIC_INIT)
 #undef GEN_STATIC_INIT
 
 // ============================================================================
-// Find Phobos-family module by scanning all loaded modules for GetInteropAPIVersion.
-// If multiple different versions found, disable API to prevent conflicts.
-// ============================================================================
-
-static HMODULE FindPhobosExtModule(bool* conflictDetected)
-{
-	HMODULE hFound = nullptr;
-	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, 0);
-
-	if (hSnapshot == INVALID_HANDLE_VALUE)
-		return nullptr;
-
-	MODULEENTRY32 me;
-	me.dwSize = sizeof(me);
-	MODULEENTRY32 firstMe = {};
-
-	if (Module32First(hSnapshot, &me))
-	{
-		do
-		{
-			auto pfn = (fnGetInteropAPIVersion)
-				GetProcAddress(me.hModule, "_GetInteropAPIVersion@4");
-
-			if (!pfn)
-				continue;
-
-			InteropAPIVersion ver;
-			if (FAILED(pfn(&ver)) || ver.major < 1)
-				continue;
-
-			if (!hFound)
-			{
-				hFound = me.hModule;
-				firstMe = me;
-				Debug::Log(L"[PhobosExtInterop] Found: %s (v%u.%u.%u)\n",
-					me.szModule, ver.major, ver.minor, ver.patch);
-
-				#define GEN_LOAD_EXPORT(name, fnType, decorated) \
-					PhobosExtInterop::name = (fnType)GetProcAddress(me.hModule, decorated);
-				FOREACH_INTEROP_FN(GEN_LOAD_EXPORT)
-				#undef GEN_LOAD_EXPORT
-			}
-			else
-			{
-				// Found another Phobos-family module → check version conflict
-				InteropAPIVersion firstVer = {};
-				auto pfnFirst = (fnGetInteropAPIVersion)
-					GetProcAddress(hFound, "GetInteropAPIVersion");
-				if (pfnFirst)
-					pfnFirst(&firstVer);
-
-				if (firstVer.major != ver.major || firstVer.minor != ver.minor || firstVer.patch != ver.patch)
-				{
-					Debug::Log(L"[PhobosExtInterop] [Error]: Conflicting Phobos versions detected!\n");
-					Debug::Log(L"[PhobosExtInterop] [Error]:   %s (v%u.%u.%u)\n",
-						firstMe.szModule, firstVer.major, firstVer.minor, firstVer.patch);
-					Debug::Log(L"[PhobosExtInterop] [Error]:   %s (v%u.%u.%u)\n",
-						me.szModule, ver.major, ver.minor, ver.patch);
-					Debug::Log(L"[PhobosExtInterop] [Error]: Interop API disabled.\n");
-
-					hFound = nullptr;
-					if (conflictDetected)
-						*conflictDetected = true;
-					break;
-				}
-			}
-		} while (Module32Next(hSnapshot, &me));
-	}
-
-	CloseHandle(hSnapshot);
-	return hFound;
-}
-
-// ============================================================================
-// Init - Locate PhobosExt_Changzhi.dll and load all Interop function pointers
+// Init
 // ============================================================================
 
 void PhobosExtInterop::Init()
 {
-	Debug::Log("[PhobosExtInterop] Init called\n");
+	Debug::Log("[PhobosExtInterop] Init: searching for an Interop API provider\n");
 
-	// Step 1: Find by export (GetInteropAPIVersion)
 	bool conflict = false;
-	s_hPhobosExt = FindPhobosExtModule(&conflict);
+	s_hProvider = InteropModule::FindProvider(conflict);
 
 	if (conflict)
 	{
-		s_hPhobosExt = nullptr;
-		s_phobosLoaded = false;
+		// 冲突的双方已由 FindProvider 记录。
+		Reset();
+		Debug::Log("[PhobosExtInterop] [Error]: Interop API disabled\n");
 		return;
 	}
 
-	// Step 2: Fallback - find by module name
-	if (!s_hPhobosExt)
+	if (!s_hProvider)
 	{
-		s_hPhobosExt = ::GetModuleHandleW(L"Phobos.dll");
-	}
-
-	if (!s_hPhobosExt)
-	{
-		Debug::Log(L"[PhobosExtInterop] [Error]: Phobos.dll not found.\n");
-		s_phobosLoaded = false;
+		// 这不是错误。提供方属于可选依赖，缺失时所有调用方都会回退到原版行为。
+		s_available = false;
+		InteropApiTable::Unload();
+		Debug::Log("[PhobosExtInterop] No provider found, Interop API disabled\n");
 		return;
 	}
 
-	s_phobosLoaded = true;
-#define GEN_LOAD_CHECK(name, fnType, ...) \
-	if (!PhobosExtInterop::name) s_phobosLoaded = false;
-	FOREACH_INTEROP_FN(GEN_LOAD_CHECK)
-#undef GEN_LOAD_CHECK
+	InteropApiTable::Load(s_hProvider);
 
-	Debug::Log(L"[PhobosExtInterop] %s\n",
-		s_phobosLoaded ? L"Loaded" : L"Failed");
+	if (!InteropApiTable::Verify(s_hProvider))
+	{
+		Reset();
+		Debug::Log("[PhobosExtInterop] [Error]: required exports missing, Interop API disabled\n");
+		return;
+	}
+
+	s_available = true;
+
+	// 版本闸门是加载契约的一部分，而不是可选项：它正是把"静默的 ABI 不匹配"
+	// 变成一条日志的关键。
+	if (!CheckVersion())
+	{
+		Reset();
+		return;
+	}
+
+	InteropAPIVersion provided {};
+
+	if (GetVersion(provided))
+	{
+		Debug::Log("[PhobosExtInterop] Loaded (provider API v%u.%u.%u, built for v%u.%u.%u)\n",
+			provided.major, provided.minor, provided.patch,
+			INTEROP_VERSION_CURRENT.major, INTEROP_VERSION_CURRENT.minor, INTEROP_VERSION_CURRENT.patch);
+	}
+}
+
+void PhobosExtInterop::Reset()
+{
+	InteropApiTable::Unload();
+	s_hProvider = nullptr;
+	s_available = false;
 }
 
 // ============================================================================
@@ -135,43 +86,40 @@ void PhobosExtInterop::Init()
 
 bool PhobosExtInterop::GetVersion(InteropAPIVersion& version)
 {
-	if (!s_hPhobosExt)
+	if (!s_hProvider)
 		return false;
 
-	auto pfn = (fnGetInteropAPIVersion)
-		GetProcAddress(s_hPhobosExt, "GetInteropAPIVersion");
-
-	if (!pfn)
-		pfn = (fnGetInteropAPIVersion)
-			GetProcAddress(s_hPhobosExt, "_GetInteropAPIVersion@4");
+	auto const pfn = ResolveInteropExport<fnGetInteropAPIVersion>(s_hProvider, "GetInteropAPIVersion");
 
 	return pfn && SUCCEEDED(pfn(&version));
 }
 
 bool PhobosExtInterop::CheckVersion()
 {
-	InteropAPIVersion loaded;
+	InteropAPIVersion provided {};
 
-	if (!GetVersion(loaded))
-		return false;
-
-	if (loaded.major != INTEROP_VERSION_CURRENT.major)
+	if (!GetVersion(provided))
 	{
-		Debug::Log(L"[PhobosExtInterop] [Error]: Major version mismatch "
-			L"(supports v%u.%u.%u, loaded v%u.%u.%u)\n",
-			INTEROP_VERSION_CURRENT.major, INTEROP_VERSION_CURRENT.minor, INTEROP_VERSION_CURRENT.patch,
-			loaded.major, loaded.minor, loaded.patch);
-		s_phobosLoaded = false;
+		Debug::Log("[PhobosExtInterop] [Error]: provider does not expose GetInteropAPIVersion\n");
 		return false;
 	}
 
-	if (loaded.minor != INTEROP_VERSION_CURRENT.minor
-		|| loaded.patch != INTEROP_VERSION_CURRENT.patch)
+	if (!IsInteropMajorCompatible(provided))
 	{
-		Debug::Log(L"[PhobosExtInterop] [Warning]: Minor/patch mismatch "
-			L"(supports v%u.%u.%u, loaded v%u.%u.%u)\n",
+		Debug::Log("[PhobosExtInterop] [Error]: incompatible Interop API major version "
+			"(built for v%u.x.x, provider is v%u.%u.%u)\n",
+			INTEROP_VERSION_CURRENT.major,
+			provided.major, provided.minor, provided.patch);
+
+		return false;
+	}
+
+	if (provided != INTEROP_VERSION_CURRENT)
+	{
+		Debug::Log("[PhobosExtInterop] [Warning]: Interop API version differs "
+			"(built for v%u.%u.%u, provider is v%u.%u.%u); continuing\n",
 			INTEROP_VERSION_CURRENT.major, INTEROP_VERSION_CURRENT.minor, INTEROP_VERSION_CURRENT.patch,
-			loaded.major, loaded.minor, loaded.patch);
+			provided.major, provided.minor, provided.patch);
 	}
 
 	return true;

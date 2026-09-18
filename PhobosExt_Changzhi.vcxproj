@@ -86,6 +86,8 @@
     <ClCompile Include="src\Ext\WarheadType\Body.cpp" />
     <ClCompile Include="src\PhobosExt.Ext.cpp" />
     <ClCompile Include="src\PhobosExt.cpp" />
+    <ClCompile Include="src\Interop\InteropApiTable.cpp" />
+    <ClCompile Include="src\Interop\InteropModule.cpp" />
     <ClCompile Include="src\Interop\PhobosExtInterop.cpp" />
     <ClCompile Include="src\Utilities\ShapeTextPrinter.cpp" />
     <ClCompile Include="src\Utilities\SpawnerHelper.cpp" />
@@ -143,6 +145,9 @@
     <ClInclude Include="src\Utilities\Debug.h" />
     <ClInclude Include="src\Ext\WarheadType\Body.h" />
     <ClInclude Include="src\PhobosExt.h" />
+    <ClInclude Include="src\Interop\InteropApi.h" />
+    <ClInclude Include="src\Interop\InteropApiTable.h" />
+    <ClInclude Include="src\Interop\InteropModule.h" />
     <ClInclude Include="src\Interop\PhobosExtInterop.h" />
     <ClInclude Include="src\Utilities\Enum.h" />
     <ClInclude Include="src\Utilities\EnumFunctions.h" />
