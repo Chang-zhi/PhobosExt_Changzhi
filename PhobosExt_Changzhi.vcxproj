@@ -78,6 +78,9 @@
     <ClCompile Include="src\New\ChoiceBox\Entities\Derived\WaypointChoiceBoxClass.cpp" />
     <ClCompile Include="src\New\ChoiceBox\Entities\Derived\ScreenChoiceBoxClass.cpp" />
     <ClCompile Include="src\New\ChoiceBox\Types\ChoiceBoxTypeClass.cpp" />
+    <ClCompile Include="src\New\TriggerGroup\Types\TriggerGroupClass.cpp" />
+    <ClCompile Include="src\Ext\TAction\TriggerSelector.cpp" />
+    <ClCompile Include="src\Ext\TAction\Body.Triggers.cpp" />
     <ClCompile Include="src\Utilities\Anchor.cpp" />
     <ClCompile Include="src\Utilities\AresAddressInit.cpp" />
     <ClCompile Include="src\Utilities\AresHelper.cpp" />
@@ -129,6 +132,8 @@
     <ClInclude Include="src\New\ChoiceBox\Entities\Derived\WaypointChoiceBoxClass.h" />
     <ClInclude Include="src\New\ChoiceBox\Entities\Derived\ScreenChoiceBoxClass.h" />
     <ClInclude Include="src\New\ChoiceBox\Types\ChoiceBoxTypeClass.h" />
+    <ClInclude Include="src\New\TriggerGroup\Types\TriggerGroupClass.h" />
+    <ClInclude Include="src\Ext\TAction\TriggerSelector.h" />
     <ClInclude Include="src\Utilities\Anchor.h" />
     <ClInclude Include="src\Utilities\AresFunctions.h" />
     <ClInclude Include="src\Utilities\AresHelper.h" />

@@ -9,6 +9,7 @@
 #include <Ext/TechnoType/Body.h>
 #include <New/ChoiceBox/Types/ChoiceBoxTypeClass.h>
 #include <New/TextBox/Types/TextBoxTypeClass.h>
+#include <New/TriggerGroup/Types/TriggerGroupClass.h>
 #include <Ext/TAction/ScriptManipulator.h>
 #include <Ext/TAction/TaskForceManipulator.h>
 #include <Utilities/Patch.h>
@@ -34,6 +35,7 @@ void RulesExt::LoadBeforeTypeData(RulesClass* pThis, CCINIClass* pINI)
 {
 	TextBoxTypeClass::LoadFromINIList(pINI);
 	ChoiceBoxTypeClass::LoadFromINIList(pINI);
+	TriggerGroupClass::LoadFromINIList(pINI);
 
 	Data->LoadBeforeTypeData(pThis, pINI);
 }

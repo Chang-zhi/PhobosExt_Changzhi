@@ -21,6 +21,7 @@
 #include <New/ChoiceBox/Entities/Derived/WaypointChoiceBoxClass.h>
 #include <New/ChoiceBox/Entities/Derived/ScreenChoiceBoxClass.h>
 #include <New/ChoiceBox/Types/ChoiceBoxTypeClass.h>
+#include <New/TriggerGroup/Types/TriggerGroupClass.h>
 
 #include <utility>
 
@@ -202,7 +203,8 @@ using PhobosExtTypeRegistry = TypeRegistry <
 	MapChoiceBoxClass,
 	WaypointChoiceBoxClass,
 	ScreenChoiceBoxClass,
-	FootPathVisualizer
+	FootPathVisualizer,
+	TriggerGroupClass
 	// other classes
 > ;
 

@@ -261,6 +261,20 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 	case PhobosExtTriggerAction::SellAllBuildingsOfHouse:
 		return TActionExt::SellAllBuildingsOfHouse(pThis, pHouse, pObject, pTrigger, location);
 
+	// ---- 触发组 / 随机触发 Actions ----
+	case PhobosExtTriggerAction::RandomEnableTriggersByGroup:
+		return TActionExt::RandomEnableTriggersByGroup(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosExtTriggerAction::RandomDisableTriggersByGroup:
+		return TActionExt::RandomDisableTriggersByGroup(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosExtTriggerAction::RandomEnableTriggersByName:
+		return TActionExt::RandomEnableTriggersByName(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosExtTriggerAction::RandomDisableTriggersByName:
+		return TActionExt::RandomDisableTriggersByName(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosExtTriggerAction::AddTriggerToGroupById:
+		return TActionExt::AddTriggerToGroupById(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosExtTriggerAction::RemoveTriggerFromGroupById:
+		return TActionExt::RemoveTriggerFromGroupById(pThis, pHouse, pObject, pTrigger, location);
+
 	// case PhobosExtTriggerAction::testAction:
 	// 	return TActionExt::testAction(pThis, pHouse, pObject, pTrigger, location);
 

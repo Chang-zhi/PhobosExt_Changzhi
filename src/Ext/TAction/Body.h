@@ -266,6 +266,26 @@ enum class PhobosExtTriggerAction : unsigned int
 	// 变卖指定所属方的全部建筑...
 	SellAllBuildingsOfHouse = 687,
 
+	// ---- 触发组 / 随机触发 Actions (688-693) ----
+
+	// 随机允许触发(按触发组)...
+	RandomEnableTriggersByGroup = 688,
+
+	// 随机禁止触发(按触发组)...
+	RandomDisableTriggersByGroup = 689,
+
+	// 随机允许触发(按名称)...
+	RandomEnableTriggersByName = 690,
+
+	// 随机禁止触发(按名称)...
+	RandomDisableTriggersByName = 691,
+
+	// 向触发组添加触发(按ID)...
+	AddTriggerToGroupById = 692,
+
+	// 从触发组移除触发(按ID)...
+	RemoveTriggerFromGroupById = 693,
+
 	// 测试用
 	// testAction = 1150,
 };
@@ -402,6 +422,14 @@ static bool name(TActionClass* pThis, HouseClass* pHouse, \
 
 	// 变卖指定所属方的全部建筑
 	ACTION_FUNC(SellAllBuildingsOfHouse);
+
+	// ---- 触发组 / 随机触发 Actions ----
+	ACTION_FUNC(RandomEnableTriggersByGroup);
+	ACTION_FUNC(RandomDisableTriggersByGroup);
+	ACTION_FUNC(RandomEnableTriggersByName);
+	ACTION_FUNC(RandomDisableTriggersByName);
+	ACTION_FUNC(AddTriggerToGroupById);
+	ACTION_FUNC(RemoveTriggerFromGroupById);
 
 	// 测试用
 	// ACTION_FUNC(testAction);

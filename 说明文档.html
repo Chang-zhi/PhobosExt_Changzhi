@@ -438,6 +438,7 @@ pre code { padding: 0; font-size: inherit; color: inherit; background: none; bor
     <li class="nav__subitem" data-target="actions_14" data-page="actions" title="游戏速度 · 682">14. 游戏速度</li>
     <li class="nav__subitem" data-target="actions_15" data-page="actions" title="禁止存档与读档 · 683–686">15. 禁止存档与读档</li>
     <li class="nav__subitem" data-target="actions_16" data-page="actions" title="变卖所属方全部建筑 · 687">16. 变卖所属方全部建筑</li>
+    <li class="nav__subitem" data-target="actions_17" data-page="actions" title="触发组与随机允许/禁止触发 · 688–693">17. 随机允许/禁止触发</li>
   </ul>
 </li>
 
@@ -897,6 +898,7 @@ Command.RecruitRange=            ; double - 自动装载的招募半径 - (默�
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_14')" class="sec-toc__link">14. 游戏速度</a> <span class="sec-toc__id">682</span></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_15')" class="sec-toc__link">15. 禁止存档与读档</a> <span class="sec-toc__id">683–686</span></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_16')" class="sec-toc__link">16. 变卖所属方全部建筑</a> <span class="sec-toc__id">687</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_17')" class="sec-toc__link">17. 随机允许/禁止触发</a> <span class="sec-toc__id">688–693</span></li>
 </ul>
 </div>
 
@@ -1319,6 +1321,74 @@ ShowTextBoxInShroud.Techno=      ; boolean - 单位文本框在黑幕中是否�
 </table>
 </div>
 <p>变卖指定所属方的全部建筑，不可变卖的科技类型会被跳过。</p>
+</div>
+
+<hr class="sec-divider--double">
+
+<div id="actions_17">
+<h3 class="doc-heading--tertiary">17. 随机允许/禁止触发</h3>
+<p>把一批触发登记成一个「触发组」，再用行为从组里（或按名称）随机抽取若干个，批量设置它们的允许 / 禁止状态。</p>
+<p class="doc-text--gray">相当于原版行为 <code>53 允许触发</code> / <code>54 禁止触发</code></p>
+
+<h4>触发组定义</h4>
+<p>在 <code>rulesmd.ini</code> 或地图小节里定义。</p>
+<pre class="doc-code--block"><code>[TriggerGroups]
+0=FristTriggerGroup                     ; 索引 - 组名
+1=YouTriggerGroup
+
+[YouTriggerGroup]                       ; 小节名 = 组名
+0=01000004                              ; 键任意 - 成员为触发 ID
+2=01000007</code></pre>
+<p class="doc-text--gray">组名请控制在 31 个字符以内，超长会被截断。</p>
+
+<h4>配合触发动作</h4>
+<div class="doc-table--action">
+<table class="doc-table">
+<thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
+<tbody>
+<tr><td class="doc-table__td">688</td><td class="doc-table__td">随机允许触发(按触发组)</td><td class="doc-table__td">触发组，抽取模式，数量</td></tr>
+<tr><td class="doc-table__td">689</td><td class="doc-table__td">随机禁止触发(按触发组)</td><td class="doc-table__td">触发组，抽取模式，数量</td></tr>
+<tr><td class="doc-table__td">690</td><td class="doc-table__td">随机允许触发(按名称)</td><td class="doc-table__td">前缀，抽取模式，数量</td></tr>
+<tr><td class="doc-table__td">691</td><td class="doc-table__td">随机禁止触发(按名称)</td><td class="doc-table__td">前缀，抽取模式，数量</td></tr>
+<tr><td class="doc-table__td">692</td><td class="doc-table__td">向触发组添加触发(按ID)</td><td class="doc-table__td">触发，触发组</td></tr>
+<tr><td class="doc-table__td">693</td><td class="doc-table__td">从触发组移除触发(按ID)</td><td class="doc-table__td">触发，触发组</td></tr>
+</tbody>
+</table>
+</div>
+<p><strong>数量</strong>：<code>-1</code> 表示全部命中项，<code>0</code> 视为不操作，正数表示随机抽几个（去重）。</p>
+
+<h4>按名称匹配</h4>
+<p>「按名称」只按 <strong>触发名称</strong> 做前缀匹配（不区分大小写），<strong>不匹配触发 ID</strong>。<br>
+若触发名按 <code>[组名]描述</code> 命名，输入 <code>组名</code> 就能命中所有 <code>[组名]…</code> 的触发；输入本身已带方括号时按原文匹配，不会再套一层括号。</p>
+<pre class="doc-code--block"><code>输入 触发组5     →  命中 [触发组5]刷兵#123、[触发组5]巡逻
+输入 [触发组5]   →  同上（输入已带方括号，按原文前缀匹配，不会变成 [[触发组5]]）</code></pre>
+
+<h4>抽取模式</h4>
+<p>四个独立的筛选开关，可任意组合（下拉里已列出全部 12 种有效组合）。</p>
+<div class="doc-table--action">
+<table class="doc-table">
+<thead><tr><th class="doc-table__th">位值</th><th class="doc-table__th">含义</th></tr></thead>
+<tbody>
+<tr><td class="doc-table__td">1</td><td class="doc-table__td">仅当前存在的触发（未被销毁）</td></tr>
+<tr><td class="doc-table__td">2</td><td class="doc-table__td">仅符合当前游戏难度的触发</td></tr>
+<tr><td class="doc-table__td">4</td><td class="doc-table__td">仅当前为允许的触发</td></tr>
+<tr><td class="doc-table__td">8</td><td class="doc-table__td">仅当前为禁止的触发</td></tr>
+</tbody>
+</table>
+</div>
+<pre class="doc-code--block"><code>0  = 全部触发类型
+1  = 仅当前存在的触发
+2  = 仅符合当前游戏难度的触发类型
+3  = 当前存在 + 符合当前难度
+4  = 仅当前为允许的触发类型
+5  = 当前存在 + 当前为允许
+6  = 符合当前难度 + 当前为允许
+7  = 当前存在 + 符合当前难度 + 当前为允许
+8  = 仅当前为禁止的触发类型
+9  = 当前存在 + 当前为禁止
+10 = 符合当前难度 + 当前为禁止
+11 = 当前存在 + 符合当前难度 + 当前为禁止</code></pre>
+
 </div>
 
 </section>
