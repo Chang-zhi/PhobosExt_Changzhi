@@ -81,6 +81,7 @@
     <ClCompile Include="src\New\TriggerGroup\Types\TriggerGroupClass.cpp" />
     <ClCompile Include="src\Ext\TAction\TriggerSelector.cpp" />
     <ClCompile Include="src\Ext\TAction\Body.Triggers.cpp" />
+    <ClCompile Include="src\Ext\TAction\Body.AITrigger.cpp" />
     <ClCompile Include="src\Utilities\Anchor.cpp" />
     <ClCompile Include="src\Utilities\AresAddressInit.cpp" />
     <ClCompile Include="src\Utilities\AresHelper.cpp" />

@@ -286,6 +286,14 @@ enum class PhobosExtTriggerAction : unsigned int
 	// 从触发组移除触发(按ID)...
 	RemoveTriggerFromGroupById = 693,
 
+	// ---- AI 触发开关 (694-695) ----
+
+	// 允许指定 AI 触发...
+	EnableAITriggerById = 694,
+
+	// 禁止指定 AI 触发...
+	DisableAITriggerById = 695,
+
 	// 测试用
 	// testAction = 1150,
 };
@@ -430,6 +438,10 @@ static bool name(TActionClass* pThis, HouseClass* pHouse, \
 	ACTION_FUNC(RandomDisableTriggersByName);
 	ACTION_FUNC(AddTriggerToGroupById);
 	ACTION_FUNC(RemoveTriggerFromGroupById);
+
+	// ---- AI 触发开关 ----
+	ACTION_FUNC(EnableAITriggerById);
+	ACTION_FUNC(DisableAITriggerById);
 
 	// 测试用
 	// ACTION_FUNC(testAction);

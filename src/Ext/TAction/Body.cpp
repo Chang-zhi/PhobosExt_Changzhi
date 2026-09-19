@@ -275,6 +275,12 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 	case PhobosExtTriggerAction::RemoveTriggerFromGroupById:
 		return TActionExt::RemoveTriggerFromGroupById(pThis, pHouse, pObject, pTrigger, location);
 
+	// ---- AI 触发开关 ----
+	case PhobosExtTriggerAction::EnableAITriggerById:
+		return TActionExt::EnableAITriggerById(pThis, pHouse, pObject, pTrigger, location);
+	case PhobosExtTriggerAction::DisableAITriggerById:
+		return TActionExt::DisableAITriggerById(pThis, pHouse, pObject, pTrigger, location);
+
 	// case PhobosExtTriggerAction::testAction:
 	// 	return TActionExt::testAction(pThis, pHouse, pObject, pTrigger, location);
 

@@ -439,6 +439,7 @@ pre code { padding: 0; font-size: inherit; color: inherit; background: none; bor
     <li class="nav__subitem" data-target="actions_15" data-page="actions" title="禁止存档与读档 · 683–686">15. 禁止存档与读档</li>
     <li class="nav__subitem" data-target="actions_16" data-page="actions" title="变卖所属方全部建筑 · 687">16. 变卖所属方全部建筑</li>
     <li class="nav__subitem" data-target="actions_17" data-page="actions" title="触发组与随机允许/禁止触发 · 688–693">17. 随机允许/禁止触发</li>
+    <li class="nav__subitem" data-target="actions_18" data-page="actions" title="允许/禁止指定 AI 触发 · 694、695">18. AI 触发开关</li>
   </ul>
 </li>
 
@@ -899,6 +900,7 @@ Command.RecruitRange=            ; double - 自动装载的招募半径 - (默�
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_15')" class="sec-toc__link">15. 禁止存档与读档</a> <span class="sec-toc__id">683–686</span></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_16')" class="sec-toc__link">16. 变卖所属方全部建筑</a> <span class="sec-toc__id">687</span></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_17')" class="sec-toc__link">17. 随机允许/禁止触发</a> <span class="sec-toc__id">688–693</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_18')" class="sec-toc__link">18. AI 触发开关</a> <span class="sec-toc__id">694、695</span></li>
 </ul>
 </div>
 
@@ -1390,6 +1392,26 @@ ShowTextBoxInShroud.Techno=      ; boolean - 单位文本框在黑幕中是否�
 9  = 当前存在 + 当前为禁止
 10 = 符合当前难度 + 当前为禁止
 11 = 当前存在 + 符合当前难度 + 当前为禁止</code></pre>
+
+</div>
+
+<hr class="sec-divider--double">
+
+<div id="actions_18">
+<h3 class="doc-heading--tertiary">18. AI 触发开关</h3>
+<p>在任务进行中允许或禁止指定的 AI 触发。</p>
+
+<div class="doc-table--action">
+<table class="doc-table">
+<thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
+<tbody>
+<tr><td class="doc-table__td">694</td><td class="doc-table__td">允许指定AI触发(按ID)</td><td class="doc-table__td">AI 触发</td></tr>
+<tr><td class="doc-table__td">695</td><td class="doc-table__td">禁止指定AI触发(按ID)</td><td class="doc-table__td">AI 触发</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>只对地图内置 AI 触发有效，不适用于 <code>aimd.ini</code> 内的全局 AI 触发。</p>
 
 </div>
 
