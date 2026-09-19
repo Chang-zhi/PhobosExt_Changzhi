@@ -372,10 +372,10 @@ namespace
 	}
 }
 
-TagClass* GeneralUtils::GetTagClassByIndex(int Index, bool forceNew)
+TagClass* GeneralUtils::GetTagClassById(int tagId, bool forceNew)
 {
-	std::string tagIndex = "0" + std::to_string(Index);
-	TagTypeClass* pTagType = TagTypeClass::FindByNameOrID(tagIndex.c_str());
+	std::string tagIdStr = "0" + std::to_string(tagId);
+	TagTypeClass* pTagType = TagTypeClass::FindByNameOrID(tagIdStr.c_str());
 	if (!pTagType) return nullptr;
 
 	if (forceNew)

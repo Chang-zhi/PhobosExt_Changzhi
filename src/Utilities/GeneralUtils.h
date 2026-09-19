@@ -49,8 +49,8 @@ namespace GeneralUtils
 	int SafeMultiply(int value, double mult);
 	DynamicVectorClass<ColorScheme*>* BuildPalette(const char* paletteFileName);
 
-	// Gets or creates a TagClass by numeric index (the tag type ID is "0" + Index).
-	TagClass* GetTagClassByIndex(int Index, bool forceNew = true);
+	// Gets or creates a TagClass by tag type ID (the tag type ID is "0" + tagId).
+	TagClass* GetTagClassById(int tagId, bool forceNew = true);
 
 	// Returns true when the techno (or any cell of a building's foundation) is
 	// within distanceCells (circular, cell distance) of targetCell.
