@@ -28,8 +28,6 @@ void TextBoxTypeClass::LoadFromINI(CCINIClass* pINI)
 	this->MaxWidth.Read(exINI, section, "MaxWidth");
 	this->BackgroundOpacity.Read(exINI, section, "BackgroundOpacity");
 	this->Duration.Read(exINI, section, "Duration");
-
-	// Color 格式：Color=R,G,B  （默认 255,215,0）
 	this->Color.Read(exINI, section, "Color");
 }
 

@@ -21,93 +21,8 @@ static ScriptTypeClass* FindScript(const char* text) { return text && text[0] ? 
 static TeamTypeClass* FindTeam(int param) { return TeamTypeClass::Find(MakeID(param).c_str()); }
 
 // ============================================================================
-// Capture original ScriptType actions and TeamType Script bindings from INI.
-// Called eagerly during scenario loading to avoid picking up modifications
-// made by other DLLs (which would happen with lazy capture).
-// ============================================================================
-void ScriptManipulator::CaptureFromINI(CCINIClass* pINI)
-{
-	if (!pINI)
-		return;
-
-	// --- Read [ScriptTypes] to capture original actions for each ScriptType ---
-	int scriptCount = pINI->GetKeyCount("ScriptTypes");
-	Debug::Log("[PhobosExt] CaptureFromINI: [ScriptTypes] has %d entries\n", scriptCount);
-
-	for (int i = 0; i < scriptCount; ++i)
-	{
-		const char* keyName = pINI->GetKeyName("ScriptTypes", i);
-		char scriptID[256];
-		if (pINI->ReadString("ScriptTypes", keyName, "", scriptID, sizeof(scriptID)) <= 0)
-			continue;
-
-		auto const pScript = ScriptTypeClass::Find(scriptID);
-		if (!pScript)
-			continue;
-
-		auto const pExt = ScriptTypeExt::ExtMap.FindOrAllocate(pScript);
-		int const nActions = pINI->GetKeyCount(scriptID);
-		pExt->OriginalActionsCount = (nActions > ScriptTypeExt::ScriptActionCount)
-			? ScriptTypeExt::ScriptActionCount : nActions;
-
-		for (int j = 0; j < pExt->OriginalActionsCount; ++j)
-		{
-			char actBuf[256];
-			if (pINI->ReadString(scriptID, std::to_string(j).c_str(), "", actBuf, sizeof(actBuf)) <= 0)
-				continue;
-
-			char* comma = strchr(actBuf, ',');
-			if (comma)
-			{
-				*comma = '\0';
-				pExt->OriginalActions[j].Action = std::atoi(actBuf);
-				pExt->OriginalActions[j].Argument = std::atoi(comma + 1);
-			}
-		}
-
-		Debug::Log("[PhobosExt] CaptureFromINI: Script [%s] captured %d actions\n",
-			scriptID, pExt->OriginalActionsCount);
-	}
-
-	// --- Read [TeamTypes] to capture original ScriptType index for each TeamType ---
-	int teamCount = pINI->GetKeyCount("TeamTypes");
-	Debug::Log("[PhobosExt] CaptureFromINI: [TeamTypes] has %d entries\n", teamCount);
-
-	for (int i = 0; i < teamCount; ++i)
-	{
-		const char* keyName = pINI->GetKeyName("TeamTypes", i);
-		char teamID[256];
-		if (pINI->ReadString("TeamTypes", keyName, "", teamID, sizeof(teamID)) <= 0)
-			continue;
-
-		auto const pTeamType = TeamTypeClass::Find(teamID);
-		if (!pTeamType)
-			continue;
-
-		auto const pExt = TeamTypeExt::ExtMap.FindOrAllocate(pTeamType);
-
-		char scriptID[256];
-		if (pINI->ReadString(teamID, "Script", "", scriptID, sizeof(scriptID)) > 0)
-		{
-			for (int j = 0; j < ScriptTypeClass::Array.Count; ++j)
-			{
-				if (_stricmp(ScriptTypeClass::Array.GetItem(j)->ID, scriptID) == 0)
-				{
-					pExt->OriginalScriptTypeIndex = j;
-					Debug::Log("[PhobosExt] CaptureFromINI: TeamType [%s] -> Script [%s] index=%d\n",
-						teamID, scriptID, j);
-					break;
-				}
-			}
-		}
-	}
-
-	Debug::Log("[PhobosExt] CaptureFromINI: complete\n");
-}
-
-// ============================================================================
 // Helper: backup script content before modification.
-// If already captured from INI at load time, this is a no-op.
+// The backup is taken lazily, right before the first modification.
 // Returns ExtData for IsModified flag.
 // ============================================================================
 static ScriptTypeExt::ExtData* CaptureOriginalScriptContent(ScriptTypeClass* pScript)
@@ -117,7 +32,6 @@ static ScriptTypeExt::ExtData* CaptureOriginalScriptContent(ScriptTypeClass* pSc
 
 	auto const pExt = ScriptTypeExt::ExtMap.FindOrAllocate(pScript);
 
-	// Already captured from INI at load time (OriginalActionsCount > 0) or capture now
 	if (pExt->OriginalActionsCount <= 0)
 		pExt->CaptureOriginal();
 
@@ -361,14 +275,13 @@ void ScriptManipulator::ModifyScriptByGlobalVar(TActionClass* pThis)
 
 // ============================================================================
 // Helper: lazily capture the original ScriptType index for a TeamType.
-// If already captured from INI at load time (OriginalScriptTypeIndex >= 0),
-// this is a no-op. Otherwise captures from current in-memory state.
+// Captured before the first rebind, so it is a no-op if already captured.
 // ============================================================================
 void ScriptManipulator::CaptureOriginalScriptIndex(void* pExtVoid, TeamTypeClass* pTeamType)
 {
 	auto const pExt = static_cast<TeamTypeExt::ExtData*>(pExtVoid);
 
-	// Already captured from INI at load time
+	// Already captured
 	if (pExt->OriginalScriptTypeIndex >= 0)
 		return;
 

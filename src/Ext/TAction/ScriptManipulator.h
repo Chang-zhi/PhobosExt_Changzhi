@@ -27,8 +27,6 @@ public:
 	static void RestoreAllScriptContents();
 	static void SeekTeamTypeScript(TActionClass* pThis);
 
-	static void CaptureFromINI(CCINIClass* pINI);
-
 private:
 	static void ResetTeamsUsingScript(ScriptTypeClass* pScript);
 	static void CaptureOriginalScriptIndex(void* pExt, TeamTypeClass* pTeamType);

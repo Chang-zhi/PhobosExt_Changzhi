@@ -22,7 +22,6 @@ public:
 	static void RestoreAllTaskForces();
 
 	static void RefreshTeamsUsingTaskForce(TaskForceClass* pTF);
-	static void CaptureFromINI(CCINIClass* pINI);
 
 private:
 	static TaskForceClass* FindTaskForce(int param);

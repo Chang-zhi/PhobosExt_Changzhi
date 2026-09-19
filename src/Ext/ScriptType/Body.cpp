@@ -46,12 +46,6 @@ void ScriptTypeExt::ExtData::LoadFromStream(PhobosExtStreamReader& Stm)
 {
 	Extension<ScriptTypeClass>::LoadFromStream(Stm);
 	this->Serialize(Stm);
-
-	if (this->IsModified)
-	{
-		// Original was already captured at INI load time,
-		// but if we loaded from save, restore from our backup
-	}
 }
 
 void ScriptTypeExt::ExtData::SaveToStream(PhobosExtStreamWriter& Stm)

@@ -10,8 +10,6 @@
 #include <New/ChoiceBox/Types/ChoiceBoxTypeClass.h>
 #include <New/TextBox/Types/TextBoxTypeClass.h>
 #include <New/TriggerGroup/Types/TriggerGroupClass.h>
-#include <Ext/TAction/ScriptManipulator.h>
-#include <Ext/TAction/TaskForceManipulator.h>
 #include <Utilities/Patch.h>
 
 std::unique_ptr<RulesExt::ExtData> RulesExt::Data = nullptr;
@@ -42,9 +40,6 @@ void RulesExt::LoadBeforeTypeData(RulesClass* pThis, CCINIClass* pINI)
 
 void RulesExt::LoadAfterTypeData(RulesClass* pThis, CCINIClass* pINI)
 {
-	ScriptManipulator::CaptureFromINI(pINI);
-	TaskForceManipulator::CaptureFromINI(pINI);
-
 	if (pINI == CCINIClass::INI_Rules)
 		Data->InitializeAfterTypeData(pThis);
 

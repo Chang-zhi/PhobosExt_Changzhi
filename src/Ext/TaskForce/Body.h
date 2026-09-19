@@ -5,6 +5,8 @@
 #include <Utilities/Template.h>
 #include <Helpers/Template.h>
 
+#include <string>
+
 class TaskForceExt
 {
 public:
@@ -16,6 +18,7 @@ public:
 	{
 	public:
 		TaskForceEntryStruct OriginalEntries[6];
+		std::string OriginalEntryTypeIDs[6];
 		int OriginalCountEntries;
 		bool IsModified;
 
@@ -25,7 +28,10 @@ public:
 			, IsModified { false }
 		{
 			for (int i = 0; i < 6; ++i)
+			{
 				this->OriginalEntries[i] = { 0, nullptr };
+				this->OriginalEntryTypeIDs[i].clear();
+			}
 		}
 
 		virtual ~ExtData() = default;

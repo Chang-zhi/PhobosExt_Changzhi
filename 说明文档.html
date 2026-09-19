@@ -1335,10 +1335,12 @@ ShowTextBoxInShroud.Techno=      ; boolean - 单位文本框在黑幕中是否�
 <pre class="doc-code--block"><code>[TriggerGroups]
 0=FristTriggerGroup                     ; 索引 - 组名
 1=YouTriggerGroup
+...
 
 [YouTriggerGroup]                       ; 小节名 = 组名
 0=01000004                              ; 键任意 - 成员为触发 ID
-2=01000007</code></pre>
+2=01000007
+...</code></pre>
 <p class="doc-text--gray">组名请控制在 31 个字符以内，超长会被截断。</p>
 
 <h4>配合触发动作</h4>
@@ -1358,7 +1360,7 @@ ShowTextBoxInShroud.Techno=      ; boolean - 单位文本框在黑幕中是否�
 <p><strong>数量</strong>：<code>-1</code> 表示全部命中项，<code>0</code> 视为不操作，正数表示随机抽几个（去重）。</p>
 
 <h4>按名称匹配</h4>
-<p>「按名称」只按 <strong>触发名称</strong> 做前缀匹配（不区分大小写），<strong>不匹配触发 ID</strong>。<br>
+<p>「按名称」只按 <strong>触发名称</strong> 做前缀匹配（不区分大小写）。<br>
 若触发名按 <code>[组名]描述</code> 命名，输入 <code>组名</code> 就能命中所有 <code>[组名]…</code> 的触发；输入本身已带方括号时按原文匹配，不会再套一层括号。</p>
 <pre class="doc-code--block"><code>输入 触发组5     →  命中 [触发组5]刷兵#123、[触发组5]巡逻
 输入 [触发组5]   →  同上（输入已带方括号，按原文前缀匹配，不会变成 [[触发组5]]）</code></pre>
@@ -1591,7 +1593,7 @@ ShowTextBoxInShroud.Techno=      ; boolean - 单位文本框在黑幕中是否�
 
 <div id="scripts_4">
 <h3 class="doc-heading--tertiary">4. 巡逻系列</h3>
-<p>让小队巡逻（移动）到指定阵营的建筑附近或基地集结点，<br>
+<p>让小队巡逻到指定阵营的建筑附近或基地集结点，<br>
   行为与原版脚本动作 <code>16</code>（巡逻至路径点）相同，只是目标换成建筑或集结点。</p>
 <div class="doc-table--action">
 <table class="doc-table">
