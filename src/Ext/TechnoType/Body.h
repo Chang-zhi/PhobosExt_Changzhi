@@ -36,6 +36,7 @@ public:
 		Valueable<double> SmartVHPScan_Overflow;
 		Valueable<double> SmartVHPScan_SwitchThreshold;
 		Valueable<bool> SmartVHPScan_IncludeInflight;
+		Valueable<int> SmartVHPScan_CountIdleFrames;   // 打满人数上限后先空手等这么多帧，超时才允许超编
 
 		ExtData(TechnoTypeClass* OwnerObject) : Extension<TechnoTypeClass>(OwnerObject)
 			, AutoHunt { false }
@@ -52,6 +53,7 @@ public:
 			, SmartVHPScan_Overflow { 0.25 }
 			, SmartVHPScan_SwitchThreshold { 1.25 }
 			, SmartVHPScan_IncludeInflight { true }
+			, SmartVHPScan_CountIdleFrames { 0 }
 		{ }
 
 		virtual ~ExtData() = default;

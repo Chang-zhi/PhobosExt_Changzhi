@@ -30,6 +30,12 @@ namespace SmartVHPScan
 		{
 			TechnoClass* Target = nullptr;
 			int MaxRange = 0;
+			int IdleSince = -1;         // 连续空手的起始帧；-1 = 本轮有目标
+			bool HandToVanilla = false; // 我们给不出它该打谁 → 交回引擎自己搜
+
+			// 以下两个只看不判，供诊断日志判断"它上帧是不是真的持有目标 / 引擎有没有来问过"。
+			bool WasCommitted = false;
+			int LastQueryFrame = -1;
 		};
 
 		int _frame = -1;

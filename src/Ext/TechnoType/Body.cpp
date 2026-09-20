@@ -78,6 +78,7 @@ void TechnoTypeExt::ExtData::LoadFromINIFile(CCINIClass* const pINI)
 	this->SmartVHPScan_Overflow.Read(exINI, pSection, "SmartVHPScan.Overflow");
 	this->SmartVHPScan_SwitchThreshold.Read(exINI, pSection, "SmartVHPScan.SwitchThreshold");
 	this->SmartVHPScan_IncludeInflight.Read(exINI, pSection, "SmartVHPScan.IncludeInflight");
+	this->SmartVHPScan_CountIdleFrames.Read(exINI, pSection, "SmartVHPScan.CountIdleFrames");
 
 }
 
@@ -114,6 +115,7 @@ void TechnoTypeExt::ExtData::Serialize(T& Stm)
 		.Process(this->SmartVHPScan_Overflow)
 		.Process(this->SmartVHPScan_SwitchThreshold)
 		.Process(this->SmartVHPScan_IncludeInflight)
+		.Process(this->SmartVHPScan_CountIdleFrames)
 		;
 }
 void TechnoTypeExt::ExtData::LoadFromStream(PhobosExtStreamReader& Stm)

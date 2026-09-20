@@ -1,16 +1,42 @@
 #include <TechnoClass.h>
+#include <TechnoTypeClass.h>
 #include <Fundamentals.h>
 
 #include <Helpers/Macro.h>
 #include <Helpers/Cast.h>
 
 #include <Ext/TechnoType/Body.h>
+#include <Utilities/Debug.h>
 
 #include <New/SmartVHPScan/Scoring.h>
 #include <New/SmartVHPScan/FireDuty.h>
 #include <New/SmartVHPScan/OrderLedger.h>
 
 #include <unordered_set>
+
+#if SMARTVHPSCAN_DIAG
+namespace
+{
+	int _clearLogFrame = -1;
+	int _clearLogCount = 0;
+
+	// 每帧最多记几条"目标被清空"，避免刷屏。
+	bool AllowClearTargetLog()
+	{
+		if (_clearLogFrame != Unsorted::CurrentFrame)
+		{
+			_clearLogFrame = Unsorted::CurrentFrame;
+			_clearLogCount = 0;
+		}
+
+		if (_clearLogCount >= 3)
+			return false;
+
+		++_clearLogCount;
+		return true;
+	}
+}
+#endif
 
 namespace SmartVHPScan
 {
@@ -90,7 +116,10 @@ namespace SmartVHPScan
 			return;
 
 		// 只关心启用了本功能的单位，其余单位的 SetTarget 与本模块无关。
-		if (GetMode(TechnoTypeExt::ExtMap.Find(pUnit->GetTechnoType())) == SmartVHPScanType::None)
+		// 注意这道钩子对全场的每一次 SetTarget 都会跑，类型指针先判空再进扩展表。
+		const auto pType = pUnit->GetTechnoType();
+
+		if (!pType || GetMode(TechnoTypeExt::ExtMap.Find(pType)) == SmartVHPScanType::None)
 			return;
 
 		auto& rec = _records[pUnit];
@@ -172,6 +201,19 @@ DEFINE_HOOK(0x6FCDB0, TechnoClass_SetTarget_SmartVHPScanObserve, 0x5)
 {
 	GET(TechnoClass*, pThis, ECX);
 	GET_STACK(AbstractClass*, pTarget, 0x4);
+
+#if SMARTVHPSCAN_DIAG
+	// 谁把目标清空了：记下 SetTarget(nullptr) 的调用者地址，可直接拿去 IDA 查。
+	// 单位明明有可打的目标却站着不动时，先看这条。
+	if (!pTarget && AllowClearTargetLog())
+	{
+		GET_STACK(DWORD, caller, 0x0);
+
+		Debug::Log("[SmartVHPScan] 目标被清空 frame=%d unit=%p type=%s by=%08X\n",
+			Unsorted::CurrentFrame, pThis,
+			(pThis && pThis->GetTechnoType()) ? pThis->GetTechnoType()->ID : "?", caller);
+	}
+#endif
 
 	SmartVHPScan::OrderLedger::Instance().Observe(pThis, pTarget);
 

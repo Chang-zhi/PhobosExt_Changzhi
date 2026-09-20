@@ -742,6 +742,7 @@ AllowTabBriefingInSinglePlayer=  ; boolean - 单人任务中能否用 Tab 打开
 <pre class="doc-code--block"><code>[TechnoType]
 SmartVHPScan=                    ; 枚举字符串 - 索敌模式 None/LowHealth/FullHealth/Count - (默认 None)
 SmartVHPScan.Count=              ; integer - 同一目标最多几个单位同时打 - (默认 1)
+SmartVHPScan.CountIdleFrames=    ; integer - 打满人数上限后等这么多帧，超时才允许超编 - (默认 0)
 SmartVHPScan.Bias=               ; double - 偏好强度，越大越执着 - (默认 2.0)
 SmartVHPScan.UnknownFactor=      ; double - 血量未知目标的分值倍数 - (默认 1.0)
 SmartVHPScan.ExcludeFraction=    ; double - 低于该血量比例的目标不打，0=关闭 - (默认 0.0)
@@ -765,7 +766,7 @@ SmartVHPScan.IncludeInflight=    ; boolean - 飞行中的弹药算不算已投�
 <tr><td class="doc-table__td"><code>None</code></td><td class="doc-table__td">不启用。</td></tr>
 <tr><td class="doc-table__td"><code>LowHealth</code></td><td class="doc-table__td">残血优先，血越少越先打。</td></tr>
 <tr><td class="doc-table__td"><code>FullHealth</code></td><td class="doc-table__td">满血优先，血越多越先打。</td></tr>
-<tr><td class="doc-table__td"><code>Count</code></td><td class="doc-table__td">不看血量，只限制同一目标的攻击人数。</td></tr>
+<tr><td class="doc-table__td"><code>Count</code></td><td class="doc-table__td">不看血量，只优先分散火力：同一目标最多同时被 N 个单位打，多出来的单位先去打别的目标。</td></tr>
 </tbody>
 </table>
 
@@ -773,7 +774,8 @@ SmartVHPScan.IncludeInflight=    ; boolean - 飞行中的弹药算不算已投�
 <table class="doc-table">
 <thead><tr><th class="doc-table__th" style="width:170px">属性</th><th class="doc-table__th" style="width:150px">适用模式</th><th class="doc-table__th">说明</th></tr></thead>
 <tbody>
-<tr><td class="doc-table__td"><code>Count</code></td><td class="doc-table__td"><code>Count</code></td><td class="doc-table__td">同一目标同时开火的上限，盟友的单位也计入；填 0 或负数按 <code>1</code> 处理。</td></tr>
+<tr><td class="doc-table__td"><code>Count</code></td><td class="doc-table__td"><code>Count</code></td><td class="doc-table__td">同一目标同时开火的软上限，盟友的单位也计入；填 0 或负数按 <code>1</code> 处理。</td></tr>
+<tr><td class="doc-table__td"><code>CountIdleFrames</code></td><td class="doc-table__td"><code>Count</code></td><td class="doc-table__td">打满人数上限后等这么多帧，等不到才允许超编；<code>0</code>=不等待。</td></tr>
 <tr><td class="doc-table__td"><code>Bias</code></td><td class="doc-table__td"><code>LowHealth</code>／<code>FullHealth</code></td><td class="doc-table__td">偏好强度，越大越执着于残血／满血目标。</td></tr>
 <tr><td class="doc-table__td"><code>UnknownFactor</code></td><td class="doc-table__td"><code>LowHealth</code>／<code>FullHealth</code></td><td class="doc-table__td">刚出现、血量未知的目标的分值倍数：<code>1.0</code>=一视同仁，调低靠后，调高靠前。</td></tr>
 <tr><td class="doc-table__td"><code>ExcludeFraction</code></td><td class="doc-table__td">全部</td><td class="doc-table__td">血量低于该比例的目标不再攻击，<code>0</code>=关闭（如 <code>0.05</code> 表示剩 5% 血以下不打）；血量未知的目标不受影响。</td></tr>

@@ -96,10 +96,8 @@ namespace SmartVHPScan
 				return false;
 		}
 
-		// 超时空 / 相位状态的目标不可选。
-		if (pTarget->TemporalTargetingMe || pTarget->BeingWarpedOut)
-			return false;
-
+		// 正被超时空抹除 / 相位冻结的目标不在这里否掉：常规单位确实打不了它，
+		// 但弹头带 Temporal=yes 的武器可以 —— 那是攻击者相关的判定，见 CanEngage。
 		return true;
 	}
 
@@ -199,6 +197,15 @@ namespace SmartVHPScan
 			// 弹道对空/对地必须匹配，否则会选中打不到的目标。
 			if (!(targetInAir ? pCandidate->Projectile->AA : pCandidate->Projectile->AG))
 				continue;
+
+			// 正被超时空抹除 / 相位冻结的目标：常规武器对它开火无效，只有弹头带
+			// Temporal=yes 的武器能打。判在选武器这一层，是为了让"主武器不行、副武器
+			// 是 Temporal"的单位也能把副武器挑出来打。
+			if ((pTarget->TemporalTargetingMe || pTarget->BeingWarpedOut)
+				&& !pCandidate->Warhead->Temporal)
+			{
+				continue;
+			}
 
 			pWeapon = pCandidate;
 			verses = candidateVerses;
