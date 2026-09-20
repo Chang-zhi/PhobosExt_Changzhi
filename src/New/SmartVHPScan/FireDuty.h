@@ -25,9 +25,7 @@ namespace SmartVHPScan
 
 		void Rebuild();
 
-		// 一个单位的本轮结论。
-		// MaxRange 是它本轮参与调度时的武器射程上限：Query 要用它做一次复核，
-		// 免得把"引擎刚刚放弃的目标"原样喂回去（见 Query 里的说明）。
+		// 本轮结论。MaxRange 用于 Query 复核，免得把引擎刚放弃的目标原样喂回。
 		struct PlanEntry
 		{
 			TechnoClass* Target = nullptr;

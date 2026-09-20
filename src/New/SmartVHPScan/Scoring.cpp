@@ -89,15 +89,14 @@ namespace SmartVHPScan
 		if (pTargetType->Insignificant)
 			return false;
 
-		// ⑥ 隐形建筑（InvisibleInGame）不参与自动索敌 —— 与 `Mission.Attack.cpp`
-		// 里对 BuildingClass 的处理一致。
+		// 隐形建筑不参与自动索敌，与 Mission.Attack.cpp 的处理一致。
 		if (const auto pBuilding = abstract_cast<BuildingClass*>(pTarget))
 		{
 			if (pBuilding->Type->InvisibleInGame)
 				return false;
 		}
 
-		// ⑦ 处在超时空 / 相位状态的目标不可选。
+		// 超时空 / 相位状态的目标不可选。
 		if (pTarget->TemporalTargetingMe || pTarget->BeingWarpedOut)
 			return false;
 
@@ -123,7 +122,7 @@ namespace SmartVHPScan
 		unsigned allowed = 0u;
 
 		if (categories & 0x100u)
-			allowed = 0x8042u;          // 原版是**赋值**而非 |=（该分支在前）
+			allowed = 0x8042u;          // 原版是赋值而非 |=（该分支在最前）
 
 		if (categories & 0x004u)
 			allowed |= 1u << 2u;        // AbstractType::Aircraft
@@ -197,7 +196,7 @@ namespace SmartVHPScan
 			if (!(candidateVerses > VersesThreshold))
 				continue;
 
-			// 弹道对空/对地必须匹配（否则会出现"选中打不到的飞机 / 地面单位"）。
+			// 弹道对空/对地必须匹配，否则会选中打不到的目标。
 			if (!(targetInAir ? pCandidate->Projectile->AA : pCandidate->Projectile->AG))
 				continue;
 
@@ -227,8 +226,7 @@ namespace SmartVHPScan
 			}
 		}
 
-		// 区域(Zone)可达性：按攻击者自己的 TargetZoneScanType 判定，
-		// 避免"目标在围墙内 / 隔着水域"这类选了也打不到的情况。
+		// 区域可达性：按攻击者自己的 TargetZoneScanType 判，避免选中隔墙 / 隔水的目标。
 		TargetZoneScanType zoneScanType = TargetZoneScanType::Same;
 		if (pAttackerExt)
 			zoneScanType = pAttackerExt->TargetZoneScanType;
@@ -250,7 +248,7 @@ namespace SmartVHPScan
 		if (!pAttacker || !pTarget || pTarget == pAttacker)
 			return false;
 
-		// 目标本身还成立吗（活着 / 上地图 / 是合法攻击对象）——与目标池同一道门。
+		// 与目标池同一道门。
 		if (!IsValidTarget(pTarget))
 			return false;
 
@@ -304,7 +302,7 @@ namespace SmartVHPScan
 		if (!pExt)
 			return -1.0;
 
-		// 装甲倍率：用 CanEngage 选出的那把武器，与伤害预算同一把尺子。
+		// 与伤害预算用同一把武器算装甲倍率。
 		double verses = 0.0;
 		if (pWeapon && pWeapon->Warhead)
 		{
@@ -326,12 +324,12 @@ namespace SmartVHPScan
 		if (!unknown && strength > 0)
 			fraction = std::clamp(static_cast<double>(estimatedHealth) / strength, 0.0, 1.0);
 
-		// 硬性排除：已知血量且低于阈值 → 该单位不考虑这个目标（默认 0，关闭）。
+		// 已知血量低于阈值 → 不考虑（默认 0 = 关闭）。
 		const double excludeFraction = pExt->SmartVHPScan_ExcludeFraction.Get();
 		if (excludeFraction > 0.0 && !unknown && fraction < excludeFraction)
 			return -1.0;
 
-		// Count 模式：纯数量上限，不做血量偏好。
+		// Count 模式不做血量偏好。
 		if (mode == SmartVHPScanType::Count)
 			return value;
 
@@ -339,22 +337,20 @@ namespace SmartVHPScan
 
 		if (unknown)
 		{
-			// 血量未知（刚出现 / 未观测）：中性，可微调。
+			// 血量未知：中性，可微调。
 			factor = pExt->SmartVHPScan_UnknownFactor.Get();
 		}
 		else if (mode == SmartVHPScanType::LowHealth)
 		{
-			// 残血优先：血越低加成越高。
 			factor = 1.0 + pExt->SmartVHPScan_Bias.Get() * (1.0 - fraction);
 		}
-		else // FullHealth（None 与 Count 已在上方返回，这里只剩它）
+		else // FullHealth
 		{
-			// 满血优先：血越高加成越高。
 			factor = 1.0 + pExt->SmartVHPScan_Bias.Get() * fraction;
 		}
 
 		int effDamage = pExt->SmartVHPScan_Damage.Get();
-		if (effDamage == 0 && pWeapon)
+		if (effDamage <= 0 && pWeapon)   // 与 FireDuty 的 Volley 口径保持一致
 			effDamage = pWeapon->Damage;
 
 		if (effDamage > 0)

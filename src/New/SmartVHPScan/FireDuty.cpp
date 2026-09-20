@@ -45,40 +45,40 @@ namespace SmartVHPScan
 			TechnoClass* Techno;
 			TechnoTypeExt::ExtData* Ext;
 			SmartVHPScanType Mode;
-			int MaxRange;            
-			double SwitchThreshold;  
-			double Overflow;         
+			int MaxRange;
+			double SwitchThreshold;
+			double Overflow;
 			bool IncludeInflight;
-			int CountCap;            
-			bool HasTarget = false;  
+			int CountCap;              // 数量模式下同一目标的本单位上限，0 = 不限
+			bool HasTarget = false;
 		};
 
 		struct Edge
 		{
-			int Unit = -1;         
-			int Target = -1;       
-			double Volley = 0;     
-			double Quality = 0;    
-			int CountCap = 0;      
-			double Overflow = 0;   
-			bool Occupancy = false;
+			int Unit = -1;
+			int Target = -1;
+			double Volley = 0;
+			double Quality = 0;
+			int CountCap = 0;
+			double Overflow = 0;
+			bool Occupancy = false; // 打不掉血但打得动（心控 / 超时空），一个持有者即够
 		};
 
 		struct SideBook
 		{
 			HouseClass* House = nullptr;
-			double Volley = 0.0;   
-			double Inflight = 0.0; 
-			double Planned = 0.0;  
-			int Assigned = 0;      
-			int Count = 0;         
-			bool Occupied = false; 
+			double Volley = 0.0;   // 已持有目标单位的火力
+			double Inflight = 0.0; // 在途弹药
+			double Planned = 0.0;  // 本轮新派的火力
+			int Assigned = 0;
+			int Count = 0;
+			bool Occupied = false;
 		};
 
-		// 某个阵营视角下目标的聚合状态。
+		// 阵营视角聚合：己方与盟友的账页合起来看。
 		struct SideView
 		{
-			double Spent = 0.0;    // 已投入火力（Volley + Planned；Inflight 视视角方开关）
+			double Spent = 0.0;    // Volley + Planned；Inflight 按视角方开关计入
 			int Assigned = 0;
 			int Count = 0;
 			bool Occupied = false;
@@ -89,12 +89,11 @@ namespace SmartVHPScan
 			TechnoClass* Techno;
 			double Priority = 0;
 			double Need = 0;
-			std::vector<SideBook> Books; // 阵营账页（元素个数 = 对它有投入的阵营数，通常 ≤ 4）
+			std::vector<SideBook> Books;
 			std::vector<int> Edges; // 候选边下标，按 Quality 降序
 		};
 
-		// 取该目标属于 pHouse 的账页，没有则现场开一页。
-		// 注意：返回引用后立即使用，中间不得再对同一目标的 Books 做 push_back。
+		// 取 pHouse 的账页，没有则开一页。返回的引用在下次 Books.push_back 后失效。
 		SideBook& BookOf(TargetInfo& T, HouseClass* pHouse)
 		{
 			for (auto& book : T.Books)
@@ -130,7 +129,7 @@ namespace SmartVHPScan
 			return view;
 		}
 
-		// 在"能打但打不满"的一组里挑火力最大的；并列时取质量更高的（更近 / 是当前目标）。
+		// 打不满的一组里挑火力最大的，并列时取质量更高的。
 		bool PreferAtLeast(const Edge& a, const Edge& b)
 		{
 			if (a.Volley > b.Volley + Epsilon)
@@ -141,7 +140,7 @@ namespace SmartVHPScan
 			return false;
 		}
 
-		// 在"会打过头"的一组里挑溢出最小的；并列时取质量更高的。
+		// 会打过头的一组里挑溢出最小的，并列时取质量更高的。
 		bool PreferAtMost(const Edge& a, const Edge& b)
 		{
 			if (a.Volley < b.Volley - Epsilon)
@@ -152,9 +151,7 @@ namespace SmartVHPScan
 			return false;
 		}
 
-		// 预算分配：为某个目标挑一个尚未被派出的单位。
-		// 顺序 = 占位型（该目标在该阵营视角下尚无人时）> 打不满里火力最大的
-		// > 打过头的里溢出最小的。所有预算判定都按候选边所属单位的阵营视角进行。
+		// 挑一个尚未派出的单位：占位型（该目标在它阵营视角下无人时）> 打不满里火力最大的 > 打过头里溢出最小的。
 		int PickCandidate(const TargetInfo& T, const std::vector<Edge>& edges,
 			const std::vector<UnitInfo>& units, const std::vector<bool>& assigned)
 		{
@@ -173,12 +170,10 @@ namespace SmartVHPScan
 				const auto& U = units[e.Unit];
 				const auto view = ViewFor(T, U.Techno->Owner, U.IncludeInflight);
 
-				// 该阵营视角已有占位持有者（心控 / 超时空 / EMP）→ 不再派任何人：
-				// 伤害单位打它是浪费，第二个占位单位更是完全白费。
+				// 已有占位持有者：伤害单位打它是浪费，第二个占位单位更是白费。
 				if (view.Occupied)
 					continue;
 
-				// 数量模式的硬上限：该目标在该阵营视角下已经站满了就不再派人。
 				if (e.CountCap > 0 && view.Count >= e.CountCap)
 					continue;
 
@@ -205,7 +200,7 @@ namespace SmartVHPScan
 				}
 			}
 
-			// 一击定胜负的措施优先，且只需一个持有者。
+			// 占位型优先，且只需一个持有者。
 			if (bestOcc >= 0 && bestOccAssigned == 0)
 				return bestOcc;
 			if (bestUnder >= 0)
@@ -236,15 +231,19 @@ namespace SmartVHPScan
 
 		if (!pAttacker)
 			return result;
-		OrderLedger::Instance().MarkScanPending(pAttacker);
 
 		const unsigned categoryMask = static_cast<unsigned>(threat) & ~ScoringModeBits;
 
-		if (onlyTargetHouseEnemy)                                  // ①
+		// 这两条是完全交还原版的路径：不接管也不写回目标，绝不能盖帧戳 ——
+		// 否则引擎随后（同帧）的 SetTarget 会被 Observe 误判成索敌写回而漏记这条指令。
+		if (onlyTargetHouseEnemy)
 			return result;
 
-		if ((categoryMask & ~RepresentableCategoryBits) != 0u)     // ②
+		if ((categoryMask & ~RepresentableCategoryBits) != 0u)
 			return result;
+
+		// 从这里开始才可能写回目标：先盖戳，再惰性重建。
+		OrderLedger::Instance().MarkScanPending(pAttacker);
 
 		const int frame = Unsorted::CurrentFrame;
 		if (_frame != frame)
@@ -255,22 +254,18 @@ namespace SmartVHPScan
 
 		const auto it = _plan.find(pAttacker);
 		if (it == _plan.end())
-			return result; // 不在单位池内 → 由调用方回退
+		{
+			// 没有目标可写回，戳必须立刻撤掉，否则会残留到本帧稍后的外部指令上。
+			OrderLedger::Instance().CancelScanPending(pAttacker);
+			return result;
+		}
 
 		result.Handled = true;
 		result.Target = it->second.Target;
 
-		// ③ 只回答"此刻依然成立"的目标。
-		//
-		// 调用方的典型流程是「先把目标清空，再问 GreatestThreat 要一个」：
-		//   · TechnoClass::AI（0x6F9E50）：!IsCloseEnough(Target) → SetTarget(0)
-		//   · FootClass::UpdateAttackMove（slot 307 = 0x4DF3A0）：
-		//     !InAuxiliarySearchRange(Target) → Target = 0
-		// 若此时把它刚放弃的目标原样喂回去，单位就被永久钉在一个打不到的目标上 ——
-		// 目标既清不掉，也换不了别人。原版不会这样：GreatestThreat 经
-		// CanAutoTargetObject 只会返回当前仍然合格的目标。
-		//
-		// 判据与建边/保留时同一套（见 Scoring.cpp 的 IsStillEngageable）。
+		// 只回答"此刻依然成立"的目标。调用方通常是「先清空目标，再问 GreatestThreat 要一个」，
+		// 若把刚放弃的目标原样喂回去，单位会被永久钉在打不到的目标上：既清不掉也换不了人。
+		// 判据与建边 / 保留时同一套（IsStillEngageable）。
 		if (result.Target
 			&& (!AllowsTargetType(threat, result.Target)
 				|| !IsStillEngageable(pAttacker, result.Target,
@@ -288,14 +283,12 @@ namespace SmartVHPScan
 
 	void FireDuty::Rebuild()
 	{
-		// 上一帧表让位给粘滞判定（_previous 只比 Target 指针，见 FireDuty.h）；
-		// swap 而不是拷贝：_plan 腾出的桶数组直接复用，避免每帧重新分配。
+		// _previous 供粘滞判定（只比 Target 指针）；swap 而非拷贝，让 _plan 复用腾出的桶。
 		_previous.swap(_plan);
 		_plan.clear();
 
-		// ================= 1. 单位池 =================
-		// 池内包含**所有**开启了 SmartVHPScan 的单位。
-		// committed[u] != nullptr 表示第 u 个单位**已经持有目标**，它的结论就是"继续打它"。
+		// ---- 单位池 ----
+		// committed[u] != nullptr 表示第 u 个单位已持有目标，结论就是"继续打它"。
 		std::vector<UnitInfo> units;
 		std::vector<TechnoClass*> committed;
 		units.reserve(TechnoClass::Array.Count);
@@ -314,8 +307,7 @@ namespace SmartVHPScan
 
 			const auto pExt = TechnoTypeExt::ExtMap.Find(pType);
 
-			// 总开关：未启用本功能的单位不进单位池。唯一判定入口见 Scoring.h ——
-			// 下面所有 SmartVHPScan_* 字段都只在这道门之后才允许读。
+			// 总开关：未启用则不进池，SmartVHPScan_* 字段只在这道门之后才允许读。
 			const auto mode = GetMode(pExt);
 			if (mode == SmartVHPScanType::None)
 				continue;
@@ -324,7 +316,7 @@ namespace SmartVHPScan
 				continue;
 
 			const int maxRange = GetMaxWeaponRange(pTechno);
-			if (maxRange <= 0)                      // 取不到武器 → 不参与调度
+			if (maxRange <= 0)
 				continue;
 
 			UnitInfo info;
@@ -336,8 +328,7 @@ namespace SmartVHPScan
 			info.Overflow = std::max(pExt->SmartVHPScan_Overflow.Get(), 0.0);
 			info.IncludeInflight = pExt->SmartVHPScan_IncludeInflight.Get();
 
-			// "数量模式"的硬上限：同一目标最多同时被几个本单位打，
-			// 达到上限的单位不再被派往该目标。
+			// 数量模式的硬上限。
 			info.CountCap = 0;
 			if (mode == SmartVHPScanType::Count)
 				info.CountCap = std::max(pExt->SmartVHPScan_Count.Get(), 1);
@@ -351,17 +342,9 @@ namespace SmartVHPScan
 
 			OrderLedger::Instance().MarkSeen(pTechno);
 
-			// 粘滞是有前提的：目标必须"现在还能打"。
-			//
-			// 原版在目标离开射程/不再可打时会主动放弃目标：
-			//   · TechnoClass::AI（0x6F9E50）：!IsCloseEnough(Target) → SetTarget(0)
-			//   · FootClass::UpdateAttackMove（slot 307 = 0x4DF3A0）：
-			//     !InAuxiliarySearchRange(Target) → Target = 0
-			// 我们照同一条规则判定：不满足就当作"没有目标"，本轮落回自由池重新分配
-			// （可能换一个够得着的目标，也可能暂时空手）。
-			//
-			// 否则会出两类错：旧目标被当成"已投入的火力"继续记账（压住别的单位不让打），
-			// 而且会被 Query 原样喂回引擎，让引擎的放弃动作失效。
+			// 粘滞的前提是目标"现在还能打"。原版在目标离开射程时会主动放弃目标，
+			// 我们照同一条规则判；否则旧目标会被当成已投入的火力继续记账，
+			// 并被 Query 原样喂回，让引擎的放弃动作失效。
 			const bool retainable = IsStillEngageable(pTechno, pRetain, pExt, maxRange);
 
 			units.back().HasTarget = retainable;
@@ -378,8 +361,7 @@ namespace SmartVHPScan
 		if (units.empty())
 			return;
 
-		// ================= 2. 目标池 =================
-		// 与攻击者无关的资格判定，全场只算一次。
+		// ---- 目标池：与攻击者无关的资格判定，全场只算一次 ----
 		std::vector<TechnoClass*> targetPool;
 		targetPool.reserve(TechnoClass::Array.Count);
 
@@ -403,8 +385,7 @@ namespace SmartVHPScan
 
 		const int poolSize = static_cast<int>(targetPool.size());
 
-		// ================= 3. 候选边（只给自由单位建）=========================
-		// 唯一的准入判定入口：敌我 → 射程 → 隐身 → 能不能打到 → 威胁分。
+		// ---- 候选边（只给自由单位建）：敌我 → 射程 → 隐身 → 能不能打到 → 威胁分 ----
 		std::vector<Edge> edges;
 		std::vector<std::vector<int>> edgesOfTarget(poolSize);
 		std::vector<std::vector<int>> edgesOfUnit(units.size());
@@ -415,11 +396,11 @@ namespace SmartVHPScan
 		{
 			const auto& U = units[u];
 
-			// 已持有目标的单位不建边（见 Edge 的说明），它的火力在第 5.1 步单独记账。
+			// 已持有目标的单位不建边，它的火力在记账阶段单独处理。
 			if (U.HasTarget)
 				continue;
 
-			// 粘滞源：上一帧执勤表里它的目标。只做指针比较，绝不解引用。
+			// 粘滞源：上一帧执勤表里它的目标，只比指针。
 			const auto prevIt = _previous.find(U.Techno);
 
 			for (int ti = 0; ti < poolSize; ++ti)
@@ -429,14 +410,12 @@ namespace SmartVHPScan
 				if (pTarget == U.Techno || !IsHostile(U.Techno, pTarget))
 					continue;
 
-				// 射程最便宜，放最前面：能砍掉绝大多数 (单位, 目标) 组合，
-				// 让后面 SelectWeapon / Zone 这些较贵的判定只跑在够得着的目标上。
+				// 射程最便宜，放最前面，让后面较贵的判定只跑在够得着的目标上。
 				const double distance = static_cast<double>(U.Techno->DistanceFrom(pTarget));
 				if (distance > U.MaxRange)
 					continue;
 
 				// 隐身目标需要本方有传感器，否则选它等于白跑。
-				// GetCell 对异常坐标可能返回空指针，先守卫再解引用。
 				const auto pCell = pTarget->GetCell();
 				if (pTarget->CloakState == CloakState::Cloaked
 					&& (!pCell || !pCell->Sensors_InclHouse(U.Techno->Owner->ArrayIndex)))
@@ -451,7 +430,7 @@ namespace SmartVHPScan
 
 				const double threat = ComputeThreat(U.Mode, U.Techno, pTarget, pTargetType, U.Ext, pWeapon);
 				if (threat < 0.0)
-					continue;   // 被 ExcludeFraction 硬性排除
+					continue;   // 被 ExcludeFraction 排除
 
 				Edge e;
 				e.Unit = u;
@@ -460,8 +439,7 @@ namespace SmartVHPScan
 				e.Overflow = U.Overflow;
 				e.Occupancy = false;
 
-				// 一轮开火的期望伤害。SmartVHPScan.Damage > 0 时用它（心控 / 超时空
-				// 这类武器的 Damage 字段没有伤害含义），否则用实际会对该目标使用的武器。
+				// SmartVHPScan.Damage > 0 时用它：心控 / 超时空的 Damage 字段没有伤害含义。
 				int damage = U.Ext->SmartVHPScan_Damage.Get();
 				if (damage <= 0 && pWeapon)
 					damage = pWeapon->Damage;
@@ -473,7 +451,6 @@ namespace SmartVHPScan
 
 				if (!(e.Volley > 0.0))
 				{
-					// 打不掉血但打得动：视为"占位型"，一个持有者即可解决问题。
 					e.Volley = 0.0;
 					e.Occupancy = true;
 				}
@@ -514,8 +491,7 @@ namespace SmartVHPScan
 			T.Techno = pTarget;
 			T.Priority = targetPriority[ti];
 
-			// 需求火力 = 目标剩余血量的估计值；血量未知（迷雾）时按满血估，
-			// 宁可多派也不欠火。
+			// 血量未知（迷雾）时按满血估，宁可多派也不欠火。
 			const int estimated = pTarget->EstimatedHealth;
 			T.Need = estimated > 0
 				? static_cast<double>(estimated)
@@ -537,6 +513,7 @@ namespace SmartVHPScan
 				targets[remap[ti]].Edges = std::move(edgesOfTarget[ti]);
 		}
 
+		// ---- 记账：已持有目标的单位 + 在途弹药 ----
 		{
 			std::unordered_map<TechnoClass*, int> indexOf;
 			for (int i = 0; i < static_cast<int>(targets.size()); ++i)
@@ -550,20 +527,20 @@ namespace SmartVHPScan
 
 				const auto it = indexOf.find(pExisting);
 				if (it == indexOf.end())
-					continue;   // 该目标没有自由边（打不到 / 不敌视 / 无人可派）→ 不记账
+					continue;   // 目标没有自由边，记了也没人看
 
 				const auto& U = units[u];
 
-				// 候选边矩阵里没有 committed 单位，这里现场判它对"自己目标"这一条边。
+				// 候选边里没有已持有目标的单位，这里现场判它对"自己目标"这一条边。
 				WeaponTypeClass* pWeapon = nullptr;
 				double verses = 0.0;
 				if (!CanEngage(U.Techno, pExisting, pExisting->GetTechnoType(), U.Ext, &pWeapon, &verses))
-					continue;   // 本帧已打不动（弹头 / 弹道变了）→ 没有火力可记
+					continue;   // 本帧已打不动，没有火力可记
 
 				auto& T = targets[it->second];
 				auto& book = BookOf(T, U.Techno->Owner);
 
-				// 口径与第 3 步算 Volley 完全一致：自定义 Damage 优先，否则用实际武器。
+				// 口径与建边时算 Volley 一致。
 				int damage = U.Ext->SmartVHPScan_Damage.Get();
 				if (damage <= 0 && pWeapon)
 					damage = pWeapon->Damage;
@@ -590,8 +567,7 @@ namespace SmartVHPScan
 					if (!pBullet || !pBullet->Target || !pBullet->Owner)
 						continue;
 
-					// 发射者必须仍在场上：`Owner` 非空并不代表它还有效（见上面 liveTechnos）。
-					// 对已消失的发射者不记账 —— 那一发即使命中也不再属于任何存活阵营。
+					// 发射者必须仍在场上：Owner 非空不代表它还有效。
 					if (liveTechnos.find(pBullet->Owner) == liveTechnos.end())
 						continue;
 
@@ -603,7 +579,7 @@ namespace SmartVHPScan
 					if (it == indexOf.end())
 						continue;   // 目标没有自由边，记了也没人看
 
-					// 只统计"对目标有敌意"的弹药：友军打的不算，目标自己打自己更不算。
+					// 只统计对目标有敌意的弹药。
 					if (!IsHostile(pBullet->Owner, pTargetTechno))
 						continue;
 
@@ -612,10 +588,10 @@ namespace SmartVHPScan
 						: 1.0;
 
 					double dmg = static_cast<double>(pBullet->Health) * mult;
-					if (!(dmg > 0.0))     // 负数 = 治疗类弹头，不算伤害
+					if (!(dmg > 0.0))     // 负数 = 治疗类弹头
 						continue;
 
-					// 换算成"对目标装甲的有效伤害"，与 Volley 口径保持一致。
+					// 折算成对目标装甲的有效伤害，与 Volley 口径一致。
 					if (pBullet->WeaponType && pBullet->WeaponType->Warhead)
 					{
 						const int armor = static_cast<int>(pTargetTechno->GetTechnoType()->Armor);
@@ -626,17 +602,13 @@ namespace SmartVHPScan
 						}
 					}
 
-					// 记进发射方阵营的账页；是否抵扣需求由消费方的
-					// IncludeInflight 决定（ViewFor），记账侧不做封顶 —— 需求封顶
-					// 在聚合时进行，与旧实现"不把 Remain 压成负数"等效。
+					// 是否抵扣需求由消费方的 IncludeInflight 决定（ViewFor），这里不封顶。
 					BookOf(targets[it->second], pBullet->Owner->Owner).Inflight += dmg;
 				}
 			}
 		}
 
-		// ================= 6. 排序 =================
-		// 目标按优先级降序；每个目标的候选按质量降序。
-		// 全部用稳定排序，保证同一帧内的分配结果可复现。
+		// ---- 排序：目标按优先级降序，候选按质量降序。稳定排序保证同帧结果可复现 ----
 		std::stable_sort(targets.begin(), targets.end(),
 			[](const TargetInfo& a, const TargetInfo& b) { return a.Priority > b.Priority; });
 
@@ -646,7 +618,7 @@ namespace SmartVHPScan
 				[&edges](int a, int b) { return edges[a].Quality > edges[b].Quality; });
 		}
 
-		// 每个自由单位"能打到哪些目标"（压实后的目标下标），按目标优先级降序 —— 兜底轮转用。
+		// 每个自由单位"能打到哪些目标"，按目标优先级降序 —— 兜底轮转用。
 		std::vector<std::vector<int>> unitTargets(units.size());
 
 		for (int u = 0; u < static_cast<int>(units.size()); ++u)
@@ -668,7 +640,7 @@ namespace SmartVHPScan
 		for (int u = 0; u < static_cast<int>(units.size()); ++u)
 			assigned[u] = units[u].HasTarget;
 
-		// 数量模式的硬上限与"占位型独占"都在分配层生效（按阵营视角，见 PickCandidate）。
+		// 数量上限与"占位型独占"都在分配层生效，判定按阵营视角进行（见 PickCandidate）。
 		auto Commit = [&](int edgeIndex, TargetInfo& T)
 		{
 			const auto& pick = edges[edgeIndex];
@@ -687,9 +659,7 @@ namespace SmartVHPScan
 
 			if (pick.Occupancy)
 			{
-				// 占位型武器（心控 / 超时空 / EMP）：一个持有者就够了，
-				// 多派的人不是"少打一点"，而是完全白费，故直接标记为已解决。
-				book.Occupied = true;
+				book.Occupied = true;   // 多派的人不是少打一点，而是完全白费
 			}
 			else
 			{
@@ -724,6 +694,7 @@ namespace SmartVHPScan
 				break;
 		}
 
+		// ---- 兜底轮转：还没派出去的单位轮流摊到能打的目标上 ----
 		{
 			int cursor = 0;
 
@@ -749,7 +720,7 @@ namespace SmartVHPScan
 					if (U.CountCap > 0 && view.Count >= U.CountCap)
 						continue;
 
-					// 摊到这个目标上：账页补记，后续单位的视角就能看到"这里已经有人"。
+					// 账页补记，后续单位的视角就能看到"这里已经有人"。
 					auto& book = BookOf(T, U.Techno->Owner);
 					book.Assigned++;
 
