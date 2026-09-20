@@ -7,9 +7,9 @@
 #include <FPSCounter.h>
 #include <GameOptionsClass.h>
 #include <Ext/TechnoType/Body.h>
-#include <New/ChoiceBox/Types/ChoiceBoxTypeClass.h>
-#include <New/TextBox/Types/TextBoxTypeClass.h>
-#include <New/TriggerGroup/Types/TriggerGroupClass.h>
+#include <New/ChoiceBox/ChoiceBoxTypeClass.h>
+#include <New/TextBox/TextBoxTypeClass.h>
+#include <New/TriggerGroup/TriggerGroupClass.h>
 #include <Utilities/Patch.h>
 
 std::unique_ptr<RulesExt::ExtData> RulesExt::Data = nullptr;

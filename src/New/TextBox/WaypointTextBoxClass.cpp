@@ -1,5 +1,5 @@
 #include "WaypointTextBoxClass.h"
-#include "../../Types/TextBoxTypeClass.h"
+#include "TextBoxTypeClass.h"
 
 #include <StringTable.h>
 #include <TacticalClass.h>

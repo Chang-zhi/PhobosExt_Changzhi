@@ -3,8 +3,8 @@
 #include <Utilities/Debug.h>
 #include <FootClass.h>
 
-#include <Effects/IEffect.h>
-#include <Effects/DamageEvent.h>
+#include <New/Effects/IEffect.h>
+#include <New/Effects/DamageEvent.h>
 #include <Ext/WarheadType/Body.h>
 
 // ============================================================

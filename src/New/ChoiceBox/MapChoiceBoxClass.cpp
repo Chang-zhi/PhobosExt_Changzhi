@@ -1,8 +1,8 @@
 #include "MapChoiceBoxClass.h"
 
-#include <New/ChoiceBox/Types/ChoiceBoxTypeClass.h>
-#include <New/ChoiceBox/Entities/Derived/WaypointChoiceBoxClass.h>
-#include <New/ChoiceBox/Entities/Derived/ScreenChoiceBoxClass.h>
+#include <New/ChoiceBox/ChoiceBoxTypeClass.h>
+#include <New/ChoiceBox/WaypointChoiceBoxClass.h>
+#include <New/ChoiceBox/ScreenChoiceBoxClass.h>
 
 #include <StringTable.h>
 #include <Surface.h>

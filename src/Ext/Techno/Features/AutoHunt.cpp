@@ -1,13 +1,17 @@
-#include "AutoHunt.h"
-
 #include <TechnoClass.h>
 #include <FootClass.h>
 #include <TeamClass.h>
 
-#include <Ext\TechnoType\Body.h>
+#include <Ext/Techno/Body.h>
+#include <Ext/TechnoType/Body.h>
 
+namespace
+{
+	// 每 AUTOHUNT_CHECK_FRAME 帧检测一次
+	constexpr size_t AUTOHUNT_CHECK_FRAME = 15;
+}
 
-void ProcessAutoHunt(FootClass* pFoot)
+void TechnoExt::ProcessAutoHunt(FootClass* pFoot)
 {
 	// 每 AUTOHUNT_CHECK_FRAME 帧检测一次
 	if (Unsorted::CurrentFrame % AUTOHUNT_CHECK_FRAME != 0)

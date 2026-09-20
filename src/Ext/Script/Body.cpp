@@ -1,6 +1,6 @@
 #include "Body.h"
 #include <New/FootPath/FootPathVisualizer.h>
-#include "PatrolService.h"
+#include <Ext/Script/Features/PatrolService.h>
 #include <Ext/Rules/Body.h>
 
 #include <CellSpread.h>

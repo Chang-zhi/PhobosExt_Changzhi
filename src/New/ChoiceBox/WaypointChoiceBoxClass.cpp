@@ -1,6 +1,6 @@
 #include "WaypointChoiceBoxClass.h"
 #include "ScreenChoiceBoxClass.h"
-#include "../../Types/ChoiceBoxTypeClass.h"
+#include "ChoiceBoxTypeClass.h"
 
 #include <TacticalClass.h>
 #include <ScenarioClass.h>

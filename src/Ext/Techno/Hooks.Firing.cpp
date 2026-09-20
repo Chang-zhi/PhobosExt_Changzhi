@@ -7,7 +7,6 @@
 #include <TechnoTypeClass.h>
 
 #include <Ext/WarheadType/Body.h>
-#include <Ext/Techno/TemporalAOE.h>
 #include <Utilities/EnumFunctions.h>
 #include <Utilities/Debug.h>
 
@@ -28,13 +27,13 @@ DEFINE_HOOK(0x6FC339, TechnoClass_CanFire, 0x6)
 	if (pWeapon->Warhead && pWeapon->Warhead->Temporal)
 	{
 		// AOE 副目标拦截
-		auto claimIt = TemporalAOE::SecondaryClaims.find(pTargetTechno);
-		if (claimIt != TemporalAOE::SecondaryClaims.end() && claimIt->second != pThis)
+		auto claimIt = TechnoExt::TemporalAOE::SecondaryClaims.find(pTargetTechno);
+		if (claimIt != TechnoExt::TemporalAOE::SecondaryClaims.end() && claimIt->second != pThis)
 			return CannotFire;
 
 		// AOE 主目标拦截
-		auto mainIt = TemporalAOE::CachedMainOwners.find(pTargetTechno);
-		if (mainIt != TemporalAOE::CachedMainOwners.end() && mainIt->second != pThis)
+		auto mainIt = TechnoExt::TemporalAOE::CachedMainOwners.find(pTargetTechno);
+		if (mainIt != TechnoExt::TemporalAOE::CachedMainOwners.end() && mainIt->second != pThis)
 			return CannotFire;
 
 		// Temporal.Exclusive 拦截

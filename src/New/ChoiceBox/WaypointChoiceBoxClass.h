@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Base/MapChoiceBoxClass.h"
+#include "MapChoiceBoxClass.h"
 
 #include <PhobosExt.h>
 #include <Utilities/SavegameDef.h>

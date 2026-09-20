@@ -1,6 +1,6 @@
 #include "Body.h"
-#include "ScriptManipulator.h"
-#include "TaskForceManipulator.h"
+#include <Ext/TAction/Features/ScriptManipulator.h>
+#include <Ext/TAction/Features/TaskForceManipulator.h>
 
 #include <YRpp.h>
 #include <TagClass.h>
@@ -24,13 +24,13 @@
 #include <Utilities/SpawnerHelper.h>
 #include <Utilities/GeneralUtils.h>
 
-#include <New/TextBox/Entities/Base/MapTextBoxClass.h>
-#include <New/TextBox/Types/TextBoxTypeClass.h>
-#include <New/TextBox/Entities/Derived/WaypointTextBoxClass.h>
-#include <New/TextBox/Entities/Derived/TechnoTextBoxClass.h>
-#include <New/ChoiceBox/Types/ChoiceBoxTypeClass.h>
-#include <New/ChoiceBox/Entities/Derived/WaypointChoiceBoxClass.h>
-#include <New/ChoiceBox/Entities/Derived/ScreenChoiceBoxClass.h>
+#include <New/TextBox/MapTextBoxClass.h>
+#include <New/TextBox/TextBoxTypeClass.h>
+#include <New/TextBox/WaypointTextBoxClass.h>
+#include <New/TextBox/TechnoTextBoxClass.h>
+#include <New/ChoiceBox/ChoiceBoxTypeClass.h>
+#include <New/ChoiceBox/WaypointChoiceBoxClass.h>
+#include <New/ChoiceBox/ScreenChoiceBoxClass.h>
 
 #include <set>
 #include <vector>

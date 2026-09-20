@@ -3,11 +3,6 @@
 #include <Unsorted.h>
 
 #include <Utilities/Debug.h>
-#include <Ext/Techno/AutoHunt.h>
-#include <Ext/Techno/LegalTargetAI.h>
-#include <Ext/Techno/TemporalExclusive.h>
-#include <Ext/Techno/TemporalAOE.h>
-#include <Ext/Techno/BerzerkRestore.h>
 
 
 // Avoid secondary jump
@@ -22,7 +17,7 @@ DEFINE_HOOK(0x6F9E50, TechnoClass_AI, 0x5)
 	GET(TechnoClass*, pThis, ECX);
 
 	// Berzerk restore check
-	BerzerkRestoreCheck(pThis);
+	TechnoExt::BerzerkRestoreCheck(pThis);
 
 	// Temporal exclusive 的全局维护：每帧只跑一次
 	{
@@ -30,14 +25,14 @@ DEFINE_HOOK(0x6F9E50, TechnoClass_AI, 0x5)
 		if (Unsorted::CurrentFrame != lastTemporalFrame)
 		{
 			lastTemporalFrame = Unsorted::CurrentFrame;
-			CleanupInvalidTemporalLocks();
-			UpdateTemporalExclusive();
+			TechnoExt::TemporalExclusive::CleanupInvalidTemporalLocks();
+			TechnoExt::TemporalExclusive::UpdateTemporalExclusive();
 		}
 	}
 
 	// Temporal exclusive
-	HandleLegalTargetAITargeting(pThis);
-	HandleTemporalExclusiveTargeting(pThis);
+	TechnoExt::HandleLegalTargetAITargeting(pThis);
+	TechnoExt::TemporalExclusive::HandleTemporalExclusiveTargeting(pThis);
 
 	auto const pExt = TechnoExt::ExtMap.Find(pThis);
 	if (pExt)
@@ -51,7 +46,7 @@ DEFINE_HOOK(0x6F9E50, TechnoClass_AI, 0x5)
 		if (Unsorted::CurrentFrame != lastFrame)
 		{
 			lastFrame = Unsorted::CurrentFrame;
-			TemporalAOE::ValidateGlobals();
+			TechnoExt::TemporalAOE::ValidateGlobals();
 		}
 	}
 
@@ -63,7 +58,7 @@ DEFINE_HOOK(0x4DA54E, FootClass_AI, 0x6)
 {
 	GET(FootClass*, pThis, ESI);
 
-	ProcessAutoHunt(pThis);
+	TechnoExt::ProcessAutoHunt(pThis);
 
 	return 0;
 }

@@ -10,9 +10,6 @@
 #include <TechnoTypeClass.h>
 
 #include <Utilities/AresFunctions.h>
-#include <Ext/Techno/TemporalAOE.h>
-#include <Ext/Techno/BerzerkRestore.h>
-#include <Ext/Techno/TemporalExclusive.h>
 #include <TemporalClass.h>
 
 TechnoExt::ExtContainer TechnoExt::ExtMap;
@@ -88,8 +85,6 @@ void TechnoExt::ExtData::InvalidatePointer(void* ptr, bool bRemoved)
 	if (state.CachedMain == ptr)
 	{
 		state.CachedMainDead = true;
-		Debug::Log("[TemporalAOE] InvalidatePointer: CachedMain %08X destroyed, setting CachedMainDead\n",
-			(DWORD)ptr);
 	}
 
 	// 副目标列表（由 InvalidateAOESecondaryClaims 统一处理指针失效）
@@ -135,7 +130,7 @@ bool TechnoExt::LoadGlobals(PhobosExtStreamReader& Stm)
 	TemporalAOE::SecondaryClaims.clear();
 	TemporalAOE::WarpingOutTargets.clear();
 	TemporalAOE::CachedMainOwners.clear();
-	TemporalExclusiveTargetsMap.clear();
+	TemporalExclusive::TargetsMap.clear();
 	BerzerkRestoreClearCache();
 
 	TemporalAOE::s_PostLoadCleanupNeeded = true;
@@ -249,13 +244,13 @@ DEFINE_HOOK(0x6F4500, TechnoClass_DTOR, 0x5)
 {
 	GET(TechnoClass*, pItem, ECX);
 
-	TemporalAOE::InvalidatePtr(pItem);
-	BerzerkRestorePointerInvalidate(pItem);
+	TechnoExt::TemporalAOE::InvalidatePtr(pItem);
+	TechnoExt::BerzerkRestorePointerInvalidate(pItem);
 	// 清理 CachedMainOwners 中指向已销毁对象的条目
-	for (auto it = TemporalAOE::CachedMainOwners.begin(); it != TemporalAOE::CachedMainOwners.end(); )
+	for (auto it = TechnoExt::TemporalAOE::CachedMainOwners.begin(); it != TechnoExt::TemporalAOE::CachedMainOwners.end(); )
 	{
 		if (it->first == pItem || it->second == pItem)
-			it = TemporalAOE::CachedMainOwners.erase(it);
+			it = TechnoExt::TemporalAOE::CachedMainOwners.erase(it);
 		else
 			++it;
 	}

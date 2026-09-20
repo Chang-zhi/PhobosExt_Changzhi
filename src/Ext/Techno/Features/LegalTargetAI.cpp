@@ -2,10 +2,11 @@
 #include <TechnoClass.h>
 #include <TechnoTypeClass.h>
 
+#include <Ext/Techno/Body.h>
 #include <Ext/TechnoType/Body.h>
 #include <Utilities/Debug.h>
 
-void HandleLegalTargetAITargeting(TechnoClass* pThis)
+void TechnoExt::HandleLegalTargetAITargeting(TechnoClass* pThis)
 {
 	if(!pThis) return;
 	if(!pThis->Target) return;

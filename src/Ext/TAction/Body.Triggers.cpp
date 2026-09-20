@@ -1,10 +1,10 @@
 #include "Body.h"
-#include "TriggerSelector.h"
+#include <Ext/TAction/Features/TriggerSelector.h>
 
 #include <YRpp.h>
 #include <TriggerTypeClass.h>
 
-#include <New/TriggerGroup/Types/TriggerGroupClass.h>
+#include <New/TriggerGroup/TriggerGroupClass.h>
 #include <Utilities/Debug.h>
 
 #include <utility>

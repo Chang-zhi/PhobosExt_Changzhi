@@ -12,16 +12,16 @@
 #include <Ext/TeamType/Body.h>
 #include <Ext/Script/Body.h>
 
-#include <New/TextBox/Entities/Base/MapTextBoxClass.h>
-#include <New/TextBox/Entities/Derived/TechnoTextBoxClass.h>
-#include <New/TextBox/Entities/Derived/WaypointTextBoxClass.h>
-#include <New/TextBox/Types/TextBoxTypeClass.h>
+#include <New/TextBox/MapTextBoxClass.h>
+#include <New/TextBox/TechnoTextBoxClass.h>
+#include <New/TextBox/WaypointTextBoxClass.h>
+#include <New/TextBox/TextBoxTypeClass.h>
 #include <New/FootPath/FootPathVisualizer.h>
-#include <New/ChoiceBox/Entities/Base/MapChoiceBoxClass.h>
-#include <New/ChoiceBox/Entities/Derived/WaypointChoiceBoxClass.h>
-#include <New/ChoiceBox/Entities/Derived/ScreenChoiceBoxClass.h>
-#include <New/ChoiceBox/Types/ChoiceBoxTypeClass.h>
-#include <New/TriggerGroup/Types/TriggerGroupClass.h>
+#include <New/ChoiceBox/MapChoiceBoxClass.h>
+#include <New/ChoiceBox/WaypointChoiceBoxClass.h>
+#include <New/ChoiceBox/ScreenChoiceBoxClass.h>
+#include <New/ChoiceBox/ChoiceBoxTypeClass.h>
+#include <New/TriggerGroup/TriggerGroupClass.h>
 
 #include <utility>
 

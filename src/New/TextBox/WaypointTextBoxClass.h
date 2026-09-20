@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "../Base/MapTextBoxClass.h"
+#include "MapTextBoxClass.h"
 
 #include <PhobosExt.h>
 #include <Utilities/SavegameDef.h>

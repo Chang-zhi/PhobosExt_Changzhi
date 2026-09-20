@@ -1,5 +1,5 @@
 #include "TechnoTextBoxClass.h"
-#include <New/TextBox/Types/TextBoxTypeClass.h>
+#include <New/TextBox/TextBoxTypeClass.h>
 
 #include <StringTable.h>
 #include <TacticalClass.h>

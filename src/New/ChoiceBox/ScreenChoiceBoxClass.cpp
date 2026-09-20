@@ -1,6 +1,6 @@
 #include "ScreenChoiceBoxClass.h"
 #include "WaypointChoiceBoxClass.h"
-#include "../../Types/ChoiceBoxTypeClass.h"
+#include "ChoiceBoxTypeClass.h"
 
 #include <Surface.h>
 #include <Utilities/Stream.h>

@@ -5,7 +5,7 @@
 #include <TriggerClass.h>
 #include <ScenarioClass.h>
 
-#include <New/TriggerGroup/Types/TriggerGroupClass.h>
+#include <New/TriggerGroup/TriggerGroupClass.h>
 #include <Utilities/Debug.h>
 
 #include <algorithm>

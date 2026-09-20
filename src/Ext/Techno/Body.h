@@ -9,13 +9,17 @@
 #include <Utilities/TemplateDef.h>
 #include <Utilities/Macro.h>
 
-#include <Ext\TechnoType\Body.h>
-#include <Effects/IEffect.h>
+#include <Ext/TechnoType/Body.h>
+#include <New/Effects/IEffect.h>
 
 #include <vector>
 #include <set>
 #include <unordered_set>
+#include <unordered_map>
 #include <memory>
+
+class FootClass;
+class TemporalClass;
 
 class TechnoExt
 {
@@ -101,10 +105,69 @@ public:
 	static bool LoadGlobals(PhobosExtStreamReader& Stm);
 	static bool SaveGlobals(PhobosExtStreamWriter& Stm);
 
-	// WeaponHelpers.cpp
+	// Features/WeaponHelpers.cpp
 	static WeaponTypeClass* GetCurrentWeapon(TechnoClass* pThis, int& weaponIndex, bool getSecondary = false);
 	static WeaponTypeClass* GetCurrentWeapon(TechnoClass* pThis, bool getSecondary = false);
 
 	// 目标是否处于本单位可抵达的移动区域（对齐上游 AllowedTargetByZone）
 	static bool AllowedTargetByZone(TechnoClass* pThis, TechnoClass* pTarget, TargetZoneScanType zoneScanType, WeaponTypeClass* pWeapon = nullptr, bool useZone = false, int zone = -1);
+
+	// ── 自动Hunt（Features/AutoHunt.cpp） ────────────────────────
+	static void ProcessAutoHunt(FootClass* pFoot);
+
+	// ── 混乱恢复（Features/BerzerkRestore.cpp） ──────────────────
+	static void BerzerkRestoreCheck(TechnoClass* pThis);
+	static void BerzerkRestorePointerInvalidate(void* ptr);
+	static void BerzerkRestoreClearCache();
+
+	// ── 合法目标 AI（Features/LegalTargetAI.cpp） ────────────────
+	static void HandleLegalTargetAITargeting(TechnoClass* pThis);
+
+	// ── 超时空 AOE（Features/TemporalAOE.cpp） ──────────────────
+	struct TemporalAOE
+	{
+		// 副目标 → 假 Temporal 条目
+		struct FakeTemporalEntry
+		{
+			TemporalClass* FakeTemporal;
+			TechnoClass*   Attacker;
+		};
+
+		static std::unordered_map<TechnoClass*, FakeTemporalEntry> FakeTemporals;
+		static std::unordered_map<TechnoClass*, TechnoClass*> SecondaryClaims;
+		static std::unordered_set<TechnoClass*> WarpingOutTargets;
+		static std::unordered_map<TechnoClass*, TechnoClass*> CachedMainOwners;
+		static std::unordered_map<TechnoClass*, std::unordered_set<TechnoClass*>> SecondariesByAttacker;
+		static bool s_PostLoadCleanupNeeded;
+
+		static void CreateFakeTemporal(TechnoClass* pAttacker, TechnoClass* pTarget);
+		static void DestroyFakeTemporal(TechnoClass* pTarget);
+		static void DestroyFakeTemporalsByAttacker(TechnoClass* pAttacker);
+		static void DestroyFakeTemporalsByTargetList(const std::vector<TechnoClass*>& targets);
+		static void DestroyAllFakeTemporals();
+		static void InitAOEState(TechnoClass* pAttacker);
+		static bool HasAOEWeapon(TechnoClass* pAttacker);
+		static void ReleaseAttackerLocks(TechnoClass* pAttacker);
+		static void InvalidatePtr(void* ptr);
+		static void ValidateGlobals();
+
+		static void ForceTechnoRedraw(TechnoClass* pTechno);
+		static void ClearBuildingsDisabled(std::unordered_set<TechnoClass*>& set);
+		static void PostLoadCleanup();
+		static void ReleaseAOESecondaries(TechnoClass* pAttacker, TemporalAOEState& state);
+		static void DeactivateAOE(TechnoClass* pAttacker, TemporalAOEState& state);
+		static void PlayWarpAwayAnim(TechnoClass* pTarget);
+		static void WarpOutTarget(TechnoClass* pTarget, TechnoClass* pKiller, TemporalAOEState& state);
+	};
+
+	// ── 超时空武器互斥（Features/TemporalExclusive.cpp） ─────────
+	struct TemporalExclusive
+	{
+		static std::unordered_map<TechnoClass*, TechnoClass*> TargetsMap;
+
+		static bool IsCurrentUseExclusiveTemporalWeapon(TechnoClass* pTechno);
+		static void CleanupInvalidTemporalLocks();
+		static void HandleTemporalExclusiveTargeting(TechnoClass* pThis);
+		static void UpdateTemporalExclusive();
+	};
 };

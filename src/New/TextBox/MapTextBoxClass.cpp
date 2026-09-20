@@ -1,7 +1,7 @@
 #include "MapTextBoxClass.h"
 
-#include <New/TextBox/Entities/Derived/TechnoTextBoxClass.h>
-#include "../Derived/WaypointTextBoxClass.h"
+#include <New/TextBox/TechnoTextBoxClass.h>
+#include "WaypointTextBoxClass.h"
 
 #include <StringTable.h>
 #include <Surface.h>

@@ -1,8 +1,7 @@
-#include "BerzerkRestore.h"
-
 #include <TechnoClass.h>
 #include <FootClass.h>
 #include <Ext/Rules/Body.h>
+#include <Ext/Techno/Body.h>
 #include <Utilities/Debug.h>
 
 #include <unordered_map>
@@ -10,7 +9,7 @@
 // 缓存每个单位上一帧的 Berzerk 状态，用于检测状态变化
 static std::unordered_map<TechnoClass*, bool> BerzerkStateCache;
 
-void BerzerkRestorePointerInvalidate(void* ptr)
+void TechnoExt::BerzerkRestorePointerInvalidate(void* ptr)
 {
 	if (!ptr) return;
 
@@ -23,7 +22,7 @@ void BerzerkRestorePointerInvalidate(void* ptr)
 	}
 }
 
-void BerzerkRestoreClearCache()
+void TechnoExt::BerzerkRestoreClearCache()
 {
 	BerzerkStateCache.clear();
 }
@@ -33,7 +32,7 @@ void BerzerkRestoreClearCache()
 // 如果规则允许，清除目标防止乱跑
 // 由 TechnoClass_AI 钩子每帧调用
 // ============================================================
-void BerzerkRestoreCheck(TechnoClass* pThis)
+void TechnoExt::BerzerkRestoreCheck(TechnoClass* pThis)
 {
 	if (!pThis)
 		return;

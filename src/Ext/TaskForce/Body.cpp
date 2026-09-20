@@ -2,7 +2,7 @@
 
 #include <Utilities/Stream.h>
 #include <Utilities/Debug.h>
-#include <Ext/TAction/TaskForceManipulator.h>
+#include <Ext/TAction/Features/TaskForceManipulator.h>
 
 #include <TechnoTypeClass.h>
 
