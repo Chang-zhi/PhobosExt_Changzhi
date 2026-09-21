@@ -1,4 +1,4 @@
-# PhobosExt_Chang_zhi
+# PhobosExt_Changzhi
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE.md)
 

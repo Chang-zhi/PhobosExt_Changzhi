@@ -47,7 +47,7 @@ bool TActionExt::BindAllTeamMemberToTag(TActionClass* pThis, HouseClass* pHouse,
 
 	for (auto const pTechno : TechnoClass::Array)
 	{
-		if (pTechno->WhatAmI() != AbstractType::BuildingType)
+		if (pTechno && pTechno->WhatAmI() != AbstractType::Building)
 		{
 			if (FootClass* pFoot = abstract_cast<FootClass*>(pTechno))
 			{
@@ -122,7 +122,7 @@ bool TActionExt::BindAllTechnoTypeToTag(TActionClass* pThis, HouseClass* pHouse,
 	// 遍历 TechnoClass, 尝试将 TagClass 绑定到 TechnoClass 上
 	for (auto const pTechno : TechnoClass::Array)
 	{
-		if (pTechno->get_ID() == std::string(techno))
+		if (pTechno && pTechno->get_ID() == std::string(techno))
 		{
 			if (pTechno->AttachedTag) pTechno->ReplaceTag(pTagClass);
 			else pTechno->AttachTrigger(pTagClass);

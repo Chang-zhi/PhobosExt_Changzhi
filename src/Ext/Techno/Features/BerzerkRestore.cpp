@@ -55,7 +55,8 @@ void TechnoExt::BerzerkRestoreCheck(TechnoClass* pThis)
 			pThis->ForceMission(Mission::Guard);
 			if (auto pFoot = abstract_cast<FootClass*>(pThis))
 			{
-				pFoot->Locomotor->Stop_Moving();
+				if (pFoot->Locomotor)
+					pFoot->Locomotor->Stop_Moving();
 				pFoot->Destination = nullptr;
 				pFoot->LastDestination = nullptr;
 				pFoot->MegaDestination = nullptr;

@@ -16,7 +16,67 @@
 #include <unordered_map>
 #include <algorithm>
 
+#include <EventClass.h>
+#include <TargetClass.h>
+
 #include "Command.h"
+
+// 联机同步：玩家指令必须投递为 EventClass（原版 Scatter/Deploy 也是这么做的），
+// 直接调 TechnoClass::Scatter() / ForceMission() 只有本机生效，会 out of sync。
+
+// 0x4C65E0: EventClass 的 Target 版构造 (houseIndex, eventType, id, rtti)。
+// 显式取签名是因为 YRpp 的 (int,EventType,int,int) 与 (...,const int&) 重载有歧义。
+using EventClassTargetCtor = void* (__thiscall*)(void*, int, EventType, int, int);
+
+static const EventClassTargetCtor EventClass_TargetCtor =
+	reinterpret_cast<EventClassTargetCtor>(0x4C65E0);
+
+// 0xAC4CF4: 计划模式。原版入队前会检查，这里保持一致。
+static bool IsOrderQueueBlocked()
+{
+	return *reinterpret_cast<const unsigned char*>(0xAC4CF4) != 0;
+}
+
+// 投递一条"只带自身目标"的指令事件（等价原版 0x6FFE00）。
+static void QueueSelfOrder(TechnoClass* pTechno, EventType eType)
+{
+	if (!pTechno || !pTechno->Owner || !pTechno->IsAlive || pTechno->InLimbo)
+		return;
+
+	if (IsOrderQueueBlocked())
+		return;
+
+	const TargetClass whom(pTechno);
+
+	// EventClass 无默认构造，先备缓冲区让游戏构造函数填入（Frame 由它设为当前帧）
+	alignas(EventClass) unsigned char buffer[sizeof(EventClass)] { };
+
+	EventClass_TargetCtor(buffer, pTechno->Owner->ArrayIndex, eType, whom.m_ID, whom.m_RTTI);
+	EventClass::OutList.Add(*reinterpret_cast<EventClass*>(buffer));
+}
+
+// 按 TechnoClass::Array 下标排序：该顺序各客户端一致，可作确定性排序键。
+static void SortByCanonicalOrder(std::vector<TechnoClass*>& list)
+{
+	if (list.size() < 2)
+		return;
+
+	std::unordered_map<TechnoClass*, int> rank;
+	rank.reserve(TechnoClass::Array.Count);
+
+	for (int i = 0; i < TechnoClass::Array.Count; ++i)
+	{
+		if (TechnoClass* pTechno = TechnoClass::Array.GetItem(i))
+			rank.emplace(pTechno, i);
+	}
+
+	std::stable_sort(list.begin(), list.end(), [&rank](TechnoClass* a, TechnoClass* b)
+		{
+			const int ia = rank.contains(a) ? rank[a] : INT_MAX;
+			const int ib = rank.contains(b) ? rank[b] : INT_MAX;
+			return ia < ib;
+		});
+}
 
 // 载具信息结构体
 struct TransportInfo
@@ -25,6 +85,22 @@ struct TransportInfo
 	int UsedCapacity;			// 已经使用的容量
 	int MaxCapacity;			// 最大容量
 };
+
+// 按 TechnoClass::Array 顺序收集 map 中的载具（跨客户端一致的顺序）
+static void CollectCanonicalOrder(
+	const std::unordered_map<TechnoClass*, TransportInfo>& transports,
+	std::vector<TechnoClass*>& out)
+{
+	out.clear();
+	out.reserve(transports.size());
+
+	for (int i = 0; i < TechnoClass::Array.Count; ++i)
+	{
+		TechnoClass* pTechno = TechnoClass::Array.GetItem(i);
+		if (pTechno && transports.contains(pTechno))
+			out.push_back(pTechno);
+	}
+}
 
 // Helper: 递归收集载具及其递归乘客到 unordered_set
 static void CollectWhitelist(
@@ -74,7 +150,8 @@ static void ScatterFriendlyCell(
 					continue;
 			}
 		}
-		pTech->Scatter(pTech->GetCoords(), true, false);
+		// 投递散开指令（原来直接调 Scatter()，只有本机生效）
+		QueueSelfOrder(pTech, EventType::Scatter);
 	}
 }
 
@@ -153,6 +230,10 @@ static int TryAssign(
 				sortedKeys[groupEnd]->GetTechnoType()->SizeLimit == groupLimit)
 				groupEnd++;
 
+			// 先清空载具格上的己方单位；只投递一次，避免刷爆 128 格的 OutList
+			for (size_t ti = groupStart; ti < groupEnd; ti++)
+				ScatterFriendlyCell(transports[sortedKeys[ti]].Cell, pPlayer, sortedKeys[ti]);
+
 			bool anyAssigned = true;
 			while (anyAssigned)
 			{
@@ -177,9 +258,6 @@ static int TryAssign(
 						if (u.Unit == pCurVeh)
 							continue;
 
-						// 目标载具坐标上有其他单位 → 散开阔塞者
-						ScatterFriendlyCell(t.Cell, pPlayer, pCurVeh);
-
 						// 防循环登车：两个都是失败载具则跳过
 						if (transports.count(u.Unit) && transports.count(pCurVeh))
 						{
@@ -203,7 +281,7 @@ static int TryAssign(
 						if (useRangeLimit && dist > recruitRange)
 							continue;
 
-						if (dist < bestDist || (dist == bestDist && u.Size < units[bestIdx].Size))
+						if (dist < bestDist || (bestIdx >= 0 && dist == bestDist && u.Size < units[bestIdx].Size))
 						{
 							bestDist = dist;
 							bestIdx = static_cast<int>(i);
@@ -214,17 +292,18 @@ static int TryAssign(
 					{
 						UnitInfo& u = units[bestIdx];
 
-						if (UnitClass* pUnit = abstract_cast<UnitClass*>(u.Unit))
-						{
-							if (pUnit->Deployed)
-								pUnit->ForceMission(Mission::Unload);
-						}
-						else if (InfantryClass* pInf = abstract_cast<InfantryClass*>(u.Unit))
-						{
-							if (pInf->IsDeployed())
-								pInf->ForceMission(Mission::Unload);
-						}
+						// 已部署的先解除部署：投递原版"部署"事件
+						bool needUndeploy = false;
 
+						if (UnitClass* pUnit = abstract_cast<UnitClass*>(u.Unit))
+							needUndeploy = pUnit->Deployed;
+						else if (InfantryClass* pInf = abstract_cast<InfantryClass*>(u.Unit))
+							needUndeploy = pInf->IsDeployed();
+
+						if (needUndeploy)
+							QueueSelfOrder(u.Unit, EventType::Deploy);
+
+						// 这条原本就是联机的（内部投递 MegaMission 事件），不用改
 						u.Unit->ObjectClickedAction(Action::Enter, pCurVeh, false);
 						t.UsedCapacity += u.Size;
 						u.Assigned = true;
@@ -316,15 +395,19 @@ public:
 				selectedNonTransports.push_back(pTechno);
 		}
 
+		// 选中顺序各客户端不同，先归一化（否则距离并列时会挑到不同的人）
+		SortByCanonicalOrder(selectedNonTransports);
+
 		// 没有载具? 直接返回!
 		if (transports.empty())
 			return;
 
-		// 按 SizeLimit 排序生成有序键列表
+		// 键列表按数组序收集（不能用 map 遍历序：指针哈希使各机器顺序不同）
 		std::vector<TechnoClass*> sortedKeys;
-		for (auto& [pVeh, _] : transports)
-			sortedKeys.push_back(pVeh);
-		std::sort(sortedKeys.begin(), sortedKeys.end(), [](TechnoClass* a, TechnoClass* b) {
+		CollectCanonicalOrder(transports, sortedKeys);
+
+		// stable_sort + 只比 SizeLimit：并列时保持数组序，结果跨客户端一致
+		std::stable_sort(sortedKeys.begin(), sortedKeys.end(), [](TechnoClass* a, TechnoClass* b) {
 			return a->GetTechnoType()->SizeLimit < b->GetTechnoType()->SizeLimit;
 		});
 
@@ -396,8 +479,10 @@ public:
 			std::vector<TechnoClass*> failedTransports;
 			bool hasSuccessful = false;
 
-			for (auto& [pVeh, info] : transports)
+			// 同样按 sortedKeys 遍历，保证 failedTransports 的收集顺序一致
+			for (TechnoClass* pVeh : sortedKeys)
 			{
+				const TransportInfo& info = transports[pVeh];
 				int initCap = initialCapacities.at(pVeh);
 				// 没有非载具可匹配时，还有空位的载具一律作为"匹配不到" -> 可当乘客
 				// 有非载具可匹配时，只有真正没招到人的才当乘客
@@ -428,8 +513,10 @@ public:
 				// 全是失败载具且至少 2 个：选剩余容量最大的做接收方，其他的上它
 				TechnoClass* pReceiver = nullptr;
 				int bestRemaining = 0;
-				for (auto& [pVeh, info] : transports)
+				// 严格大于：并列时取数组序靠前者，各客户端一致
+				for (TechnoClass* pVeh : sortedKeys)
 				{
+					const TransportInfo& info = transports[pVeh];
 					int rem = info.MaxCapacity - info.UsedCapacity;
 					if (rem > bestRemaining)
 					{
@@ -456,11 +543,11 @@ public:
 					if (failedSize > static_cast<int>(pReceiver->GetTechnoType()->SizeLimit))
 						continue;
 
-					// 如果已部署则先解除部署
+					// 已部署的先解除部署（同上，投递事件）
 					if (UnitClass* pUnit = abstract_cast<UnitClass*>(pFailed))
 					{
 						if (pUnit->Deployed)
-							pUnit->ForceMission(Mission::Unload);
+							QueueSelfOrder(pFailed, EventType::Deploy);
 					}
 
 					pFailed->ObjectClickedAction(Action::Enter, pReceiver, false);

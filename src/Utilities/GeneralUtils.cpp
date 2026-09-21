@@ -98,10 +98,19 @@ struct DummyTypeExtHere
 
 const double GeneralUtils::GetWarheadVersusArmor(WarheadTypeClass* pWH, Armor armorType)
 {
-	if (!AresHelper::CanUseAres)
-		return pWH->Verses[static_cast<int>(armorType)];
+	const int idx = static_cast<int>(armorType);
+	if (!pWH || idx < 0)
+		return 0.0;
 
-	return reinterpret_cast<DummyTypeExtHere*>(*(uintptr_t*)((char*)pWH + 0x1CC))->Verses[static_cast<int>(armorType)].Verses;
+	if (!AresHelper::CanUseAres)
+		return pWH->Verses[idx];
+
+	// 硬编码 Ares 扩展偏移;指针可能为空、vector 也可能比枚举短，都要回退
+	auto const pAresExt = reinterpret_cast<DummyTypeExtHere*>(*(uintptr_t*)((char*)pWH + 0x1CC));
+	if (!pAresExt || static_cast<size_t>(idx) >= pAresExt->Verses.size())
+		return pWH->Verses[idx];
+
+	return pAresExt->Verses[idx].Verses;
 }
 
 const double GeneralUtils::GetWarheadVersusArmor(WarheadTypeClass* pWH, TechnoClass* pThis, TechnoTypeClass* pType)

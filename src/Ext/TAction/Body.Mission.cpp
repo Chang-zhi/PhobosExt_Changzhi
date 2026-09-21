@@ -209,7 +209,7 @@ bool TActionExt::SetGameSpeed(TActionClass* pThis, HouseClass* pHouse, ObjectCla
 
 	GameOptionsClass::Instance.GameSpeed = 6 - value;
 
-	if (!speedControl)
+	if (!SessionClass::IsMultiplayer() && !speedControl)
 	{
 		*reinterpret_cast<bool*>(0xA8EDDC) = true;
 	}

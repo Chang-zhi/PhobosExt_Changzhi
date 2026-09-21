@@ -1,6 +1,7 @@
 #include "Body.h"
 #include <New/FootPath/FootPathVisualizer.h>
 #include <Ext/Script/Features/PatrolService.h>
+#include <Ext/ScriptType/Body.h>
 #include <Ext/Rules/Body.h>
 
 #include <CellSpread.h>
@@ -55,7 +56,11 @@ void ScriptExt::ProcessAction(TeamClass* pTeam)
 	if (!pTeam || !pTeam->CurrentScript)
 		return;
 
+	// CurrentMission 可能被改写成 -1（如脚本重置），需防数组越界
 	const auto pNodeIndex = pTeam->CurrentScript->CurrentMission;
+	if (pNodeIndex < 0 || pNodeIndex >= ScriptTypeExt::ScriptActionCount)
+		return;
+
 	const auto& node = pTeam->CurrentScript->Type->ScriptActions[pNodeIndex];
 	const int action = node.Action;
 
@@ -213,8 +218,8 @@ void ScriptExt::LoadIntoTransportsDistributed(TeamClass* pTeam)
 		return;
 	}
 
-	// SizeLimit 小的载具优先挑选
-	std::sort(transports.begin(), transports.end(), [](const TransportInfo& a, const TransportInfo& b) {
+	// SizeLimit 小的载具优先挑选；stable_sort 保证并列时顺序各机一致
+	std::stable_sort(transports.begin(), transports.end(), [](const TransportInfo& a, const TransportInfo& b) {
 		return a.Vehicle->GetTechnoType()->SizeLimit < b.Vehicle->GetTechnoType()->SizeLimit;
 	});
 
@@ -335,7 +340,7 @@ void ScriptExt::LoadIntoTransportsDistributed(TeamClass* pTeam)
 						static_cast<short>(u.Cell.X - t.Cell.X),
 						static_cast<short>(u.Cell.Y - t.Cell.Y)
 					});
-					if (dist < bestDist || (dist == bestDist && u.Size < units[bestIdx].Size))
+					if (dist < bestDist || (bestIdx >= 0 && dist == bestDist && u.Size < units[bestIdx].Size))
 					{
 						bestDist = dist;
 						bestIdx = static_cast<int>(i);
@@ -469,7 +474,8 @@ void ScriptExt::Mission_ScatterAttack(TeamClass* pTeam, int attackAITargetType)
 
 		// 按成员相对小队中心的方位角排序，再连续等分到各组：
 		// 每组占据一个方向扇区，使各组向不同方向分散。
-		std::sort(members.begin(), members.end(), [&](FootClass* a, FootClass* b) {
+		// stable_sort：方位角并列时保持原顺序，各机一致
+		std::stable_sort(members.begin(), members.end(), [&](FootClass* a, FootClass* b) {
 			const CoordStruct ca = a->GetCoords();
 			const CoordStruct cb = b->GetCoords();
 			const double ba = std::atan2(static_cast<double>(ca.Y) - teamCenterY, static_cast<double>(ca.X) - teamCenterX);
@@ -654,7 +660,7 @@ void ScriptExt::Mission_ScatterAttack(TeamClass* pTeam, int attackAITargetType)
 		TechnoClass* pGroupTarget = nullptr;
 		for (auto pFoot : group)
 		{
-			TechnoClass* const pCurrent = static_cast<TechnoClass*>(pFoot->Target);
+			TechnoClass* const pCurrent = abstract_cast<TechnoClass*>(pFoot->Target);
 			if (pCurrent && pCurrent->Health > 0 && !pCurrent->InLimbo && pCurrent->IsOnMap
 				&& !pFoot->Owner->IsAlliedWith(pCurrent->Owner))
 			{
