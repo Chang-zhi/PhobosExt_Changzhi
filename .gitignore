@@ -19,6 +19,7 @@ DevBuild/
 /.vscode
 /.docs/
 /.workbuddy/
+/.codebuddy/
 
 build
 cmake-*

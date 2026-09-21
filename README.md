@@ -1,63 +1,57 @@
-# [PhobosExt](https://github.com/Chang-zhi/PhobosExt_Changzhi)
+# PhobosExt_Chang_zhi
 
-一个扩展《红色警戒2：尤里的复仇》游戏功能的 DLL，基于 Phobos 开发，作者[*Chang_zhi*](https://space.bilibili.com/423792550)。  
-主要面向 任务/地图 作者，可以自由的将其用于任务包或模组制作。
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE.md)
 
-**尽管叫 PhobosExt , 但不依赖 Ares 或 Phobos，可独立运行。推荐和其一同使用。**
+一个扩展《红色警戒2：尤里的复仇》游戏功能的 DLL，基于 Phobos 二次开发，面向任务/地图作者，可自由用于任务包与模组制作。
 
-**具体新增内容请见说明文档.html**
+尽管名叫 PhobosExt，但**运行时不依赖 Ares 或 Phobos，可独立使用**，推荐与它们一同使用。
 
-说是基于 Phobos，其实只是删了删代码 (
-<span style="color: gray;">低创作品，大佬轻喷</span>
+> **关于本项目的性质**：由作者 Chang_zhi 个人开发维护的**非官方**扩展，与[官方 Phobos](https://github.com/Phobos-developers/Phobos) 项目组无关；版本与功能不与官方同步，问题请向作者反馈，勿报告给官方项目组。
 
----
+> 说是基于 Phobos，其实只是删了删代码。低创作品，大佬轻喷。
 
-### 兼容性说明
+## 文档
 
-需保证游戏版本为 YR 1.001。  
-**不依赖 Ares 或 Phobos，可单独使用**，与 Ares、Phobos 共存不会冲突。  
-仅有部分功能依赖 Phobos：触发行为 `653`、`654`（需 Phobos v0.5-alpha 及以上）。  
-本 DLL 已避免使用 `ExtPointerOffset` ，改用独立 `unordered_map` 存储扩展数据，不会与 Ares 或 Phobos 的原生扩展数据冲突。(严格来说可能变慢, 但对现代cpu的影响应该可以忽略不计) 
+| 文档 | 内容 |
+|---|---|
+| [说明文档](assets/说明文档.html) | 新增游戏机制、触发行为/事件、脚本动作、按键命令，以及兼容性与已知问题 |
+| [更新日志](assets/更新日志.txt) | 各版本变更记录 |
 
----
+## 使用
 
-### 已知问题
+游戏版本需为 **YR 1.001**。安装、配置与全部功能说明见 **[说明文档](assets/说明文档.html)**。
 
-1. 使用 `Temporal=yes` + `Temporal.Exclusive=yes` 的武器会改变单位的选敌逻辑，可能出现异常。
-2. `LegalTargetWhenAIOwner=no` 的 AI 单位会改变其他单位的选敌逻辑，可能出现异常。
-3. 基地节点跨所属方判定开启后：与触发行为 `30`（自动建设基地）不兼容，且不要让 AI 造围墙。
+## 构建
 
----
+需要 Visual Studio（**v143** 工具集，即 VS 2022 及以上）。
 
-### 反馈
+```bat
+scripts\build_release.bat
+```
 
-遇到 bug 或兼容性问题欢迎反馈：B站私信 <https://space.bilibili.com/423792550> ｜ 邮箱 3071564490@qq.com
+产物位于 `Release\PhobosExt_Changzhi.dll`。
 
----
+## 反馈
 
-### 致谢
-[*Ares*](https://github.com/Ares-Developers/Ares) 项目组   
-[*Phobos*](https://github.com/Phobos-developers/Phobos) 项目组   
-[*YRpp*](https://github.com/Phobos-developers/YRpp) 项目组  
-韩大妈 [*@B站主页*](https://space.bilibili.com/2229647)   
-九千天华 [*@B站主页*](https://space.bilibili.com/362533219)   
-偏微whyffu [*@B站主页*](https://space.bilibili.com/41073096)    
-妖妖酱 [*@GitHub*](https://github.com/yaoyaojiang)   
+遇到 bug 或兼容性问题，欢迎通过以下方式反馈：
 
-<span style="color: gray;">排名不分先后</span>
+- B站私信：<https://space.bilibili.com/423792550>
+- 邮箱：3071564490@qq.com
 
----
+## 致谢
 
-### 许可
-Github 仓库: [**PhobosExt_Changzhi**](https://github.com/Chang-zhi/PhobosExt_Changzhi)    
-本项目代码采用与 Phobos 相同的 `GPL-3.0 license` 许可证。     
-《红色警戒2：尤里的复仇》及其相关素材归 Electronic Arts 所有。  
+- [Ares](https://github.com/Ares-Developers/Ares) 项目组
+- [Phobos](https://github.com/Phobos-developers/Phobos) 项目组
+- [YRpp](https://github.com/Phobos-developers/YRpp) 项目组
+- 韩大妈 [@B站主页](https://space.bilibili.com/2229647)
+- 九千天华 [@B站主页](https://space.bilibili.com/362533219)
+- 偏微whyffu [@B站主页](https://space.bilibili.com/41073096)
+- 妖妖酱 [@GitHub](https://github.com/yaoyaojiang)
 
----
+排名不分先后。
 
-## 触发编辑器配置
+## 许可
 
-为了在触发编辑器中使用新的触发动作，您需要复制压缩包里面的 `FAData_Customized.ini` 到地编的根目录下。
+本项目代码采用与 Phobos 相同的 [GPL-3.0](LICENSE.md) 许可证。
 
-仅支持[FA2SP_HDM_Edition](https://github.com/handama/FA2sp)(韩大妈版本)
-其他版本请自行移植。
+《红色警戒2：尤里的复仇》及其相关素材归 Electronic Arts 所有。
