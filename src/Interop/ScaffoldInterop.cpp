@@ -1,4 +1,4 @@
-#include "PhobosExtInterop.h"
+#include "ScaffoldInterop.h"
 
 #include "InteropApiTable.h"
 #include "InteropModule.h"
@@ -9,10 +9,10 @@
 // 静态成员初始化
 // ============================================================================
 
-bool PhobosExtInterop::s_available = false;
-HMODULE PhobosExtInterop::s_hProvider = nullptr;
+bool ScaffoldInterop::s_available = false;
+HMODULE ScaffoldInterop::s_hProvider = nullptr;
 
-#define GEN_STATIC_INIT(isRequired, member, fnType, exportName) fnType PhobosExtInterop::member = nullptr;
+#define GEN_STATIC_INIT(isRequired, member, fnType, exportName) fnType ScaffoldInterop::member = nullptr;
 FOREACH_INTEROP_FN(GEN_STATIC_INIT)
 #undef GEN_STATIC_INIT
 
@@ -20,9 +20,9 @@ FOREACH_INTEROP_FN(GEN_STATIC_INIT)
 // Init
 // ============================================================================
 
-void PhobosExtInterop::Init()
+void ScaffoldInterop::Init()
 {
-	Debug::Log("[PhobosExtInterop] Init: searching for an Interop API provider\n");
+	Debug::Log("[ScaffoldInterop] Init: searching for an Interop API provider\n");
 
 	bool conflict = false;
 	s_hProvider = InteropModule::FindProvider(conflict);
@@ -31,7 +31,7 @@ void PhobosExtInterop::Init()
 	{
 		// 冲突的双方已由 FindProvider 记录。
 		Reset();
-		Debug::Log("[PhobosExtInterop] [Error]: Interop API disabled\n");
+		Debug::Log("[ScaffoldInterop] [Error]: Interop API disabled\n");
 		return;
 	}
 
@@ -40,7 +40,7 @@ void PhobosExtInterop::Init()
 		// 这不是错误。提供方属于可选依赖，缺失时所有调用方都会回退到原版行为。
 		s_available = false;
 		InteropApiTable::Unload();
-		Debug::Log("[PhobosExtInterop] No provider found, Interop API disabled\n");
+		Debug::Log("[ScaffoldInterop] No provider found, Interop API disabled\n");
 		return;
 	}
 
@@ -49,7 +49,7 @@ void PhobosExtInterop::Init()
 	if (!InteropApiTable::Verify(s_hProvider))
 	{
 		Reset();
-		Debug::Log("[PhobosExtInterop] [Error]: required exports missing, Interop API disabled\n");
+		Debug::Log("[ScaffoldInterop] [Error]: required exports missing, Interop API disabled\n");
 		return;
 	}
 
@@ -67,13 +67,13 @@ void PhobosExtInterop::Init()
 
 	if (GetVersion(provided))
 	{
-		Debug::Log("[PhobosExtInterop] Loaded (provider API v%u.%u.%u, built for v%u.%u.%u)\n",
+		Debug::Log("[ScaffoldInterop] Loaded (provider API v%u.%u.%u, built for v%u.%u.%u)\n",
 			provided.major, provided.minor, provided.patch,
 			INTEROP_VERSION_CURRENT.major, INTEROP_VERSION_CURRENT.minor, INTEROP_VERSION_CURRENT.patch);
 	}
 }
 
-void PhobosExtInterop::Reset()
+void ScaffoldInterop::Reset()
 {
 	InteropApiTable::Unload();
 	s_hProvider = nullptr;
@@ -84,7 +84,7 @@ void PhobosExtInterop::Reset()
 // GetVersion / CheckVersion
 // ============================================================================
 
-bool PhobosExtInterop::GetVersion(InteropAPIVersion& version)
+bool ScaffoldInterop::GetVersion(InteropAPIVersion& version)
 {
 	if (!s_hProvider)
 		return false;
@@ -94,19 +94,19 @@ bool PhobosExtInterop::GetVersion(InteropAPIVersion& version)
 	return pfn && SUCCEEDED(pfn(&version));
 }
 
-bool PhobosExtInterop::CheckVersion()
+bool ScaffoldInterop::CheckVersion()
 {
 	InteropAPIVersion provided {};
 
 	if (!GetVersion(provided))
 	{
-		Debug::Log("[PhobosExtInterop] [Error]: provider does not expose GetInteropAPIVersion\n");
+		Debug::Log("[ScaffoldInterop] [Error]: provider does not expose GetInteropAPIVersion\n");
 		return false;
 	}
 
 	if (!IsInteropMajorCompatible(provided))
 	{
-		Debug::Log("[PhobosExtInterop] [Error]: incompatible Interop API major version "
+		Debug::Log("[ScaffoldInterop] [Error]: incompatible Interop API major version "
 			"(built for v%u.x.x, provider is v%u.%u.%u)\n",
 			INTEROP_VERSION_CURRENT.major,
 			provided.major, provided.minor, provided.patch);
@@ -116,7 +116,7 @@ bool PhobosExtInterop::CheckVersion()
 
 	if (provided != INTEROP_VERSION_CURRENT)
 	{
-		Debug::Log("[PhobosExtInterop] [Warning]: Interop API version differs "
+		Debug::Log("[ScaffoldInterop] [Warning]: Interop API version differs "
 			"(built for v%u.%u.%u, provider is v%u.%u.%u); continuing\n",
 			INTEROP_VERSION_CURRENT.major, INTEROP_VERSION_CURRENT.minor, INTEROP_VERSION_CURRENT.patch,
 			provided.major, provided.minor, provided.patch);

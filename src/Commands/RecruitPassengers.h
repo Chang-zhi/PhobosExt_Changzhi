@@ -338,8 +338,14 @@ public:
 
 	virtual const wchar_t* GetUICategory() const override
 	{
-		const wchar_t* textPtr
-			= StringTable::TryFetchString("CMND:UICATEGORY_PHOBOSEXT", L"PhobosExt");
+		// 新键优先; 未配置时回退到旧键 PhobosExt, 兼容按旧键做过的语言包
+		const wchar_t* textPtr = StringTable::TryFetchString("CMND:UICATEGORY_SCAFFOLD");
+
+		if (!textPtr || !*textPtr)
+			textPtr = StringTable::TryFetchString("CMND:UICATEGORY_PHOBOSEXT");
+
+		if (!textPtr || !*textPtr)
+			textPtr = L"Scaffold";
 
 		return textPtr;
 	}

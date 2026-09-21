@@ -1,10 +1,10 @@
 #include "Patch.h"
 #include "Macro.h"
-#include <PhobosExt.h>
+#include <Scaffold.h>
 
 int GetSection(const char* sectionName, void** pVirtualAddress)
 {
-	auto hInstance = PhobosExt::hInstance;
+	auto hInstance = Scaffold::hInstance;
 	auto pHeader = reinterpret_cast<PIMAGE_NT_HEADERS>(((PIMAGE_DOS_HEADER)hInstance)->e_lfanew + (long)hInstance);
 
 	for (int i = 0; i < pHeader->FileHeader.NumberOfSections; i++)

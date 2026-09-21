@@ -17,7 +17,7 @@ namespace
 	FILE* GetLogFile()
 	{
 #ifdef DEBUG
-		static FILE* const s_pLogFile = fopen("PhobosExt.log", "w");
+		static FILE* const s_pLogFile = fopen("Scaffold.log", "w");
 		return s_pLogFile;
 #else
 		return nullptr; // 仅 DEBUG 构建生成日志文件
@@ -30,14 +30,14 @@ namespace
 		FILE* const pLog = GetLogFile();
 		if (!pLog)
 			return;
-		fprintf(pLog, "[PhobosExt] %s\n", pText);
+		fprintf(pLog, "[Scaffold] %s\n", pText);
 		fflush(pLog);
 #endif
 	}
 }
 
 // 独立日志文件说明:游戏原版 debug 函数 0x4068E0 是空壳,Release 无控制台,
-// 仅 DEBUG 构建写入工作目录下的 PhobosExt.log(见上方 #ifdef DEBUG)
+// 仅 DEBUG 构建写入工作目录下的 Scaffold.log(见上方 #ifdef DEBUG)
 
 void Debug::Log(const char* pFormat, ...)
 {
@@ -48,7 +48,7 @@ void Debug::Log(const char* pFormat, ...)
 
 	WriteToLogFile(FinalStringBuffer);
 
-	LogGame("%s %s", "[PhobosExt]", FinalStringBuffer);
+	LogGame("%s %s", "[Scaffold]", FinalStringBuffer);
 }
 
 void Debug::Log(const wchar_t* pFormat, ...)
@@ -64,7 +64,7 @@ void Debug::Log(const wchar_t* pFormat, ...)
 
 	WriteToLogFile(FinalStringBuffer);
 
-	LogGame("%s %s", "[PhobosExt]", FinalStringBuffer);
+	LogGame("%s %s", "[Scaffold]", FinalStringBuffer);
 }
 
 void Debug::LogGame(const char* pFormat, ...)
@@ -157,8 +157,8 @@ void __declspec(naked) _Fake_Debug_Log()
 	__asm { jmp eax }
 }
 
-// Filtered hook: formats the string, checks for PhobosExt tag in OUTPUT, writes conditionally
-void __declspec(naked) _PhobosExtOnly_Debug_Log()
+// Filtered hook: formats the string, checks for Scaffold tag in OUTPUT, writes conditionally
+void __declspec(naked) _ScaffoldOnly_Debug_Log()
 {
 	__asm { mov ecx, [esp + 0x4] }
 	__asm { lea edx, [esp + 0x8] }
@@ -173,7 +173,7 @@ HANDLE Console::ConsoleHandle;
 
 bool Console::Create()
 {
-	// Try to allocate a new console; if it already exists (e.g. from original PhobosExt),
+	// Try to allocate a new console; if it already exists (e.g. from original Scaffold),
 	// still try to get a valid handle to it
 	bool consoleAllocated = (AllocConsole() != FALSE);
 
@@ -181,7 +181,7 @@ bool Console::Create()
 	if (NULL == ConsoleHandle)
 		return false;
 
-	SetConsoleTitleA("PhobosExt Debug Console");
+	SetConsoleTitleA("Scaffold Debug Console");
 
 	// Set console to UTF-8 mode to match /utf-8 compilation
 	SetConsoleOutputCP(CP_UTF8);
@@ -194,12 +194,12 @@ bool Console::Create()
 	if (AresHelper::CanUseAres)
 		PatchLog(0x4A4AC0, _Fake_Debug_Log, &_Real_Debug_Log);
 
-	// Patch game log function with filter: only show PhobosExt messages on console
-	PatchLog(0x4068E0, _PhobosExtOnly_Debug_Log, nullptr);
+	// Patch game log function with filter: only show Scaffold messages on console
+	PatchLog(0x4068E0, _ScaffoldOnly_Debug_Log, nullptr);
 
 	if (!consoleAllocated)
 	{
-		// Console already exists (original PhobosExt created it) - still set CP_UTF8 above
+		// Console already exists (original Scaffold created it) - still set CP_UTF8 above
 		return true;
 	}
 

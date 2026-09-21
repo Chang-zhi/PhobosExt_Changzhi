@@ -1,14 +1,14 @@
-# PhobosExt_Changzhi
+# Scaffold
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE.md)
 
 一个扩展《红色警戒2：尤里的复仇》游戏功能的 DLL，基于 Phobos 二次开发，面向任务/地图作者，可自由用于任务包与模组制作。
 
-尽管名叫 PhobosExt，但**运行时不依赖 Ares 或 Phobos，可独立使用**，推荐与它们一同使用。
+**运行时不依赖 Ares 或 Phobos，可独立使用**，推荐与它们一同使用。
 
 > **关于本项目的性质**：由作者 Chang_zhi 个人开发维护的**非官方**扩展，与[官方 Phobos](https://github.com/Phobos-developers/Phobos) 项目组无关；版本与功能不与官方同步，问题请向作者反馈，勿报告给官方项目组。
 
-> 说是基于 Phobos，其实只是删了删代码。低创作品，大佬轻喷。
+> **曾用名**：本项目曾名 **PhobosExt_Changzhi**。为与官方 Phobos 区分、避免混淆，现更名为 **Scaffold**。
 
 ## 文档
 
@@ -29,7 +29,7 @@
 scripts\build_release.bat
 ```
 
-产物位于 `Release\PhobosExt_Changzhi.dll`。
+产物位于 `Release\Scaffold.dll`。
 
 ## 反馈
 

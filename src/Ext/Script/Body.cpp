@@ -22,11 +22,11 @@ ScriptExt::ExtContainer ScriptExt::ExtMap;
 // =============================
 // load / save
 
-void ScriptExt::ExtData::LoadFromStream(PhobosExtStreamReader& Stm)
+void ScriptExt::ExtData::LoadFromStream(ScaffoldStreamReader& Stm)
 {
 }
 
-void ScriptExt::ExtData::SaveToStream(PhobosExtStreamWriter& Stm)
+void ScriptExt::ExtData::SaveToStream(ScaffoldStreamWriter& Stm)
 {
 	// 不保存任何状态
 }
@@ -68,43 +68,43 @@ void ScriptExt::ProcessAction(TeamClass* pTeam)
 	const bool fresh = (pNodeIndex != pExt->LastProcessedMission);
 	pExt->LastProcessedMission = pNodeIndex;
 
-	switch (static_cast<PhobosExtScripts>(action))
+	switch (static_cast<ScaffoldScripts>(action))
 	{
-	case PhobosExtScripts::DistributedLoadIntoTransports:
+	case ScaffoldScripts::DistributedLoadIntoTransports:
 		ScriptExt::LoadIntoTransportsDistributed(pTeam);
 		break;
 
-	case PhobosExtScripts::RegisterFootPathVisualizer:
+	case ScaffoldScripts::RegisterFootPathVisualizer:
 		ScriptExt::RegisterFootPathVisualizer(pTeam);
 		break;
 
-	case PhobosExtScripts::UnregisterFootPathVisualizer:
+	case ScaffoldScripts::UnregisterFootPathVisualizer:
 		ScriptExt::UnregisterFootPathVisualizer(pTeam);
 		break;
 
-	case PhobosExtScripts::ScatterAttack:
+	case ScaffoldScripts::ScatterAttack:
 		ScriptExt::Mission_ScatterAttack(pTeam, -1);
 		break;
 
-	case PhobosExtScripts::ScatterAttackByAITargetTypes:
+	case ScaffoldScripts::ScatterAttackByAITargetTypes:
 		ScriptExt::Mission_ScatterAttack(pTeam, static_cast<unsigned>(node.Argument) >> 16);
 		break;
 
-	case PhobosExtScripts::PatrolToEnemyBuildingNearby:
+	case ScaffoldScripts::PatrolToEnemyBuildingNearby:
 		ScriptExt::PatrolToBuildingNearby(
 			pTeam, node.Argument & 0xFFFF, static_cast<unsigned>(node.Argument) >> 16, fresh, true);
 		break;
 
-	case PhobosExtScripts::PatrolToEnemyRally:
+	case ScaffoldScripts::PatrolToEnemyRally:
 		ScriptExt::PatrolToRally(pTeam, fresh, true);
 		break;
 
-	case PhobosExtScripts::PatrolToFriendlyBuildingNearby:
+	case ScaffoldScripts::PatrolToFriendlyBuildingNearby:
 		ScriptExt::PatrolToBuildingNearby(
 			pTeam, node.Argument & 0xFFFF, static_cast<unsigned>(node.Argument) >> 16, fresh, false);
 		break;
 
-	case PhobosExtScripts::PatrolToFriendlyRally:
+	case ScaffoldScripts::PatrolToFriendlyRally:
 		ScriptExt::PatrolToRally(pTeam, fresh, false);
 		break;
 
@@ -379,7 +379,7 @@ void ScriptExt::LoadIntoTransportsDistributed(TeamClass* pTeam)
 
 	if (totalAssigned > 0)
 		pTeam->StepCompleted = false;
-	// 如果 totalAssigned == 0，说明没有可分配的，PhobosExt 已设 StepCompleted=true
+	// 如果 totalAssigned == 0，说明没有可分配的，Scaffold 已设 StepCompleted=true
 }
 
 // =============================

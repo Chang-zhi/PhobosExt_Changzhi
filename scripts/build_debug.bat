@@ -1,6 +1,6 @@
 @if not defined _echo echo off
 
-rem Builds PhobosExt DevBuild.
+rem Builds Scaffold DevBuild.
 
 rem Ensure we're in correct directory.
 cd /D "%~dp0"

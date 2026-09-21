@@ -1,6 +1,6 @@
 #include "AresHelper.h"
 #include "AresFunctions.h"
-#include <PhobosExt.h>
+#include <Scaffold.h>
 #include <Utilities/Debug.h>
 #include <Utilities/Patch.h>
 #include <CRC.h>
@@ -10,7 +10,7 @@
 class TechnoClass;
 class TechnoTypeClass;
 
-uintptr_t AresHelper::PhobosExtBaseAddress = 0x0;
+uintptr_t AresHelper::ScaffoldBaseAddress = 0x0;
 uintptr_t AresHelper::AresBaseAddress = 0x0;
 HMODULE AresHelper::AresDllHmodule = nullptr;
 AresHelper::Version AresHelper::AresVersion = AresHelper::Version::Unknown;
@@ -22,8 +22,8 @@ const AresHelper::AresTimestampMap AresHelper::AresTimestampBytes =
 	{ 0x61daa114, Version::Ares30p },
 };
 
-#ifndef PHOBOS_EXT_DLL
-#define PHOBOS_EXT_DLL "PhobosExt_Changzhi.dll"
+#ifndef SCAFFOLD_DLL
+#define SCAFFOLD_DLL "Scaffold.dll"
 #endif
 
 bool module_has_syhks00(HMODULE hModule)
@@ -82,8 +82,8 @@ void AresHelper::GetGameModulesBaseAddresses()
 				{
 					if (!_strcmpi(originalModuleName, "Ares.dll"))
 						AresBaseAddress = (uintptr_t)modEntry.modBaseAddr;
-					else if (!_strcmpi(originalModuleName, PHOBOS_EXT_DLL))
-						PhobosExtBaseAddress = (uintptr_t)modEntry.modBaseAddr;
+					else if (!_strcmpi(originalModuleName, SCAFFOLD_DLL))
+						ScaffoldBaseAddress = (uintptr_t)modEntry.modBaseAddr;
 					syringables.emplace_back(originalModuleName, modEntry.modBaseAddr);
 				}
 				else
@@ -111,7 +111,7 @@ void AresHelper::Init()
 
 	if (!AresBaseAddress)
 	{
-		Debug::LogDeferred("[PhobosExt] Failed to detect Ares. Disabling integration.\n");
+		Debug::LogDeferred("[Scaffold] Failed to detect Ares. Disabling integration.\n");
 		return;
 	}
 	// find offset of PE header
@@ -134,15 +134,15 @@ void AresHelper::Init()
 	switch (AresVersion)
 	{
 	case Version::Ares30:
-		Debug::LogDeferred("[PhobosExt] Detected Ares 3.0.\n");
+		Debug::LogDeferred("[Scaffold] Detected Ares 3.0.\n");
 		AresFunctions::InitAres3_0();
 		break;
 	case Version::Ares30p:
-		Debug::LogDeferred("[PhobosExt] Detected Ares 3.0p1.\n");
+		Debug::LogDeferred("[Scaffold] Detected Ares 3.0p1.\n");
 		AresFunctions::InitAres3_0p1();
 		break;
 	default:
-		Debug::LogDeferred("[PhobosExt] Detected a version of Ares that is not supported by PhobosExt. Disabling integration.\n");
+		Debug::LogDeferred("[Scaffold] Detected a version of Ares that is not supported by Scaffold. Disabling integration.\n");
 		AresFunctions::InitNoAres();
 		break;
 	}

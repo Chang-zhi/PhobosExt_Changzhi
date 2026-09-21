@@ -70,8 +70,8 @@ public:
 
 		virtual ~ExtData() override;
 		virtual void InvalidatePointer(void* ptr, bool bRemoved) override;
-		virtual void LoadFromStream(PhobosExtStreamReader& Stm) override;
-		virtual void SaveToStream(PhobosExtStreamWriter& Stm) override;
+		virtual void LoadFromStream(ScaffoldStreamReader& Stm) override;
+		virtual void SaveToStream(ScaffoldStreamWriter& Stm) override;
 
 		void UpdateTemporalAOE();
 		void UpdateEffects();       // 每帧更新所有附加效果并清理已死亡效果
@@ -106,8 +106,8 @@ public:
 
 	static ExtContainer ExtMap;
 
-	static bool LoadGlobals(PhobosExtStreamReader& Stm);
-	static bool SaveGlobals(PhobosExtStreamWriter& Stm);
+	static bool LoadGlobals(ScaffoldStreamReader& Stm);
+	static bool SaveGlobals(ScaffoldStreamWriter& Stm);
 
 	// Features/WeaponHelpers.cpp
 	static WeaponTypeClass* GetCurrentWeapon(TechnoClass* pThis, int& weaponIndex, bool getSecondary = false);

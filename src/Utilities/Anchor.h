@@ -31,8 +31,8 @@ public:
 	Point2D OffsetPosition(const LTRBStruct& ltrb) const;
 
 	void Read(INI_EX& parser, const char* pSection, const char* pBaseFlag);
-	bool Load(PhobosExtStreamReader& Stm, bool RegisterForChange);
-	bool Save(PhobosExtStreamWriter& Stm) const;
+	bool Load(ScaffoldStreamReader& Stm, bool RegisterForChange);
+	bool Save(ScaffoldStreamWriter& Stm) const;
 
 private:
 	template <typename T>

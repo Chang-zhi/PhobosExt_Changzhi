@@ -1,6 +1,6 @@
 #pragma once
 
-#include <PhobosExt.h>
+#include <Scaffold.h>
 #include <GeneralStructures.h>
 #include <Utilities/Enum.h>
 #include <Utilities/SavegameDef.h>
@@ -12,15 +12,15 @@
 #include <vector>
 #include <memory>
 
-class PhobosExtStreamWriter;
-class PhobosExtStreamReader;
+class ScaffoldStreamWriter;
+class ScaffoldStreamReader;
 
 struct ChoiceBoxButton
 {
 	std::string Text;             ///< CSF 标签（INI: Button.TextN）
 
-	bool Load(PhobosExtStreamReader& Stm, bool RegisterForChange);
-	bool Save(PhobosExtStreamWriter& Stm) const;
+	bool Load(ScaffoldStreamReader& Stm, bool RegisterForChange);
+	bool Save(ScaffoldStreamWriter& Stm) const;
 };
 
 class ChoiceBoxTypeClass final : public Enumerable<ChoiceBoxTypeClass>
@@ -59,8 +59,8 @@ public:
 	{ }
 
 	virtual void LoadFromINI(CCINIClass* pINI);
-	virtual void LoadFromStream(PhobosExtStreamReader& stm);
-	virtual void SaveToStream(PhobosExtStreamWriter& stm);
+	virtual void LoadFromStream(ScaffoldStreamReader& stm);
+	virtual void SaveToStream(ScaffoldStreamWriter& stm);
 
 private:
 	template <typename T>

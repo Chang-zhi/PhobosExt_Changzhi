@@ -38,7 +38,7 @@ public:
 
 	static std::function<AresSWTypeExtData* (SuperWeaponTypeClass*)> SWTypeExtMap_Find;
 
-	static PhobosExtMap<ObjectClass*, AlphaShapeClass*>* AlphaExtMap;
+	static ScaffoldMap<ObjectClass*, AlphaShapeClass*>* AlphaExtMap;
 private:
 
 	static constexpr bool _maybe = false;

@@ -62,8 +62,8 @@ public:
 
 		virtual void InvalidatePointer(void* ptr, bool bRemoved) override { }
 
-		virtual void LoadFromStream(PhobosExtStreamReader& Stm) override;
-		virtual void SaveToStream(PhobosExtStreamWriter& Stm) override;
+		virtual void LoadFromStream(ScaffoldStreamReader& Stm) override;
+		virtual void SaveToStream(ScaffoldStreamWriter& Stm) override;
 
 		void LoadFromINIByWhatAmI(INI_EX& exINI, const char* pSection, INI_EX& exArtINI, const char* pArtSection);
 

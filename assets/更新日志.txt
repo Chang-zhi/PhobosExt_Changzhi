@@ -1,7 +1,8 @@
 ============================================================
 声  明
 ============================================================
-本文件记录的是 Chang_zhi 个人开发维护的非官方扩展 PhobosExt_Changzhi 的更新日志,
+本文件记录的是 Chang_zhi 个人开发维护的非官方扩展 Scaffold 的更新日志,
+本项目曾名 PhobosExt_Changzhi, 为与官方 Phobos 区分、避免混淆、现更名为 Scaffold。
 
 它不是官方 Phobos 项目的更新日志。
 
@@ -10,10 +11,11 @@
 的立场。使用本 DLL 遇到的问题请向作者 Chang_zhi 反馈, 请勿向官方 Phobos
 项目组报告。
 
-仓库: https://github.com/Chang-zhi/PhobosExt_Changzhi
+仓库: https://github.com/Chang-zhi/Scaffold
 ============================================================
 
 ======V1.0.3.0=======
+0, 为了与官方Phobos区分, 改名为Scaffold
 1, 新增触发组[TriggerGroups]
 2, 新增触发动作:
 - 688=随机允许触发(按触发组)...
@@ -133,7 +135,7 @@
 8, 新增按键命令系统:
     - 新增 [General] -> Command.RecruitRange=     ;double 默认7.5 自动招募半径
     - 新增按键 Recruit Passengers: 选中空载具按指定按键，自动招募附近单位上车
-9, 新增脚本动作 5500=分布式装载(PhobosExt)
+9, 新增脚本动作 5500=分布式装载(Scaffold)
 
 2026,6,24
 ======V0.0.13.6=======
@@ -210,7 +212,7 @@
 
 2026.6.8
 ======V0.0.13.4=======
-1,为FAData_TriggerAndScript.ini中的PhobosExt动作添加专用ParamTypes.
+1,为FAData_TriggerAndScript.ini中的Scaffold动作添加专用ParamTypes.
 2,翻译FAData_TriggerAndScript.ini英文区段为英文.
 3,添加新动作 - 577=建立作战小队(考虑限制)...
 4,新增 [Country House] -> BaseNodeCrossOwners=     ;boolean 默认false

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <PhobosExt.h>
+#include <Scaffold.h>
 #include <Utilities/Enumerable.h>
 #include <Utilities/Constructs.h>
 #include <Utilities/SavegameDef.h>
@@ -9,8 +9,8 @@
 
 class CCINIClass;
 class TriggerTypeClass;
-class PhobosExtStreamReader;
-class PhobosExtStreamWriter;
+class ScaffoldStreamReader;
+class ScaffoldStreamWriter;
 
 // 触发组：为“以触发类型为单位”的批量操作提供可复用、可总览、可在编辑器中选择的容器。
 // 定义格式（两段式）：
@@ -25,13 +25,13 @@ class TriggerGroupClass final : public Enumerable<TriggerGroupClass>
 {
 public:
 	// 成员：触发 ID（[Triggers] 的键，如 "01000004"）
-	std::vector<PhobosExtFixedString<32>> Members;
+	std::vector<ScaffoldFixedString<32>> Members;
 
 	explicit TriggerGroupClass(const char* const pTitle) : Enumerable(pTitle) { }
 
 	virtual void LoadFromINI(CCINIClass* pINI);
-	virtual void LoadFromStream(PhobosExtStreamReader& stm);
-	virtual void SaveToStream(PhobosExtStreamWriter& stm);
+	virtual void LoadFromStream(ScaffoldStreamReader& stm);
+	virtual void SaveToStream(ScaffoldStreamWriter& stm);
 
 	// ===== 运行时接口 =====
 	// 按 ID 解析成触发类型指针（找不到返回 nullptr）

@@ -48,7 +48,7 @@ HMODULE InteropModule::FindProvider(bool& conflictDetected)
 
 	if (hSnapshot == INVALID_HANDLE_VALUE)
 	{
-		Debug::Log("[PhobosExtInterop] [Error]: module snapshot failed (%lu)\n", ::GetLastError());
+		Debug::Log("[ScaffoldInterop] [Error]: module snapshot failed (%lu)\n", ::GetLastError());
 		return nullptr;
 	}
 
@@ -80,7 +80,7 @@ HMODULE InteropModule::FindProvider(bool& conflictDetected)
 				foundName = Narrow(me.szModule);
 				foundVersion = version;
 
-				LogVersion("[PhobosExtInterop] Provider found:", foundName, version);
+				LogVersion("[ScaffoldInterop] Provider found:", foundName, version);
 				continue;
 			}
 
@@ -88,10 +88,10 @@ HMODULE InteropModule::FindProvider(bool& conflictDetected)
 			// 二者按定义就是 ABI 兼容的。
 			if (version != foundVersion)
 			{
-				Debug::Log("[PhobosExtInterop] [Error]: conflicting Interop providers detected\n");
-				LogVersion("[PhobosExtInterop] [Error]:  ", foundName, foundVersion);
-				LogVersion("[PhobosExtInterop] [Error]:  ", Narrow(me.szModule), version);
-				Debug::Log("[PhobosExtInterop] [Error]: Interop API disabled\n");
+				Debug::Log("[ScaffoldInterop] [Error]: conflicting Interop providers detected\n");
+				LogVersion("[ScaffoldInterop] [Error]:  ", foundName, foundVersion);
+				LogVersion("[ScaffoldInterop] [Error]:  ", Narrow(me.szModule), version);
+				Debug::Log("[ScaffoldInterop] [Error]: Interop API disabled\n");
 
 				::CloseHandle(hSnapshot);
 
@@ -160,7 +160,7 @@ void InteropModule::CollectDecorations(HMODULE hProvider, const char* exportName
 
 void InteropModule::ReportUnresolvedExport(HMODULE hProvider, const char* exportName, bool isRequired)
 {
-	Debug::Log("[PhobosExtInterop] %s: %s export '%s' not found\n",
+	Debug::Log("[ScaffoldInterop] %s: %s export '%s' not found\n",
 		isRequired ? "[Error]" : "[Warning]",
 		isRequired ? "required" : "optional",
 		exportName);
@@ -172,13 +172,13 @@ void InteropModule::ReportUnresolvedExport(HMODULE hProvider, const char* export
 
 	if (decorations.empty())
 	{
-		Debug::Log("[PhobosExtInterop]   no '_%s@...' export present either\n", exportName);
+		Debug::Log("[ScaffoldInterop]   no '_%s@...' export present either\n", exportName);
 		return;
 	}
 
 	for (const auto& decoration : decorations)
 	{
-		Debug::Log("[PhobosExtInterop]   provider exports '%s' - signature may have changed\n",
+		Debug::Log("[ScaffoldInterop]   provider exports '%s' - signature may have changed\n",
 			decoration.c_str());
 	}
 }

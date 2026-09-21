@@ -37,7 +37,7 @@
 #include <ranges>
 #include "Parser.h"
 
-#include <PhobosExt.h>
+#include <Scaffold.h>
 #include <CCINIClass.h>
 #include <Unsorted.h>
 
@@ -56,17 +56,17 @@ public:
 
 	char* value() const
 	{
-		return PhobosExt::readBuffer;
+		return Scaffold::readBuffer;
 	}
 
 	size_t max_size() const
 	{
-		return PhobosExt::readLength;
+		return Scaffold::readLength;
 	}
 
 	bool empty() const
 	{
-		return !PhobosExt::readBuffer[0];
+		return !Scaffold::readBuffer[0];
 	}
 
 	// basic string reader

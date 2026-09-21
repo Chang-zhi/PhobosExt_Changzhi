@@ -1,6 +1,6 @@
 #include "TriggerGroupClass.h"
 
-#include <PhobosExt.h>
+#include <Scaffold.h>
 #include <CCINIClass.h>
 #include <TriggerTypeClass.h>
 
@@ -21,7 +21,7 @@ void TriggerGroupClass::LoadFromINI(CCINIClass* pINI)
 {
 	const char* section = this->Name;
 
-	// 组名由 PhobosExtFixedString<32> 承载，超过 31 字符会被静默截断；
+	// 组名由 ScaffoldFixedString<32> 承载，超过 31 字符会被静默截断；
 	// 截断后的名字又要当作小节名使用，会找不到 [组名] 小节导致成员静默丢失。
 	if (std::strlen(section) >= this->Name.Size - 1)
 	{
@@ -41,8 +41,8 @@ void TriggerGroupClass::LoadFromINI(CCINIClass* pINI)
 	{
 		const char* key = pINI->GetKeyName(section, i);
 
-		if (pINI->ReadString(section, key, "", PhobosExt::readBuffer) && PhobosExt::readBuffer[0])
-			this->Members.emplace_back(PhobosExt::readBuffer);
+		if (pINI->ReadString(section, key, "", Scaffold::readBuffer) && Scaffold::readBuffer[0])
+			this->Members.emplace_back(Scaffold::readBuffer);
 	}
 }
 
@@ -112,12 +112,12 @@ void TriggerGroupClass::Serialize(T& Stm)
 		;
 }
 
-void TriggerGroupClass::LoadFromStream(PhobosExtStreamReader& Stm)
+void TriggerGroupClass::LoadFromStream(ScaffoldStreamReader& Stm)
 {
 	this->Serialize(Stm);
 }
 
-void TriggerGroupClass::SaveToStream(PhobosExtStreamWriter& Stm)
+void TriggerGroupClass::SaveToStream(ScaffoldStreamWriter& Stm)
 {
 	this->Serialize(Stm);
 }

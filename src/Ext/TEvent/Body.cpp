@@ -36,13 +36,13 @@ void TEventExt::ExtData::Serialize(T& Stm)
 	//Stm;
 }
 
-void TEventExt::ExtData::LoadFromStream(PhobosExtStreamReader& Stm)
+void TEventExt::ExtData::LoadFromStream(ScaffoldStreamReader& Stm)
 {
 	Extension<TEventClass>::LoadFromStream(Stm);
 	this->Serialize(Stm);
 }
 
-void TEventExt::ExtData::SaveToStream(PhobosExtStreamWriter& Stm)
+void TEventExt::ExtData::SaveToStream(ScaffoldStreamWriter& Stm)
 {
 	Extension<TEventClass>::SaveToStream(Stm);
 	this->Serialize(Stm);
@@ -71,9 +71,9 @@ int TEventExt::GetFlags(int iEvent)
 	//       这类事件每帧都在逻辑更新循环中被检查。
 	//       0x684DCA 是原版游戏中这个逻辑的参考地址。
 
-	switch (static_cast<PhobosExtTriggerEvent>(iEvent))
+	switch (static_cast<ScaffoldTriggerEvent>(iEvent))
 	{
-	//case PhobosExtTriggerEvent::TechnoDestroyedByHouse:
+	//case ScaffoldTriggerEvent::TechnoDestroyedByHouse:
 	//	return 0;
 	//case
 	//	return 0x4;
@@ -88,10 +88,10 @@ std::optional<bool> TEventExt::Execute(TEventClass* pThis, int iEvent, HouseClas
 	ObjectClass* pObject, CDTimerClass* pTimer, bool* isPersitant, TechnoClass* pSource,
 	TriggerClass* pTrigger)
 {
-	const auto eventKind = static_cast<PhobosExtTriggerEvent>(pThis->EventKind);
+	const auto eventKind = static_cast<ScaffoldTriggerEvent>(pThis->EventKind);
 
 	// They must be the same, but for other triggers to take effect normally, this cannot be judged outside case.
-	auto isSameEvent = [&]() { return eventKind == static_cast<PhobosExtTriggerEvent>(iEvent); };
+	auto isSameEvent = [&]() { return eventKind == static_cast<ScaffoldTriggerEvent>(iEvent); };
 
 	switch (eventKind)
 	{
@@ -100,40 +100,40 @@ std::optional<bool> TEventExt::Execute(TEventClass* pThis, int iEvent, HouseClas
 		// helper struct
 		struct and_with { bool operator()(int a, int b) { return a & b; } };
 
-	case PhobosExtTriggerEvent::TechnoTypeOfHouseNearWaypoint:
+	case ScaffoldTriggerEvent::TechnoTypeOfHouseNearWaypoint:
 		return TEventExt::TechnoTypeOfHouseNearWaypoint(pThis, pHouse);
-	case PhobosExtTriggerEvent::TechnoTypeOfHouseAllLeavesWaypoint:
+	case ScaffoldTriggerEvent::TechnoTypeOfHouseAllLeavesWaypoint:
 		return !TEventExt::TechnoTypeOfHouseNearWaypoint(pThis, pHouse);
-	case PhobosExtTriggerEvent::TechnoTypeOfHouseExistsAtWaypoint:
+	case ScaffoldTriggerEvent::TechnoTypeOfHouseExistsAtWaypoint:
 		return TEventExt::TechnoTypeOfHouseExistsAtWaypoint(pThis, pHouse);
-	case PhobosExtTriggerEvent::TechnoTypeOfHouseNotExistsAtWaypoint:
+	case ScaffoldTriggerEvent::TechnoTypeOfHouseNotExistsAtWaypoint:
 		return !TEventExt::TechnoTypeOfHouseExistsAtWaypoint(pThis, pHouse);
-	case PhobosExtTriggerEvent::ElapsedTimeFrames:
+	case ScaffoldTriggerEvent::ElapsedTimeFrames:
 		return TEventExt::ElapsedTimeFramesFunc(pThis);
 
-	case PhobosExtTriggerEvent::MissionTimerGreater:
+	case ScaffoldTriggerEvent::MissionTimerGreater:
 		return TEventExt::MissionTimerGreaterFunc(pThis);
-	case PhobosExtTriggerEvent::MissionTimerLess:
+	case ScaffoldTriggerEvent::MissionTimerLess:
 		return TEventExt::MissionTimerLessFunc(pThis);
 
-	case PhobosExtTriggerEvent::ChoiceBoxButtonClicked:
+	case ScaffoldTriggerEvent::ChoiceBoxButtonClicked:
 		return TEventExt::ChoiceBoxButtonClickedFunc(pThis, pHouse);
-	case PhobosExtTriggerEvent::ChoiceBoxAnyButtonClicked:
+	case ScaffoldTriggerEvent::ChoiceBoxAnyButtonClicked:
 		return TEventExt::ChoiceBoxAnyButtonClickedFunc(pThis, pHouse);
-	case PhobosExtTriggerEvent::ChoiceBoxTimedOut:
+	case ScaffoldTriggerEvent::ChoiceBoxTimedOut:
 		return TEventExt::ChoiceBoxTimedOutFunc(pThis, pHouse);
 
-	case PhobosExtTriggerEvent::HousePowerOutputMuch:
+	case ScaffoldTriggerEvent::HousePowerOutputMuch:
 		return TEventExt::PowerHander(pThis, pHouse, PowerEventMode::Output, true);
-	case PhobosExtTriggerEvent::HousePowerOutputLess:
+	case ScaffoldTriggerEvent::HousePowerOutputLess:
 		return TEventExt::PowerHander(pThis, pHouse, PowerEventMode::Output, false);
-	case PhobosExtTriggerEvent::HousePowerDrainMuch:
+	case ScaffoldTriggerEvent::HousePowerDrainMuch:
 		return TEventExt::PowerHander(pThis, pHouse, PowerEventMode::Drain, true);
-	case PhobosExtTriggerEvent::HousePowerDrainLess:
+	case ScaffoldTriggerEvent::HousePowerDrainLess:
 		return TEventExt::PowerHander(pThis, pHouse, PowerEventMode::Drain, false);
-	case PhobosExtTriggerEvent::HousePowerSurplusMuch:
+	case ScaffoldTriggerEvent::HousePowerSurplusMuch:
 		return TEventExt::PowerHander(pThis, pHouse, PowerEventMode::Surplus, true);
-	case PhobosExtTriggerEvent::HousePowerSurplusLess:
+	case ScaffoldTriggerEvent::HousePowerSurplusLess:
 		return TEventExt::PowerHander(pThis, pHouse, PowerEventMode::Surplus, false);
 
 

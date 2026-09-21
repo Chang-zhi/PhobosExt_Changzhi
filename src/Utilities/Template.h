@@ -114,9 +114,9 @@ public:
 	template<bool Allocate = false>
 	inline void Read(INI_EX& parser, const char* pSection, const char* pKey);
 
-	inline bool Load(PhobosExtStreamReader& Stm, bool RegisterForChange);
+	inline bool Load(ScaffoldStreamReader& Stm, bool RegisterForChange);
 
-	inline bool Save(PhobosExtStreamWriter& Stm) const;
+	inline bool Save(ScaffoldStreamWriter& Stm) const;
 };
 
 template <typename T> requires std::is_enum_v<T>
@@ -221,9 +221,9 @@ public:
 	template<bool Allocate = false>
 	inline void Read(INI_EX& parser, const char* pSection, const char* pKey);
 
-	inline bool Load(PhobosExtStreamReader& Stm, bool RegisterForChange);
+	inline bool Load(ScaffoldStreamReader& Stm, bool RegisterForChange);
 
-	inline bool Save(PhobosExtStreamWriter& Stm) const;
+	inline bool Save(ScaffoldStreamWriter& Stm) const;
 };
 
 template<typename Lookuper>
@@ -297,9 +297,9 @@ public:
 		return this->Rookie;
 	}
 
-	inline bool Load(PhobosExtStreamReader& Stm, bool RegisterForChange);
+	inline bool Load(ScaffoldStreamReader& Stm, bool RegisterForChange);
 
-	inline bool Save(PhobosExtStreamWriter& Stm) const;
+	inline bool Save(ScaffoldStreamWriter& Stm) const;
 };
 
 
@@ -340,9 +340,9 @@ public:
 		return Iterator<T>(*this);
 	}
 
-	inline bool Load(PhobosExtStreamReader& Stm, bool RegisterForChange);
+	inline bool Load(ScaffoldStreamReader& Stm, bool RegisterForChange);
 
-	inline bool Save(PhobosExtStreamWriter& Stm) const;
+	inline bool Save(ScaffoldStreamWriter& Stm) const;
 };
 
 template<class T>
@@ -372,9 +372,9 @@ public:
 		return this->GetElements();
 	}
 
-	inline bool Load(PhobosExtStreamReader& Stm, bool RegisterForChange);
+	inline bool Load(ScaffoldStreamReader& Stm, bool RegisterForChange);
 
-	inline bool Save(PhobosExtStreamWriter& Stm) const;
+	inline bool Save(ScaffoldStreamWriter& Stm) const;
 };
 
 template<typename Lookuper>
@@ -460,9 +460,9 @@ public:
 		return this->BaseValue;
 	}
 
-	inline bool Load(PhobosExtStreamReader& Stm, bool RegisterForChange);
+	inline bool Load(ScaffoldStreamReader& Stm, bool RegisterForChange);
 
-	inline bool Save(PhobosExtStreamWriter& Stm) const;
+	inline bool Save(ScaffoldStreamWriter& Stm) const;
 };
 
 template<typename T>

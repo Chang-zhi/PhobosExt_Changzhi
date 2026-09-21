@@ -3,7 +3,7 @@
 #include <Interop/InteropApi.h>
 
 // =============================================================================
-// PhobosExtInterop - Interop API 提供方的外观（Facade）
+// ScaffoldInterop - Interop API 提供方的外观（Facade）
 //
 // 启动阶段调用一次 Init()，之后所有对下列函数指针的使用都必须先经过
 // IsAvailable() 判断。
@@ -15,7 +15,7 @@
 // 本类刻意保持为薄外观：模块发现放在 InteropModule，指针表放在 InteropApiTable，
 // ABI 定义放在 InteropApi.h。
 // =============================================================================
-class PhobosExtInterop
+class ScaffoldInterop
 {
 public:
 	// 定位提供方、解析函数指针并校验 API 版本。未安装提供方时调用也是安全的。

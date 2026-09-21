@@ -158,7 +158,7 @@ void HouseExt::ExtData::Serialize(T& Stm)
 		int count = (int)this->AuthorizedNodeKeys.size();
 		Stm.Process(count);
 
-		if constexpr (std::is_same_v<T, PhobosExtStreamReader>)
+		if constexpr (std::is_same_v<T, ScaffoldStreamReader>)
 			this->AuthorizedNodeKeys.resize(count);
 
 		for (int i = 0; i < count; ++i)
@@ -174,7 +174,7 @@ void HouseExt::ExtData::Serialize(T& Stm)
 		int count = (int)this->DeferredNodeList.size();
 		Stm.Process(count);
 
-		if constexpr (std::is_same_v<T, PhobosExtStreamReader>)
+		if constexpr (std::is_same_v<T, ScaffoldStreamReader>)
 			this->DeferredNodeList.resize(count);
 
 		for (int i = 0; i < count; ++i)
@@ -188,25 +188,25 @@ void HouseExt::ExtData::Serialize(T& Stm)
 	}
 }
 
-void HouseExt::ExtData::LoadFromStream(PhobosExtStreamReader& Stm)
+void HouseExt::ExtData::LoadFromStream(ScaffoldStreamReader& Stm)
 {
 	Extension<HouseClass>::LoadFromStream(Stm);
 	this->Serialize(Stm);
 }
 
-void HouseExt::ExtData::SaveToStream(PhobosExtStreamWriter& Stm)
+void HouseExt::ExtData::SaveToStream(ScaffoldStreamWriter& Stm)
 {
 	Extension<HouseClass>::SaveToStream(Stm);
 	this->Serialize(Stm);
 }
 
-bool HouseExt::LoadGlobals(PhobosExtStreamReader& Stm)
+bool HouseExt::LoadGlobals(ScaffoldStreamReader& Stm)
 {
 	return Stm
 		.Success();
 }
 
-bool HouseExt::SaveGlobals(PhobosExtStreamWriter& Stm)
+bool HouseExt::SaveGlobals(ScaffoldStreamWriter& Stm)
 {
 	return Stm
 		.Success();

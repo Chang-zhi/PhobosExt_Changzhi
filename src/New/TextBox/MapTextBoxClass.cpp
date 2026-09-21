@@ -327,12 +327,12 @@ void MapTextBoxClass::Clear()
 	Array.clear();
 }
 
-bool MapTextBoxClass::Load(PhobosExtStreamReader& Stm, bool RegisterForChange)
+bool MapTextBoxClass::Load(ScaffoldStreamReader& Stm, bool RegisterForChange)
 {
 	return Serialize(Stm);
 }
 
-bool MapTextBoxClass::Save(PhobosExtStreamWriter& Stm) const
+bool MapTextBoxClass::Save(ScaffoldStreamWriter& Stm) const
 {
 	return const_cast<MapTextBoxClass*>(this)->Serialize(Stm);
 }
@@ -417,20 +417,20 @@ void MapTextBoxClass::ClearAll()
 
 // ========== 全局存档/读档 ==========
 
-bool MapTextBoxClass::SaveGlobals(PhobosExtStreamWriter& Stm)
+bool MapTextBoxClass::SaveGlobals(ScaffoldStreamWriter& Stm)
 {
 	Stm.Save(Array.size());
 	for (auto const& item : Array)
 	{
 		Stm.Save(item.get());                             // 保存旧指针地址
-		PhobosExtFixedString<64> marker(item->GetTypeMarker()); // 保存类型标记
+		ScaffoldFixedString<64> marker(item->GetTypeMarker()); // 保存类型标记
 		Stm.Save(marker);
 		item->Save(Stm);                                  // 保存实例数据
 	}
 	return true;
 }
 
-bool MapTextBoxClass::LoadGlobals(PhobosExtStreamReader& Stm)
+bool MapTextBoxClass::LoadGlobals(ScaffoldStreamReader& Stm)
 {
 	// 清除当前所有已存在的实例
 	Clear();
@@ -443,7 +443,7 @@ bool MapTextBoxClass::LoadGlobals(PhobosExtStreamReader& Stm)
 	for (size_t i = 0; i < Count; ++i)
 	{
 		void* oldPtr = nullptr;
-		PhobosExtFixedString<64> typeMarker;
+		ScaffoldFixedString<64> typeMarker;
 
 		if (!Stm.Load(oldPtr) || !Stm.Load(typeMarker))
 			return false;

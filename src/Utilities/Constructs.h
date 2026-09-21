@@ -46,10 +46,10 @@
 #include <memory>
 #include <vector>
 
-#include <PhobosExt.h>
+#include <Scaffold.h>
 
-class PhobosExtStreamReader;
-class PhobosExtStreamWriter;
+class ScaffoldStreamReader;
+class ScaffoldStreamWriter;
 #include "Enum.h"
 
 class ConvertClass;
@@ -125,8 +125,8 @@ public:
 		CCINIClass* pINI, const char* pSection, const char* pKey,
 		const char* pDefault = "");
 
-	bool Load(PhobosExtStreamReader& Stm, bool RegisterForChange);
-	bool Save(PhobosExtStreamWriter& Stm) const;
+	bool Load(ScaffoldStreamReader& Stm, bool RegisterForChange);
+	bool Save(ScaffoldStreamWriter& Stm) const;
 
 private:
 	void Clear();
@@ -135,7 +135,7 @@ private:
 
 // a poor man's map with contiguous storage
 template <typename TKey, typename TValue>
-class PhobosExtMap
+class ScaffoldMap
 {
 public:
 	TValue& operator[] (const TKey& key)
@@ -149,7 +149,7 @@ public:
 
 	TValue* find(const TKey& key)
 	{
-		auto pValue = static_cast<const PhobosExtMap*>(this)->find(key);
+		auto pValue = static_cast<const ScaffoldMap*>(this)->find(key);
 		return const_cast<TValue*>(pValue);
 	}
 
@@ -222,7 +222,7 @@ public:
 		this->values.clear();
 	}
 
-	bool load(PhobosExtStreamReader& Stm, bool RegisterForChange)
+	bool load(ScaffoldStreamReader& Stm, bool RegisterForChange)
 	{
 		this->clear();
 
@@ -234,8 +234,8 @@ public:
 			this->values.resize(size);
 			for (size_t i = 0; i < size; ++i)
 			{
-				if (!Savegame::ReadPhobosExtStream(Stm, this->values[i].first, RegisterForChange)
-					|| !Savegame::ReadPhobosExtStream(Stm, this->values[i].second, RegisterForChange))
+				if (!Savegame::ReadScaffoldStream(Stm, this->values[i].first, RegisterForChange)
+					|| !Savegame::ReadScaffoldStream(Stm, this->values[i].second, RegisterForChange))
 				{
 					return false;
 				}
@@ -245,14 +245,14 @@ public:
 		return ret;
 	}
 
-	bool save(PhobosExtStreamWriter& Stm) const
+	bool save(ScaffoldStreamWriter& Stm) const
 	{
 		Stm.Save(this->values.size());
 
 		for (const auto& item : this->values)
 		{
-			Savegame::WritePhobosExtStream(Stm, item.first);
-			Savegame::WritePhobosExtStream(Stm, item.second);
+			Savegame::WriteScaffoldStream(Stm, item.first);
+			Savegame::WriteScaffoldStream(Stm, item.second);
 		}
 
 		return true;
@@ -281,19 +281,19 @@ private:
 };
 
 // pcx filename storage with optional automatic loading
-class PhobosExtPCXFile
+class ScaffoldPCXFile
 {
 	static const size_t Capacity = 0x20;
 public:
-	explicit PhobosExtPCXFile(bool autoResolve = true) : filename(), resolve(autoResolve), checked(false), exists(false)
+	explicit ScaffoldPCXFile(bool autoResolve = true) : filename(), resolve(autoResolve), checked(false), exists(false)
 	{ }
 
-	PhobosExtPCXFile(const char* pFilename, bool autoResolve = true) : PhobosExtPCXFile(autoResolve)
+	ScaffoldPCXFile(const char* pFilename, bool autoResolve = true) : ScaffoldPCXFile(autoResolve)
 	{
 		*this = pFilename;
 	}
 
-	PhobosExtPCXFile& operator = (const char* pFilename);
+	ScaffoldPCXFile& operator = (const char* pFilename);
 
 	const FixedString<Capacity>::data_type& GetFilename() const
 	{
@@ -306,9 +306,9 @@ public:
 
 	bool Read(INIClass* pINI, const char* pSection, const char* pKey, const char* pDefault = "");
 
-	bool Load(PhobosExtStreamReader& Stm, bool RegisterForChange);
+	bool Load(ScaffoldStreamReader& Stm, bool RegisterForChange);
 
-	bool Save(PhobosExtStreamWriter& Stm) const;
+	bool Save(ScaffoldStreamWriter& Stm) const;
 
 private:
 	FixedString<Capacity> filename;
@@ -343,9 +343,9 @@ public:
 		return !this->Text || !*this->Text;
 	}
 
-	bool load(PhobosExtStreamReader& Stm, bool RegisterForChange);
+	bool load(ScaffoldStreamReader& Stm, bool RegisterForChange);
 
-	bool save(PhobosExtStreamWriter& Stm) const;
+	bool save(ScaffoldStreamWriter& Stm) const;
 
 	FixedString<0x20> Label;
 	const wchar_t* Text { nullptr };
@@ -353,30 +353,30 @@ public:
 
 // fixed string with read method
 template <size_t Capacity>
-class PhobosExtFixedString : public FixedString<Capacity>
+class ScaffoldFixedString : public FixedString<Capacity>
 {
 public:
-	PhobosExtFixedString() = default;
-	explicit PhobosExtFixedString(nullptr_t) noexcept { };
-	explicit PhobosExtFixedString(const char* value) noexcept : FixedString<Capacity>(value) { }
+	ScaffoldFixedString() = default;
+	explicit ScaffoldFixedString(nullptr_t) noexcept { };
+	explicit ScaffoldFixedString(const char* value) noexcept : FixedString<Capacity>(value) { }
 
 	using FixedString<Capacity>::operator=;
 
 	// It's not obvious, but pDefault = "" means that by default initial string will not be changed
 	bool Read(INIClass* pINI, const char* pSection, const char* pKey, const char* pDefault = "")
 	{
-		if (pINI->ReadString(pSection, pKey, pDefault, PhobosExt::readBuffer, FixedString<Capacity>::Size))
+		if (pINI->ReadString(pSection, pKey, pDefault, Scaffold::readBuffer, FixedString<Capacity>::Size))
 		{
-			if (!INIClass::IsBlank(PhobosExt::readBuffer))
+			if (!INIClass::IsBlank(Scaffold::readBuffer))
 			{
-				*this = PhobosExt::readBuffer;
+				*this = Scaffold::readBuffer;
 			}
 			else
 			{
 				*this = nullptr;
 			}
 		}
-		return PhobosExt::readBuffer[0] != 0;
+		return Scaffold::readBuffer[0] != 0;
 	}
 };
 
@@ -443,14 +443,14 @@ struct Handle
 		Handle(std::move(*this));
 	}
 
-	bool load(PhobosExtStreamReader& Stm, bool RegisterForChange)
+	bool load(ScaffoldStreamReader& Stm, bool RegisterForChange)
 	{
-		return Savegame::ReadPhobosExtStream(Stm, this->Value, RegisterForChange);
+		return Savegame::ReadScaffoldStream(Stm, this->Value, RegisterForChange);
 	}
 
-	bool save(PhobosExtStreamWriter& Stm) const
+	bool save(ScaffoldStreamWriter& Stm) const
 	{
-		return Savegame::WritePhobosExtStream(Stm, this->Value);
+		return Savegame::WriteScaffoldStream(Stm, this->Value);
 	}
 
 private:
@@ -501,9 +501,9 @@ public:
 
 	bool Read(INI_EX& parser, const char* pSection, const char* pKey);
 
-	bool Load(PhobosExtStreamReader& Stm, bool RegisterForChange);
+	bool Load(ScaffoldStreamReader& Stm, bool RegisterForChange);
 
-	bool Save(PhobosExtStreamWriter& Stm) const;
+	bool Save(ScaffoldStreamWriter& Stm) const;
 
 private:
 	BlitterFlags value { BlitterFlags::None };
@@ -536,9 +536,9 @@ public:
 
 	bool Read(INI_EX& parser, const char* pSection, const char* pKey);
 
-	bool Load(PhobosExtStreamReader& Stm, bool RegisterForChange);
+	bool Load(ScaffoldStreamReader& Stm, bool RegisterForChange);
 
-	bool Save(PhobosExtStreamWriter& Stm) const;
+	bool Save(ScaffoldStreamWriter& Stm) const;
 private:
 	SHPStruct* value { nullptr };
 };

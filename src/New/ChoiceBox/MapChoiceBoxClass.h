@@ -1,6 +1,6 @@
 #pragma once
 
-#include <PhobosExt.h>
+#include <Scaffold.h>
 #include <GeneralStructures.h>
 #include <Utilities/SavegameDef.h>
 
@@ -8,8 +8,8 @@
 #include <vector>
 #include <memory>
 
-class PhobosExtStreamWriter;
-class PhobosExtStreamReader;
+class ScaffoldStreamWriter;
+class ScaffoldStreamReader;
 class ChoiceBoxTypeClass;
 
 class MapChoiceBoxClass
@@ -76,12 +76,12 @@ public:
 	static void ApplyClickEvent(int boxID, int buttonIndex); // 应用（所有客户端）
 
 	// 全局存档/读档
-	static bool SaveGlobals(PhobosExtStreamWriter& Stm);
-	static bool LoadGlobals(PhobosExtStreamReader& Stm);
+	static bool SaveGlobals(ScaffoldStreamWriter& Stm);
+	static bool LoadGlobals(ScaffoldStreamReader& Stm);
 
 	// ===== 序列化 =====
-	virtual bool Load(PhobosExtStreamReader& Stm, bool RegisterForChange);
-	virtual bool Save(PhobosExtStreamWriter& Stm) const;
+	virtual bool Load(ScaffoldStreamReader& Stm, bool RegisterForChange);
+	virtual bool Save(ScaffoldStreamWriter& Stm) const;
 
 protected:
 	MapChoiceBoxClass() = default;

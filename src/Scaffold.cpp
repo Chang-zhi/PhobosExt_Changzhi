@@ -1,5 +1,5 @@
-#include "PhobosExt.h"
-#include <Interop/PhobosExtInterop.h>
+#include "Scaffold.h"
+#include <Interop/ScaffoldInterop.h>
 
 #include <Drawing.h>
 #include <SessionClass.h>
@@ -11,17 +11,17 @@
 #include "Utilities/AresHelper.h"
 #include "Utilities/Parser.h"
 
-HANDLE PhobosExt::hInstance = 0;
+HANDLE Scaffold::hInstance = 0;
 
-char PhobosExt::readBuffer[PhobosExt::readLength];
-wchar_t PhobosExt::wideBuffer[PhobosExt::readLength];
-const char* PhobosExt::AppIconPath = nullptr;
+char Scaffold::readBuffer[Scaffold::readLength];
+wchar_t Scaffold::wideBuffer[Scaffold::readLength];
+const char* Scaffold::AppIconPath = nullptr;
 
-bool PhobosExt::DisplayDamageNumbers = false;
+bool Scaffold::DisplayDamageNumbers = false;
 
-const wchar_t* PhobosExt::VersionDescription = L"Chang_zhi Custom PhobosExt build #" _STR(BUILD_NUMBER) L". Please test the build before shipping.";
+const wchar_t* Scaffold::VersionDescription = L"Chang_zhi Custom Scaffold build #" _STR(BUILD_NUMBER) L". Please test the build before shipping.";
 
-void PhobosExt::ExeTerminate()
+void Scaffold::ExeTerminate()
 {
 	Console::Release();
 }
@@ -30,12 +30,12 @@ bool __stdcall DllMain(HANDLE hInstance, DWORD dwReason, LPVOID v)
 {
 	if (dwReason == DLL_PROCESS_ATTACH)
 	{
-		PhobosExt::hInstance = hInstance;
+		Scaffold::hInstance = hInstance;
 	}
 	return true;
 }
 
-void PhobosExt::ExeRun()
+void Scaffold::ExeRun()
 {
 	Patch::ApplyStatic();
 
@@ -43,7 +43,7 @@ void PhobosExt::ExeRun()
 
 #ifndef IS_RELEASE_VER
 
-	if (PhobosExt::DetachFromDebugger())
+	if (Scaffold::DetachFromDebugger())
 	{
 		MessageBoxW(NULL,
 		L"You can now attach a debugger.\n\n"
@@ -79,7 +79,7 @@ void PhobosExt::ExeRun()
 #endif
 }
 
-void PhobosExt::CmdLineParse(char** ppArgs, int nNumArgs)
+void Scaffold::CmdLineParse(char** ppArgs, int nNumArgs)
 {
 	bool foundInheritance = false;
 	bool foundInclude = false;
@@ -99,7 +99,7 @@ void PhobosExt::CmdLineParse(char** ppArgs, int nNumArgs)
 
 		if (_stricmp(pArg, "-Icon") == 0)
 		{
-			PhobosExt::AppIconPath = ppArgs[++i];
+			Scaffold::AppIconPath = ppArgs[++i];
 		}
 		if (_stricmp(pArg, "-Inheritance") == 0)
 		{
@@ -166,7 +166,7 @@ void PhobosExt::CmdLineParse(char** ppArgs, int nNumArgs)
 
 DEFINE_HOOK(0x7CD810, ExeRun, 0x9)
 {
-	PhobosExt::ExeRun();
+	Scaffold::ExeRun();
 
 	return 0;
 }
@@ -180,7 +180,7 @@ DEFINE_NAKED_HOOK(0x7CD8EA, _ExeTerminate)
 	CALL(EAX);
 	PUSH_REG(EAX);
 
-	__asm {call PhobosExt::ExeTerminate};
+	__asm {call Scaffold::ExeTerminate};
 
 	// Jump back
 	POP_REG(EAX);
@@ -194,8 +194,8 @@ DEFINE_HOOK(0x52F639, _YR_CmdLineParse, 0x5)
 	GET(char**, ppArgs, ESI);
 	GET(int, nNumArgs, EDI);
 
-	PhobosExt::CmdLineParse(ppArgs, nNumArgs);
-	PhobosExtInterop::Init();
+	Scaffold::CmdLineParse(ppArgs, nNumArgs);
+	ScaffoldInterop::Init();
 	Debug::LogDeferredFinalize();
 	return 0;
 }
@@ -208,7 +208,7 @@ DEFINE_HOOK(0x52F639, _YR_CmdLineParse, 0x5)
 #include <Dbghelp.h>
 #include <tlhelp32.h>
 
-bool PhobosExt::DetachFromDebugger()
+bool Scaffold::DetachFromDebugger()
 {
 	auto GetDebuggerProcessId = [](DWORD dwSelfProcessId) -> DWORD
 		{

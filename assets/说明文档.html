@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PhobosExt 说明文档</title><style>
+<title>Scaffold 说明文档</title><style>
 /* ============================================================
    1. 基础重置 / 全局
    ============================================================ */
@@ -391,7 +391,7 @@ pre code { padding: 0; font-size: inherit; color: inherit; background: none; bor
 <!----------------->
 
 <button class="nav-toggle" id="navToggle" onclick="toggleNav()">☰</button>
-<nav class="nav" id="mainNav"><div class="nav__title"><span class="nav__close" onclick="toggleNav()">◀</span>PhobosExt<span class="nav__lock" onclick="toggleLock()"><svg class="lock-icon lock-icon--locked" viewBox="0 0 24 24" width="17" height="17" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="11" width="16" height="11" rx="2.5" fill="#d92929"/><path d="M7 11V7a5 5 0 0 1 10 0v4" fill="none" stroke="#d92929" stroke-width="2.5" stroke-linecap="round"/></svg><svg class="lock-icon lock-icon--unlocked" viewBox="0 0 24 24" width="17" height="17" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="11" width="16" height="11" rx="2.5" fill="#d92929"/><path d="M7 11V7a5 5 0 0 1 10 0" fill="none" stroke="#d92929" stroke-width="2.5" stroke-linecap="round"/></svg></span></div>
+<nav class="nav" id="mainNav"><div class="nav__title"><span class="nav__close" onclick="toggleNav()">◀</span>Scaffold<span class="nav__lock" onclick="toggleLock()"><svg class="lock-icon lock-icon--locked" viewBox="0 0 24 24" width="17" height="17" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="11" width="16" height="11" rx="2.5" fill="#d92929"/><path d="M7 11V7a5 5 0 0 1 10 0v4" fill="none" stroke="#d92929" stroke-width="2.5" stroke-linecap="round"/></svg><svg class="lock-icon lock-icon--unlocked" viewBox="0 0 24 24" width="17" height="17" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="11" width="16" height="11" rx="2.5" fill="#d92929"/><path d="M7 11V7a5 5 0 0 1 10 0" fill="none" stroke="#d92929" stroke-width="2.5" stroke-linecap="round"/></svg></span></div>
 <div class="nav__search"><div class="nav__search-box"><input id="searchInput" type="search" placeholder="搜索功能 / 编号 / 键名" autocomplete="off"><button class="search-clear" id="searchClear" title="清空搜索" aria-label="清空搜索"><svg viewBox="0 0 24 24" width="11" height="11" xmlns="http://www.w3.org/2000/svg"><line x1="5" y1="5" x2="19" y2="19" stroke="#d92929" stroke-width="2.5" stroke-linecap="round"/><line x1="19" y1="5" x2="5" y2="19" stroke="#d92929" stroke-width="2.5" stroke-linecap="round"/></svg></button></div><div class="nav__search-hint">按 / 或 Ctrl+K 定位搜索框</div></div>
 <ul class="nav__list">
 <li class="nav__item nav__item--active" page="home">首页</li>
@@ -481,11 +481,12 @@ pre code { padding: 0; font-size: inherit; color: inherit; background: none; bor
 <!----------------->
 
 <section id="sec_home" class="active">
-<h1 class="doc-title"><a href="https://github.com/Chang-zhi/PhobosExt_Changzhi" target="_blank" class="doc-link doc-link--plain">PhobosExt</a> <span class="doc-title__sub">扩展 DLL</span></h1>
+<h1 class="doc-title"><a href="https://github.com/Chang-zhi/Scaffold" target="_blank" class="doc-link doc-link--plain">Scaffold</a> <span class="doc-title__sub">扩展 DLL</span></h1>
 
 <div class="doc-note doc-note--identity">
 <span class="doc-note__title"><svg class="doc-note__icon" viewBox="0 0 24 24" width="14" height="14" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" fill="none" stroke="#d92929" stroke-width="2"/><rect x="11" y="10.5" width="2" height="6.5" rx="1" fill="#d92929"/><circle cx="12" cy="7" r="1.5" fill="#d92929"/></svg>关于本项目的性质</span>
-<p><strong>PhobosExt_Changzhi</strong> 是作者 <strong>Chang_zhi</strong> 个人开发维护的<strong>非官方</strong>扩展，与 <a href="https://github.com/Phobos-developers/Phobos" target="_blank" class="doc-link">官方 Phobos</a> 项目组无关。</p>
+<p><strong>Scaffold</strong> 是作者 <strong>Chang_zhi</strong> 个人开发维护的<strong>非官方</strong>扩展，与 <a href="https://github.com/Phobos-developers/Phobos" target="_blank" class="doc-link">官方 Phobos</a> 项目组无关。</p>
+<p><strong>曾用名</strong>：本项目曾名 <code>PhobosExt_Changzhi</code>。为与官方 Phobos 区分、避免混淆，现更名为 <strong>Scaffold</strong>。</p>
 <p>源码基于官方 Phobos 二次开发（沿用其 <strong>GPL-3.0</strong> 许可），独立于官方维护。<br>
   版本与功能不与官方同步，也不代表 Phobos 项目组的立场。使用中遇到的问题请向作者反馈，请勿报告给官方 Phobos 项目组。</p>
 </div>
@@ -495,15 +496,15 @@ pre code { padding: 0; font-size: inherit; color: inherit; background: none; bor
 <p>仅部分功能依赖 <strong>Phobos</strong>：不安装 Phobos 也可独立使用，但推荐一同使用。</p>
 <p class="doc-text--gray">左侧导航栏可展开各页子目录跳转至对应条目；顶部搜索框可直接搜功能名、编号或键名。</p>
 
-<h2 class="doc-heading--secondary">安装与使用</h2>
+<h2 class="doc-heading--secondary">安装教程</h2>
 <p>需通过 <strong>Syringe</strong> 注入运行。</p>
 
 <h3 class="doc-heading--tertiary">发布包内容</h3>
 <table class="doc-table">
 <thead><tr><th class="doc-table__th" style="width:220px">文件</th><th class="doc-table__th">说明</th><th class="doc-table__th" style="width:170px">放置位置</th></tr></thead>
 <tbody>
-<tr><td class="doc-table__td"><code>PhobosExt_Changzhi.dll</code></td><td class="doc-table__td">扩展本体，必需</td><td class="doc-table__td">游戏根目录</td></tr>
-<tr><td class="doc-table__td"><code>PhobosExt_Changzhi.pdb</code></td><td class="doc-table__td">调试符号，仅排查崩溃时用到</td><td class="doc-table__td">与 DLL 同目录</td></tr>
+<tr><td class="doc-table__td"><code>Scaffold.dll</code></td><td class="doc-table__td">扩展本体，必需</td><td class="doc-table__td">游戏根目录</td></tr>
+<tr><td class="doc-table__td"><code>Scaffold.pdb</code></td><td class="doc-table__td">调试符号，仅排查崩溃时用到</td><td class="doc-table__td">与 DLL 同目录</td></tr>
 <tr><td class="doc-table__td"><code>FAData_Customized.ini</code></td><td class="doc-table__td">地图编辑器数据，允许用户使用新增触发/脚本</td><td class="doc-table__td">地图编辑器目录</td></tr>
 <tr><td class="doc-table__td"><code>说明文档.html</code></td><td class="doc-table__td">本文件，全部功能说明</td><td class="doc-table__td">任意</td></tr>
 <tr><td class="doc-table__td"><code>更新日志.txt</code></td><td class="doc-table__td">各版本变更记录</td><td class="doc-table__td">任意</td></tr>
@@ -513,14 +514,14 @@ pre code { padding: 0; font-size: inherit; color: inherit; background: none; bor
 <h3 class="doc-heading--tertiary">安装步骤</h3>
 <ol>
 <li>确认游戏版本为 <strong>YR 1.001</strong>。</li>
-<li>把 <code>PhobosExt_Changzhi.dll</code>（推荐连同 <code>.pdb</code>）放入游戏根目录，即 <code>gamemd.exe</code> 所在目录。</li>
+<li>把 <code>Scaffold.dll</code>（推荐连同 <code>.pdb</code>）放入游戏根目录，即 <code>gamemd.exe</code> 所在目录。</li>
 <li>用 Syringe 启动游戏：已装 Ares / Phobos 时直接双击 <code>RunAres.bat</code>；否则执行 <code>Syringe.exe "gamemd.exe"</code>。Syringe 会自动加载游戏目录下的兼容 DLL，无需额外配置。</li>
 <li>把 <code>FAData_Customized.ini</code> 放入地图编辑器目录（仅支持 HDM Edition），编辑器即可识别新增编号。</li>
 </ol>
 
 <div class="doc-note">
 <span class="doc-note__title">卸载</span>
-<p>删除游戏目录下的 <code>PhobosExt_Changzhi.dll</code>（及 <code>.pdb</code>）即可；<code>FAData_Customized.ini</code> 可一并删除。</p>
+<p>删除游戏目录下的 <code>Scaffold.dll</code>（及 <code>.pdb</code>）即可；<code>FAData_Customized.ini</code> 可一并删除。</p>
 </div>
 
 <h2 class="doc-heading--secondary">兼容性</h2>
@@ -547,7 +548,7 @@ pre code { padding: 0; font-size: inherit; color: inherit; background: none; bor
 <p class="doc-text--gray">排名不分先后</p>
 
 <h2 class="doc-heading--secondary">许可</h2>
-<p>仓库：<a href="https://github.com/Chang-zhi/PhobosExt_Changzhi" target="_blank" class="doc-link"><strong>PhobosExt_Changzhi</strong></a>｜代码采用与 Phobos 相同的 <code>GPL-3.0</code> 许可。</p>
+<p>仓库：<a href="https://github.com/Chang-zhi/Scaffold" target="_blank" class="doc-link"><strong>Scaffold</strong></a>｜代码采用与 Phobos 相同的 <code>GPL-3.0</code> 许可。</p>
 <p>《红色警戒2：尤里的复仇》及其相关素材归 Electronic Arts 所有。</p>
 </section>
 
@@ -867,7 +868,7 @@ SmartVHPScan=FullHealth</code></pre>
 <table class="doc-table">
 <thead><tr><th class="doc-table__th" style="width:250px">CSF 标签</th><th class="doc-table__th" style="width:80px">用途</th><th class="doc-table__th">默认文本</th></tr></thead>
 <tbody>
-<tr><td class="doc-table__td"><code>CMND:UICATEGORY_PHOBOSEXT</code></td><td class="doc-table__td">分类</td><td class="doc-table__td">PhobosExt</td></tr>
+<tr><td class="doc-table__td"><code>CMND:UICATEGORY_SCAFFOLD</code></td><td class="doc-table__td">分类</td><td class="doc-table__td">Scaffold</td></tr>
 <tr><td class="doc-table__td"><code>CMND:UINAME_AUTOLOAD</code></td><td class="doc-table__td">名称</td><td class="doc-table__td">自动装载 Auto passengers load</td></tr>
 <tr><td class="doc-table__td"><code>CMND:UIDESCR_AUTOLOAD</code></td><td class="doc-table__td">描述</td><td class="doc-table__td">选中空载具按指定按键，自动招募附近单位上车\nRecruit nearby units to board selected empty transports</td></tr>
 </tbody>
@@ -1694,7 +1695,7 @@ ShowTextBoxInShroud.Techno=      ; boolean - 单位文本框在黑幕中是否�
 
 
 <footer class="doc-footer">
-<p>PhobosExt_Changzhi — 由 Chang_zhi 维护的<strong>非官方</strong> YR 扩展插件 · <a href="https://github.com/Chang-zhi/PhobosExt_Changzhi" target="_blank" class="doc-link">GitHub 仓库</a></p>
+<p>Scaffold — 由 Chang_zhi 维护的<strong>非官方</strong> YR 扩展插件 · <a href="https://github.com/Chang-zhi/Scaffold" target="_blank" class="doc-link">GitHub 仓库</a></p>
 <p>《红色警戒2：尤里的复仇》及其相关素材归 Electronic Arts 所有。</p>
 </footer>
 </div>

@@ -95,7 +95,7 @@ namespace detail
 		}
 		else if (!parser.empty())
 		{
-			Debug::INIParseFailed(pSection, pKey, parser.value(), "[Change_zhi Custom PhobosExt] Expected a valid boolean value [1, true, yes, 0, false, no]");
+			Debug::INIParseFailed(pSection, pKey, parser.value(), "[Change_zhi Custom Scaffold] Expected a valid boolean value [1, true, yes, 0, false, no]");
 		}
 
 		return false;
@@ -362,19 +362,19 @@ namespace detail
 			auto const buffer = parser.value();
 			char* context = nullptr;
 
-			if (auto const pFrame = strtok_s(buffer, PhobosExt::readDelims, &context))
+			if (auto const pFrame = strtok_s(buffer, Scaffold::readDelims, &context))
 				Parser<int>::Parse(pFrame, &value.Frame);
-			if (auto const pCount = strtok_s(nullptr, PhobosExt::readDelims, &context))
+			if (auto const pCount = strtok_s(nullptr, Scaffold::readDelims, &context))
 				Parser<int>::Parse(pCount, &value.Count);
-			if (auto const pInterval = strtok_s(nullptr, PhobosExt::readDelims, &context))
+			if (auto const pInterval = strtok_s(nullptr, Scaffold::readDelims, &context))
 				Parser<int>::Parse(pInterval, &value.Interval);
-			if (auto const pFrame = strtok_s(nullptr, PhobosExt::readDelims, &context))
+			if (auto const pFrame = strtok_s(nullptr, Scaffold::readDelims, &context))
 				Parser<int>::Parse(pFrame, &value.MiniFrame);
-			if (auto const pCount = strtok_s(nullptr, PhobosExt::readDelims, &context))
+			if (auto const pCount = strtok_s(nullptr, Scaffold::readDelims, &context))
 				Parser<int>::Parse(pCount, &value.MiniCount);
-			if (auto const pHotX = strtok_s(nullptr, PhobosExt::readDelims, &context))
+			if (auto const pHotX = strtok_s(nullptr, Scaffold::readDelims, &context))
 				MouseCursorHotSpotX::Parse(pHotX, &value.HotX);
-			if (auto const pHotY = strtok_s(nullptr, PhobosExt::readDelims, &context))
+			if (auto const pHotY = strtok_s(nullptr, Scaffold::readDelims, &context))
 				MouseCursorHotSpotY::Parse(pHotY, &value.HotY);
 
 			ret = true;
@@ -596,7 +596,7 @@ namespace detail
 			auto str = parser.value();
 			char* context = nullptr;
 
-			for (auto cur = strtok_s(str, PhobosExt::readDelims, &context); cur; cur = strtok_s(nullptr, PhobosExt::readDelims, &context))
+			for (auto cur = strtok_s(str, Scaffold::readDelims, &context); cur; cur = strtok_s(nullptr, Scaffold::readDelims, &context))
 			{
 				auto const landType = GroundType::GetLandTypeFromName(parser.value());
 
@@ -1120,7 +1120,7 @@ namespace detail
 
 			auto str = parser.value();
 			char* context = nullptr;
-			for (auto cur = strtok_s(str, PhobosExt::readDelims, &context); cur; cur = strtok_s(nullptr, PhobosExt::readDelims, &context))
+			for (auto cur = strtok_s(str, Scaffold::readDelims, &context); cur; cur = strtok_s(nullptr, Scaffold::readDelims, &context))
 			{
 				if (!_strcmpi(cur, "building"))
 				{
@@ -1207,15 +1207,15 @@ if(_strcmpi(parser.value(), #name) == 0){ value = LocomotionClass::CLSIDs::name;
 
 #undef PARSE_IF_IS_LOCO
 
-#define PARSE_IF_IS_PHOBOS_EXT_LOCO(name)\
+#define PARSE_IF_IS_SCAFFOLD_LOCO(name)\
 if(_strcmpi(parser.value(), #name) == 0){ value = __uuidof(name ## LocomotionClass); return true; }
 
 			// Add your locomotor parsing here
 #ifdef CUSTOM_LOCO_EXAMPLE_ENABLED // Add semantic parsing for loco
-			PARSE_IF_IS_PHOBOS_EXT_LOCO(Test);
+			PARSE_IF_IS_SCAFFOLD_LOCO(Test);
 #endif
 
-#undef PARSE_IF_IS_PHOBOS_EXT_LOCO
+#undef PARSE_IF_IS_SCAFFOLD_LOCO
 
 			return false;
 		}
@@ -1555,15 +1555,15 @@ void __declspec(noinline) Valueable<T>::Read(INI_EX& parser, const char* pSectio
 }
 
 template <typename T>
-bool Valueable<T>::Load(PhobosExtStreamReader& Stm, bool RegisterForChange)
+bool Valueable<T>::Load(ScaffoldStreamReader& Stm, bool RegisterForChange)
 {
-	return Savegame::ReadPhobosExtStream(Stm, this->Value, RegisterForChange);
+	return Savegame::ReadScaffoldStream(Stm, this->Value, RegisterForChange);
 }
 
 template <typename T>
-bool Valueable<T>::Save(PhobosExtStreamWriter& Stm) const
+bool Valueable<T>::Save(ScaffoldStreamWriter& Stm) const
 {
-	return Savegame::WritePhobosExtStream(Stm, this->Value);
+	return Savegame::WriteScaffoldStream(Stm, this->Value);
 }
 
 
@@ -1603,24 +1603,24 @@ void __declspec(noinline) Nullable<T>::Read(INI_EX& parser, const char* pSection
 }
 
 template <typename T>
-bool Nullable<T>::Load(PhobosExtStreamReader& Stm, bool RegisterForChange)
+bool Nullable<T>::Load(ScaffoldStreamReader& Stm, bool RegisterForChange)
 {
 	this->Reset();
-	auto ret = Savegame::ReadPhobosExtStream(Stm, this->HasValue);
+	auto ret = Savegame::ReadScaffoldStream(Stm, this->HasValue);
 
 	if (ret && this->HasValue)
-		ret = Savegame::ReadPhobosExtStream(Stm, this->Value, RegisterForChange);
+		ret = Savegame::ReadScaffoldStream(Stm, this->Value, RegisterForChange);
 
 	return ret;
 }
 
 template <typename T>
-bool Nullable<T>::Save(PhobosExtStreamWriter& Stm) const
+bool Nullable<T>::Save(ScaffoldStreamWriter& Stm) const
 {
-	auto ret = Savegame::WritePhobosExtStream(Stm, this->HasValue);
+	auto ret = Savegame::WriteScaffoldStream(Stm, this->HasValue);
 
 	if (this->HasValue)
-		ret = Savegame::WritePhobosExtStream(Stm, this->Value);
+		ret = Savegame::WriteScaffoldStream(Stm, this->Value);
 
 	return ret;
 }
@@ -1680,19 +1680,19 @@ void __declspec(noinline) Promotable<T>::Read(INI_EX& parser, const char* const 
 };
 
 template <typename T>
-bool Promotable<T>::Load(PhobosExtStreamReader& Stm, bool RegisterForChange)
+bool Promotable<T>::Load(ScaffoldStreamReader& Stm, bool RegisterForChange)
 {
-	return Savegame::ReadPhobosExtStream(Stm, this->Rookie, RegisterForChange)
-		&& Savegame::ReadPhobosExtStream(Stm, this->Veteran, RegisterForChange)
-		&& Savegame::ReadPhobosExtStream(Stm, this->Elite, RegisterForChange);
+	return Savegame::ReadScaffoldStream(Stm, this->Rookie, RegisterForChange)
+		&& Savegame::ReadScaffoldStream(Stm, this->Veteran, RegisterForChange)
+		&& Savegame::ReadScaffoldStream(Stm, this->Elite, RegisterForChange);
 }
 
 template <typename T>
-bool Promotable<T>::Save(PhobosExtStreamWriter& Stm) const
+bool Promotable<T>::Save(ScaffoldStreamWriter& Stm) const
 {
-	return Savegame::WritePhobosExtStream(Stm, this->Rookie)
-		&& Savegame::WritePhobosExtStream(Stm, this->Veteran)
-		&& Savegame::WritePhobosExtStream(Stm, this->Elite);
+	return Savegame::WriteScaffoldStream(Stm, this->Rookie)
+		&& Savegame::WriteScaffoldStream(Stm, this->Veteran)
+		&& Savegame::WriteScaffoldStream(Stm, this->Elite);
 }
 
 
@@ -1709,10 +1709,10 @@ void __declspec(noinline) ValueableVector<T>::Read(INI_EX& parser, const char* p
 }
 
 template <typename T>
-bool ValueableVector<T>::Load(PhobosExtStreamReader& Stm, bool RegisterForChange)
+bool ValueableVector<T>::Load(ScaffoldStreamReader& Stm, bool RegisterForChange)
 {
 	size_t size = 0;
-	if (Savegame::ReadPhobosExtStream(Stm, size, RegisterForChange))
+	if (Savegame::ReadScaffoldStream(Stm, size, RegisterForChange))
 	{
 		this->clear();
 		this->reserve(size);
@@ -1720,7 +1720,7 @@ bool ValueableVector<T>::Load(PhobosExtStreamReader& Stm, bool RegisterForChange
 		for (size_t i = 0; i < size; ++i)
 		{
 			value_type buffer = value_type();
-			Savegame::ReadPhobosExtStream(Stm, buffer, false);
+			Savegame::ReadScaffoldStream(Stm, buffer, false);
 			this->emplace_back(std::move(buffer));
 
 			if (RegisterForChange)
@@ -1734,10 +1734,10 @@ bool ValueableVector<T>::Load(PhobosExtStreamReader& Stm, bool RegisterForChange
 }
 
 template <>
-inline bool ValueableVector<bool>::Load(PhobosExtStreamReader& stm, bool registerForChange)
+inline bool ValueableVector<bool>::Load(ScaffoldStreamReader& stm, bool registerForChange)
 {
 	size_t size = 0;
-	if (Savegame::ReadPhobosExtStream(stm, size, registerForChange))
+	if (Savegame::ReadScaffoldStream(stm, size, registerForChange))
 	{
 		this->clear();
 		this->reserve(size);
@@ -1746,7 +1746,7 @@ inline bool ValueableVector<bool>::Load(PhobosExtStreamReader& stm, bool registe
 		{
 			bool value;
 
-			if (!Savegame::ReadPhobosExtStream(stm, value, false))
+			if (!Savegame::ReadScaffoldStream(stm, value, false))
 				return false;
 
 			this->emplace_back(value);
@@ -1759,14 +1759,14 @@ inline bool ValueableVector<bool>::Load(PhobosExtStreamReader& stm, bool registe
 }
 
 template <typename T>
-bool ValueableVector<T>::Save(PhobosExtStreamWriter& Stm) const
+bool ValueableVector<T>::Save(ScaffoldStreamWriter& Stm) const
 {
 	auto size = this->size();
-	if (Savegame::WritePhobosExtStream(Stm, size))
+	if (Savegame::WriteScaffoldStream(Stm, size))
 	{
 		for (auto const& item : *this)
 		{
-			if (!Savegame::WritePhobosExtStream(Stm, item))
+			if (!Savegame::WriteScaffoldStream(Stm, item))
 				return false;
 		}
 
@@ -1777,14 +1777,14 @@ bool ValueableVector<T>::Save(PhobosExtStreamWriter& Stm) const
 }
 
 template <>
-inline bool ValueableVector<bool>::Save(PhobosExtStreamWriter& stm) const
+inline bool ValueableVector<bool>::Save(ScaffoldStreamWriter& stm) const
 {
 	auto size = this->size();
-	if (Savegame::WritePhobosExtStream(stm, size))
+	if (Savegame::WriteScaffoldStream(stm, size))
 	{
 		for (bool item : *this)
 		{
-			if (!Savegame::WritePhobosExtStream(stm, item))
+			if (!Savegame::WriteScaffoldStream(stm, item))
 				return false;
 		}
 
@@ -1811,20 +1811,20 @@ void __declspec(noinline) NullableVector<T>::Read(INI_EX& parser, const char* pS
 }
 
 template <typename T>
-bool NullableVector<T>::Load(PhobosExtStreamReader& Stm, bool RegisterForChange)
+bool NullableVector<T>::Load(ScaffoldStreamReader& Stm, bool RegisterForChange)
 {
 	this->clear();
 
-	if (Savegame::ReadPhobosExtStream(Stm, this->hasValue, RegisterForChange))
+	if (Savegame::ReadScaffoldStream(Stm, this->hasValue, RegisterForChange))
 		return !this->hasValue || ValueableVector<T>::Load(Stm, RegisterForChange);
 
 	return false;
 }
 
 template <typename T>
-bool NullableVector<T>::Save(PhobosExtStreamWriter& Stm) const
+bool NullableVector<T>::Save(ScaffoldStreamWriter& Stm) const
 {
-	if (Savegame::WritePhobosExtStream(Stm, this->hasValue))
+	if (Savegame::WriteScaffoldStream(Stm, this->hasValue))
 		return !this->hasValue || ValueableVector<T>::Save(Stm);
 
 	return false;
@@ -1885,17 +1885,17 @@ void __declspec(noinline) Damageable<T>::Read(INI_EX& parser, const char* const 
 };
 
 template <typename T>
-bool Damageable<T>::Load(PhobosExtStreamReader& Stm, bool RegisterForChange)
+bool Damageable<T>::Load(ScaffoldStreamReader& Stm, bool RegisterForChange)
 {
-	return Savegame::ReadPhobosExtStream(Stm, this->BaseValue, RegisterForChange)
-		&& Savegame::ReadPhobosExtStream(Stm, this->ConditionYellow, RegisterForChange)
-		&& Savegame::ReadPhobosExtStream(Stm, this->ConditionRed, RegisterForChange);
+	return Savegame::ReadScaffoldStream(Stm, this->BaseValue, RegisterForChange)
+		&& Savegame::ReadScaffoldStream(Stm, this->ConditionYellow, RegisterForChange)
+		&& Savegame::ReadScaffoldStream(Stm, this->ConditionRed, RegisterForChange);
 }
 
 template <typename T>
-bool Damageable<T>::Save(PhobosExtStreamWriter& Stm) const
+bool Damageable<T>::Save(ScaffoldStreamWriter& Stm) const
 {
-	return Savegame::WritePhobosExtStream(Stm, this->BaseValue)
-		&& Savegame::WritePhobosExtStream(Stm, this->ConditionYellow)
-		&& Savegame::WritePhobosExtStream(Stm, this->ConditionRed);
+	return Savegame::WriteScaffoldStream(Stm, this->BaseValue)
+		&& Savegame::WriteScaffoldStream(Stm, this->ConditionYellow)
+		&& Savegame::WriteScaffoldStream(Stm, this->ConditionRed);
 }

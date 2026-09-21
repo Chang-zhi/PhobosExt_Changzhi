@@ -37,7 +37,7 @@ DEFINE_HOOK(0x7271F9, TEventClass_GetFlags, 0x5)
 	GET(TEventClass*, pThis, ESI);
 
 	int nEvent = static_cast<int>(pThis->EventKind);
-	if (nEvent >= PhobosExtTriggerEvent::TechnoTypeOfHouseNearWaypoint && nEvent < PhobosExtTriggerEvent::_DummyMaximum)
+	if (nEvent >= ScaffoldTriggerEvent::TechnoTypeOfHouseNearWaypoint && nEvent < ScaffoldTriggerEvent::_DummyMaximum)
 	{
 		eAttach |= TEventExt::GetFlags(nEvent);
 	}
@@ -53,7 +53,7 @@ DEFINE_HOOK(0x71F3FE, TEventClass_BuildINIEntry, 0x5)
 	GET(TEventClass*, pThis, ECX);
 
 	int nEvent = static_cast<int>(pThis->EventKind);
-	if (nEvent >= PhobosExtTriggerEvent::TechnoTypeOfHouseNearWaypoint && nEvent < PhobosExtTriggerEvent::_DummyMaximum)
+	if (nEvent >= ScaffoldTriggerEvent::TechnoTypeOfHouseNearWaypoint && nEvent < ScaffoldTriggerEvent::_DummyMaximum)
 		eNeedType = 43;
 
 	R->EAX(eNeedType);
@@ -66,7 +66,7 @@ DEFINE_HOOK(0x726577, TEventClass_Persistable, 0x7)
 	GET(TEventClass*, pThis, EDI);
 
 	int nEvent = static_cast<int>(pThis->EventKind);
-	if (nEvent >= PhobosExtTriggerEvent::TechnoTypeOfHouseNearWaypoint && nEvent < PhobosExtTriggerEvent::_DummyMaximum)
+	if (nEvent >= ScaffoldTriggerEvent::TechnoTypeOfHouseNearWaypoint && nEvent < ScaffoldTriggerEvent::_DummyMaximum)
 		R->AL(true);
 	else
 		R->AL(pThis->GetStateB());

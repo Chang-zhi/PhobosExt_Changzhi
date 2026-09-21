@@ -2,15 +2,15 @@
 
 #include "MapTextBoxClass.h"
 
-#include <PhobosExt.h>
+#include <Scaffold.h>
 #include <Utilities/SavegameDef.h>
 
 #include <string>
 #include <vector>
 #include <memory>
 
-class PhobosExtStreamWriter;
-class PhobosExtStreamReader;
+class ScaffoldStreamWriter;
+class ScaffoldStreamReader;
 
 class TechnoTextBoxClass final : public MapTextBoxClass
 {
@@ -46,8 +46,8 @@ public:
 	static void CleanupDeadLabels();    // 清理已摧毁单位的残留标签
 
 	// ===== 序列化 =====
-	bool Load(PhobosExtStreamReader& Stm, bool RegisterForChange) override;
-	bool Save(PhobosExtStreamWriter& Stm) const override;
+	bool Load(ScaffoldStreamReader& Stm, bool RegisterForChange) override;
+	bool Save(ScaffoldStreamWriter& Stm) const override;
 
 private:
 	template <typename T>

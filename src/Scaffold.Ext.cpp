@@ -1,4 +1,4 @@
-#include <PhobosExt.h>
+#include <Scaffold.h>
 
 #include <LoadOptionsClass.h>
 
@@ -55,8 +55,8 @@ concept PointerInvalidationSubscribable =
 template <typename T>
 concept GlobalSaveLoadable = requires
 {
-	T::LoadGlobals(std::declval<PhobosExtStreamReader&>());
-	T::SaveGlobals(std::declval<PhobosExtStreamWriter&>());
+	T::LoadGlobals(std::declval<ScaffoldStreamReader&>());
+	T::SaveGlobals(std::declval<ScaffoldStreamWriter&>());
 };
 
 template <typename TAction, typename TProcessed, typename... ArgTypes>
@@ -100,7 +100,7 @@ struct InvalidatePointerAction
 };
 
 // calls:
-// T::LoadGlobals(PhobosExtStreamReader&)
+// T::LoadGlobals(ScaffoldStreamReader&)
 struct LoadGlobalsAction
 {
 	template <typename T>
@@ -108,9 +108,9 @@ struct LoadGlobalsAction
 	{
 		if constexpr (GlobalSaveLoadable<T>)
 		{
-			PhobosExtByteStream stm(0);
+			ScaffoldByteStream stm(0);
 			stm.ReadBlockFromStream(pStm);
-			PhobosExtStreamReader reader(stm);
+			ScaffoldStreamReader reader(stm);
 
 			return T::LoadGlobals(reader) && reader.ExpectEndOfBlock();
 		}
@@ -122,7 +122,7 @@ struct LoadGlobalsAction
 };
 
 // calls:
-// T::SaveGlobals(PhobosExtStreamWriter&)
+// T::SaveGlobals(ScaffoldStreamWriter&)
 struct SaveGlobalsAction
 {
 	template <typename T>
@@ -130,8 +130,8 @@ struct SaveGlobalsAction
 	{
 		if constexpr (GlobalSaveLoadable<T>)
 		{
-			PhobosExtByteStream stm;
-			PhobosExtStreamWriter writer(stm);
+			ScaffoldByteStream stm;
+			ScaffoldStreamWriter writer(stm);
 
 			return T::SaveGlobals(writer) && stm.WriteBlockToStream(pStm);
 		}
@@ -184,7 +184,7 @@ private:
 #pragma endregion
 
 // Add more class names as you like
-using PhobosExtTypeRegistry = TypeRegistry <
+using ScaffoldTypeRegistry = TypeRegistry <
 	// Ext classes
 	HouseExt,
 	TActionExt,
@@ -213,32 +213,32 @@ DEFINE_HOOK(0x7258D0, AnnounceInvalidPointer, 0x6)
 	GET(AbstractClass* const, pInvalid, ECX);
 	GET(bool const, removed, EDX);
 
-	PhobosExtTypeRegistry::InvalidatePointer(pInvalid, removed);
+	ScaffoldTypeRegistry::InvalidatePointer(pInvalid, removed);
 
 	return 0;
 }
 
 DEFINE_HOOK(0x685659, Scenario_ClearClasses, 0xa)
 {
-	PhobosExtTypeRegistry::Clear();
+	ScaffoldTypeRegistry::Clear();
 	return 0;
 }
 
 // Ares saves its things at the end of the save
-// PhobosExt will save the things at the beginning of the save
+// Scaffold will save the things at the beginning of the save
 // Considering how DTA gets the scenario name, I decided to save it after Rules - secsome
 
-DEFINE_HOOK(0x67D32C, SaveGame_PhobosExt, 0x5)
+DEFINE_HOOK(0x67D32C, SaveGame_Scaffold, 0x5)
 {
 	GET(IStream*, pStm, ESI);
-	PhobosExtTypeRegistry::SaveGlobals(pStm);
+	ScaffoldTypeRegistry::SaveGlobals(pStm);
 	return 0;
 }
 
-DEFINE_HOOK(0x67E826, LoadGame_PhobosExt, 0x6)
+DEFINE_HOOK(0x67E826, LoadGame_Scaffold, 0x6)
 {
 	GET(IStream*, pStm, ESI);
-	PhobosExtTypeRegistry::LoadGlobals(pStm);
+	ScaffoldTypeRegistry::LoadGlobals(pStm);
 	return 0;
 }
 
@@ -248,8 +248,8 @@ DEFINE_HOOK(0x67D04E, GameSave_SavegameInformation, 0x7)
 
 	Info.InternalVersion = Info.InternalVersion + SAVEGAME_ID;
 	strncat(Info.ExecutableName.data(),
-		" + PhobosExt " FILE_VERSION_STR,
-		Info.ExecutableName.Size - sizeof(" + Chang_zhi Custom PhobosExt " FILE_VERSION_STR)
+		" + Scaffold " FILE_VERSION_STR,
+		Info.ExecutableName.Size - sizeof(" + Chang_zhi Custom Scaffold " FILE_VERSION_STR)
 	);
 
 	return 0;

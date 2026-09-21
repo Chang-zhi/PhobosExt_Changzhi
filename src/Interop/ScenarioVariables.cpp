@@ -1,6 +1,6 @@
 #include "ScenarioVariables.h"
 
-#include <Interop/PhobosExtInterop.h>
+#include <Interop/ScaffoldInterop.h>
 #include <ScenarioClass.h>
 
 // 本翻译单元是本工程中唯一需要了解“剧本变量如何存储”的地方:
@@ -16,12 +16,12 @@ bool ScenarioVariables::TryRead(Scope scope, int index, int& outValue)
 
 	// 提供方存在时以 Interop API 为准: 值为完整 int。除 E_FAIL(ScenarioExt 未初始化)
 	// 外不应失败; S_FALSE 表示变量不存在, 提供方已把输出置 0, 因此按成功处理。
-	if (PhobosExtInterop::IsAvailable())
+	if (ScaffoldInterop::IsAvailable())
 	{
 		int value = 0;
 		HRESULT const hr = bGlobal
-			? PhobosExtInterop::Variables_GetGlobal(index, &value)
-			: PhobosExtInterop::Variables_GetLocal(index, &value);
+			? ScaffoldInterop::Variables_GetGlobal(index, &value)
+			: ScaffoldInterop::Variables_GetLocal(index, &value);
 
 		if (FAILED(hr))
 			return false;
@@ -55,12 +55,12 @@ bool ScenarioVariables::TryWrite(Scope scope, int index, int value)
 
 	bool const bGlobal = (scope == Scope::Global);
 
-	if (PhobosExtInterop::IsAvailable())
+	if (ScaffoldInterop::IsAvailable())
 	{
 		// 提供方在变量不存在时会创建之; 仅 ScenarioExt 未初始化(E_FAIL)才算失败。
 		HRESULT const hr = bGlobal
-			? PhobosExtInterop::Variables_SetGlobal(index, value)
-			: PhobosExtInterop::Variables_SetLocal(index, value);
+			? ScaffoldInterop::Variables_SetGlobal(index, value)
+			: ScaffoldInterop::Variables_SetLocal(index, value);
 
 		return SUCCEEDED(hr);
 	}

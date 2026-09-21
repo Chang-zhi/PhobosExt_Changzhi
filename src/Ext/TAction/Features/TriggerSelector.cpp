@@ -1,6 +1,6 @@
 #include "TriggerSelector.h"
 
-#include <PhobosExt.h>
+#include <Scaffold.h>
 #include <TriggerTypeClass.h>
 #include <TriggerClass.h>
 #include <ScenarioClass.h>

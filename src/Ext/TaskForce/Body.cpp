@@ -34,7 +34,7 @@ void TaskForceExt::ExtData::Serialize(T& Stm)
 	}
 }
 
-void TaskForceExt::ExtData::LoadFromStream(PhobosExtStreamReader& Stm)
+void TaskForceExt::ExtData::LoadFromStream(ScaffoldStreamReader& Stm)
 {
 	Extension<TaskForceClass>::LoadFromStream(Stm);
 	this->Serialize(Stm);
@@ -50,7 +50,7 @@ void TaskForceExt::ExtData::LoadFromStream(PhobosExtStreamReader& Stm)
 		// 避免恢复出"有数量但没有类型"的坏条目
 		if (!this->OriginalEntryTypeIDs[i].empty() && !this->OriginalEntries[i].Type)
 		{
-			Debug::Log("[PhobosExt] LoadFromStream: TaskForce [%s] entry[%d] type [%s] not found, cleared\n",
+			Debug::Log("[Scaffold] LoadFromStream: TaskForce [%s] entry[%d] type [%s] not found, cleared\n",
 				this->OwnerObject() ? this->OwnerObject()->ID : "null", i,
 				this->OriginalEntryTypeIDs[i].c_str());
 
@@ -59,7 +59,7 @@ void TaskForceExt::ExtData::LoadFromStream(PhobosExtStreamReader& Stm)
 	}
 }
 
-void TaskForceExt::ExtData::SaveToStream(PhobosExtStreamWriter& Stm)
+void TaskForceExt::ExtData::SaveToStream(ScaffoldStreamWriter& Stm)
 {
 	Extension<TaskForceClass>::SaveToStream(Stm);
 	this->Serialize(Stm);
@@ -71,14 +71,14 @@ void TaskForceExt::ExtData::CaptureOriginal()
 
 	if (this->OriginalCountEntries > 0)
 	{
-		Debug::Log("[PhobosExt] CaptureOriginal: TaskForce [%s] already captured, skip\n",
+		Debug::Log("[Scaffold] CaptureOriginal: TaskForce [%s] already captured, skip\n",
 			pType ? pType->ID : "null");
 		return;
 	}
 
 	if (pType->CountEntries <= 0)
 	{
-		Debug::Log("[PhobosExt] CaptureOriginal: TaskForce [%s] has no entries, skip\n",
+		Debug::Log("[Scaffold] CaptureOriginal: TaskForce [%s] has no entries, skip\n",
 			pType ? pType->ID : "null");
 		return;
 	}
@@ -91,7 +91,7 @@ void TaskForceExt::ExtData::CaptureOriginal()
 		this->OriginalEntryTypeIDs[i] = pType->Entries[i].Type ? pType->Entries[i].Type->ID : "";
 	}
 
-	Debug::Log("[PhobosExt] CaptureOriginal: TaskForce [%s] captured %d entries\n",
+	Debug::Log("[Scaffold] CaptureOriginal: TaskForce [%s] captured %d entries\n",
 		pType->ID, this->OriginalCountEntries);
 }
 
@@ -101,7 +101,7 @@ void TaskForceExt::ExtData::RestoreOriginal()
 	if (!this->IsModified)
 		return;
 
-	Debug::Log("[PhobosExt] RestoreOriginal: TaskForce [%s] restore %d entries\n",
+	Debug::Log("[Scaffold] RestoreOriginal: TaskForce [%s] restore %d entries\n",
 		pType->ID, this->OriginalCountEntries);
 
 	pType->CountEntries = this->OriginalCountEntries;

@@ -138,14 +138,14 @@ bool ScreenChoiceBoxClass::Serialize(T& Stm)
 		.Success();
 }
 
-bool ScreenChoiceBoxClass::Load(PhobosExtStreamReader& Stm, bool RegisterForChange)
+bool ScreenChoiceBoxClass::Load(ScaffoldStreamReader& Stm, bool RegisterForChange)
 {
 	if (!this->MapChoiceBoxClass::Load(Stm, RegisterForChange))
 		return false;
 	return Serialize(Stm);
 }
 
-bool ScreenChoiceBoxClass::Save(PhobosExtStreamWriter& Stm) const
+bool ScreenChoiceBoxClass::Save(ScaffoldStreamWriter& Stm) const
 {
 	if (!this->MapChoiceBoxClass::Save(Stm))
 		return false;

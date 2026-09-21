@@ -44,13 +44,13 @@ bool CustomPalette::LoadFromINI(
 	CCINIClass* pINI, const char* pSection, const char* pKey,
 	const char* pDefault)
 {
-	if (pINI->ReadString(pSection, pKey, pDefault, PhobosExt::readBuffer))
+	if (pINI->ReadString(pSection, pKey, pDefault, Scaffold::readBuffer))
 	{
-		GeneralUtils::ApplyTheaterSuffixToString(PhobosExt::readBuffer);
+		GeneralUtils::ApplyTheaterSuffixToString(Scaffold::readBuffer);
 
 		this->Clear();
 
-		if (auto pPal = FileSystem::AllocatePalette(PhobosExt::readBuffer))
+		if (auto pPal = FileSystem::AllocatePalette(Scaffold::readBuffer))
 		{
 			this->Palette.reset(pPal);
 			this->CreateConvert();
@@ -61,7 +61,7 @@ bool CustomPalette::LoadFromINI(
 	return false;
 }
 
-bool CustomPalette::Load(PhobosExtStreamReader& Stm, bool RegisterForChange)
+bool CustomPalette::Load(ScaffoldStreamReader& Stm, bool RegisterForChange)
 {
 	this->Clear();
 
@@ -82,7 +82,7 @@ bool CustomPalette::Load(PhobosExtStreamReader& Stm, bool RegisterForChange)
 	return ret;
 }
 
-bool CustomPalette::Save(PhobosExtStreamWriter& Stm) const
+bool CustomPalette::Save(ScaffoldStreamWriter& Stm) const
 {
 	Stm.Save(this->Mode);
 	Stm.Save(this->Palette != nullptr);
@@ -118,7 +118,7 @@ void CustomPalette::CreateConvert()
 }
 
 
-PhobosExtPCXFile& PhobosExtPCXFile::operator = (const char* pFilename)
+ScaffoldPCXFile& ScaffoldPCXFile::operator = (const char* pFilename)
 {
 	this->filename = pFilename;
 	auto& data = this->filename.data();
@@ -135,12 +135,12 @@ PhobosExtPCXFile& PhobosExtPCXFile::operator = (const char* pFilename)
 	return *this;
 }
 
-BSurface* PhobosExtPCXFile::GetSurface(BytePalette* pPalette) const
+BSurface* ScaffoldPCXFile::GetSurface(BytePalette* pPalette) const
 {
 	return this->Exists() ? PCX::Instance.GetSurface(this->filename, pPalette) : nullptr;
 }
 
-bool PhobosExtPCXFile::Exists() const
+bool ScaffoldPCXFile::Exists() const
 {
 	if (!this->checked)
 	{
@@ -154,7 +154,7 @@ bool PhobosExtPCXFile::Exists() const
 	return this->exists;
 }
 
-bool PhobosExtPCXFile::Read(INIClass* pINI, const char* pSection, const char* pKey, const char* pDefault)
+bool ScaffoldPCXFile::Read(INIClass* pINI, const char* pSection, const char* pKey, const char* pDefault)
 {
 	char buffer[Capacity];
 	if (pINI->ReadString(pSection, pKey, pDefault, buffer))
@@ -169,7 +169,7 @@ bool PhobosExtPCXFile::Read(INIClass* pINI, const char* pSection, const char* pK
 	return buffer[0] != 0;
 }
 
-bool PhobosExtPCXFile::Load(PhobosExtStreamReader& Stm, bool RegisterForChange)
+bool ScaffoldPCXFile::Load(ScaffoldStreamReader& Stm, bool RegisterForChange)
 {
 	this->filename = nullptr;
 	if (Stm.Load(*this))
@@ -187,7 +187,7 @@ bool PhobosExtPCXFile::Load(PhobosExtStreamReader& Stm, bool RegisterForChange)
 	return false;
 }
 
-bool PhobosExtPCXFile::Save(PhobosExtStreamWriter& Stm) const
+bool ScaffoldPCXFile::Save(ScaffoldStreamWriter& Stm) const
 {
 	Stm.Save(*this);
 	return true;
@@ -209,7 +209,7 @@ const CSFText& CSFText::operator = (const char* label)
 	return *this;
 }
 
-bool CSFText::load(PhobosExtStreamReader& Stm, bool RegisterForChange)
+bool CSFText::load(ScaffoldStreamReader& Stm, bool RegisterForChange)
 {
 	this->Text = nullptr;
 	if (Stm.Load(this->Label.data()))
@@ -223,7 +223,7 @@ bool CSFText::load(PhobosExtStreamReader& Stm, bool RegisterForChange)
 	return false;
 }
 
-bool CSFText::save(PhobosExtStreamWriter& Stm) const
+bool CSFText::save(ScaffoldStreamWriter& Stm) const
 {
 	Stm.Save(this->Label.data());
 	return true;
@@ -242,13 +242,13 @@ bool TranslucencyLevel::Read(INI_EX& parser, const char* pSection, const char* p
 	return false;
 }
 
-bool TranslucencyLevel::Load(PhobosExtStreamReader& Stm, bool RegisterForChange)
+bool TranslucencyLevel::Load(ScaffoldStreamReader& Stm, bool RegisterForChange)
 {
 	Stm.Load(this->value);
 	return true;
 }
 
-bool TranslucencyLevel::Save(PhobosExtStreamWriter& Stm) const
+bool TranslucencyLevel::Save(ScaffoldStreamWriter& Stm) const
 {
 	Stm.Save(this->value);
 	return true;
@@ -278,12 +278,12 @@ bool TheaterSpecificSHP::Read(INI_EX& parser, const char* pSection, const char* 
 	return false;
 }
 
-bool TheaterSpecificSHP::Load(PhobosExtStreamReader& Stm, bool RegisterForChange)
+bool TheaterSpecificSHP::Load(ScaffoldStreamReader& Stm, bool RegisterForChange)
 {
-	return Savegame::ReadPhobosExtStream(Stm, this->value, RegisterForChange);
+	return Savegame::ReadScaffoldStream(Stm, this->value, RegisterForChange);
 }
 
-bool TheaterSpecificSHP::Save(PhobosExtStreamWriter& Stm) const
+bool TheaterSpecificSHP::Save(ScaffoldStreamWriter& Stm) const
 {
-	return Savegame::WritePhobosExtStream(Stm, this->value);
+	return Savegame::WriteScaffoldStream(Stm, this->value);
 }

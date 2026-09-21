@@ -136,7 +136,7 @@ void TaskForceManipulator::RefreshTeamsUsingTaskForce(TaskForceClass* pTF)
 				if (current > allowed)
 				{
 					--current;
-					Debug::Log("[PhobosExt] RefreshTeamsUsingTF: Liberate [%s] from Team [%s] (exceed %d>%d)\n",
+					Debug::Log("[Scaffold] RefreshTeamsUsingTF: Liberate [%s] from Team [%s] (exceed %d>%d)\n",
 						pType->ID, pTeamType->ID, current + 1, allowed);
 					pTeam->LiberateMember(pUnit);
 					++nTeamsPruned;
@@ -149,7 +149,7 @@ void TaskForceManipulator::RefreshTeamsUsingTaskForce(TaskForceClass* pTF)
 		}
 	}
 
-	Debug::Log("[PhobosExt] RefreshTeamsUsingTF: [%s] updated %d TeamTypes, pruned %d units\n",
+	Debug::Log("[Scaffold] RefreshTeamsUsingTF: [%s] updated %d TeamTypes, pruned %d units\n",
 		pTF->ID, nTeamTypesUpdated, nTeamsPruned);
 }
 
@@ -218,7 +218,7 @@ void TaskForceManipulator::RefreshTeamsOfType(TeamTypeClass* pTeamType)
 			if (current > allowed)
 			{
 				--current;
-				Debug::Log("[PhobosExt] RefreshTeamsOfType: Liberate [%s] from Team [%s]\n",
+				Debug::Log("[Scaffold] RefreshTeamsOfType: Liberate [%s] from Team [%s]\n",
 					pType->ID, pTeamType->ID);
 				pTeam->LiberateMember(pUnit);
 			}
@@ -238,7 +238,7 @@ void TaskForceManipulator::ClearTaskForce(TActionClass* pThis)
 	auto const pTF = FindTaskForce(pThis->Param3);
 	if (!pTF)
 	{
-		Debug::Log("[PhobosExt] ClearTaskForce: Param3=%d -> TaskForce not found!\n", pThis->Param3);
+		Debug::Log("[Scaffold] ClearTaskForce: Param3=%d -> TaskForce not found!\n", pThis->Param3);
 		return;
 	}
 
@@ -251,7 +251,7 @@ void TaskForceManipulator::ClearTaskForce(TActionClass* pThis)
 	auto const pExt = TaskForceExt::ExtMap.Find(pTF);
 	if (pExt) pExt->IsModified = true;
 
-	Debug::Log("[PhobosExt] ClearTaskForce: TaskForce [%s] cleared\n", pTF->ID);
+	Debug::Log("[Scaffold] ClearTaskForce: TaskForce [%s] cleared\n", pTF->ID);
 
 	RefreshTeamsUsingTaskForce(pTF);
 }
@@ -266,7 +266,7 @@ void TaskForceManipulator::CopyTaskForce(TActionClass* pThis)
 
 	if (!pSrc || !pDst)
 	{
-		Debug::Log("[PhobosExt] CopyTaskForce: Src=%d Dst=%d -> not found!\n",
+		Debug::Log("[Scaffold] CopyTaskForce: Src=%d Dst=%d -> not found!\n",
 			pThis->Param3, pThis->Param4);
 		return;
 	}
@@ -285,7 +285,7 @@ void TaskForceManipulator::CopyTaskForce(TActionClass* pThis)
 	auto const pExt = TaskForceExt::ExtMap.Find(pDst);
 	if (pExt) pExt->IsModified = true;
 
-	Debug::Log("[PhobosExt] CopyTaskForce: [%s](%d entries) -> [%s]\n",
+	Debug::Log("[Scaffold] CopyTaskForce: [%s](%d entries) -> [%s]\n",
 		pSrc->ID, pSrc->CountEntries, pDst->ID);
 
 	RefreshTeamsUsingTaskForce(pDst);
@@ -344,7 +344,7 @@ void TaskForceManipulator::ModifyTaskForceEntry(TActionClass* pThis)
 	auto const pExt = TaskForceExt::ExtMap.Find(pTF);
 	if (pExt) pExt->IsModified = true;
 
-	Debug::Log("[PhobosExt] ModifyTaskForceEntry: [%s] entry[%d] amount=%d type=%s\n",
+	Debug::Log("[Scaffold] ModifyTaskForceEntry: [%s] entry[%d] amount=%d type=%s\n",
 		pTF->ID, entryIdx, amount, technoID ? technoID : "(keep)");
 
 	RefreshTeamsUsingTaskForce(pTF);
@@ -361,7 +361,7 @@ void TaskForceManipulator::RebindTeamTypeTaskForce(TActionClass* pThis)
 
 	if (!pTeamType || !pNewTF)
 	{
-		Debug::Log("[PhobosExt] RebindTeamTypeTaskForce: TeamType=%d TF=%d -> not found!\n",
+		Debug::Log("[Scaffold] RebindTeamTypeTaskForce: TeamType=%d TF=%d -> not found!\n",
 			pThis->Param3, pThis->Param4);
 		return;
 	}
@@ -369,7 +369,7 @@ void TaskForceManipulator::RebindTeamTypeTaskForce(TActionClass* pThis)
 	auto const pExt = TeamTypeExt::ExtMap.FindOrAllocate(pTeamType);
 	CaptureOriginalTaskForceIndex(pExt, pTeamType);
 
-	Debug::Log("[PhobosExt] RebindTeamTypeTaskForce: [%s] -> TaskForce [%s]\n",
+	Debug::Log("[Scaffold] RebindTeamTypeTaskForce: [%s] -> TaskForce [%s]\n",
 		pTeamType->ID, pNewTF->ID);
 
 	pTeamType->TaskForce = pNewTF;
@@ -387,14 +387,14 @@ void TaskForceManipulator::ResetTeamTypeTaskForce(TActionClass* pThis)
 	if (!pTeamType)
 		return;
 
-	Debug::Log("[PhobosExt] ResetTeamTypeTaskForce: Param3=%d\n", pThis->Param3);
+	Debug::Log("[Scaffold] ResetTeamTypeTaskForce: Param3=%d\n", pThis->Param3);
 
 	auto const pExt = TeamTypeExt::ExtMap.FindOrAllocate(pTeamType);
 	CaptureOriginalTaskForceIndex(pExt, pTeamType);
 
 	if (pExt->OriginalTaskForceIndex < 0)
 	{
-		Debug::Log("[PhobosExt] ResetTeamTypeTaskForce: No original TaskForce index!\n");
+		Debug::Log("[Scaffold] ResetTeamTypeTaskForce: No original TaskForce index!\n");
 		return;
 	}
 
@@ -403,7 +403,7 @@ void TaskForceManipulator::ResetTeamTypeTaskForce(TActionClass* pThis)
 	pTeamType->ProcessTaskForce();
 	RefreshTeamsOfType(pTeamType);
 
-	Debug::Log("[PhobosExt] ResetTeamTypeTaskForce: [%s] -> TaskForce [%s]\n",
+	Debug::Log("[Scaffold] ResetTeamTypeTaskForce: [%s] -> TaskForce [%s]\n",
 		pTeamType->ID, pOriginalTF->ID);
 }
 
@@ -412,7 +412,7 @@ void TaskForceManipulator::ResetTeamTypeTaskForce(TActionClass* pThis)
 // ============================================================================
 void TaskForceManipulator::ResetAllTeamTypeTaskForces()
 {
-	Debug::Log("[PhobosExt] ResetAllTeamTypeTaskForces\n");
+	Debug::Log("[Scaffold] ResetAllTeamTypeTaskForces\n");
 
 	for (int i = 0; i < TeamTypeClass::Array.Count; ++i)
 	{
@@ -441,7 +441,7 @@ void TaskForceManipulator::ResetAllTeamTypeTaskForces()
 		RefreshTeamsOfType(pTeamType);
 	}
 
-	Debug::Log("[PhobosExt] ResetAllTeamTypeTaskForces: complete\n");
+	Debug::Log("[Scaffold] ResetAllTeamTypeTaskForces: complete\n");
 }
 
 // ============================================================================
@@ -457,7 +457,7 @@ void TaskForceManipulator::RestoreTaskForce(TActionClass* pThis)
 	if (pExt)
 	{
 		pExt->RestoreOriginal();
-		Debug::Log("[PhobosExt] RestoreTaskForce: [%s] restored\n", pTF->ID);
+		Debug::Log("[Scaffold] RestoreTaskForce: [%s] restored\n", pTF->ID);
 	}
 }
 
@@ -466,7 +466,7 @@ void TaskForceManipulator::RestoreTaskForce(TActionClass* pThis)
 // ============================================================================
 void TaskForceManipulator::RestoreAllTaskForces()
 {
-	Debug::Log("[PhobosExt] RestoreAllTaskForces\n");
+	Debug::Log("[Scaffold] RestoreAllTaskForces\n");
 
 	for (int i = 0; i < TaskForceClass::Array.Count; ++i)
 	{

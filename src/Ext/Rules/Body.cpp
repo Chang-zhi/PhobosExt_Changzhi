@@ -1,7 +1,7 @@
 #include "Body.h"
 #include <Windows.h>
 #include <string.h>
-#include <PhobosExt.h>
+#include <Scaffold.h>
 #include <Utilities/TemplateDef.h>
 #include <Utilities/Parser.h>
 #include <FPSCounter.h>
@@ -86,9 +86,9 @@ void RulesExt::ExtData::LoadAfterTypeData(RulesClass* pThis, CCINIClass* pINI)
 		{
 			std::vector<TechnoTypeClass*> objectsList;
 			char* context = nullptr;
-			pINI->ReadString("AITargetTypes", pINI->GetKeyName("AITargetTypes", i), "", PhobosExt::readBuffer);
+			pINI->ReadString("AITargetTypes", pINI->GetKeyName("AITargetTypes", i), "", Scaffold::readBuffer);
 
-			for (char* cur = strtok_s(PhobosExt::readBuffer, PhobosExt::readDelims, &context); cur; cur = strtok_s(nullptr, PhobosExt::readDelims, &context))
+			for (char* cur = strtok_s(Scaffold::readBuffer, Scaffold::readDelims, &context); cur; cur = strtok_s(nullptr, Scaffold::readDelims, &context))
 			{
 				TechnoTypeClass* buffer;
 				if (Parser<TechnoTypeClass*>::TryParse(cur, &buffer))
@@ -101,7 +101,7 @@ void RulesExt::ExtData::LoadAfterTypeData(RulesClass* pThis, CCINIClass* pINI)
 		}
 
 		this->AITargetTypesLists = std::move(lists);
-		Debug::Log("[PhobosExt] AITargetTypes: parsed %d lists\n", static_cast<int>(this->AITargetTypesLists.size()));
+		Debug::Log("[Scaffold] AITargetTypes: parsed %d lists\n", static_cast<int>(this->AITargetTypesLists.size()));
 	}
 }
 
@@ -132,7 +132,7 @@ void RulesExt::ExtData::Serialize(T& Stm)
 		;
 }
 
-void RulesExt::ExtData::LoadFromStream(PhobosExtStreamReader& Stm)
+void RulesExt::ExtData::LoadFromStream(ScaffoldStreamReader& Stm)
 {
 	Extension<RulesClass>::LoadFromStream(Stm);
 	this->Serialize(Stm);
@@ -140,7 +140,7 @@ void RulesExt::ExtData::LoadFromStream(PhobosExtStreamReader& Stm)
 	this->ReplaceVoxelLightSources();
 }
 
-void RulesExt::ExtData::SaveToStream(PhobosExtStreamWriter& Stm)
+void RulesExt::ExtData::SaveToStream(ScaffoldStreamWriter& Stm)
 {
 	Extension<RulesClass>::SaveToStream(Stm);
 	this->Serialize(Stm);
@@ -189,10 +189,10 @@ DEFINE_HOOK(0x678841, RulesClass_Load_Suffix, 0x7)
 {
 	auto buffer = RulesExt::Global();
 
-	PhobosExtByteStream Stm(0);
+	ScaffoldByteStream Stm(0);
 	if (Stm.ReadBlockFromStream(RulesExt::g_pStm))
 	{
-		PhobosExtStreamReader Reader(Stm);
+		ScaffoldStreamReader Reader(Stm);
 
 		if (Reader.Expect(RulesExt::Canary) && Reader.RegisterChange(buffer))
 			buffer->LoadFromStream(Reader);
@@ -204,8 +204,8 @@ DEFINE_HOOK(0x678841, RulesClass_Load_Suffix, 0x7)
 DEFINE_HOOK(0x675205, RulesClass_Save_Suffix, 0x8)
 {
 	auto buffer = RulesExt::Global();
-	PhobosExtByteStream saver(sizeof(*buffer));
-	PhobosExtStreamWriter writer(saver);
+	ScaffoldByteStream saver(sizeof(*buffer));
+	ScaffoldStreamWriter writer(saver);
 
 	writer.Expect(RulesExt::Canary);
 	writer.RegisterChange(buffer);

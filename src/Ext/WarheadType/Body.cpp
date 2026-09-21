@@ -43,24 +43,24 @@ void WarheadTypeExt::ExtData::Serialize(T& Stm)
 		;
 }
 
-void WarheadTypeExt::ExtData::LoadFromStream(PhobosExtStreamReader& Stm)
+void WarheadTypeExt::ExtData::LoadFromStream(ScaffoldStreamReader& Stm)
 {
 	Extension<WarheadTypeClass>::LoadFromStream(Stm);
 	this->Serialize(Stm);
 }
 
-void WarheadTypeExt::ExtData::SaveToStream(PhobosExtStreamWriter& Stm)
+void WarheadTypeExt::ExtData::SaveToStream(ScaffoldStreamWriter& Stm)
 {
 	Extension<WarheadTypeClass>::SaveToStream(Stm);
 	this->Serialize(Stm);
 }
 
-bool WarheadTypeExt::LoadGlobals(PhobosExtStreamReader& Stm)
+bool WarheadTypeExt::LoadGlobals(ScaffoldStreamReader& Stm)
 {
 	return Stm.Success();
 }
 
-bool WarheadTypeExt::SaveGlobals(PhobosExtStreamWriter& Stm)
+bool WarheadTypeExt::SaveGlobals(ScaffoldStreamWriter& Stm)
 {
 	return Stm.Success();
 }

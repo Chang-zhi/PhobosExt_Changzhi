@@ -58,7 +58,7 @@ void ScriptManipulator::ResetTeamsUsingScript(ScriptTypeClass* pScript)
 			continue;
 
 		++nReset;
-		Debug::Log("[PhobosExt] ResetTeamsUsingScript: Team #%d [%s] Script.CurrentMission=%d->0\n",
+		Debug::Log("[Scaffold] ResetTeamsUsingScript: Team #%d [%s] Script.CurrentMission=%d->0\n",
 			i, pTeam->Type->ID, pTeam->CurrentScript->CurrentMission);
 
 		// Set to -1 so NextMission() increments to 0 on next tick (action 0 will execute)
@@ -66,7 +66,7 @@ void ScriptManipulator::ResetTeamsUsingScript(ScriptTypeClass* pScript)
 		pTeam->StepCompleted = true;
 	}
 
-	Debug::Log("[PhobosExt] ResetTeamsUsingScript: Script [%s] reset %d teams\n",
+	Debug::Log("[Scaffold] ResetTeamsUsingScript: Script [%s] reset %d teams\n",
 		pScript->ID, nReset);
 }
 
@@ -78,20 +78,20 @@ void ScriptManipulator::ClearScript(TActionClass* pThis)
 	ScriptTypeClass* const pScript = FindScript(pThis->Param3);
 	if (!pScript)
 	{
-		Debug::Log("[PhobosExt] ClearScript: Param3=%d -> ScriptType not found!\n", pThis->Param3);
+		Debug::Log("[Scaffold] ClearScript: Param3=%d -> ScriptType not found!\n", pThis->Param3);
 		return;
 	}
 
 	auto const pExt = CaptureOriginalScriptContent(pScript);
 
-	Debug::Log("[PhobosExt] ClearScript: Script [%s] Param3=%d ActionsCount=%d IsModified=%d\n",
+	Debug::Log("[Scaffold] ClearScript: Script [%s] Param3=%d ActionsCount=%d IsModified=%d\n",
 		pScript->ID, pThis->Param3, pScript->ActionsCount, pExt->IsModified);
 	pScript->ActionsCount = 0;
 	for (int i = 0; i < ScriptTypeExt::ScriptActionCount; ++i)
 		pScript->ScriptActions[i] = { 0, 0 };
 	pExt->IsModified = true;
 
-	Debug::Log("[PhobosExt] ClearScript: Script [%s] cleared, ActionsCount=0 IsModified=1\n",
+	Debug::Log("[Scaffold] ClearScript: Script [%s] cleared, ActionsCount=0 IsModified=1\n",
 		pScript->ID);
 
 	ResetTeamsUsingScript(pScript);
@@ -114,7 +114,7 @@ void ScriptManipulator::CopyScript(TActionClass* pThis)
 	if (count > ScriptTypeExt::ScriptActionCount)
 		count = ScriptTypeExt::ScriptActionCount;
 
-	Debug::Log("[PhobosExt] CopyScript: Src=[%s](%d actions) Dst=[%s] Param3=%d Param4=%d\n",
+	Debug::Log("[Scaffold] CopyScript: Src=[%s](%d actions) Dst=[%s] Param3=%d Param4=%d\n",
 		pSrc->ID, pSrc->ActionsCount, pDst->ID, pThis->Param3, pThis->Param4);
 
 	pDst->ActionsCount = count;
@@ -138,7 +138,7 @@ void ScriptManipulator::CopyScript(TActionClass* pThis)
 void ScriptManipulator::ModifyScriptByParam(TActionClass* pThis)
 {
 	auto const pScript = FindScript(pThis->Text);
-	Debug::Log("[PhobosExt] ModifyScriptByParam: Text=[%s] Param3=%d Param4=%d Param5=%d Param6=%d\n",
+	Debug::Log("[Scaffold] ModifyScriptByParam: Text=[%s] Param3=%d Param4=%d Param5=%d Param6=%d\n",
 		pThis->Text, pThis->Param3, pThis->Param4, pThis->Param5, pThis->Param6);
 	if (!pScript)
 		return;
@@ -172,7 +172,7 @@ void ScriptManipulator::ModifyScriptByParam(TActionClass* pThis)
 void ScriptManipulator::ModifyScriptByLocalVar(TActionClass* pThis)
 {
 	auto const pScript = FindScript(pThis->Text);
-	Debug::Log("[PhobosExt] ModifyScriptByLocalVar: Text=[%s] Param3=%d Param4=%d Param5=%d Param6=%d\n",
+	Debug::Log("[Scaffold] ModifyScriptByLocalVar: Text=[%s] Param3=%d Param4=%d Param5=%d Param6=%d\n",
 		pThis->Text, pThis->Param3, pThis->Param4, pThis->Param5, pThis->Param6);
 	if (!pScript)
 		return;
@@ -184,7 +184,7 @@ void ScriptManipulator::ModifyScriptByLocalVar(TActionClass* pThis)
 	int lineNum = 0;
 	if (!ScenarioVariables::TryRead(scope, pThis->Param3, lineNum))
 	{
-		Debug::Log("[PhobosExt] ModifyScriptByLocalVar: 行号变量读取失败 Param3=%d(需索引在 [0, %d) 且变量存储可用)\n",
+		Debug::Log("[Scaffold] ModifyScriptByLocalVar: 行号变量读取失败 Param3=%d(需索引在 [0, %d) 且变量存储可用)\n",
 			pThis->Param3, ScenarioVariables::LocalCount);
 		return;
 	}
@@ -202,7 +202,7 @@ void ScriptManipulator::ModifyScriptByLocalVar(TActionClass* pThis)
 		|| !ScenarioVariables::TryRead(scope, pThis->Param5, param1)
 		|| !ScenarioVariables::TryRead(scope, pThis->Param6, param2Val))
 	{
-		Debug::Log("[PhobosExt] ModifyScriptByLocalVar: 变量读取失败 Param4~6=%d/%d/%d(需索引在 [0, %d) 且变量存储可用)\n",
+		Debug::Log("[Scaffold] ModifyScriptByLocalVar: 变量读取失败 Param4~6=%d/%d/%d(需索引在 [0, %d) 且变量存储可用)\n",
 			pThis->Param4, pThis->Param5, pThis->Param6, ScenarioVariables::LocalCount);
 		return;
 	}
@@ -226,7 +226,7 @@ void ScriptManipulator::ModifyScriptByLocalVar(TActionClass* pThis)
 void ScriptManipulator::ModifyScriptByGlobalVar(TActionClass* pThis)
 {
 	auto const pScript = FindScript(pThis->Text);
-	Debug::Log("[PhobosExt] ModifyScriptByGlobalVar: Text=[%s] Param3=%d Param4=%d Param5=%d Param6=%d\n",
+	Debug::Log("[Scaffold] ModifyScriptByGlobalVar: Text=[%s] Param3=%d Param4=%d Param5=%d Param6=%d\n",
 		pThis->Text, pThis->Param3, pThis->Param4, pThis->Param5, pThis->Param6);
 	if (!pScript)
 		return;
@@ -238,7 +238,7 @@ void ScriptManipulator::ModifyScriptByGlobalVar(TActionClass* pThis)
 	int lineNum = 0;
 	if (!ScenarioVariables::TryRead(scope, pThis->Param3, lineNum))
 	{
-		Debug::Log("[PhobosExt] ModifyScriptByGlobalVar: 行号变量读取失败 Param3=%d(需索引在 [0, %d) 且变量存储可用)\n",
+		Debug::Log("[Scaffold] ModifyScriptByGlobalVar: 行号变量读取失败 Param3=%d(需索引在 [0, %d) 且变量存储可用)\n",
 			pThis->Param3, ScenarioVariables::GlobalCount);
 		return;
 	}
@@ -256,7 +256,7 @@ void ScriptManipulator::ModifyScriptByGlobalVar(TActionClass* pThis)
 		|| !ScenarioVariables::TryRead(scope, pThis->Param5, param1)
 		|| !ScenarioVariables::TryRead(scope, pThis->Param6, param2Val))
 	{
-		Debug::Log("[PhobosExt] ModifyScriptByGlobalVar: 变量读取失败 Param4~6=%d/%d/%d(需索引在 [0, %d) 且变量存储可用)\n",
+		Debug::Log("[Scaffold] ModifyScriptByGlobalVar: 变量读取失败 Param4~6=%d/%d/%d(需索引在 [0, %d) 且变量存储可用)\n",
 			pThis->Param4, pThis->Param5, pThis->Param6, ScenarioVariables::GlobalCount);
 		return;
 	}
@@ -335,7 +335,7 @@ void ScriptManipulator::RebindTeamTypeScript(TActionClass* pThis)
 	auto const pExt = TeamTypeExt::ExtMap.FindOrAllocate(pTeamType);
 	CaptureOriginalScriptIndex(pExt, pTeamType);
 
-	Debug::Log("[PhobosExt] RebindTeamTypeScript: TeamType Param3=%d NewScript Param4=%d\n",
+	Debug::Log("[Scaffold] RebindTeamTypeScript: TeamType Param3=%d NewScript Param4=%d\n",
 		pThis->Param3, pThis->Param4);
 
 	pTeamType->ScriptType = pNewScript;
@@ -351,7 +351,7 @@ void ScriptManipulator::ResetTeamTypeScript(TActionClass* pThis)
 	if (!pTeamType)
 		return;
 
-	Debug::Log("[PhobosExt] ResetTeamTypeScript: Param3=%d\n", pThis->Param3);
+	Debug::Log("[Scaffold] ResetTeamTypeScript: Param3=%d\n", pThis->Param3);
 
 	auto const pExt = TeamTypeExt::ExtMap.FindOrAllocate(pTeamType);
 	CaptureOriginalScriptIndex(pExt, pTeamType);
@@ -369,7 +369,7 @@ void ScriptManipulator::ResetTeamTypeScript(TActionClass* pThis)
 // ============================================================================
 void ScriptManipulator::ResetAllTeamTypeScripts()
 {
-	Debug::Log("[PhobosExt] ResetAllTeamTypeScripts\n");
+	Debug::Log("[Scaffold] ResetAllTeamTypeScripts\n");
 
 	for (int i = 0; i < TeamTypeClass::Array.Count; ++i)
 	{
@@ -426,7 +426,7 @@ static bool RestoreOriginalScriptContent(ScriptTypeClass* pScript)
 void ScriptManipulator::RestoreScriptContent(TActionClass* pThis)
 {
 	auto const pScript = FindScript(pThis->Param3);
-	Debug::Log("[PhobosExt] RestoreScriptContent: Param3=%d\n", pThis->Param3);
+	Debug::Log("[Scaffold] RestoreScriptContent: Param3=%d\n", pThis->Param3);
 
 	if (RestoreOriginalScriptContent(pScript))
 		ResetTeamsUsingScript(pScript);
@@ -437,7 +437,7 @@ void ScriptManipulator::RestoreScriptContent(TActionClass* pThis)
 // ============================================================================
 void ScriptManipulator::RestoreAllScriptContents()
 {
-	Debug::Log("[PhobosExt] RestoreAllScriptContents\n");
+	Debug::Log("[Scaffold] RestoreAllScriptContents\n");
 
 	for (int i = 0; i < ScriptTypeClass::Array.Count; ++i)
 	{
@@ -463,7 +463,7 @@ void ScriptManipulator::SeekTeamTypeScript(TActionClass* pThis)
 	int const targetLine = pThis->Param4;
 	int const seekTo = (targetLine <= 0) ? -1 : (targetLine - 1);
 
-	Debug::Log("[PhobosExt] SeekTeamTypeScript: TeamType [%s] targetLine=%d seekTo=%d\n",
+	Debug::Log("[Scaffold] SeekTeamTypeScript: TeamType [%s] targetLine=%d seekTo=%d\n",
 		pTeamType->ID, targetLine, seekTo);
 
 	for (int i = 0; i < TeamClass::Array.Count; ++i)

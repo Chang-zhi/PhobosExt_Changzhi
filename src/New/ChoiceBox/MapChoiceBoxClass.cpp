@@ -866,7 +866,7 @@ bool MapChoiceBoxClass::Serialize(T& Stm)
 		.Success();
 }
 
-bool MapChoiceBoxClass::Load(PhobosExtStreamReader& Stm, bool RegisterForChange)
+bool MapChoiceBoxClass::Load(ScaffoldStreamReader& Stm, bool RegisterForChange)
 {
 	if (!Serialize(Stm))
 		return false;
@@ -885,7 +885,7 @@ bool MapChoiceBoxClass::Load(PhobosExtStreamReader& Stm, bool RegisterForChange)
 	return true;
 }
 
-bool MapChoiceBoxClass::Save(PhobosExtStreamWriter& Stm) const
+bool MapChoiceBoxClass::Save(ScaffoldStreamWriter& Stm) const
 {
 	return const_cast<MapChoiceBoxClass*>(this)->Serialize(Stm);
 }
@@ -1057,20 +1057,20 @@ bool MapChoiceBoxClass::ClampToScreen() const
 
 // ========== 全局存档/读档（遵循 TextBox 序列化模式） ==========
 
-bool MapChoiceBoxClass::SaveGlobals(PhobosExtStreamWriter& Stm)
+bool MapChoiceBoxClass::SaveGlobals(ScaffoldStreamWriter& Stm)
 {
 	Stm.Save(Array.size());
 	for (auto const& item : Array)
 	{
 		Stm.Save(item.get());                              // 保存旧指针地址（占位）
-		PhobosExtFixedString<64> marker(item->GetTypeMarker());// 保存类型标记
+		ScaffoldFixedString<64> marker(item->GetTypeMarker());// 保存类型标记
 		Stm.Save(marker);
 		item->Save(Stm);                                   // 保存实例数据
 	}
 	return true;
 }
 
-bool MapChoiceBoxClass::LoadGlobals(PhobosExtStreamReader& Stm)
+bool MapChoiceBoxClass::LoadGlobals(ScaffoldStreamReader& Stm)
 {
 	// 清除当前所有已存在的实例
 	Clear();
@@ -1083,7 +1083,7 @@ bool MapChoiceBoxClass::LoadGlobals(PhobosExtStreamReader& Stm)
 	for (size_t i = 0; i < Count; ++i)
 	{
 		void* oldPtr = nullptr;
-		PhobosExtFixedString<64> typeMarker;
+		ScaffoldFixedString<64> typeMarker;
 
 		if (!Stm.Load(oldPtr) || !Stm.Load(typeMarker))
 			return false;

@@ -24,13 +24,13 @@ void TeamTypeExt::ExtData::Serialize(T& Stm)
 		;
 }
 
-void TeamTypeExt::ExtData::LoadFromStream(PhobosExtStreamReader& Stm)
+void TeamTypeExt::ExtData::LoadFromStream(ScaffoldStreamReader& Stm)
 {
 	Extension<TeamTypeClass>::LoadFromStream(Stm);
 	this->Serialize(Stm);
 }
 
-void TeamTypeExt::ExtData::SaveToStream(PhobosExtStreamWriter& Stm)
+void TeamTypeExt::ExtData::SaveToStream(ScaffoldStreamWriter& Stm)
 {
 	Extension<TeamTypeClass>::SaveToStream(Stm);
 	this->Serialize(Stm);

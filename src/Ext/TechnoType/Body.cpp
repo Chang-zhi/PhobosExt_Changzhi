@@ -121,13 +121,13 @@ void TechnoTypeExt::ExtData::Serialize(T& Stm)
 		.Process(this->SmartVHPScan_CountIdleFrames)
 		;
 }
-void TechnoTypeExt::ExtData::LoadFromStream(PhobosExtStreamReader& Stm)
+void TechnoTypeExt::ExtData::LoadFromStream(ScaffoldStreamReader& Stm)
 {
 	Extension<TechnoTypeClass>::LoadFromStream(Stm);
 	this->Serialize(Stm);
 }
 
-void TechnoTypeExt::ExtData::SaveToStream(PhobosExtStreamWriter& Stm)
+void TechnoTypeExt::ExtData::SaveToStream(ScaffoldStreamWriter& Stm)
 {
 	Extension<TechnoTypeClass>::SaveToStream(Stm);
 	this->Serialize(Stm);

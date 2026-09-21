@@ -1,6 +1,6 @@
 #include "TextBoxTypeClass.h"
 
-#include <PhobosExt.h>
+#include <Scaffold.h>
 #include <CCINIClass.h>
 
 #include <Utilities/INIParser.h>
@@ -43,12 +43,12 @@ void TextBoxTypeClass::Serialize(T& Stm)
 		;
 }
 
-void TextBoxTypeClass::LoadFromStream(PhobosExtStreamReader& Stm)
+void TextBoxTypeClass::LoadFromStream(ScaffoldStreamReader& Stm)
 {
 	this->Serialize(Stm);
 }
 
-void TextBoxTypeClass::SaveToStream(PhobosExtStreamWriter& Stm)
+void TextBoxTypeClass::SaveToStream(ScaffoldStreamWriter& Stm)
 {
 	this->Serialize(Stm);
 }

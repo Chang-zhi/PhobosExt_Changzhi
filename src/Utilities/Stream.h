@@ -6,19 +6,19 @@
 
 struct IStream;
 
-class PhobosExtStreamReader;
-class PhobosExtStreamWriter;
+class ScaffoldStreamReader;
+class ScaffoldStreamWriter;
 
 namespace Savegame
 {
 	template <typename T>
-	bool ReadPhobosExtStream(PhobosExtStreamReader& Stm, T& Value, bool RegisterForChange);
+	bool ReadScaffoldStream(ScaffoldStreamReader& Stm, T& Value, bool RegisterForChange);
 
 	template <typename T>
-	bool WritePhobosExtStream(PhobosExtStreamWriter& Stm, const T& Value);
+	bool WriteScaffoldStream(ScaffoldStreamWriter& Stm, const T& Value);
 }
 
-class PhobosExtByteStream
+class ScaffoldByteStream
 {
 public:
 	using data_t = unsigned char;
@@ -28,8 +28,8 @@ protected:
 	size_t CurrentOffset;
 
 public:
-	PhobosExtByteStream(size_t Reserve = 0x1000);
-	~PhobosExtByteStream();
+	ScaffoldByteStream(size_t Reserve = 0x1000);
+	~ScaffoldByteStream();
 
 	size_t Size() const
 	{
@@ -101,17 +101,17 @@ public:
 	};
 };
 
-class PhobosExtStreamWorkerBase
+class ScaffoldStreamWorkerBase
 {
 public:
-	explicit PhobosExtStreamWorkerBase(PhobosExtByteStream& Stream) :
+	explicit ScaffoldStreamWorkerBase(ScaffoldByteStream& Stream) :
 		stream(&Stream),
 		success(true)
 	{ }
 
-	PhobosExtStreamWorkerBase(const PhobosExtStreamWorkerBase&) = delete;
+	ScaffoldStreamWorkerBase(const ScaffoldStreamWorkerBase&) = delete;
 
-	PhobosExtStreamWorkerBase& operator = (const PhobosExtStreamWorkerBase&) = delete;
+	ScaffoldStreamWorkerBase& operator = (const ScaffoldStreamWorkerBase&) = delete;
 
 	bool Success() const
 	{
@@ -138,23 +138,23 @@ protected:
 		return true;
 	}
 
-	PhobosExtByteStream* stream;
+	ScaffoldByteStream* stream;
 	bool success;
 };
 
-class PhobosExtStreamReader : public PhobosExtStreamWorkerBase
+class ScaffoldStreamReader : public ScaffoldStreamWorkerBase
 {
 public:
-	explicit PhobosExtStreamReader(PhobosExtByteStream& Stream) : PhobosExtStreamWorkerBase(Stream) { }
-	PhobosExtStreamReader(const PhobosExtStreamReader&) = delete;
+	explicit ScaffoldStreamReader(ScaffoldByteStream& Stream) : ScaffoldStreamWorkerBase(Stream) { }
+	ScaffoldStreamReader(const ScaffoldStreamReader&) = delete;
 
-	PhobosExtStreamReader& operator = (const PhobosExtStreamReader&) = delete;
+	ScaffoldStreamReader& operator = (const ScaffoldStreamReader&) = delete;
 
 	template <typename T>
-	PhobosExtStreamReader& Process(T& value, bool RegisterForChange = true)
+	ScaffoldStreamReader& Process(T& value, bool RegisterForChange = true)
 	{
 		if (this->IsValid(stream_debugging_t()))
-			this->success &= Savegame::ReadPhobosExtStream(*this, value, RegisterForChange);
+			this->success &= Savegame::ReadScaffoldStream(*this, value, RegisterForChange);
 		return *this;
 	}
 
@@ -183,7 +183,7 @@ public:
 		return true;
 	}
 
-	bool Read(PhobosExtByteStream::data_t* Value, size_t Size)
+	bool Read(ScaffoldByteStream::data_t* Value, size_t Size)
 	{
 		if (!this->stream->Read(Value, Size))
 		{
@@ -223,19 +223,19 @@ private:
 	void EmitSwizzleWarning(long id, void* pointer, std::false_type) const { }
 };
 
-class PhobosExtStreamWriter : public PhobosExtStreamWorkerBase
+class ScaffoldStreamWriter : public ScaffoldStreamWorkerBase
 {
 public:
-	explicit PhobosExtStreamWriter(PhobosExtByteStream& Stream) : PhobosExtStreamWorkerBase(Stream) { }
-	PhobosExtStreamWriter(const PhobosExtStreamWriter&) = delete;
+	explicit ScaffoldStreamWriter(ScaffoldByteStream& Stream) : ScaffoldStreamWorkerBase(Stream) { }
+	ScaffoldStreamWriter(const ScaffoldStreamWriter&) = delete;
 
-	PhobosExtStreamWriter& operator = (const PhobosExtStreamWriter&) = delete;
+	ScaffoldStreamWriter& operator = (const ScaffoldStreamWriter&) = delete;
 
 	template <typename T>
-	PhobosExtStreamWriter& Process(T& value, bool RegisterForChange = true)
+	ScaffoldStreamWriter& Process(T& value, bool RegisterForChange = true)
 	{
 		if (this->IsValid(stream_debugging_t()))
-			this->success &= Savegame::WritePhobosExtStream(*this, value);
+			this->success &= Savegame::WriteScaffoldStream(*this, value);
 
 		return *this;
 	}
@@ -248,7 +248,7 @@ public:
 		this->stream->Save(buffer);
 	}
 
-	void Write(const PhobosExtByteStream::data_t* Value, size_t Size)
+	void Write(const ScaffoldByteStream::data_t* Value, size_t Size)
 	{
 		this->stream->Write(Value, Size);
 	}

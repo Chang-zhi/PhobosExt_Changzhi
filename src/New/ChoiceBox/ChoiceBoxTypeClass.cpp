@@ -1,6 +1,6 @@
 #include "ChoiceBoxTypeClass.h"
 
-#include <PhobosExt.h>
+#include <Scaffold.h>
 #include <CCINIClass.h>
 
 #include <Utilities/INIParser.h>
@@ -16,12 +16,12 @@ const char* Enumerable<ChoiceBoxTypeClass>::GetMainSection()
 }
 
 // ========== ChoiceBoxButton 序列化 ==========
-bool ChoiceBoxButton::Load(PhobosExtStreamReader& Stm, bool RegisterForChange)
+bool ChoiceBoxButton::Load(ScaffoldStreamReader& Stm, bool RegisterForChange)
 {
 	return Stm.Process(this->Text, RegisterForChange).Success();
 }
 
-bool ChoiceBoxButton::Save(PhobosExtStreamWriter& Stm) const
+bool ChoiceBoxButton::Save(ScaffoldStreamWriter& Stm) const
 {
 	return Stm.Process(const_cast<std::string&>(this->Text)).Success();
 }
@@ -102,12 +102,12 @@ void ChoiceBoxTypeClass::Serialize(T& Stm)
 		;
 }
 
-void ChoiceBoxTypeClass::LoadFromStream(PhobosExtStreamReader& Stm)
+void ChoiceBoxTypeClass::LoadFromStream(ScaffoldStreamReader& Stm)
 {
 	this->Serialize(Stm);
 }
 
-void ChoiceBoxTypeClass::SaveToStream(PhobosExtStreamWriter& Stm)
+void ChoiceBoxTypeClass::SaveToStream(ScaffoldStreamWriter& Stm)
 {
 	this->Serialize(Stm);
 }

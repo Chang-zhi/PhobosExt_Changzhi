@@ -63,12 +63,12 @@ void Anchor::Read(INI_EX& parser, const char* pSection, const char* pFlagFormat)
 	this->Vertical.Read(parser, pSection, flagName);
 }
 
-bool Anchor::Load(PhobosExtStreamReader& stm, bool registerForChange)
+bool Anchor::Load(ScaffoldStreamReader& stm, bool registerForChange)
 {
 	return this->Serialize(stm);
 }
 
-bool Anchor::Save(PhobosExtStreamWriter& stm) const
+bool Anchor::Save(ScaffoldStreamWriter& stm) const
 {
 	return const_cast<Anchor*>(this)->Serialize(stm);
 }

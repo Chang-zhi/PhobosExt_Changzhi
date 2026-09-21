@@ -8,15 +8,15 @@
 
 #include "MapTextBoxClass.h"
 
-#include <PhobosExt.h>
+#include <Scaffold.h>
 #include <Utilities/SavegameDef.h>
 
 #include <string>
 #include <vector>
 #include <memory>
 
-class PhobosExtStreamWriter;
-class PhobosExtStreamReader;
+class ScaffoldStreamWriter;
+class ScaffoldStreamReader;
 class TextBoxTypeClass;
 
 class WaypointTextBoxClass final : public MapTextBoxClass
@@ -47,8 +47,8 @@ public:
 	static void Clear();                    // 清空所有实例（同 ClearAll）
 
 	// ===== 序列化 =====
-	bool Load(PhobosExtStreamReader& Stm, bool RegisterForChange) override;
-	bool Save(PhobosExtStreamWriter& Stm) const override;
+	bool Load(ScaffoldStreamReader& Stm, bool RegisterForChange) override;
+	bool Save(ScaffoldStreamWriter& Stm) const override;
 
 protected:
 	template <typename T>

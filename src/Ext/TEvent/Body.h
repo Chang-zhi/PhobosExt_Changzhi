@@ -11,7 +11,7 @@
 class HouseClass;
 class TriggerClass;
 
-enum PhobosExtTriggerEvent
+enum ScaffoldTriggerEvent
 {
 	// 路径点附近存在所属方的任意科技类型...
 	TechnoTypeOfHouseNearWaypoint = 550,
@@ -88,8 +88,8 @@ public:
 
 		virtual void InvalidatePointer(void* ptr, bool bRemoved) override { }
 
-		virtual void LoadFromStream(PhobosExtStreamReader& Stm) override;
-		virtual void SaveToStream(PhobosExtStreamWriter& Stm) override;
+		virtual void LoadFromStream(ScaffoldStreamReader& Stm) override;
+		virtual void SaveToStream(ScaffoldStreamWriter& Stm) override;
 
 
 	private:

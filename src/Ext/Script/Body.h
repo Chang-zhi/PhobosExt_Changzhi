@@ -12,7 +12,7 @@
 #include <vector>
 
 // 自定义 AI 脚本动作编号
-enum class PhobosExtScripts : unsigned int
+enum class ScaffoldScripts : unsigned int
 {
 	DistributedLoadIntoTransports = 5500,
 
@@ -53,8 +53,8 @@ public:
 
 		virtual void InvalidatePointer(void* ptr, bool bRemoved) override;
 
-		virtual void LoadFromStream(PhobosExtStreamReader& Stm) override;
-		virtual void SaveToStream(PhobosExtStreamWriter& Stm) override;
+		virtual void LoadFromStream(ScaffoldStreamReader& Stm) override;
+		virtual void SaveToStream(ScaffoldStreamWriter& Stm) override;
 
 		std::vector<std::vector<FootClass*>> ScatterAttackGroups;
 		int LastProcessedMission;
