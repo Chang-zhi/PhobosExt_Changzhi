@@ -495,6 +495,34 @@ pre code { padding: 0; font-size: inherit; color: inherit; background: none; bor
 <p>仅部分功能依赖 <strong>Phobos</strong>：不安装 Phobos 也可独立使用，但推荐一同使用。</p>
 <p class="doc-text--gray">左侧导航栏可展开各页子目录跳转至对应条目；顶部搜索框可直接搜功能名、编号或键名。</p>
 
+<h2 class="doc-heading--secondary">安装与使用</h2>
+<p>需通过 <strong>Syringe</strong> 注入运行。</p>
+
+<h3 class="doc-heading--tertiary">发布包内容</h3>
+<table class="doc-table">
+<thead><tr><th class="doc-table__th" style="width:220px">文件</th><th class="doc-table__th">说明</th><th class="doc-table__th" style="width:170px">放置位置</th></tr></thead>
+<tbody>
+<tr><td class="doc-table__td"><code>PhobosExt_Changzhi.dll</code></td><td class="doc-table__td">扩展本体，必需</td><td class="doc-table__td">游戏根目录</td></tr>
+<tr><td class="doc-table__td"><code>PhobosExt_Changzhi.pdb</code></td><td class="doc-table__td">调试符号，仅排查崩溃时用到</td><td class="doc-table__td">与 DLL 同目录</td></tr>
+<tr><td class="doc-table__td"><code>FAData_Customized.ini</code></td><td class="doc-table__td">地图编辑器数据，允许用户使用新增触发/脚本</td><td class="doc-table__td">地图编辑器目录</td></tr>
+<tr><td class="doc-table__td"><code>说明文档.html</code></td><td class="doc-table__td">本文件，全部功能说明</td><td class="doc-table__td">任意</td></tr>
+<tr><td class="doc-table__td"><code>更新日志.txt</code></td><td class="doc-table__td">各版本变更记录</td><td class="doc-table__td">任意</td></tr>
+</tbody>
+</table>
+
+<h3 class="doc-heading--tertiary">安装步骤</h3>
+<ol>
+<li>确认游戏版本为 <strong>YR 1.001</strong>。</li>
+<li>把 <code>PhobosExt_Changzhi.dll</code>（推荐连同 <code>.pdb</code>）放入游戏根目录，即 <code>gamemd.exe</code> 所在目录。</li>
+<li>用 Syringe 启动游戏：已装 Ares / Phobos 时直接双击 <code>RunAres.bat</code>；否则执行 <code>Syringe.exe "gamemd.exe"</code>。Syringe 会自动加载游戏目录下的兼容 DLL，无需额外配置。</li>
+<li>把 <code>FAData_Customized.ini</code> 放入地图编辑器目录（仅支持 HDM Edition），编辑器即可识别新增编号。</li>
+</ol>
+
+<div class="doc-note">
+<span class="doc-note__title">卸载</span>
+<p>删除游戏目录下的 <code>PhobosExt_Changzhi.dll</code>（及 <code>.pdb</code>）即可；<code>FAData_Customized.ini</code> 可一并删除。</p>
+</div>
+
 <h2 class="doc-heading--secondary">兼容性</h2>
 <ul class="doc-list">
 <li>需游戏版本 <strong>YR 1.001</strong>。</li>
@@ -502,14 +530,6 @@ pre code { padding: 0; font-size: inherit; color: inherit; background: none; bor
 <li>依赖 Phobos 的功能：触发行为 <code>653</code>、<code>654</code>（需 Phobos v0.5-alpha 及以上）。<br>
   <a href="javascript:switchPage('actions');setTimeout(function(){scrollToFeature('actions_8')},100)" class="doc-link">→ 查看对应的触发行为（653／654）</a></li>
 </ul>
-
-<h2 class="doc-heading--secondary">已知问题</h2>
-<ol class="doc-list">
-<li>使用 <code>Temporal=yes</code> + <code>Temporal.Exclusive=yes</code> 的武器会改变单位的选敌逻辑，可能出现异常。</li>
-<li><code>LegalTargetWhenAIOwner=no</code> 的 AI 单位会改变其他单位的选敌逻辑，可能出现异常。</li>
-<li>基地节点跨所属方判定开启后：与触发行为 <code>30</code>（自动建设基地）不兼容，且不要让 AI 造围墙。<br>
-  <a href="javascript:switchPage('gameplay');setTimeout(function(){scrollToFeature('gameplay_4')},100)" class="doc-link">→ 查看基地节点跨所属方判定</a></li>
-</ol>
 
 <h2 class="doc-heading--secondary">反馈</h2>
 <p>遇到 bug 或兼容性问题欢迎反馈：<a href="https://space.bilibili.com/423792550" target="_blank" class="doc-link">B站私信</a> ｜ 邮箱 3071564490@qq.com</p>
