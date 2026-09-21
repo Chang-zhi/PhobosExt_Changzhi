@@ -243,7 +243,8 @@ void TechnoExt::TemporalAOE::ValidateGlobals()
 		// 攻击者无效（OpenTopped 乘员虽然 InLimbo 但仍然活跃）
 		else if (!pAttacker || pAttacker->Health <= 0
 			|| (pAttacker->InLimbo
-				&& !(pAttacker->Transporter && pAttacker->Transporter->GetTechnoType()->OpenTopped)))
+				&& !(pAttacker->Transporter && pAttacker->Transporter->GetTechnoType()
+					&& pAttacker->Transporter->GetTechnoType()->OpenTopped)))
 			invalid = true;
 		// 攻击者被冻住
 		else if (pAttacker->BeingWarpedOut)
@@ -300,7 +301,8 @@ void TechnoExt::TemporalAOE::ValidateGlobals()
 			else if (pOwner->Health <= 0 || pOwner->BeingWarpedOut)
 				invalid = true;
 			else if (pOwner->InLimbo
-				&& !(pOwner->Transporter && pOwner->Transporter->GetTechnoType()->OpenTopped))
+				&& !(pOwner->Transporter && pOwner->Transporter->GetTechnoType()
+					&& pOwner->Transporter->GetTechnoType()->OpenTopped))
 				invalid = true;
 		}
 		if (invalid)
@@ -669,7 +671,8 @@ void TechnoExt::TemporalAOE::WarpOutTarget(TechnoClass* pTarget, TechnoClass* pK
 		{
 			pSource = pKiller;
 		}
-		else if (pKiller->Transporter && pKiller->Transporter->GetTechnoType()->OpenTopped
+		else if (pKiller->Transporter && pKiller->Transporter->GetTechnoType()
+			&& pKiller->Transporter->GetTechnoType()->OpenTopped
 			&& pKiller->Transporter->Health > 0 && !pKiller->Transporter->InLimbo)
 		{
 			pSource = pKiller->Transporter;
@@ -801,7 +804,8 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 	auto pTemporal = pThis ? pThis->TemporalImUsing : nullptr;
 
 	if (!pThis || pThis->Health <= 0
-		|| (pThis->InLimbo && !(pThis->Transporter && pThis->Transporter->GetTechnoType()->OpenTopped)))
+		|| (pThis->InLimbo && !(pThis->Transporter && pThis->Transporter->GetTechnoType()
+			&& pThis->Transporter->GetTechnoType()->OpenTopped)))
 	{
 		TemporalAOE::DeactivateAOE(pThis, state);
 		return;
@@ -1209,8 +1213,10 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 				// 新目标进入范围 → 累加其时间贡献（永不扣减）
 				if (state.ContributedTargets.find(pNew) == state.ContributedTargets.end())
 				{
-					int contribution = static_cast<int>(
-						10.0 * pNew->GetTechnoType()->Strength * state.SecondaryWeight);
+					auto const pNewType = pNew->GetTechnoType();
+					int contribution = pNewType
+						? static_cast<int>(10.0 * pNewType->Strength * state.SecondaryWeight)
+						: 0;
 					state.ExtraWarpAdded += contribution;
 					state.WarpTimer += contribution; // 同步展开计时器
 					state.ContributedTargets.insert(pNew);
@@ -1330,8 +1336,12 @@ void TechnoExt::ExtData::UpdateTemporalAOE()
 	{
 		{
 			int baseWarp = 0;
-			if (pThis->TemporalImUsing->Target && pThis->TemporalImUsing->Target->Health > 0)
-				baseWarp = 10 * pThis->TemporalImUsing->Target->GetTechnoType()->Strength;
+			auto const pWarpTarget = pThis->TemporalImUsing->Target;
+			if (pWarpTarget && pWarpTarget->Health > 0)
+			{
+				if (auto const pWarpType = pWarpTarget->GetTechnoType())
+					baseWarp = 10 * pWarpType->Strength;
+			}
 			if (state.WarpTimer == 0)
 			{
 				state.WarpTimer = baseWarp + state.ExtraWarpAdded;

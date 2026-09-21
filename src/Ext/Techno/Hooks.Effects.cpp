@@ -31,7 +31,7 @@ DEFINE_HOOK(0x701900, TechnoClass_ReceiveDamage_Effects, 0x6)
     if (pArgs->WH)
     {
         auto const pWHExt = WarheadTypeExt::ExtMap.Find(pArgs->WH);
-        const int reduceBy = pWHExt->BerserkReduce.Get();
+        const int reduceBy = pWHExt ? pWHExt->BerserkReduce.Get() : 0;
 
         if (reduceBy != 0 && pThis->Berzerk)
         {
@@ -57,7 +57,8 @@ DEFINE_HOOK(0x701900, TechnoClass_ReceiveDamage_Effects, 0x6)
                 pThis->ForceMission(Mission::Guard);
                 if (auto pFoot = abstract_cast<FootClass*>(pThis))
                 {
-                    pFoot->Locomotor->Stop_Moving();
+                    if (pFoot->Locomotor)
+                        pFoot->Locomotor->Stop_Moving();
                     pFoot->Destination = nullptr;
                     pFoot->LastDestination = nullptr;
                     pFoot->MegaDestination = nullptr;

@@ -47,7 +47,7 @@ public:
 	void DrawAt(Point2D centerPos);     // 在指定屏幕坐标绘制选择框
 
 	// ===== 交互 =====
-	bool CheckMouseClick();             // 检测鼠标点击，返回 true 表示有点击
+	int PollMouseClick();               // 检测本机点击，返回命中的按钮索引（-1=无）；不修改状态
 	void ResetChoice();                 // 重置选择状态
 
 	// ===== 虚接口（派生类实现） =====
@@ -67,6 +67,13 @@ public:
 
 	// 按 ID 查找实例
 	static MapChoiceBoxClass* FindByID(int id);
+
+	// ===== 联机同步：ChoiceBox 点击 =====
+	// 点击是本机私有输入，需经 EventClass 广播，否则 TEvent 557/558 各机判定分叉。
+	// 0x40 高于原版 LAST_EVENT(47)，原版事件分派走 default，由 Hooks.cpp 拦截处理。
+	static constexpr int CLICK_EVENT_TYPE = 0x40;
+	static void QueueClickEvent(int boxID, int buttonIndex); // 投递（仅本机）
+	static void ApplyClickEvent(int boxID, int buttonIndex); // 应用（所有客户端）
 
 	// 全局存档/读档
 	static bool SaveGlobals(PhobosExtStreamWriter& Stm);

@@ -46,7 +46,7 @@ bool HouseExt::IsDisabledFromShell(
 		if (BuildTech.FindItemIndex(pItem2) == -1)
 		{
 			auto const pSuper = pHouse->Supers[pItem->SuperWeapon];
-			if (pSuper->Type->DisableableFromShell)
+			if (pSuper && pSuper->Type && pSuper->Type->DisableableFromShell)
 				return true;
 		}
 	}

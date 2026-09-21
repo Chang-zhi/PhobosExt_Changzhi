@@ -39,6 +39,8 @@ public:
 	using base_type = ScriptClass;
 
 	static constexpr DWORD Canary = 0x3B3B3B3B;
+	// 启用指针失效通知；ScatterAttackGroups 缓存的是 FootClass*，见下方过滤
+	static constexpr bool ShouldConsiderInvalidatePointer = true;
 
 	class ExtData final : public Extension<ScriptClass>
 	{
@@ -63,6 +65,19 @@ public:
 	public:
 		ExtContainer();
 		~ExtContainer();
+
+		virtual bool InvalidateExtDataIgnorable(void* const ptr) const override
+		{
+			switch (static_cast<AbstractClass*>(ptr)->WhatAmI())
+			{
+			case AbstractType::Unit:
+			case AbstractType::Infantry:
+			case AbstractType::Aircraft:
+				return false;
+			default:
+				return true;
+			}
+		}
 	};
 
 	static ExtContainer ExtMap;

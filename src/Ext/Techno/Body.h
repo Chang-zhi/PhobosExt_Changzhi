@@ -28,7 +28,8 @@ public:
 
 	static constexpr DWORD Canary = 0x1D2C3F4E;
 	// static constexpr size_t ExtPointerOffset = 0x34C;
-	// static constexpr bool ShouldConsiderInvalidatePointer = true;
+	// 启用指针失效通知；实际处理哪些类型由下方 ExtContainer::InvalidateExtDataIgnorable 过滤
+	static constexpr bool ShouldConsiderInvalidatePointer = true;
 
 	// Temporal AOE state（定义在 ExtData 外，方便其他文件直接引用）
 	struct TemporalAOEState
@@ -88,11 +89,14 @@ public:
 
 		virtual bool InvalidateExtDataIgnorable(void* const ptr) const override
 		{
-			auto const abs = static_cast<AbstractClass*>(ptr)->WhatAmI();
-
-			switch (abs)
+			// AOEState 缓存的是 TechnoClass*（副目标 / 被禁用建筑），只对这些类型清理。
+			// 注意 AirstrikeClass 派生自 AbstractClass 而非 TechnoClass，不能作为过滤条件。
+			switch (static_cast<AbstractClass*>(ptr)->WhatAmI())
 			{
-			case AbstractType::Airstrike:
+			case AbstractType::Building:
+			case AbstractType::Unit:
+			case AbstractType::Infantry:
+			case AbstractType::Aircraft:
 				return false;
 			default:
 				return true;

@@ -33,6 +33,8 @@ public:
 	using base_type = HouseClass;
 
 	static constexpr DWORD Canary = 0xAAAA2222;
+	// 启用指针失效通知；实际处理哪些类型由下方 ExtContainer::InvalidateExtDataIgnorable 过滤
+	static constexpr bool ShouldConsiderInvalidatePointer = true;
 
 	class ExtData final : public Extension<HouseClass>
 	{

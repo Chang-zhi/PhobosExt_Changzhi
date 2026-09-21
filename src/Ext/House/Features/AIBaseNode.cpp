@@ -247,7 +247,7 @@ DEFINE_HOOK(0x4FE3E0, HouseClass_AI_BaseConstructionUpdate_Entry, 0x5)
 	}
 
 	// 设 BaseNodes[0] = 需要建造的目标
-	if (targetType >= 0)
+	if (targetType >= 0 && pThis->Base.BaseNodes.Count > 0)
 	{
 		BaseNodeClass& node = pThis->Base.BaseNodes[0];
 		node.BuildingTypeIndex = targetType;

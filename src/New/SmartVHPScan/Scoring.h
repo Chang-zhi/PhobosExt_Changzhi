@@ -7,10 +7,8 @@
 #include <Ext/TechnoType/Body.h>
 #include <Utilities/Enum.h>
 
-// 诊断日志开关：排查"单位空手 / 目标没人打"这类调度问题时打开。
-// 只有 DEBUG 构建才会真正写盘（游戏目录下的 PhobosExt.log，见 Utilities/Debug.cpp），
-// 其它配置下这些调用是空操作。定位完问题改成 0，相关代码会整体编译掉。
-#define SMARTVHPSCAN_DIAG 1
+// 诊断日志开关：
+#define SMARTVHPSCAN_DIAG 0
 
 namespace SmartVHPScan
 {

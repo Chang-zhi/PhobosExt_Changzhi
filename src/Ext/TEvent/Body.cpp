@@ -145,7 +145,7 @@ std::optional<bool> TEventExt::Execute(TEventClass* pThis, int iEvent, HouseClas
 bool TEventExt::TechnoTypeOfHouseNearWaypoint(TEventClass* pThis, HouseClass* pHouse)
 {
 	int range = pThis->Value;
-	int wayPointIndex = std::stoi(pThis->String);
+	int wayPointIndex = std::atoi(pThis->String);
 
 	CellStruct cell = ScenarioClass::Instance->GetWaypointCoords(wayPointIndex);
 
