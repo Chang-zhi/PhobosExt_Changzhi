@@ -19,7 +19,7 @@ const char* Scaffold::AppIconPath = nullptr;
 
 bool Scaffold::DisplayDamageNumbers = false;
 
-const wchar_t* Scaffold::VersionDescription = L"Chang_zhi Custom Scaffold build #" _STR(BUILD_NUMBER) L". Please test the build before shipping.";
+const wchar_t* Scaffold::VersionDescription = L"Scaffold build #" _STR(BUILD_NUMBER) L". Please test the build before shipping.";
 
 void Scaffold::ExeTerminate()
 {
@@ -77,6 +77,11 @@ void Scaffold::ExeRun()
 	}
 
 #endif
+
+	// 控制台就绪后才上屏:此前 AresHelper 的探测结果走的是 LogDeferred。
+	Debug::Log("[Scaffold] Init complete. Ares=%s, console=%s\n",
+		AresHelper::CanUseAres ? "on" : "off",
+		Console::ConsoleHandle ? "on" : "off");
 }
 
 void Scaffold::CmdLineParse(char** ppArgs, int nNumArgs)

@@ -58,7 +58,6 @@ void RulesExt::ExtData::LoadFromINIFile(CCINIClass* pINI)
 
 	this->BerzerkRestoreClearTarget.Read(exINI, GameStrings::General, "BerzerkRestoreClearTarget");
 	this->Command_RecruitRange.Read(exINI, GameStrings::General, "Command.RecruitRange");
-	this->AllowTabBriefingInSinglePlayer.Read(exINI, GameStrings::General, "AllowTabBriefingInSinglePlayer");
 }
 
 void RulesExt::ExtData::LoadBeforeTypeData(RulesClass* pThis, CCINIClass* pINI)
@@ -128,7 +127,6 @@ void RulesExt::ExtData::Serialize(T& Stm)
 		.Process(this->ShowTextBoxInShroud_Techno)
 		.Process(this->BerzerkRestoreClearTarget)
 		.Process(this->Command_RecruitRange)
-		.Process(this->AllowTabBriefingInSinglePlayer)
 		;
 }
 
@@ -277,8 +275,7 @@ DEFINE_HOOK(0x6744E4, RulesClass_ReadJumpjetControls_Extra, 0x7)
 
 DEFINE_HOOK(0x48C8B0, ScreenStateMachine_AllowTabBriefing, 0x5)
 {
-	auto ext = RulesExt::Global();
-	if (!ext || !ext->AllowTabBriefingInSinglePlayer)
+	if (!Scaffold::Config::AllowTabBriefingInSinglePlayer)
 		return 0;
 
 	int* const pCurrentUI = reinterpret_cast<int*>(0xA8EDA0);

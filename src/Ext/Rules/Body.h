@@ -38,7 +38,6 @@ public:
 
 		Valueable<bool> BerzerkRestoreClearTarget;
 		Valueable<double> Command_RecruitRange;
-		Valueable<bool> AllowTabBriefingInSinglePlayer;
 
 		std::vector<std::vector<TechnoTypeClass*>> AITargetTypesLists;
 
@@ -47,7 +46,6 @@ public:
 			, ShowTextBoxInShroud_Techno { true }
 			, BerzerkRestoreClearTarget { false }
 			, Command_RecruitRange { 10 }
-			, AllowTabBriefingInSinglePlayer { false }
 		{ }
 
 		virtual ~ExtData() = default;

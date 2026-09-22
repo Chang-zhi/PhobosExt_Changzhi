@@ -39,10 +39,6 @@ void TechnoExt::ProcessAutoHunt(FootClass* pFoot)
 	if (!pTypeExt || !pTypeExt->AutoHunt)
 		return;
 
-	Debug::Log("[AutoHunt] Processing unit: %s, Owner: %s\n",
-		pFoot->GetType()->ID,
-		pFoot->Owner ? pFoot->Owner->get_ID() : "null");
-
 	// 目标处理
 	if (pFoot->Target)
 	{

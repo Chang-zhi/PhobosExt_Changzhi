@@ -89,6 +89,7 @@
     <ClCompile Include="src\Utilities\Debug.cpp" />
     <ClCompile Include="src\Ext\WarheadType\Body.cpp" />
     <ClCompile Include="src\Scaffold.Ext.cpp" />
+    <ClCompile Include="src\Scaffold.INI.cpp" />
     <ClCompile Include="src\Scaffold.cpp" />
     <ClCompile Include="src\Interop\InteropApiTable.cpp" />
     <ClCompile Include="src\Interop\InteropModule.cpp" />

@@ -41,6 +41,7 @@ public:
 	{
 	public:
 		static bool SaveGameOnScenarioStart;
+		static bool AllowTabBriefingInSinglePlayer;
 	};
 
 };
