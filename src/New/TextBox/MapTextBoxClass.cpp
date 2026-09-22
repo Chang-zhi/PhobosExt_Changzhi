@@ -8,6 +8,7 @@
 #include <Drawing.h>
 #include <TacticalClass.h>
 #include <WWMouseClass.h>
+#include <Unsorted.h>
 
 #include <Utilities/Stream.h>
 #include <Utilities/Debug.h>
@@ -339,10 +340,17 @@ bool MapTextBoxClass::Save(ScaffoldStreamWriter& Stm) const
 
 
 
-// ========== 全局绘制入口 ==========
+// ========== 逻辑帧计时 ==========
 
-void MapTextBoxClass::DrawAll()
+void MapTextBoxClass::TickTimers()
 {
+	static int s_lastTimerFrame = -1;
+	const int timerFrame = Unsorted::CurrentFrame;
+	if (s_lastTimerFrame == timerFrame)
+		return;
+
+	s_lastTimerFrame = timerFrame;
+
 	std::vector<std::shared_ptr<MapTextBoxClass>> expired; // 收集本帧过期的实例
 
 	for (auto& pLabel : Array)
@@ -350,25 +358,9 @@ void MapTextBoxClass::DrawAll()
 		if (!pLabel)
 			continue;
 
-		// ===== 倒计时递减 =====
-		// RemainingFrames >= 0 表示有时限，每帧减1，减到0时标记为过期
-		if (pLabel->RemainingFrames >= 0)
-		{
-			if (--pLabel->RemainingFrames <= 0)
-				expired.push_back(pLabel);
-		}
-
-		// ===== 检查是否允许绘制 =====
-		if (!pLabel->CanDraw())
-			continue;
-
-		// ===== 获取绘制位置 =====
-		Point2D pos {};
-		if (!pLabel->GetDrawPosition(pos))
-			continue;
-
-		// ===== 执行绘制 =====
-		pLabel->DrawAt(pos);
+		// RemainingFrames >= 0 表示有时限，每逻辑帧减 1，减到 0 时标记为过期
+		if (pLabel->RemainingFrames >= 0 && --pLabel->RemainingFrames <= 0)
+			expired.push_back(pLabel);
 	}
 
 	// ===== 移除过期实例 =====
@@ -405,6 +397,23 @@ void MapTextBoxClass::DrawAll()
 
 	// 每帧清理已摧毁单位的残留标签
 	TechnoTextBoxClass::CleanupDeadLabels();
+}
+
+// ========== 全局绘制入口（渲染帧调用） ==========
+
+void MapTextBoxClass::DrawAll()
+{
+	for (auto& pLabel : Array)
+	{
+		if (!pLabel || !pLabel->CanDraw())
+			continue;
+
+		Point2D pos {};
+		if (!pLabel->GetDrawPosition(pos))
+			continue;
+
+		pLabel->DrawAt(pos);
+	}
 }
 
 /**

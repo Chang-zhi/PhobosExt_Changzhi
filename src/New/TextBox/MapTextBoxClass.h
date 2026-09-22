@@ -42,6 +42,7 @@ public:
 	static std::vector<std::shared_ptr<MapTextBoxClass>> Array;  // 所有文本框实例
 
 	static void DrawAll();      // 每帧绘制入口
+	static void TickTimers();   // 每逻辑帧推进计时器
 	static void ClearAll();     // 清空所有实例
 	static void Clear();        // 清空所有实例（同 ClearAll）
 

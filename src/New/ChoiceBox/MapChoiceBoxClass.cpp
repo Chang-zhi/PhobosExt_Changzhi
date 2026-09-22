@@ -886,7 +886,6 @@ MapChoiceBoxClass* MapChoiceBoxClass::FindByID(int id)
 	return nullptr;
 }
 
-// ========== 内部绘制逻辑（共享给 DrawAll/DrawWaypoint/DrawScreen） ==========
 template <typename T>
 static void DrawChoiceBoxList(std::vector<std::shared_ptr<T>>& boxes)
 {
@@ -917,6 +916,17 @@ static void DrawChoiceBoxList(std::vector<std::shared_ptr<T>>& boxes)
 			EventExt::RaiseChoiceBoxClick(ptr->ID, clickedButton);
 		}
 	}
+}
+
+template <typename T>
+static void TickChoiceBoxList(std::vector<std::shared_ptr<T>>& boxes)
+{
+	static int s_lastTimerFrame = -1;
+	const int timerFrame = Unsorted::CurrentFrame;
+	if (s_lastTimerFrame == timerFrame)
+		return;
+
+	s_lastTimerFrame = timerFrame;
 
 	// 阶段二：处理隐藏期倒计时（Normal 销毁 / Bounce 回弹，未消费也有兜底）
 	for (auto& ptr : boxes)
@@ -995,6 +1005,12 @@ static void DrawChoiceBoxList(std::vector<std::shared_ptr<T>>& boxes)
 			++it;
 		}
 	}
+}
+
+void MapChoiceBoxClass::TickTimers()
+{
+	TickChoiceBoxList(WaypointChoiceBoxClass::Array);
+	TickChoiceBoxList(ScreenChoiceBoxClass::Array);
 }
 
 void MapChoiceBoxClass::DrawAll()

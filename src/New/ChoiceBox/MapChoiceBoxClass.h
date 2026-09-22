@@ -62,6 +62,7 @@ public:
 	static void DrawAll();      // 每帧绘制入口（全部类型）
 	static void DrawWaypoint(); // 仅绘制路径点选择框
 	static void DrawScreen();   // 仅绘制屏幕坐标选择框
+	static void TickTimers();   // 每逻辑帧推进计时器
 	static void ClearAll();     // 清空所有实例
 	static void Clear();        // 清空所有实例
 
