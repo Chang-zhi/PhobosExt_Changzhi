@@ -199,8 +199,6 @@ bool TActionExt::SetParTimeDifficult(TActionClass* pThis, HouseClass* pHouse, Ob
 
 bool TActionExt::SetGameSpeed(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
 {
-	const bool speedControl = *reinterpret_cast<bool*>(0xA8EDDC);
-
 	const int value = pThis->Param3;
 	if (value < 0 || value > 6) // 负数表示不修改;越界保护
 	{
@@ -209,10 +207,8 @@ bool TActionExt::SetGameSpeed(TActionClass* pThis, HouseClass* pHouse, ObjectCla
 
 	GameOptionsClass::Instance.GameSpeed = 6 - value;
 
-	if (!SessionClass::IsMultiplayer() && !speedControl)
-	{
-		*reinterpret_cast<bool*>(0xA8EDDC) = true;
-	}
+	// speedControl
+	*reinterpret_cast<bool*>(0xA8EDDC) = true;
 
 	return true;
 }

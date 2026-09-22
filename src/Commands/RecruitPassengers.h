@@ -342,9 +342,6 @@ public:
 		const wchar_t* textPtr = StringTable::TryFetchString("CMND:UICATEGORY_SCAFFOLD");
 
 		if (!textPtr || !*textPtr)
-			textPtr = StringTable::TryFetchString("CMND:UICATEGORY_PHOBOSEXT");
-
-		if (!textPtr || !*textPtr)
 			textPtr = L"Scaffold";
 
 		return textPtr;
