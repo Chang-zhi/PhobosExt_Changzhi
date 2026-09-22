@@ -470,7 +470,7 @@ pre code { padding: 0; font-size: inherit; color: inherit; background: none; bor
     <li class="nav__subitem" data-target="actions_14" data-page="actions" title="游戏速度 · 682">14. 游戏速度</li>
     <li class="nav__subitem" data-target="actions_15" data-page="actions" title="禁止存档与读档 · 683–686">15. 禁止存档与读档</li>
     <li class="nav__subitem" data-target="actions_16" data-page="actions" title="变卖所属方全部建筑 · 687">16. 变卖所属方全部建筑</li>
-    <li class="nav__subitem" data-target="actions_17" data-page="actions" title="触发组与随机允许/禁止触发 · 688–693">17. 随机允许/禁止触发</li>
+    <li class="nav__subitem" data-target="actions_17" data-page="actions" title="触发组与随机允许／禁止触发 · 688–693">17. 随机允许／禁止触发</li>
     <li class="nav__subitem" data-target="actions_18" data-page="actions" title="允许/禁止指定 AI 触发 · 694、695">18. AI 触发开关</li>
   </ul>
 </li>
@@ -523,8 +523,8 @@ pre code { padding: 0; font-size: inherit; color: inherit; background: none; bor
 </div>
 
 <p>为《红色警戒2：尤里的复仇》扩展游戏功能的 DLL，面向任务与地图作者，可自由用于任务包与模组。作者 <a href="https://space.bilibili.com/423792550" target="_blank" class="doc-link"><strong>Chang_zhi</strong></a>。</p>
-<p>仅部分功能依赖 <strong>Phobos</strong>：不安装 Phobos 也可独立使用，但推荐一同使用。</p>
-<p class="doc-text--gray">左侧导航栏可展开各页子目录跳转至对应条目；顶部搜索框可直接搜功能名、编号或键名。</p>
+<p>不安装 <strong>Phobos</strong> 也能独立运行，但少数依赖它的功能不可用；推荐一同使用。</p>
+<p class="doc-text--gray">左侧导航栏可展开各页子目录跳转至对应条目；侧边栏顶部的搜索框可直接搜功能名、编号或键名。</p>
 
 <h2 class="doc-heading--secondary">安装教程</h2>
 <p>需通过 <strong>Syringe</strong> 注入运行。</p>
@@ -545,7 +545,7 @@ pre code { padding: 0; font-size: inherit; color: inherit; background: none; bor
 <ol>
 <li>确认游戏版本为 <strong>YR 1.001</strong>。</li>
 <li>把 <code>Scaffold.dll</code>（推荐连同 <code>.pdb</code>）放入游戏根目录，即 <code>gamemd.exe</code> 所在目录。</li>
-<li>用 Syringe 启动游戏：已装 Ares / Phobos 时直接双击 <code>RunAres.bat</code>；否则执行 <code>Syringe.exe "gamemd.exe"</code>。Syringe 会自动加载游戏目录下的兼容 DLL，无需额外配置。</li>
+<li>用 Syringe 启动游戏：已装 Ares／Phobos 时直接双击 <code>RunAres.bat</code>；否则执行 <code>Syringe.exe "gamemd.exe"</code>。Syringe 会自动加载游戏目录下的兼容 DLL，无需额外配置。</li>
 <li>把 <code>FAData_Customized.ini</code> 放入地图编辑器目录（仅支持 HDM Edition），编辑器即可识别新增编号。</li>
 </ol>
 
@@ -686,7 +686,7 @@ TemporalAOE.AffectsAllies=       ; boolean - 是否连友军一起冻结 - (默�
 <span class="doc-note__title">注意</span>
 <ul>
 <li>同一个副目标只累加一次；离开范围/死亡后解除冻结，但<strong>已累加的时间不会扣回</strong>，这是为了防止主目标被瞬间抹除。</li>
-<li>主目标与副目标都被该单位独占：其他超时空武器<strong>无法对其开火</strong>，所以不会出现多个单位给同一目标叠加时间的情况(为了防止bug)。</li>
+<li>主目标与副目标都被该单位独占：其他超时空武器<strong>无法对其开火</strong>，所以不会出现多个单位给同一目标叠加时间的情况（为避免 bug）。</li>
 <li>正在使用超时空武器的单位不会被选为副目标，避免多个超时空武器互相冻结。</li>
 </ul>
 </div>
@@ -738,7 +738,7 @@ LegalTargetWhenAIOwner=          ; boolean - AI 控制时能否被其他单位�
 
 <div id="gameplay_5">
 <h3 class="doc-heading--tertiary">3. 智能火力分配</h3>
-<p>名字沿用<code>VHPScan</code>仅为习惯，其独立于原版逻辑，实现更智能、可操作性更强的火力分配。</p>
+<p>名字沿用 <code>VHPScan</code> 仅为习惯，其独立于原版逻辑，实现更智能、可操作性更强的火力分配。</p>
 
 <pre class="doc-code--block"><code>[TechnoType]
 SmartVHPScan=                    ; 枚举字符串 - 索敌模式 None/LowHealth/FullHealth/Count - (默认 None)
@@ -1013,7 +1013,7 @@ Command.RecruitRange=            ; double - 自动装载的招募半径 - (默�
 
 <section id="sec_actions">
 <h2 class="doc-heading--secondary">新增触发行为</h2>
-<p>通过把 <code>FAData_Customized.ini</code> 复制到地图编辑器目录下来使用，目前仅支持HDM Edition。</p>
+<p>把 <code>FAData_Customized.ini</code> 放入地图编辑器目录即可使用（仅支持 HDM Edition 地图编辑器）。</p>
 
 <div class="sec-toc">
 <p class="sec-toc__title">目录</p>
@@ -1034,7 +1034,7 @@ Command.RecruitRange=            ; double - 自动装载的招募半径 - (默�
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_14')" class="sec-toc__link">14. 游戏速度</a> <span class="sec-toc__id">682</span></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_15')" class="sec-toc__link">15. 禁止存档与读档</a> <span class="sec-toc__id">683–686</span></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_16')" class="sec-toc__link">16. 变卖所属方全部建筑</a> <span class="sec-toc__id">687</span></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_17')" class="sec-toc__link">17. 随机允许/禁止触发</a> <span class="sec-toc__id">688–693</span></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_17')" class="sec-toc__link">17. 随机允许／禁止触发</a> <span class="sec-toc__id">688–693</span></li>
 <li class="sec-toc__item"><a href="javascript:scrollToFeature('actions_18')" class="sec-toc__link">18. AI 触发开关</a> <span class="sec-toc__id">694、695</span></li>
 </ul>
 </div>
@@ -1094,7 +1094,7 @@ Command.RecruitRange=            ; double - 自动装载的招募半径 - (默�
 <div id="actions_2">
 <h3 class="doc-heading--tertiary">2. 动态标签绑定</h3>
 <p>把游戏中的单位、建筑动态关联到某个标签。</p>
-<p class="doc-text--gray">使用前请先了解标签与触发系统的基本机制（可参考韩大妈的《触发系统.docx》）。</p>
+<p class="doc-text--gray">使用前需先了解标签与触发系统的基本机制（可参考韩大妈的《触发系统.docx》）。</p>
 
 <div class="doc-table--action">
 <table class="doc-table">
@@ -1102,8 +1102,8 @@ Command.RecruitRange=            ; double - 自动装载的招募半径 - (默�
 <tbody>
 <tr><td class="doc-table__td">553</td><td class="doc-table__td">将指定小队全部成员关联到指定标签</td><td class="doc-table__td">小队索引，标签索引，强制新建标签</td></tr>
 <tr><td class="doc-table__td">554</td><td class="doc-table__td">将指定所属方的指定小队全部成员关联到指定标签</td><td class="doc-table__td">小队索引，标签索引，所属方，强制新建标签</td></tr>
-<tr><td class="doc-table__td">555</td><td class="doc-table__td">将特定科技类型全部关联到指定标签</td><td class="doc-table__td">科技类型，标签索引，强制新建标签</td></tr>
-<tr><td class="doc-table__td">556</td><td class="doc-table__td">将指定所属方的特定科技类型全部关联到指定标签</td><td class="doc-table__td">科技类型，标签索引，所属方，强制新建标签</td></tr>
+<tr><td class="doc-table__td">555</td><td class="doc-table__td">将指定科技类型全部关联到指定标签</td><td class="doc-table__td">科技类型，标签索引，强制新建标签</td></tr>
+<tr><td class="doc-table__td">556</td><td class="doc-table__td">将指定所属方的指定科技类型全部关联到指定标签</td><td class="doc-table__td">科技类型，标签索引，所属方，强制新建标签</td></tr>
 <tr><td class="doc-table__td">563</td><td class="doc-table__td">安全销毁指定标签类型的所有实例</td><td class="doc-table__td">标签索引</td></tr>
 <tr><td class="doc-table__td">564</td><td class="doc-table__td">为路径点上的指定科技类型绑定标签</td><td class="doc-table__td">路径点，科技类型，标签索引，强制新建标签</td></tr>
 <tr><td class="doc-table__td">565</td><td class="doc-table__td">为路径点上指定所属方的指定科技类型绑定标签</td><td class="doc-table__td">路径点，科技类型，标签索引，所属方，强制新建标签</td></tr>
@@ -1444,14 +1444,14 @@ Command.RecruitRange=            ; double - 自动装载的招募半径 - (默�
 <hr class="sec-divider--double">
 
 <div id="actions_17">
-<h3 class="doc-heading--tertiary">17. 随机允许/禁止触发</h3>
-<p>把一批触发登记成一个「触发组」，再用行为从组里（或按名称）随机抽取若干个，批量设置它们的允许 / 禁止状态。</p>
-<p class="doc-text--gray">相当于原版行为 <code>53 允许触发</code> / <code>54 禁止触发</code></p>
+<h3 class="doc-heading--tertiary">17. 随机允许／禁止触发</h3>
+<p>把一批触发登记成一个「触发组」，再用行为从组里（或按名称）随机抽取若干个，批量设置它们的允许／禁止状态。</p>
+<p class="doc-text--gray">相当于原版行为 <code>53 允许触发</code>／<code>54 禁止触发</code>。</p>
 
 <h4>触发组定义</h4>
 <p>在 <code>rulesmd.ini</code> 或地图小节里定义。</p>
 <pre class="doc-code--block"><code>[TriggerGroups]
-0=FristTriggerGroup                     ; 索引 - 组名
+0=FirstTriggerGroup                     ; 索引 - 组名
 1=YouTriggerGroup
 ...
 
@@ -1475,7 +1475,7 @@ Command.RecruitRange=            ; double - 自动装载的招募半径 - (默�
 </tbody>
 </table>
 </div>
-<p><strong>数量</strong>：<code>-1</code> 表示全部命中项，<code>0</code> 视为不操作，正数表示随机抽几个（去重）。</p>
+<p><strong>数量</strong>：<code>-1</code> 表示全部命中项，填 <code>0</code> 不操作，正数表示随机抽几个（去重）。</p>
 
 <h4>按名称匹配</h4>
 <p>「按名称」只按 <strong>触发名称</strong> 做前缀匹配（不区分大小写）。<br>
@@ -1496,15 +1496,15 @@ Command.RecruitRange=            ; double - 自动装载的招募半径 - (默�
 </tbody>
 </table>
 </div>
-<pre class="doc-code--block"><code>0  = 全部触发类型
+<pre class="doc-code--block"><code>0  = 全部触发
 1  = 仅当前存在的触发
-2  = 仅符合当前游戏难度的触发类型
+2  = 仅符合当前游戏难度的触发
 3  = 当前存在 + 符合当前难度
-4  = 仅当前为允许的触发类型
+4  = 仅当前为允许的触发
 5  = 当前存在 + 当前为允许
 6  = 符合当前难度 + 当前为允许
 7  = 当前存在 + 符合当前难度 + 当前为允许
-8  = 仅当前为禁止的触发类型
+8  = 仅当前为禁止的触发
 9  = 当前存在 + 当前为禁止
 10 = 符合当前难度 + 当前为禁止
 11 = 当前存在 + 符合当前难度 + 当前为禁止</code></pre>
@@ -1521,8 +1521,8 @@ Command.RecruitRange=            ; double - 自动装载的招募半径 - (默�
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
 <tbody>
-<tr><td class="doc-table__td">694</td><td class="doc-table__td">允许指定AI触发</td><td class="doc-table__td">AI 触发</td></tr>
-<tr><td class="doc-table__td">695</td><td class="doc-table__td">禁止指定AI触发</td><td class="doc-table__td">AI 触发</td></tr>
+<tr><td class="doc-table__td">694</td><td class="doc-table__td">允许指定 AI 触发</td><td class="doc-table__td">AI 触发</td></tr>
+<tr><td class="doc-table__td">695</td><td class="doc-table__td">禁止指定 AI 触发</td><td class="doc-table__td">AI 触发</td></tr>
 </tbody>
 </table>
 </div>
@@ -1540,7 +1540,7 @@ Command.RecruitRange=            ; double - 自动装载的招募半径 - (默�
 
 <section id="sec_events">
 <h2 class="doc-heading--secondary">新增触发事件</h2>
-<p>通过把 <code>FAData_Customized.ini</code> 复制到地图编辑器目录下来使用，目前仅支持HDM Edition。</p>
+<p>把 <code>FAData_Customized.ini</code> 放入地图编辑器目录即可使用（仅支持 HDM Edition 地图编辑器）。</p>
 
 <div class="sec-toc">
 <p class="sec-toc__title">目录</p>
@@ -1576,7 +1576,7 @@ Command.RecruitRange=            ; double - 自动装载的招募半径 - (默�
 
 <div id="events_2">
 <h3 class="doc-heading--tertiary">2. 流逝时间（帧）</h3>
-<p>触发器激活后开始计时，流逝帧数达到指定值时事件成立。</p>
+<p>触发器激活后开始计时，流逝帧数达到指定值时触发条件成立。</p>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
@@ -1646,7 +1646,7 @@ Command.RecruitRange=            ; double - 自动装载的招募半径 - (默�
 </tbody>
 </table>
 </div>
-<p>本触发不会由于游戏第一帧 AI 的电力尚未计算完成而误触。</p>
+<p>不会因游戏第一帧 AI 电力尚未计算完成而误判。</p>
 </div>
 
 </section>
@@ -1658,7 +1658,7 @@ Command.RecruitRange=            ; double - 自动装载的招募半径 - (默�
 
 <section id="sec_scripts">
 <h2 class="doc-heading--secondary">新增脚本动作</h2>
-<p>通过把 <code>FAData_Customized.ini</code> 复制到地图编辑器目录下来使用，目前仅支持HDM Edition。</p>
+<p>把 <code>FAData_Customized.ini</code> 放入地图编辑器目录即可使用（仅支持 HDM Edition 地图编辑器）。</p>
 
 <div class="sec-toc">
 <p class="sec-toc__title">目录</p>
