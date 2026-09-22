@@ -20,12 +20,10 @@
 #include <TargetClass.h>
 
 #include "Command.h"
-
-// 联机同步：玩家指令必须投递为 EventClass（原版 Scatter/Deploy 也是这么做的），
-// 直接调 TechnoClass::Scatter() / ForceMission() 只有本机生效，会 out of sync。
+#include <Ext/Event/Body.h>
 
 // 0x4C65E0: EventClass 的 Target 版构造 (houseIndex, eventType, id, rtti)。
-// 显式取签名是因为 YRpp 的 (int,EventType,int,int) 与 (...,const int&) 重载有歧义。
+// 显式取签名是因为 YRpp 的 (int,EventType,int,int) 与 (...,const int&) 两个重载有歧义。
 using EventClassTargetCtor = void* (__thiscall*)(void*, int, EventType, int, int);
 
 static const EventClassTargetCtor EventClass_TargetCtor =
@@ -37,22 +35,48 @@ static bool IsOrderQueueBlocked()
 	return *reinterpret_cast<const unsigned char*>(0xAC4CF4) != 0;
 }
 
-// 投递一条"只带自身目标"的指令事件（等价原版 0x6FFE00）。
-static void QueueSelfOrder(TechnoClass* pTechno, EventType eType)
+// 一次分配最多追加两条事件（Deploy + Enter 的 MegaMission），故预留 2 格。
+static bool HasOrderQueueRoom()
 {
-	if (!pTechno || !pTechno->Owner || !pTechno->IsAlive || pTechno->InLimbo)
-		return;
+	return EventClass::OutList.Count + 2 <= EventClass::MAX_EVENTS;
+}
+
+static bool IsCommandableByLocalPlayer(TechnoClass* pTechno, HouseClass* pLocal)
+{
+	if (!pTechno || !pLocal)
+		return false;
+
+	if (pTechno->IsControllable())
+		return true;
+
+	if (pTechno->Owner == pLocal || pTechno->IsOwnedByCurrentPlayer)
+		return true;
+
+	if (pTechno->MindControlledByHouse == pLocal)
+		return true;
+
+	return pTechno->MindControlledBy && pTechno->MindControlledBy->Owner == pLocal;
+}
+
+// 投递一条"只带自身目标"的指令事件（等价原版 0x6FFE00）。
+static bool QueueSelfOrder(TechnoClass* pTechno, EventType eType)
+{
+	HouseClass* const pLocal = HouseClass::CurrentPlayer;
+	if (!pTechno || !pLocal || !pTechno->Owner || !pTechno->IsAlive || pTechno->InLimbo)
+		return false;
 
 	if (IsOrderQueueBlocked())
-		return;
+		return false;
+
+	if (!HasOrderQueueRoom())
+		return false;
 
 	const TargetClass whom(pTechno);
 
-	// EventClass 无默认构造，先备缓冲区让游戏构造函数填入（Frame 由它设为当前帧）
 	alignas(EventClass) unsigned char buffer[sizeof(EventClass)] { };
 
-	EventClass_TargetCtor(buffer, pTechno->Owner->ArrayIndex, eType, whom.m_ID, whom.m_RTTI);
-	EventClass::OutList.Add(*reinterpret_cast<EventClass*>(buffer));
+	EventClass_TargetCtor(buffer, pLocal->ArrayIndex, eType, whom.m_ID, whom.m_RTTI);
+	return EventClass::OutList.Add(*reinterpret_cast<EventClass*>(buffer));
 }
 
 // 按 TechnoClass::Array 下标排序：该顺序各客户端一致，可作确定性排序键。
@@ -78,15 +102,14 @@ static void SortByCanonicalOrder(std::vector<TechnoClass*>& list)
 		});
 }
 
-// 载具信息结构体
 struct TransportInfo
 {
-	CellStruct Cell;			// 所在单元格
-	int UsedCapacity;			// 已经使用的容量
-	int MaxCapacity;			// 最大容量
+	CellStruct Cell;	// 所在单元格
+	int UsedCapacity;	// 已用容量
+	int MaxCapacity;	// 最大容量
 };
 
-// 按 TechnoClass::Array 顺序收集 map 中的载具（跨客户端一致的顺序）
+// 键列表按数组序收集：不能用 map 遍历序——指针哈希决定顺序，各机不同。
 static void CollectCanonicalOrder(
 	const std::unordered_map<TechnoClass*, TransportInfo>& transports,
 	std::vector<TechnoClass*>& out)
@@ -102,7 +125,6 @@ static void CollectCanonicalOrder(
 	}
 }
 
-// Helper: 递归收集载具及其递归乘客到 unordered_set
 static void CollectWhitelist(
 	std::unordered_set<TechnoClass*>& whitelist,
 	TechnoClass* transport)
@@ -117,17 +139,16 @@ static void CollectWhitelist(
 	}
 }
 
-// 散开指定格子上非白名单内的己方单位
-// transportRoot: 该格子上应保留的载具（nullptr=全部散开）
+// 把载具格上本机可指挥的单位散开（载具自身及递归乘客除外），为登车腾位置。
 static void ScatterFriendlyCell(
 	CellStruct cell,
-	HouseClass* owner,
-	TechnoClass* transportRoot = nullptr)
+	HouseClass* pLocal,
+	TechnoClass* transportRoot,
+	std::unordered_set<TechnoClass*>& scattered)
 {
 	CellClass* pCell = MapClass::Instance.TryGetCellAt(cell);
 	if (!pCell) return;
 
-	// 临时构建白名单，排除载具内的成员
 	std::unordered_set<TechnoClass*> whitelist;
 	if (transportRoot)
 		CollectWhitelist(whitelist, transportRoot);
@@ -137,11 +158,12 @@ static void ScatterFriendlyCell(
 		TechnoClass* pTech = abstract_cast<TechnoClass*>(pObj);
 		if (!pTech || !pTech->IsAlive || pTech->InLimbo || pTech->Transporter)
 			continue;
-		if (pTech->Owner != owner)
+		if (!IsCommandableByLocalPlayer(pTech, pLocal))
 			continue;
 		if (whitelist.count(pTech))
 			continue;
-		// 正在前往该载具的单位不散开（避免打断登车流程）
+		if (scattered.contains(pTech))
+			continue;
 		if (transportRoot)
 		{
 			if (FootClass* pFoot = abstract_cast<FootClass*>(pTech))
@@ -150,40 +172,36 @@ static void ScatterFriendlyCell(
 					continue;
 			}
 		}
-		// 投递散开指令（原来直接调 Scatter()，只有本机生效）
-		QueueSelfOrder(pTech, EventType::Scatter);
+		// 一次招募可能连发几十条指令，队列满了就停手（原版同样是静默丢弃，只是提前收手不空转）
+		if (!QueueSelfOrder(pTech, EventType::Scatter))
+		{
+			Debug::Log("Recruit: cannot queue Scatter (queue full / planning mode), stop scattering cell\n");
+			return;
+		}
+
+		scattered.insert(pTech);
 	}
 }
 
-/* 尝试将一组候选单位分配到各载具中
-*
-* @param transports    		全局载具 map（会修改 UsedCapacity）
-* @param sortedKeys    		按 SizeLimit 排序的载具指针
-* @param candidates   		本轮候选单位
-* @param pPlayer      		玩家所属
-* @param initialCapacities  各载具本轮开始前的容量快照
-* @param useRangeLimit 		true=仅招募 recruitRange 内的单位
-*
-* @return 本轮成功招募到的总数
-*/
+// 把候选单位按 SizeLimit 分组，逐组轮询分配进各载具。
 static int TryAssign(
 	std::unordered_map<TechnoClass*, TransportInfo>& transports,
 	const std::vector<TechnoClass*>& sortedKeys,
 	std::vector<TechnoClass*>& candidates,
 	HouseClass* pPlayer,
 	const std::unordered_map<TechnoClass*, int>& initialCapacities,
+	std::unordered_set<TechnoClass*>& scattered,
 	bool useRangeLimit)
 {
 	const double recruitRange = RulesExt::Global()->Command_RecruitRange;
 	int totalRecruited = 0;
 
-	// 候选单位信息：用于内部标记分配状态
 	struct UnitInfo
 	{
-		TechnoClass* Unit;		// 候选单位指针
-		int Size;				// 该单位的 Size（<=0 时视为 1）
-		CellStruct Cell;		// 候选单位所在单元格
-		bool Assigned;			// 是否已被分配给某载具
+		TechnoClass* Unit;	// 候选单位
+		int Size;			// 该单位的 Size（<=0 时视为 1）
+		CellStruct Cell;	// 所在单元格
+		bool Assigned;		// 是否已分配
 	};
 	std::vector<UnitInfo> units;
 
@@ -200,7 +218,6 @@ static int TryAssign(
 		if (pUnit->IsInAir())
 			continue;
 
-		// 已在去载具路上的跳过，避免重复分配
 		if (FootClass* pFoot = abstract_cast<FootClass*>(pUnit))
 		{
 			if (pFoot->Destination)
@@ -218,7 +235,6 @@ static int TryAssign(
 		units.push_back({ pUnit, unitSize, unitCell, false });
 	}
 
-	// 按 SizeLimit 分组轮询：同组内轮询装满，再下一组
 	{
 		size_t groupStart = 0;
 		while (groupStart < sortedKeys.size())
@@ -230,9 +246,8 @@ static int TryAssign(
 				sortedKeys[groupEnd]->GetTechnoType()->SizeLimit == groupLimit)
 				groupEnd++;
 
-			// 先清空载具格上的己方单位；只投递一次，避免刷爆 128 格的 OutList
 			for (size_t ti = groupStart; ti < groupEnd; ti++)
-				ScatterFriendlyCell(transports[sortedKeys[ti]].Cell, pPlayer, sortedKeys[ti]);
+				ScatterFriendlyCell(transports[sortedKeys[ti]].Cell, pPlayer, sortedKeys[ti], scattered);
 
 			bool anyAssigned = true;
 			while (anyAssigned)
@@ -258,7 +273,6 @@ static int TryAssign(
 						if (u.Unit == pCurVeh)
 							continue;
 
-						// 防循环登车：两个都是失败载具则跳过
 						if (transports.count(u.Unit) && transports.count(pCurVeh))
 						{
 							auto itU = initialCapacities.find(u.Unit);
@@ -290,9 +304,11 @@ static int TryAssign(
 
 					if (bestIdx >= 0)
 					{
+						if (!HasOrderQueueRoom())
+							continue;
+
 						UnitInfo& u = units[bestIdx];
 
-						// 已部署的先解除部署：投递原版"部署"事件
 						bool needUndeploy = false;
 
 						if (UnitClass* pUnit = abstract_cast<UnitClass*>(u.Unit))
@@ -303,7 +319,6 @@ static int TryAssign(
 						if (needUndeploy)
 							QueueSelfOrder(u.Unit, EventType::Deploy);
 
-						// 这条原本就是联机的（内部投递 MegaMission 事件），不用改
 						u.Unit->ObjectClickedAction(Action::Enter, pCurVeh, false);
 						t.UsedCapacity += u.Size;
 						u.Assigned = true;
@@ -319,6 +334,7 @@ static int TryAssign(
 
 	return totalRecruited;
 }
+
 // 选中空载具按指定按键，自动招募附近单位上车
 class AutoPassengersLoad : public AresCommandClass
 {
@@ -338,7 +354,6 @@ public:
 
 	virtual const wchar_t* GetUICategory() const override
 	{
-		// 新键优先; 未配置时回退到旧键 PhobosExt, 兼容按旧键做过的语言包
 		const wchar_t* textPtr = StringTable::TryFetchString("CMND:UICATEGORY_SCAFFOLD");
 
 		if (!textPtr || !*textPtr)
@@ -362,26 +377,57 @@ public:
 		if (!pPlayer)
 			return;
 
-		std::unordered_map<TechnoClass*, TransportInfo> transports;
-		std::vector<TechnoClass*> selectedNonTransports;
+		std::vector<ObjectClass*> selected;
 
-		// ============================================================
-		// 1, 获取基本信息, 选中的那些是合法载具那些是乘客
-		// ============================================================
 		for (ObjectClass* pObj : ObjectClass::CurrentObjects)
 		{
 			if (!pObj || !pObj->IsSelected || !pObj->IsAlive || pObj->InLimbo)
 				continue;
 
-			TechnoClass* pTechno = abstract_cast<TechnoClass*>(pObj);
-			if (!pTechno || pTechno->Owner != pPlayer)
+			selected.push_back(pObj);
+		}
+
+		if (selected.empty())
+			return;
+
+		// 本机跑一遍招募即可：Scatter/Deploy/Enter 各自成事件下发，各机按事件复现结果。
+		RunRecruit(pPlayer, selected);
+
+		// 事件负载最多带 20 个目标，截断只作用于投递的副本，不影响上面已完成的招募。
+		if (selected.size() > EventExt::MAX_SELECTION)
+		{
+			Debug::Log("Auto passengers load: %zu selected, event keeps first %zu\n",
+				selected.size(), EventExt::MAX_SELECTION);
+			selected.resize(EventExt::MAX_SELECTION);
+		}
+
+		EventExt::RaiseRecruitPassengers(pPlayer, selected);
+	}
+
+	static void RunRecruit(HouseClass* pPlayer, const std::vector<ObjectClass*>& selected)
+	{
+		std::unordered_map<TechnoClass*, TransportInfo> transports;
+		std::vector<TechnoClass*> selectedNonTransports;
+		std::unordered_set<TechnoClass*> selectedSet;
+
+		// 1. 分拣选中对象：合法空载具记入 transports，其余作为乘客候选。
+		for (ObjectClass* pObj : selected)
+		{
+			if (!pObj || !pObj->IsAlive || pObj->InLimbo)
 				continue;
+
+			TechnoClass* pTechno = abstract_cast<TechnoClass*>(pObj);
+			if (!pTechno || !IsCommandableByLocalPlayer(pTechno, pPlayer))
+				continue;
+
+			selectedSet.insert(pTechno);
 
 			TechnoTypeClass* pType = pTechno->GetTechnoType();
 			bool isTransport = false;
 			if (pTechno->WhatAmI() == AbstractType::Unit)
 			{
-				if (pType && pType->Passengers > 0 && pObj->IsControllable())
+				if (pType && pType->Passengers > 0 && pTechno->IsControllable()
+					&& !pTechno->Deactivated && !pTechno->IsUnderEMP())
 				{
 					int used = pTechno->Passengers.GetTotalSize();
 					if (used < pType->Passengers)
@@ -390,7 +436,6 @@ public:
 						transports[pTechno] = { cell, used, pType->Passengers };
 						isTransport = true;
 					}
-					// else: 满员载具不设 isTransport，当作乘客参与上下车
 				}
 			}
 
@@ -398,55 +443,45 @@ public:
 				selectedNonTransports.push_back(pTechno);
 		}
 
-		// 选中顺序各客户端不同，先归一化（否则距离并列时会挑到不同的人）
 		SortByCanonicalOrder(selectedNonTransports);
 
-		// 没有载具? 直接返回!
+		// 没有可用载具直接返回。
 		if (transports.empty())
 			return;
 
-		// 键列表按数组序收集（不能用 map 遍历序：指针哈希使各机器顺序不同）
 		std::vector<TechnoClass*> sortedKeys;
 		CollectCanonicalOrder(transports, sortedKeys);
 
-		// stable_sort + 只比 SizeLimit：并列时保持数组序，结果跨客户端一致
 		std::stable_sort(sortedKeys.begin(), sortedKeys.end(), [](TechnoClass* a, TechnoClass* b) {
 			return a->GetTechnoType()->SizeLimit < b->GetTechnoType()->SizeLimit;
 		});
 
-		// 确保载具（只保留该格上的载具自身 + 递归乘客）
+		std::unordered_set<TechnoClass*> scattered;
+
 		for (TechnoClass* pVeh : sortedKeys)
-			ScatterFriendlyCell(transports[pVeh].Cell, pPlayer, pVeh);
+			ScatterFriendlyCell(transports[pVeh].Cell, pPlayer, pVeh, scattered);
 
 		int totalRecruited = 0;
-
-		// 记录各载具初始容量，用于判断是否招募到人
 		std::unordered_map<TechnoClass*, int> initialCapacities;
 		for (auto& [pVeh, info] : transports)
 			initialCapacities[pVeh] = info.UsedCapacity;
 
-		// ============================================================
-		// 第 1 轮尝试：选中的非载具优先招募（本轮不限距离）
-		// ============================================================
-		totalRecruited += TryAssign(transports, sortedKeys, selectedNonTransports, pPlayer, initialCapacities, false);
+		totalRecruited += TryAssign(transports, sortedKeys, selectedNonTransports, pPlayer, initialCapacities, scattered, false);
 
-		// ============================================================
-		// 第 2 轮尝试：招募非选中的, 附近指定范围的单位
-		// ============================================================
 		{
 			std::vector<TechnoClass*> unselected;
 			for (FootClass* pFoot : FootClass::Array)
 			{
 				if (!pFoot || !pFoot->IsAlive || pFoot->InLimbo)
 					continue;
-				if (pFoot->Owner != pPlayer)
+				if (!IsCommandableByLocalPlayer(pFoot, pPlayer))
 					continue;
 				if (pFoot->Transporter)
 					continue;
-				if (pFoot->IsSelected)
+				if (selectedSet.contains(pFoot))
 					continue;
 
-				// 已在去载具路上的跳过
+				// 已在去载具路上的跳过。
 				if (pFoot->Destination)
 				{
 					TechnoClass* pDestTechno = abstract_cast<TechnoClass*>(pFoot->Destination);
@@ -456,21 +491,16 @@ public:
 
 				unselected.push_back(pFoot);
 			}
-			totalRecruited += TryAssign(transports, sortedKeys, unselected, pPlayer, initialCapacities, true);
+			totalRecruited += TryAssign(transports, sortedKeys, unselected, pPlayer, initialCapacities, scattered, true);
 		}
 
-		// ============================================================
-		// 第 3 轮尝试
-		// 没匹配到人的载具把自己当作乘客上到其他载具
-		// ============================================================
 		{
-			// 统计还有多少非载具队员可匹配
 			int nonTransportCount = 0;
 			for (FootClass* pFoot : FootClass::Array)
 			{
 				if (!pFoot || !pFoot->IsAlive || pFoot->InLimbo || pFoot->Transporter)
 					continue;
-				if (pFoot->Owner != pPlayer)
+				if (!IsCommandableByLocalPlayer(pFoot, pPlayer))
 					continue;
 				TechnoTypeClass* pType = pFoot->GetTechnoType();
 				if (!pType || pType->Passengers > 0 || pType->ConsideredAircraft)
@@ -482,13 +512,10 @@ public:
 			std::vector<TechnoClass*> failedTransports;
 			bool hasSuccessful = false;
 
-			// 同样按 sortedKeys 遍历，保证 failedTransports 的收集顺序一致
 			for (TechnoClass* pVeh : sortedKeys)
 			{
 				const TransportInfo& info = transports[pVeh];
 				int initCap = initialCapacities.at(pVeh);
-				// 没有非载具可匹配时，还有空位的载具一律作为"匹配不到" -> 可当乘客
-				// 有非载具可匹配时，只有真正没招到人的才当乘客
 				bool isFailed = (nonTransportCount == 0)
 					? (info.UsedCapacity < info.MaxCapacity)
 					: (info.UsedCapacity == initCap && info.UsedCapacity < info.MaxCapacity);
@@ -509,14 +536,12 @@ public:
 
 			if (hasSuccessful)
 			{
-				totalRecruited += TryAssign(transports, sortedKeys, failedTransports, pPlayer, initialCapacities, false);
+				totalRecruited += TryAssign(transports, sortedKeys, failedTransports, pPlayer, initialCapacities, scattered, false);
 			}
 			else if (failedTransports.size() >= 2)
 			{
-				// 全是失败载具且至少 2 个：选剩余容量最大的做接收方，其他的上它
 				TechnoClass* pReceiver = nullptr;
 				int bestRemaining = 0;
-				// 严格大于：并列时取数组序靠前者，各客户端一致
 				for (TechnoClass* pVeh : sortedKeys)
 				{
 					const TransportInfo& info = transports[pVeh];
@@ -534,6 +559,8 @@ public:
 				{
 					if (pFailed == pReceiver)
 						continue;
+					if (!HasOrderQueueRoom())
+						continue;
 
 					TechnoTypeClass* pFailedType = pFailed->GetTechnoType();
 					if (!pFailedType)
@@ -546,7 +573,6 @@ public:
 					if (failedSize > static_cast<int>(pReceiver->GetTechnoType()->SizeLimit))
 						continue;
 
-					// 已部署的先解除部署（同上，投递事件）
 					if (UnitClass* pUnit = abstract_cast<UnitClass*>(pFailed))
 					{
 						if (pUnit->Deployed)

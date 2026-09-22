@@ -68,12 +68,7 @@ public:
 	// 按 ID 查找实例
 	static MapChoiceBoxClass* FindByID(int id);
 
-	// ===== 联机同步：ChoiceBox 点击 =====
-	// 点击是本机私有输入，需经 EventClass 广播，否则 TEvent 557/558 各机判定分叉。
-	// 0x40 高于原版 LAST_EVENT(47)，原版事件分派走 default，由 Hooks.cpp 拦截处理。
-	static constexpr int CLICK_EVENT_TYPE = 0x40;
-	static void QueueClickEvent(int boxID, int buttonIndex); // 投递（仅本机）
-	static void ApplyClickEvent(int boxID, int buttonIndex); // 应用（所有客户端）
+	static void ApplyClickEvent(int boxID, int buttonIndex);
 
 	// 全局存档/读档
 	static bool SaveGlobals(ScaffoldStreamWriter& Stm);

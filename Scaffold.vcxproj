@@ -66,6 +66,7 @@
     <ClCompile Include="src\Ext\Techno\Features\WeaponHelpers.cpp" />
     <ClCompile Include="src\Ext\TEvent\Body.cpp" />
     <ClCompile Include="src\Ext\TEvent\Hooks.cpp" />
+    <ClCompile Include="src\Ext\Event\Body.cpp" />
     <ClCompile Include="src\Misc\Hooks.Ares.cpp" />
     <ClCompile Include="src\Ext\Tiberium\Hooks.cpp" />
     <ClCompile Include="src\New\TextBox\MapTextBoxClass.cpp" />
@@ -118,6 +119,7 @@
     <ClInclude Include="src\Ext\Script\Features\PatrolService.h" />
     <ClInclude Include="src\Ext\TechnoType\Body.h" />
     <ClInclude Include="src\Ext\TEvent\Body.h" />
+    <ClInclude Include="src\Ext\Event\Body.h" />
     <ClInclude Include="src\New\ChoiceBox\ChoiceBoxTypeClass.h" />
     <ClInclude Include="src\New\ChoiceBox\MapChoiceBoxClass.h" />
     <ClInclude Include="src\New\ChoiceBox\WaypointChoiceBoxClass.h" />

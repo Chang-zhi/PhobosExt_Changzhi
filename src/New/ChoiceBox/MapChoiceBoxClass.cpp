@@ -10,8 +10,8 @@
 #include <TacticalClass.h>
 #include <WWMouseClass.h>
 #include <Unsorted.h>
-#include <HouseClass.h>
-#include <EventClass.h>
+
+#include <Ext/Event/Body.h>
 
 #include <Utilities/Stream.h>
 #include <Utilities/Debug.h>
@@ -203,38 +203,6 @@ int MapChoiceBoxClass::PollMouseClick()
 	}
 
 	return -1;
-}
-
-// 投递点击事件（仅点击所在的本机调用）
-void MapChoiceBoxClass::QueueClickEvent(int boxID, int buttonIndex)
-{
-	// 同一帧内同一选择框只投递一次，防止绘制钩子重复调用刷爆 OutList
-	static int s_lastQueuedFrame = -1;
-	static int s_lastQueuedBoxID = -1;
-
-	const int frame = Unsorted::CurrentFrame;
-	if (s_lastQueuedFrame == frame && s_lastQueuedBoxID == boxID)
-		return;
-
-	s_lastQueuedFrame = frame;
-	s_lastQueuedBoxID = boxID;
-
-	HouseClass* pPlayer = HouseClass::CurrentPlayer;
-	if (!pPlayer)
-		return;
-
-	// 手动填字段，不调用 0x4C66C0：该构造内部按 Type 索引 EventNames（仅 47 项），
-	// 自定义 Type 会越界读到野指针，再经 "Adding event %s" 日志解引用而崩溃。
-	alignas(EventClass) unsigned char buffer[sizeof(EventClass)] { };
-	auto* pEvent = reinterpret_cast<EventClass*>(buffer);
-	pEvent->Type = static_cast<EventType>(CLICK_EVENT_TYPE);
-	pEvent->IsExecuted = false;
-	pEvent->HouseIndex = static_cast<char>(pPlayer->ArrayIndex);
-	pEvent->Frame = static_cast<unsigned int>(frame);
-	*reinterpret_cast<int*>(pEvent->DataBuffer) = boxID;
-	*reinterpret_cast<int*>(pEvent->DataBuffer + sizeof(int)) = buttonIndex;
-
-	EventClass::OutList.Add(*pEvent);
 }
 
 // 应用点击事件（所有客户端）
@@ -946,7 +914,7 @@ static void DrawChoiceBoxList(std::vector<std::shared_ptr<T>>& boxes)
 		const int clickedButton = ptr->PollMouseClick();
 		if (clickedButton >= 0)
 		{
-			MapChoiceBoxClass::QueueClickEvent(ptr->ID, clickedButton);
+			EventExt::RaiseChoiceBoxClick(ptr->ID, clickedButton);
 		}
 	}
 
