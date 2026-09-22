@@ -35,6 +35,9 @@
 - 修复了选择框(ChoiceBox)点击, 按键命令 Recruit Passengers, 分散攻击(5503/5508)可能会导致联机不同步的bug
 - 引入了新的bug(划掉)
 
+5, 向下兼容相关:
+- AllowTabBriefingInSinglePlayer 由 rulesmd.ini [General] 移至 RA2MD.ini [Scaffold]
+- CMND:UICATEGORY_PHOBOSEXT 改为 CMND:UICATEGORY_SCAFFOLD
 
 
 2026,9,21

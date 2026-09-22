@@ -289,6 +289,25 @@ pre code { padding: 0; font-size: inherit; color: inherit; background: none; bor
 .sec-toc__link { color: #3a3a3a; text-decoration: none; padding: 2px 7px; border-radius: 4px; transition: background .2s, color .2s; }
 .sec-toc__link:hover { background: #fbecec; color: #d92929; }
 .sec-toc__id { color: #aaa; font-size: .8rem; font-family: 'Consolas',monospace; }
+/* 页内目录 / 侧边栏的分类标题（按 rulesmd 条目分组） */
+.sec-toc__group {
+  margin: 10px 0 2px; font-family: 'Consolas',monospace;
+  font-size: .76rem; font-weight: 700; color: #b81c1c; letter-spacing: .03em;
+}
+.sec-toc__group:first-child { margin-top: 0; }
+.nav__subgroup {
+  padding: .55rem .7rem .1rem 1.35rem; list-style: none;
+  font-family: 'Consolas',monospace; font-size: .67rem; font-weight: 700;
+  color: #b81c1c; letter-spacing: .03em;
+}
+/* 正文字分类标题：包在无 id 的 div 里，避免被搜索索引当作条目 */
+.cfg-group {
+  margin: 2.4rem 0 1.2rem; padding: .5rem .95rem;
+  background: linear-gradient(90deg, #fdf1f1 0%, #fff 78%);
+  border-left: 4px solid #d92929; border-radius: 0 5px 5px 0;
+}
+.cfg-group__name { font-family: 'Consolas',monospace; font-size: 1.05rem; font-weight: 700; color: #b81c1c; }
+.cfg-group__desc { font-size: .78rem; color: #8f8585; margin-top: .1rem; }
 
 .sec-divider { margin: 2.2rem -2.6rem; border: none; height: 1px; background: #efdede; }
 .sec-divider--double {
@@ -399,15 +418,28 @@ pre code { padding: 0; font-size: inherit; color: inherit; background: none; bor
 <li class="nav__group">
   <div class="nav__item nav__item--parent" page="gameplay">新增游戏机制<span class="nav__caret" title="展开 / 收起子目录（不切换页面）"><svg viewBox="0 0 24 24" width="14" height="14" xmlns="http://www.w3.org/2000/svg"><polygon points="9,5 18,12 9,19"/></svg></span></div>
   <ul class="nav__sub">
-    <li class="nav__subitem" data-target="gameplay_1" data-page="gameplay" title="超时空武器扩展 · Temporal.Exclusive / TemporalAOE">1. 超时空武器扩展</li>
-    <li class="nav__subitem" data-target="gameplay_2" data-page="gameplay" title="自动游猎 · AutoHunt">2. 自动游猎</li>
-    <li class="nav__subitem" data-target="gameplay_3" data-page="gameplay" title="AI 单位可否被选为攻击目标 · LegalTargetWhenAIOwner">3. AI 单位可否被选为攻击目标</li>
-    <li class="nav__subitem" data-target="gameplay_4" data-page="gameplay" title="基地节点跨所属方判定 · BaseNodeCrossOwners">4. 基地节点跨所属方判定</li>
-    <li class="nav__subitem" data-target="gameplay_5" data-page="gameplay" title="混乱机制扩展 · BerzerkRestoreClearTarget / BerserkReduce">5. 混乱机制扩展</li>
-    <li class="nav__subitem" data-target="gameplay_6" data-page="gameplay" title="选择框样式 · [ChoiceBoxTypes]">6. 选择框样式</li>
-    <li class="nav__subitem" data-target="gameplay_7" data-page="gameplay" title="单人任务打开任务简报 · AllowTabBriefingInSinglePlayer">7. 单人任务打开任务简报</li>
-    <li class="nav__subitem" data-target="gameplay_8" data-page="gameplay" title="智能火力分配 · SmartVHPScan">8. 智能火力分配</li>
-    <li class="nav__subitem" data-target="gameplay_9" data-page="gameplay" title="AI 目标类型列表 · [AITargetTypes]">9. AI 目标类型列表</li>
+    <li class="nav__subgroup">[General]</li>
+    <li class="nav__subitem" data-target="gameplay_1" data-page="gameplay" title="混乱机制扩展 · BerzerkRestoreClearTarget / BerserkReduce">1. 混乱机制扩展</li>
+    <li class="nav__subitem" data-target="gameplay_9" data-page="gameplay" title="文本框黑幕显示 · ShowTextBoxInShroud">2. 文本框黑幕显示</li>
+    <li class="nav__subgroup">[WarheadType]</li>
+    <li class="nav__subitem" data-target="gameplay_2" data-page="gameplay" title="超时空武器扩展 · Temporal.Exclusive / TemporalAOE">1. 超时空武器扩展</li>
+    <li class="nav__subgroup">[TechnoType]</li>
+    <li class="nav__subitem" data-target="gameplay_3" data-page="gameplay" title="自动游猎 · AutoHunt">1. 自动游猎</li>
+    <li class="nav__subitem" data-target="gameplay_4" data-page="gameplay" title="AI 单位可否被选为目标 · LegalTargetWhenAIOwner">2. AI 单位可否被选为目标</li>
+    <li class="nav__subitem" data-target="gameplay_5" data-page="gameplay" title="智能火力分配 · SmartVHPScan">3. 智能火力分配</li>
+    <li class="nav__subgroup">[Country House]</li>
+    <li class="nav__subitem" data-target="gameplay_6" data-page="gameplay" title="基地节点跨所属方判定 · BaseNodeCrossOwners">1. 基地节点跨所属方判定</li>
+    <li class="nav__subgroup">自定义段</li>
+    <li class="nav__subitem" data-target="gameplay_7" data-page="gameplay" title="选择框样式 · [ChoiceBoxTypes]">1. 选择框样式</li>
+    <li class="nav__subitem" data-target="gameplay_8" data-page="gameplay" title="AI 目标类型列表 · [AITargetTypes]">2. AI 目标类型列表</li>
+    <li class="nav__subitem" data-target="gameplay_10" data-page="gameplay" title="文本框样式 · [TextBoxTypes]">3. 文本框样式</li>
+  </ul>
+</li>
+
+<li class="nav__group">
+  <div class="nav__item nav__item--parent" page="client">本机设置<span class="nav__caret" title="展开 / 收起子目录（不切换页面）"><svg viewBox="0 0 24 24" width="14" height="14" xmlns="http://www.w3.org/2000/svg"><polygon points="9,5 18,12 9,19"/></svg></span></div>
+  <ul class="nav__sub">
+    <li class="nav__subitem" data-target="client_1" data-page="client" title="单人任务打开任务简报 · AllowTabBriefingInSinglePlayer">1. 单人任务打开任务简报</li>
   </ul>
 </li>
 
@@ -556,25 +588,70 @@ pre code { padding: 0; font-size: inherit; color: inherit; background: none; bor
 
 <section id="sec_gameplay">
 <h2 class="doc-heading--secondary">新增游戏机制</h2>
-<p>以下功能全部通过 <code>rulesmd.ini</code>（或地图小节）中的标签启用，均为可选。</p>
 <div class="sec-toc">
 <p class="sec-toc__title">目录</p>
 <ul class="sec-toc__list">
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_1')" class="sec-toc__link"><span class="sec-toc__name">1. 超时空武器扩展</span><code class="sec-toc__key">Temporal.Exclusive / TemporalAOE</code></a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_2')" class="sec-toc__link"><span class="sec-toc__name">2. 自动游猎</span><code class="sec-toc__key">AutoHunt</code></a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_3')" class="sec-toc__link"><span class="sec-toc__name">3. AI 单位可否被选为攻击目标</span><code class="sec-toc__key">LegalTargetWhenAIOwner</code></a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_4')" class="sec-toc__link"><span class="sec-toc__name">4. 基地节点跨所属方判定</span><code class="sec-toc__key">BaseNodeCrossOwners</code></a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_5')" class="sec-toc__link"><span class="sec-toc__name">5. 混乱机制扩展</span><code class="sec-toc__key">BerzerkRestoreClearTarget / BerserkReduce</code></a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_6')" class="sec-toc__link"><span class="sec-toc__name">6. 选择框样式</span><code class="sec-toc__key">[ChoiceBoxTypes]</code></a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_7')" class="sec-toc__link"><span class="sec-toc__name">7. 单人任务打开任务简报</span><code class="sec-toc__key">AllowTabBriefingInSinglePlayer</code></a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_8')" class="sec-toc__link"><span class="sec-toc__name">8. 智能火力分配</span><code class="sec-toc__key">SmartVHPScan</code></a></li>
-<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_9')" class="sec-toc__link"><span class="sec-toc__name">9. AI 目标类型列表</span><code class="sec-toc__key">[AITargetTypes]</code></a></li>
+<li class="sec-toc__group">[General]</li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_1')" class="sec-toc__link"><span class="sec-toc__name">1. 混乱机制扩展</span><code class="sec-toc__key">BerzerkRestoreClearTarget / BerserkReduce</code></a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_9')" class="sec-toc__link"><span class="sec-toc__name">2. 文本框黑幕显示</span><code class="sec-toc__key">ShowTextBoxInShroud</code></a></li>
+<li class="sec-toc__group">[WarheadType]</li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_2')" class="sec-toc__link"><span class="sec-toc__name">1. 超时空武器扩展</span><code class="sec-toc__key">Temporal.Exclusive / TemporalAOE</code></a></li>
+<li class="sec-toc__group">[TechnoType]</li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_3')" class="sec-toc__link"><span class="sec-toc__name">1. 自动游猎</span><code class="sec-toc__key">AutoHunt</code></a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_4')" class="sec-toc__link"><span class="sec-toc__name">2. AI 单位可否被选为目标</span><code class="sec-toc__key">LegalTargetWhenAIOwner</code></a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_5')" class="sec-toc__link"><span class="sec-toc__name">3. 智能火力分配</span><code class="sec-toc__key">SmartVHPScan</code></a></li>
+<li class="sec-toc__group">[Country House]</li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_6')" class="sec-toc__link"><span class="sec-toc__name">1. 基地节点跨所属方判定</span><code class="sec-toc__key">BaseNodeCrossOwners</code></a></li>
+<li class="sec-toc__group">自定义段</li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_7')" class="sec-toc__link"><span class="sec-toc__name">1. 选择框样式</span><code class="sec-toc__key">[ChoiceBoxTypes]</code></a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_8')" class="sec-toc__link"><span class="sec-toc__name">2. AI 目标类型列表</span><code class="sec-toc__key">[AITargetTypes]</code></a></li>
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('gameplay_10')" class="sec-toc__link"><span class="sec-toc__name">3. 文本框样式</span><code class="sec-toc__key">[TextBoxTypes]</code></a></li>
 </ul>
 </div>
 
 <hr class="sec-divider">
 
+<div class="cfg-group">
+<div class="cfg-group__name">[General]</div>
+<div class="cfg-group__desc">通用设置</div>
+</div>
+
 <div id="gameplay_1">
+<h3 class="doc-heading--tertiary">1. 混乱机制扩展</h3>
+<h4>1.1 混乱恢复后清除目标</h4>
+<pre class="doc-code--block"><code>[General]
+BerzerkRestoreClearTarget=       ; boolean - 混乱恢复后是否清除当前攻击目标 - (默认 false)</code></pre>
+<p>启用后，单位从混乱状态恢复时会清除当前攻击目标、停止移动并转入 <code>Guard</code> 状态，避免恢复后乱跑。</p>
+<h4>1.2 弹头缩减混乱时间</h4>
+<pre class="doc-code--block"><code>[WarheadType]
+BerserkReduce=                   ; integer - 缩短混乱时间的帧数，负值则延长 - (默认 0)</code></pre>
+<p>单位被带此标签的弹头命中时（无论是否造成伤害），混乱时间减少对应帧数。</p>
+<ul class="doc-list">
+<li>正值 = 缩短混乱时间；负值 = 延长混乱时间。</li>
+<li>减到 0 以下时立即解除混乱，并清除攻击目标、进入 <code>Guard</code> 状态。</li>
+</ul>
+</div>
+
+<hr class="sec-divider--double">
+
+<div id="gameplay_9">
+<h3 class="doc-heading--tertiary">2. 文本框黑幕显示</h3>
+<p>控制文本框在黑幕中是否绘制。</p>
+<p><a href="javascript:switchPage('actions');setTimeout(function(){scrollToFeature('actions_1')},100)" class="doc-link">→ 查看对应的触发行为（549–552、579–589）</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:scrollToFeature('gameplay_10')" class="doc-link">→ 查看文本框样式（[TextBoxTypes]）</a></p>
+<pre class="doc-code--block"><code>[General]
+ShowTextBoxInShroud.Waypoint=    ; boolean - 路径点文本框在黑幕中是否显示 - (默认 yes)
+ShowTextBoxInShroud.Techno=      ; boolean - 单位文本框在黑幕中是否显示 - (默认 yes)</code></pre>
+<p>黑幕判定只看路径点所在格、单位所在格是否被遮挡，不检测整个文本框区域。</p>
+</div>
+
+<hr class="sec-divider--double">
+
+<div class="cfg-group">
+<div class="cfg-group__name">[WarheadType]</div>
+<div class="cfg-group__desc">弹头设置</div>
+</div>
+
+<div id="gameplay_2">
 <h3 class="doc-heading--tertiary">1. 超时空武器扩展</h3>
 <p>给超时空武器（<code>Temporal=yes</code> 的弹头）增加两种能力：同一目标只被一个武器锁定、攻击时连周围单位一起冻结。</p>
 
@@ -617,8 +694,13 @@ TemporalAOE.AffectsAllies=       ; boolean - 是否连友军一起冻结 - (默�
 
 <hr class="sec-divider--double">
 
-<div id="gameplay_2">
-<h3 class="doc-heading--tertiary">2. 自动游猎</h3>
+<div class="cfg-group">
+<div class="cfg-group__name">[TechnoType]</div>
+<div class="cfg-group__desc">单位设置</div>
+</div>
+
+<div id="gameplay_3">
+<h3 class="doc-heading--tertiary">1. 自动游猎</h3>
 <pre class="doc-code--block"><code>[TechnoType]
 AutoHunt=                        ; boolean - AI 单位自动进入游猎状态 - (默认 false)</code></pre>
 <p>该类型的所有 <strong>AI 单位</strong>自动进入 <code>Hunt</code> 状态，主动搜索并攻击敌方目标。</p>
@@ -638,8 +720,8 @@ AutoHunt=                        ; boolean - AI 单位自动进入游猎状态 -
 
 <hr class="sec-divider--double">
 
-<div id="gameplay_3">
-<h3 class="doc-heading--tertiary">3. AI 单位可否被选为攻击目标</h3>
+<div id="gameplay_4">
+<h3 class="doc-heading--tertiary">2. AI 单位可否被选为目标</h3>
 <pre class="doc-code--block"><code>[TechnoType]
 LegalTargetWhenAIOwner=          ; boolean - AI 控制时能否被其他单位选为攻击目标 - (默认 true)</code></pre>
 <p>设为 <code>no</code> 后，该类型在由 AI 控制时不会被其他单位选为普通武器的攻击目标。</p>
@@ -654,108 +736,8 @@ LegalTargetWhenAIOwner=          ; boolean - AI 控制时能否被其他单位�
 
 <hr class="sec-divider--double">
 
-<div id="gameplay_4">
-<h3 class="doc-heading--tertiary">4. 基地节点跨所属方判定</h3>
-<pre class="doc-code--block"><code>[Country House]
-BaseNodeCrossOwners=             ; boolean - AI 评估基地节点时是否计入所有所属方建筑 - (默认 false)</code></pre>
-<p>启用后，AI 判断某个基地节点是否已经建好时，会把<strong>场上所有所属方</strong>的建筑都算进来，而不是只看自己的建筑。</p>
-<p><strong>典型用途</strong>：让 AI 给玩家造建筑——玩家拿到 AI 的建筑后，AI 认为该节点已完成，不再重建。</p>
-<p>节点由本 DLL 按记录顺序控制建造，不会出现原版那种节点自动移位。</p>
-<div class="doc-note">
-<span class="doc-note__title">注意</span>
-<ul>
-<li>与触发行为 <code>30</code>（自动建设基地）<strong>不兼容</strong>：本功能接管了 AI 的节点建造顺序，开启行为 <code>30</code> 也不会更换建筑位置。</li>
-<li>开启后<strong>不要让 AI 造围墙</strong>，会导致建造卡住。</li>
-<li>触发行为 <code>560</code> 的「立即建造」参数在此模式下会把节点插到队列最前面，AI 下一帧优先建造它。</li>
-<li>触发行为 <code>560</code>／<code>561</code>／<code>562</code> 增删节点时，本功能记录的数据会同步更新。</li>
-</ul>
-</div>
-</div>
-
-<hr class="sec-divider--double">
-
 <div id="gameplay_5">
-<h3 class="doc-heading--tertiary">5. 混乱机制扩展</h3>
-<h4>5.1 混乱恢复后清除目标</h4>
-<pre class="doc-code--block"><code>[General]
-BerzerkRestoreClearTarget=       ; boolean - 混乱恢复后是否清除当前攻击目标 - (默认 false)</code></pre>
-<p>启用后，单位从混乱状态恢复时会清除当前攻击目标、停止移动并转入 <code>Guard</code> 状态，避免恢复后乱跑。</p>
-<h4>5.2 弹头缩减混乱时间</h4>
-<pre class="doc-code--block"><code>[WarheadType]
-BerserkReduce=                   ; integer - 缩短混乱时间的帧数，负值则延长 - (默认 0)</code></pre>
-<p>单位被带此标签的弹头命中时（无论是否造成伤害），混乱时间减少对应帧数。</p>
-<ul class="doc-list">
-<li>正值 = 缩短混乱时间；负值 = 延长混乱时间。</li>
-<li>减到 0 以下时立即解除混乱，并清除攻击目标、进入 <code>Guard</code> 状态。</li>
-</ul>
-</div>
-
-<hr class="sec-divider--double">
-
-<div id="gameplay_6">
-<h3 class="doc-heading--tertiary">6. 选择框样式</h3>
-<p>选择框样式在 <code>rulesmd.ini</code> 的 <code>[ChoiceBoxTypes]</code> 中定义。</p>
-<p><a href="javascript:switchPage('actions');setTimeout(function(){scrollToFeature('actions_11')},100)" class="doc-link">→ 查看对应的触发行为（590–593）</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:switchPage('events');setTimeout(function(){scrollToFeature('events_4')},100)" class="doc-link">→ 查看对应的触发事件（557–559）</a></p>
-
-<pre class="doc-code--block"><code>[ChoiceBoxTypes]
-0=MyChoiceBox
-...
-
-[MyChoiceBox]
-; 基本属性
-MaxWidth=                        ; integer - 最大像素宽度 - (默认 250)
-BackgroundOpacity=               ; integer - 背景不透明度 0~100 - (默认 75)
-Color=                           ; integer,integer,integer - 文字与边框颜色 - (默认 255,215,0)
-Duration=                        ; integer - 显示帧数，-1=无限 - (默认 -1)
-
-; 文本内容
-Title=                           ; CSF标签 - 标题 - (默认 无)
-Title.Center=                    ; boolean - 标题是否居中 - (默认 no)
-Description=                     ; CSF标签 - 描述 - (默认 无)
-
-; 按钮
-Button.Count=                    ; integer - 按钮数量 - (默认 0)
-Button.Layout=                   ; 枚举字符串 - Horizontal / Vertical - (默认 Horizontal)
-Button.Mode=                     ; 枚举字符串 - Normal / Bounce - (默认 Normal)
-Button.Width=                    ; integer - 固定宽度，0=自适应 - (默认 0)
-Button.Height=                   ; integer - 固定高度，0=自适应 - (默认 0)
-Button.Text1=                    ; CSF标签 - 按钮 1 的文字 - (默认 无)
-Button.Text2=                    ; CSF标签 - 按钮 2 的文字 - (默认 无)
-...</code></pre>
-
-<table class="doc-table">
-<thead><tr><th class="doc-table__th" style="width:170px">属性</th><th class="doc-table__th">说明</th></tr></thead>
-<tbody>
-<tr><td class="doc-table__td"><code>MaxWidth</code></td><td class="doc-table__td">最大宽度（像素），超出该宽度的文字自动换行；填 <code>0</code> 或负数按 <code>250</code> 处理。</td></tr>
-<tr><td class="doc-table__td"><code>BackgroundOpacity</code></td><td class="doc-table__td">黑色背景的不透明度，值越大背景越深：<code>0</code>=全透明，<code>100</code>=全黑。</td></tr>
-<tr><td class="doc-table__td"><code>Color</code></td><td class="doc-table__td">文字与边框颜色。鼠标悬停时加亮，选中时变红。</td></tr>
-<tr><td class="doc-table__td"><code>Duration</code></td><td class="doc-table__td">自动消失的帧数。<code>-1</code>=一直显示，需用触发行为清除；归零时若玩家没点过按钮，会触发「超时未选」事件。</td></tr>
-<tr><td class="doc-table__td"><code>Title</code>／<code>Description</code></td><td class="doc-table__td">标题显示在最上方，描述显示在标题下、按钮上；不填则不显示。</td></tr>
-<tr><td class="doc-table__td"><code>Title.Center</code></td><td class="doc-table__td">标题是否水平居中，默认左对齐。</td></tr>
-<tr><td class="doc-table__td"><code>Button.Count</code></td><td class="doc-table__td">按钮数量。有几个按钮就要写几个 <code>Button.TextN</code>。</td></tr>
-<tr><td class="doc-table__td"><code>Button.Layout</code></td><td class="doc-table__td">按钮排列：<code>Horizontal</code>=横向，一行放不下自动折行；<code>Vertical</code>=纵向单列。</td></tr>
-<tr><td class="doc-table__td"><code>Button.Mode</code></td><td class="doc-table__td"><code>Normal</code>=点击后选择框立即消失并清理；<code>Bounce</code>=点击后回弹，可反复点击（建议配合 <code>Duration=-1</code>）。</td></tr>
-<tr><td class="doc-table__td"><code>Button.Width</code></td><td class="doc-table__td">固定宽度（像素），文字自动换行；<code>0</code>=按最长按钮文字自适应。</td></tr>
-<tr><td class="doc-table__td"><code>Button.Height</code></td><td class="doc-table__td">固定高度（像素），超出部分不显示；<code>0</code>=按文字行数自适应。</td></tr>
-<tr><td class="doc-table__td"><code>Button.TextN</code></td><td class="doc-table__td">第 N 个按钮的文字，序号从 1 连续写到 <code>Button.Count</code>；中间跳过会显示空白按钮，超出数量的不会被读取。</td></tr>
-</tbody>
-</table>
-</div>
-
-<hr class="sec-divider--double">
-
-<div id="gameplay_7">
-<h3 class="doc-heading--tertiary">7. 单人任务打开任务简报</h3>
-<p>原版单人任务中 <code>Tab</code> 无法重新打开任务简报，本项用于放开该限制。</p>
-<pre class="doc-code--block"><code>[General]
-AllowTabBriefingInSinglePlayer=  ; boolean - 单人任务中能否用 Tab 打开任务简报 - (默认 false)</code></pre>
-<p>设为 <code>yes</code> 后，单人任务中可随时按 <code>Tab</code> 打开任务简报；简报内容可用触发行为 <code>664</code> 动态修改。</p>
-</div>
-
-<hr class="sec-divider--double">
-
-<div id="gameplay_8">
-<h3 class="doc-heading--tertiary">8. 智能火力分配</h3>
+<h3 class="doc-heading--tertiary">3. 智能火力分配</h3>
 <p>名字沿用<code>VHPScan</code>仅为习惯，其独立于原版逻辑，实现更智能、可操作性更强的火力分配。</p>
 
 <pre class="doc-code--block"><code>[TechnoType]
@@ -823,8 +805,90 @@ SmartVHPScan=FullHealth</code></pre>
 
 <hr class="sec-divider--double">
 
-<div id="gameplay_9">
-<h3 class="doc-heading--tertiary">9. AI 目标类型列表</h3>
+<div class="cfg-group">
+<div class="cfg-group__name">[Country House]</div>
+<div class="cfg-group__desc">所属方设置</div>
+</div>
+
+<div id="gameplay_6">
+<h3 class="doc-heading--tertiary">1. 基地节点跨所属方判定</h3>
+<pre class="doc-code--block"><code>[Country House]
+BaseNodeCrossOwners=             ; boolean - AI 评估基地节点时是否计入所有所属方建筑 - (默认 false)</code></pre>
+<p>启用后，AI 判断某个基地节点是否已经建好时，会把<strong>场上所有所属方</strong>的建筑都算进来，而不是只看自己的建筑。</p>
+<p><strong>典型用途</strong>：让 AI 给玩家造建筑——玩家拿到 AI 的建筑后，AI 认为该节点已完成，不再重建。</p>
+<p>节点由本 DLL 按记录顺序控制建造，不会出现原版那种节点自动移位。</p>
+<div class="doc-note">
+<span class="doc-note__title">注意</span>
+<ul>
+<li>与触发行为 <code>30</code>（自动建设基地）<strong>不兼容</strong>：本功能接管了 AI 的节点建造顺序，开启行为 <code>30</code> 也不会更换建筑位置。</li>
+<li>开启后<strong>不要让 AI 造围墙</strong>，会导致建造卡住。</li>
+<li>触发行为 <code>560</code> 的「立即建造」参数在此模式下会把节点插到队列最前面，AI 下一帧优先建造它。</li>
+<li>触发行为 <code>560</code>／<code>561</code>／<code>562</code> 增删节点时，本功能记录的数据会同步更新。</li>
+</ul>
+</div>
+</div>
+
+<hr class="sec-divider--double">
+
+<div class="cfg-group">
+<div class="cfg-group__name">自定义段</div>
+<div class="cfg-group__desc">[ChoiceBoxTypes]、[AITargetTypes] 等自定义类型列表段</div>
+</div>
+
+<div id="gameplay_7">
+<h3 class="doc-heading--tertiary">1. 选择框样式</h3>
+<p>选择框样式在 <code>rulesmd.ini</code> 的 <code>[ChoiceBoxTypes]</code> 中定义。</p>
+<p><a href="javascript:switchPage('actions');setTimeout(function(){scrollToFeature('actions_11')},100)" class="doc-link">→ 查看对应的触发行为（590–593）</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:switchPage('events');setTimeout(function(){scrollToFeature('events_4')},100)" class="doc-link">→ 查看对应的触发事件（557–559）</a></p>
+
+<pre class="doc-code--block"><code>[ChoiceBoxTypes]
+0=MyChoiceBox
+...
+
+[MyChoiceBox]
+; 基本属性
+MaxWidth=                        ; integer - 最大像素宽度 - (默认 250)
+BackgroundOpacity=               ; integer - 背景不透明度 0~100 - (默认 75)
+Color=                           ; integer,integer,integer - 文字与边框颜色 - (默认 255,215,0)
+Duration=                        ; integer - 显示帧数，-1=无限 - (默认 -1)
+
+; 文本内容
+Title=                           ; CSF标签 - 标题 - (默认 无)
+Title.Center=                    ; boolean - 标题是否居中 - (默认 no)
+Description=                     ; CSF标签 - 描述 - (默认 无)
+
+; 按钮
+Button.Count=                    ; integer - 按钮数量 - (默认 0)
+Button.Layout=                   ; 枚举字符串 - Horizontal / Vertical - (默认 Horizontal)
+Button.Mode=                     ; 枚举字符串 - Normal / Bounce - (默认 Normal)
+Button.Width=                    ; integer - 固定宽度，0=自适应 - (默认 0)
+Button.Height=                   ; integer - 固定高度，0=自适应 - (默认 0)
+Button.Text1=                    ; CSF标签 - 按钮 1 的文字 - (默认 无)
+Button.Text2=                    ; CSF标签 - 按钮 2 的文字 - (默认 无)
+...</code></pre>
+
+<table class="doc-table">
+<thead><tr><th class="doc-table__th" style="width:170px">属性</th><th class="doc-table__th">说明</th></tr></thead>
+<tbody>
+<tr><td class="doc-table__td"><code>MaxWidth</code></td><td class="doc-table__td">最大宽度（像素），超出该宽度的文字自动换行；填 <code>0</code> 或负数按 <code>250</code> 处理。</td></tr>
+<tr><td class="doc-table__td"><code>BackgroundOpacity</code></td><td class="doc-table__td">黑色背景的不透明度，值越大背景越深：<code>0</code>=全透明，<code>100</code>=全黑。</td></tr>
+<tr><td class="doc-table__td"><code>Color</code></td><td class="doc-table__td">文字与边框颜色。鼠标悬停时加亮，选中时变红。</td></tr>
+<tr><td class="doc-table__td"><code>Duration</code></td><td class="doc-table__td">自动消失的帧数。<code>-1</code>=一直显示，需用触发行为清除；归零时若玩家没点过按钮，会触发「超时未选」事件。</td></tr>
+<tr><td class="doc-table__td"><code>Title</code>／<code>Description</code></td><td class="doc-table__td">标题显示在最上方，描述显示在标题下、按钮上；不填则不显示。</td></tr>
+<tr><td class="doc-table__td"><code>Title.Center</code></td><td class="doc-table__td">标题是否水平居中，默认左对齐。</td></tr>
+<tr><td class="doc-table__td"><code>Button.Count</code></td><td class="doc-table__td">按钮数量。有几个按钮就要写几个 <code>Button.TextN</code>。</td></tr>
+<tr><td class="doc-table__td"><code>Button.Layout</code></td><td class="doc-table__td">按钮排列：<code>Horizontal</code>=横向，一行放不下自动折行；<code>Vertical</code>=纵向单列。</td></tr>
+<tr><td class="doc-table__td"><code>Button.Mode</code></td><td class="doc-table__td"><code>Normal</code>=点击后选择框立即消失并清理；<code>Bounce</code>=点击后回弹，可反复点击（建议配合 <code>Duration=-1</code>）。</td></tr>
+<tr><td class="doc-table__td"><code>Button.Width</code></td><td class="doc-table__td">固定宽度（像素），文字自动换行；<code>0</code>=按最长按钮文字自适应。</td></tr>
+<tr><td class="doc-table__td"><code>Button.Height</code></td><td class="doc-table__td">固定高度（像素），超出部分不显示；<code>0</code>=按文字行数自适应。</td></tr>
+<tr><td class="doc-table__td"><code>Button.TextN</code></td><td class="doc-table__td">第 N 个按钮的文字，序号从 1 连续写到 <code>Button.Count</code>；中间跳过会显示空白按钮，超出数量的不会被读取。</td></tr>
+</tbody>
+</table>
+</div>
+
+<hr class="sec-divider--double">
+
+<div id="gameplay_8">
+<h3 class="doc-heading--tertiary">2. AI 目标类型列表</h3>
 <p>自定义若干「目标类型清单」，供脚本动作 <code>5508</code> 按索引选用。<br>
   可在 <code>rulesmd.ini</code> 或地图小节中定义，每一行写一个清单。</p>
 <p><a href="javascript:switchPage('scripts');setTimeout(function(){scrollToFeature('scripts_3')},100)" class="doc-link">→ 查看对应的脚本动作（5508）</a></p>
@@ -841,6 +905,56 @@ SmartVHPScan=FullHealth</code></pre>
 </div>
 </div>
 
+<hr class="sec-divider--double">
+
+<div id="gameplay_10">
+<h3 class="doc-heading--tertiary">3. 文本框样式</h3>
+<p>在 <code>rulesmd.ini</code> 或地图小节的 <code>[TextBoxTypes]</code> 中定义，可定义任意多个；文本框触发行为按索引引用。</p>
+<p><a href="javascript:switchPage('actions');setTimeout(function(){scrollToFeature('actions_1')},100)" class="doc-link">→ 查看对应的触发行为（549–552、579–589）</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:scrollToFeature('gameplay_9')" class="doc-link">→ 查看文本框黑幕显示（ShowTextBoxInShroud）</a></p>
+<pre class="doc-code--block"><code>[TextBoxTypes]
+0=FirstBoxType
+1=YourBoxType
+...
+
+[YourBoxType]
+MaxWidth=                        ; integer - 最大像素宽度 1-1000，超出自动换行 - (默认 250)
+BackgroundOpacity=               ; integer - 背景不透明度 0~100 - (默认 75)
+Color=                           ; integer,integer,integer - 文字与边框颜色 - (默认 255,215,0)
+Duration=                        ; integer - 自动移除帧数，-1=无限 - (默认 -1)</code></pre>
+<div class="doc-note">
+<span class="doc-note__title">注意</span>
+<ul>
+<li><code>MaxWidth</code> 请填 1-1000 内的值：填 0 或负数时文本框不会绘制。</li>
+<li>「根据数据」创建时无法指定 <code>Duration</code>；这种文本框不会自动消失，需用行为清除。</li>
+</ul>
+</div>
+</div>
+
+</section>
+
+<!----------------->
+<!-- 本机设置 -->
+<!----------------->
+
+<section id="sec_client">
+<h2 class="doc-heading--secondary">本机设置</h2>
+<p>以下设置写在游戏目录 <code>RA2MD.ini</code> 的 <code>[Scaffold]</code> 段，属于<strong>本机用户设置</strong>：只影响本机的表现与输入。</p>
+<div class="sec-toc">
+<p class="sec-toc__title">目录</p>
+<ul class="sec-toc__list">
+<li class="sec-toc__item"><a href="javascript:scrollToFeature('client_1')" class="sec-toc__link"><span class="sec-toc__name">1. 单人任务打开任务简报</span><code class="sec-toc__key">AllowTabBriefingInSinglePlayer</code></a></li>
+</ul>
+</div>
+
+<hr class="sec-divider">
+
+<div id="client_1">
+<h3 class="doc-heading--tertiary">1. 单人任务打开任务简报</h3>
+<p>原版单人任务中 <code>Tab</code> 无法重新打开任务简报，本项用于放开该限制。</p>
+<pre class="doc-code--block"><code>[Scaffold]
+AllowTabBriefingInSinglePlayer=  ; boolean - 单人任务中能否用 Tab 打开任务简报 - (默认 false)</code></pre>
+<p>设为 <code>yes</code> 后，单人任务中可随时按 <code>Tab</code> 打开任务简报；简报内容可用触发行为 <code>664</code> 动态修改。</p>
+</div>
 </section>
 
 <!----------------->
@@ -930,19 +1044,7 @@ Command.RecruitRange=            ; double - 自动装载的招募半径 - (默�
 <div id="actions_1">
 <h3 class="doc-heading--tertiary">1. 文本框系统</h3>
 <p>在地图路径点或单位上绘制自定义文本框，样式可用 <code>[TextBoxTypes]</code> 预定义，也可在行为中直接指定。</p>
-
-<h4>文本框样式</h4>
-<p>在 <code>rulesmd.ini</code> 的 <code>[TextBoxTypes]</code> 中定义，可定义任意多个。</p>
-<pre class="doc-code--block"><code>[TextBoxTypes]
-0=FirstBoxType
-1=YourBoxType
-...
-
-[YourBoxType]
-MaxWidth=                        ; integer - 最大像素宽度 1-1000，超出自动换行 - (默认 250)
-BackgroundOpacity=               ; integer - 背景不透明度 0~100 - (默认 75)
-Color=                           ; integer,integer,integer - 文字与边框颜色 - (默认 255,215,0)
-Duration=                        ; integer - 自动移除帧数，-1=无限 - (默认 -1)</code></pre>
+<p><a href="javascript:switchPage('gameplay');setTimeout(function(){scrollToFeature('gameplay_10')},100)" class="doc-link">→ 查看文本框样式（[TextBoxTypes]）</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:switchPage('gameplay');setTimeout(function(){scrollToFeature('gameplay_9')},100)" class="doc-link">→ 查看文本框黑幕显示（ShowTextBoxInShroud）</a></p>
 
 <h4>路径点文本框</h4>
 <div class="doc-table--action">
@@ -977,18 +1079,11 @@ Duration=                        ; integer - 自动移除帧数，-1=无限 - (�
 </table>
 </div>
 
-<p>文本框在黑幕中的显示由 <code>[General]</code> 的两个标签控制：</p>
-<pre class="doc-code--block"><code>[General]
-ShowTextBoxInShroud.Waypoint=    ; boolean - 路径点文本框在黑幕中是否显示 - (默认 yes)
-ShowTextBoxInShroud.Techno=      ; boolean - 单位文本框在黑幕中是否显示 - (默认 yes)</code></pre>
-
 <div class="doc-note">
 <span class="doc-note__title">注意</span>
 <ul>
 <li>鼠标移到文本框上时文本会暂停绘制，避免遮挡点击；单位进入载具期间文本框暂停绘制，离开后自动恢复。</li>
-<li>黑幕判定只看路径点所在格、单位所在格是否被遮挡，不检测整个文本框区域。</li>
-<li>「根据类型」创建时，<code>[TextBoxTypes]</code> 的 <code>Duration</code> 才会生效；「根据数据」创建时不会自动消失，需要用行为清除。</li>
-<li><code>MaxWidth</code> 请填 1-1000 内的值：填 0 或负数时文本框不会绘制。</li>
+<li>「根据数据」创建时无法指定 <code>Duration</code>；这种文本框不会自动消失，需用行为清除。</li>
 <li>「作战小队」相关行为只作用于可移动单位。</li>
 </ul>
 </div>
@@ -1232,7 +1327,7 @@ ShowTextBoxInShroud.Techno=      ; boolean - 单位文本框在黑幕中是否�
 <div id="actions_11">
 <h3 class="doc-heading--tertiary">11. 选择框系统</h3>
 <p>在路径点或屏幕上创建带按钮的交互式选择框。</p>
-<p><a href="javascript:switchPage('events');setTimeout(function(){scrollToFeature('events_4')},100)" class="doc-link">→ 查看对应的触发事件（557–559）</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:switchPage('gameplay');setTimeout(function(){scrollToFeature('gameplay_6')},100)" class="doc-link">→ 查看选择框样式（[ChoiceBoxTypes]）</a></p>
+<p><a href="javascript:switchPage('events');setTimeout(function(){scrollToFeature('events_4')},100)" class="doc-link">→ 查看对应的触发事件（557–559）</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:switchPage('gameplay');setTimeout(function(){scrollToFeature('gameplay_7')},100)" class="doc-link">→ 查看选择框样式（[ChoiceBoxTypes]）</a></p>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
@@ -1307,7 +1402,7 @@ ShowTextBoxInShroud.Techno=      ; boolean - 单位文本框在黑幕中是否�
 <div class="doc-note">
 <span class="doc-note__title">注意</span>
 <ul>
-<li>执行后会<strong>同时开启单人游戏的调速选项</strong>，玩家可在设置里自行改游戏速度。</li>
+<li>执行后会<strong>同时开启调速选项</strong>，玩家可在设置里自行改游戏速度。</li>
 <li>参数超出 0~6 时不生效。</li>
 </ul>
 </div>
@@ -1513,7 +1608,7 @@ ShowTextBoxInShroud.Techno=      ; boolean - 单位文本框在黑幕中是否�
 <div id="events_4">
 <h3 class="doc-heading--tertiary">4. 选择框系统</h3>
 <p>检测选择框的按钮点击与超时，需配合触发行为使用。</p>
-<p><a href="javascript:switchPage('actions');setTimeout(function(){scrollToFeature('actions_11')},100)" class="doc-link">→ 查看对应的触发行为（590–593）</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:switchPage('gameplay');setTimeout(function(){scrollToFeature('gameplay_6')},100)" class="doc-link">→ 查看选择框样式（[ChoiceBoxTypes]）</a></p>
+<p><a href="javascript:switchPage('actions');setTimeout(function(){scrollToFeature('actions_11')},100)" class="doc-link">→ 查看对应的触发行为（590–593）</a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:switchPage('gameplay');setTimeout(function(){scrollToFeature('gameplay_7')},100)" class="doc-link">→ 查看选择框样式（[ChoiceBoxTypes]）</a></p>
 <div class="doc-table--action">
 <table class="doc-table">
 <thead><tr><th class="doc-table__th">ID</th><th class="doc-table__th">名称</th><th class="doc-table__th">参数说明</th></tr></thead>
