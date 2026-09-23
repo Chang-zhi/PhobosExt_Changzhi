@@ -22,43 +22,16 @@
 #include "Command.h"
 #include <Ext/Event/Body.h>
 
-// 0x4C65E0: EventClass 的 Target 版构造 (houseIndex, eventType, id, rtti)。
-// 显式取签名是因为 YRpp 的 (int,EventType,int,int) 与 (...,const int&) 两个重载有歧义。
 using EventClassTargetCtor = void* (__thiscall*)(void*, int, EventType, int, int);
 
 static const EventClassTargetCtor EventClass_TargetCtor =
 	reinterpret_cast<EventClassTargetCtor>(0x4C65E0);
 
-// 0xAC4CF4: 计划模式。原版入队前会检查，这里保持一致。
 static bool IsOrderQueueBlocked()
 {
 	return *reinterpret_cast<const unsigned char*>(0xAC4CF4) != 0;
 }
 
-// 一次分配最多追加两条事件（Deploy + Enter 的 MegaMission），故预留 2 格。
-static bool HasOrderQueueRoom()
-{
-	return EventClass::OutList.Count + 2 <= EventClass::MAX_EVENTS;
-}
-
-static bool IsCommandableByLocalPlayer(TechnoClass* pTechno, HouseClass* pLocal)
-{
-	if (!pTechno || !pLocal)
-		return false;
-
-	if (pTechno->IsControllable())
-		return true;
-
-	if (pTechno->Owner == pLocal || pTechno->IsOwnedByCurrentPlayer)
-		return true;
-
-	if (pTechno->MindControlledByHouse == pLocal)
-		return true;
-
-	return pTechno->MindControlledBy && pTechno->MindControlledBy->Owner == pLocal;
-}
-
-// 投递一条"只带自身目标"的指令事件（等价原版 0x6FFE00）。
 static bool QueueSelfOrder(TechnoClass* pTechno, EventType eType)
 {
 	HouseClass* const pLocal = HouseClass::CurrentPlayer;
@@ -68,18 +41,21 @@ static bool QueueSelfOrder(TechnoClass* pTechno, EventType eType)
 	if (IsOrderQueueBlocked())
 		return false;
 
-	if (!HasOrderQueueRoom())
-		return false;
-
 	const TargetClass whom(pTechno);
 
 	alignas(EventClass) unsigned char buffer[sizeof(EventClass)] { };
 
 	EventClass_TargetCtor(buffer, pLocal->ArrayIndex, eType, whom.m_ID, whom.m_RTTI);
-	return EventClass::OutList.Add(*reinterpret_cast<EventClass*>(buffer));
+
+	if (!EventClass::OutList.Add(*reinterpret_cast<EventClass*>(buffer)))
+	{
+		Debug::Log("Recruit: event out queue full, dropped event type %d\n", static_cast<int>(eType));
+		return false;
+	}
+
+	return true;
 }
 
-// 按 TechnoClass::Array 下标排序：该顺序各客户端一致，可作确定性排序键。
 static void SortByCanonicalOrder(std::vector<TechnoClass*>& list)
 {
 	if (list.size() < 2)
@@ -96,246 +72,351 @@ static void SortByCanonicalOrder(std::vector<TechnoClass*>& list)
 
 	std::stable_sort(list.begin(), list.end(), [&rank](TechnoClass* a, TechnoClass* b)
 		{
+			if (a == b)
+				return false;
+
 			const int ia = rank.contains(a) ? rank[a] : INT_MAX;
 			const int ib = rank.contains(b) ? rank[b] : INT_MAX;
-			return ia < ib;
+
+			if (ia != ib)
+				return ia < ib;
+
+			return a < b;	
 		});
 }
 
 struct TransportInfo
 {
-	CellStruct Cell;	// 所在单元格
-	int UsedCapacity;	// 已用容量
-	int MaxCapacity;	// 最大容量
+	CellStruct Cell;	
+	int UsedCapacity;	
+	int MaxCapacity;	
 };
 
-// 键列表按数组序收集：不能用 map 遍历序——指针哈希决定顺序，各机不同。
-static void CollectCanonicalOrder(
-	const std::unordered_map<TechnoClass*, TransportInfo>& transports,
-	std::vector<TechnoClass*>& out)
+struct RecruitCandidate
 {
-	out.clear();
-	out.reserve(transports.size());
+	TechnoClass* Unit;
+	int Size;			
+	CellStruct Cell;	
+	bool RangeLimited;	
+	bool Assigned;		
+};
 
-	for (int i = 0; i < TechnoClass::Array.Count; ++i)
+struct RecruitState
+{
+	std::unordered_set<TechnoClass*> Scattered;	
+	std::unordered_set<TechnoClass*> Departing;	
+	std::unordered_map<TechnoClass*, int> Granted;
+};
+
+namespace RecruitDetail
+{
+	inline bool IsCommandableByLocalPlayer(TechnoClass* pTechno, HouseClass* pLocal)
 	{
-		TechnoClass* pTechno = TechnoClass::Array.GetItem(i);
-		if (pTechno && transports.contains(pTechno))
-			out.push_back(pTechno);
+		if (!pTechno || !pLocal)
+			return false;
+
+		if (pTechno->IsControllable())
+			return true;
+
+		if (pTechno->Owner == pLocal || pTechno->IsOwnedByCurrentPlayer)
+			return true;
+
+		if (pTechno->MindControlledByHouse == pLocal)
+			return true;
+
+		return pTechno->MindControlledBy && pTechno->MindControlledBy->Owner == pLocal;
 	}
-}
 
-static void CollectWhitelist(
-	std::unordered_set<TechnoClass*>& whitelist,
-	TechnoClass* transport)
-{
-	if (!transport || whitelist.count(transport))
-		return;
-	whitelist.insert(transport);
-	for (FootClass* pPass = transport->Passengers.GetFirstPassenger();
-		pPass; pPass = pPass->NextTeamMember)
+	inline void ScatterFriendlyCell(
+		CellStruct cell,
+		HouseClass* pLocal,
+		TechnoClass* transportRoot,
+		const std::unordered_set<TechnoClass*>& whitelist,
+		std::unordered_set<TechnoClass*>& scattered)
 	{
-		CollectWhitelist(whitelist, pPass);
-	}
-}
+		CellClass* pCell = MapClass::Instance.TryGetCellAt(cell);
+		if (!pCell)
+			return;
 
-// 把载具格上本机可指挥的单位散开（载具自身及递归乘客除外），为登车腾位置。
-static void ScatterFriendlyCell(
-	CellStruct cell,
-	HouseClass* pLocal,
-	TechnoClass* transportRoot,
-	std::unordered_set<TechnoClass*>& scattered)
-{
-	CellClass* pCell = MapClass::Instance.TryGetCellAt(cell);
-	if (!pCell) return;
-
-	std::unordered_set<TechnoClass*> whitelist;
-	if (transportRoot)
-		CollectWhitelist(whitelist, transportRoot);
-
-	for (ObjectClass* pObj = pCell->GetContent(); pObj; pObj = pObj->NextObject)
-	{
-		TechnoClass* pTech = abstract_cast<TechnoClass*>(pObj);
-		if (!pTech || !pTech->IsAlive || pTech->InLimbo || pTech->Transporter)
-			continue;
-		if (!IsCommandableByLocalPlayer(pTech, pLocal))
-			continue;
-		if (whitelist.count(pTech))
-			continue;
-		if (scattered.contains(pTech))
-			continue;
-		if (transportRoot)
+		for (ObjectClass* pObj = pCell->GetContent(); pObj; pObj = pObj->NextObject)
 		{
+			TechnoClass* pTech = abstract_cast<TechnoClass*>(pObj);
+			if (!pTech || !pTech->IsAlive || pTech->InLimbo || pTech->Transporter)
+				continue;
+			if (!IsCommandableByLocalPlayer(pTech, pLocal))
+				continue;
+			if (whitelist.contains(pTech))
+				continue;
+			if (scattered.contains(pTech))
+				continue;
+
 			if (FootClass* pFoot = abstract_cast<FootClass*>(pTech))
 			{
 				if (pFoot->Destination == transportRoot)
 					continue;
 			}
-		}
-		// 一次招募可能连发几十条指令，队列满了就停手（原版同样是静默丢弃，只是提前收手不空转）
-		if (!QueueSelfOrder(pTech, EventType::Scatter))
-		{
-			Debug::Log("Recruit: cannot queue Scatter (queue full / planning mode), stop scattering cell\n");
-			return;
-		}
 
-		scattered.insert(pTech);
-	}
-}
-
-// 把候选单位按 SizeLimit 分组，逐组轮询分配进各载具。
-static int TryAssign(
-	std::unordered_map<TechnoClass*, TransportInfo>& transports,
-	const std::vector<TechnoClass*>& sortedKeys,
-	std::vector<TechnoClass*>& candidates,
-	HouseClass* pPlayer,
-	const std::unordered_map<TechnoClass*, int>& initialCapacities,
-	std::unordered_set<TechnoClass*>& scattered,
-	bool useRangeLimit)
-{
-	const double recruitRange = RulesExt::Global()->Command_RecruitRange;
-	int totalRecruited = 0;
-
-	struct UnitInfo
-	{
-		TechnoClass* Unit;	// 候选单位
-		int Size;			// 该单位的 Size（<=0 时视为 1）
-		CellStruct Cell;	// 所在单元格
-		bool Assigned;		// 是否已分配
-	};
-	std::vector<UnitInfo> units;
-
-	for (TechnoClass* pUnit : candidates)
-	{
-		if (!pUnit->IsAlive || pUnit->InLimbo || pUnit->Transporter)
-			continue;
-		if (pUnit->WhatAmI() == AbstractType::AircraftType)
-			continue;
-
-		TechnoTypeClass* pUnitType = pUnit->GetTechnoType();
-		if (!pUnitType || pUnitType->ConsideredAircraft)
-			continue;
-		if (pUnit->IsInAir())
-			continue;
-
-		if (FootClass* pFoot = abstract_cast<FootClass*>(pUnit))
-		{
-			if (pFoot->Destination)
+			if (!QueueSelfOrder(pTech, EventType::Scatter))
 			{
-				TechnoClass* pDest = abstract_cast<TechnoClass*>(pFoot->Destination);
-				if (pDest && pDest != pUnit && pDest->WhatAmI() == AbstractType::Unit)
-					continue;
+				Debug::Log("Recruit: cannot queue Scatter (queue full / planning mode), stop scattering cell\n");
+				return;
 			}
+
+			scattered.insert(pTech);
 		}
-
-		int unitSize = static_cast<int>(pUnitType->Size);
-		if (unitSize <= 0) unitSize = 1;
-
-		CellStruct unitCell = pUnit->GetMapCoords();
-		units.push_back({ pUnit, unitSize, unitCell, false });
 	}
 
+	inline void CollectCanonicalOrder(
+		const std::unordered_map<TechnoClass*, TransportInfo>& transports,
+		std::vector<TechnoClass*>& out)
 	{
-		size_t groupStart = 0;
-		while (groupStart < sortedKeys.size())
-		{
-			TechnoClass* pVeh = sortedKeys[groupStart];
-			double groupLimit = pVeh->GetTechnoType()->SizeLimit;
-			size_t groupEnd = groupStart + 1;
-			while (groupEnd < sortedKeys.size() &&
-				sortedKeys[groupEnd]->GetTechnoType()->SizeLimit == groupLimit)
-				groupEnd++;
+		out.clear();
+		out.reserve(transports.size());
 
-			for (size_t ti = groupStart; ti < groupEnd; ti++)
-				ScatterFriendlyCell(transports[sortedKeys[ti]].Cell, pPlayer, sortedKeys[ti], scattered);
+		for (int i = 0; i < TechnoClass::Array.Count; ++i)
+		{
+			TechnoClass* pTechno = TechnoClass::Array.GetItem(i);
+			if (pTechno && transports.contains(pTechno))
+				out.push_back(pTechno);
+		}
+	}
+
+	inline void CollectWhitelist(
+		std::unordered_set<TechnoClass*>& whitelist,
+		TechnoClass* transport)
+	{
+		if (!transport || whitelist.contains(transport))
+			return;
+
+		whitelist.insert(transport);
+
+		for (FootClass* pPass = transport->Passengers.GetFirstPassenger();
+			pPass; pPass = pPass->NextTeamMember)
+		{
+			CollectWhitelist(whitelist, pPass);
+		}
+	}
+
+	inline bool IsHeadingToTransport(FootClass* pFoot)
+	{
+		if (!pFoot->Destination)
+			return false;
+
+		TechnoClass* pDest = abstract_cast<TechnoClass*>(pFoot->Destination);
+		return pDest && pDest != pFoot && pDest->WhatAmI() == AbstractType::Unit;
+	}
+
+	inline bool IsUsableTransport(TechnoClass* pTechno, TransportInfo& outInfo)
+	{
+		if (pTechno->WhatAmI() != AbstractType::Unit)
+			return false;
+
+		TechnoTypeClass* pType = pTechno->GetTechnoType();
+		if (!pType || pType->Passengers <= 0)
+			return false;
+		if (!pTechno->IsControllable() || pTechno->Deactivated || pTechno->IsUnderEMP())
+			return false;
+
+		const int used = pTechno->Passengers.GetTotalSize();
+		if (used >= static_cast<int>(pType->Passengers))
+			return false;
+
+		outInfo = TransportInfo{
+			CellClass::Coord2Cell(pTechno->GetCoords()), used, static_cast<int>(pType->Passengers) };
+		return true;
+	}
+
+	inline void CollectCandidates(
+		const std::vector<TechnoClass*>& selectedNonTransports,
+		const std::unordered_set<TechnoClass*>& selectedSet,
+		HouseClass* pPlayer,
+		std::vector<RecruitCandidate>& out)
+	{
+		out.clear();
+
+		for (TechnoClass* pUnit : selectedNonTransports)
+		{
+			if (!pUnit->IsAlive || pUnit->InLimbo || pUnit->Transporter)
+				continue;
+			if (pUnit->WhatAmI() == AbstractType::AircraftType || pUnit->IsInAir())
+				continue;
+
+			TechnoTypeClass* pType = pUnit->GetTechnoType();
+			if (!pType || pType->ConsideredAircraft)
+				continue;
+
+			int size = static_cast<int>(pType->Size);
+			if (size <= 0)
+				size = 1;
+
+			out.push_back(RecruitCandidate{
+				pUnit, size, pUnit->GetMapCoords(), false, false });
+		}
+
+		for (FootClass* pFoot : FootClass::Array)
+		{
+			if (!pFoot || !pFoot->IsAlive || pFoot->InLimbo || pFoot->Transporter)
+				continue;
+			if (!IsCommandableByLocalPlayer(pFoot, pPlayer))
+				continue;
+
+			TechnoTypeClass* pType = pFoot->GetTechnoType();
+			if (!pType || pType->ConsideredAircraft)
+				continue;
+			if (pFoot->WhatAmI() == AbstractType::AircraftType || pFoot->IsInAir())
+				continue;
+
+			if (pType->Passengers > 0)
+				continue;
+
+			if (selectedSet.contains(pFoot))
+				continue;
+			if (IsHeadingToTransport(pFoot))
+				continue;
+
+			int size = static_cast<int>(pType->Size);
+			if (size <= 0)
+				size = 1;
+
+			out.push_back(RecruitCandidate{
+				pFoot, size, pFoot->GetMapCoords(), true, false });
+		}
+	}
+
+	int TryAssign(
+		const std::vector<TechnoClass*>& sortedVehicles,
+		const std::unordered_map<TechnoClass*, int>& initialCapacities,
+		std::vector<RecruitCandidate>& candidates,
+		RecruitState& state)
+	{
+		const double recruitRange = RulesExt::Global()->Command_RecruitRange;
+		int totalRecruited = 0;
+
+		std::vector<int> pool;
+		pool.reserve(candidates.size());
+
+		for (size_t i = 0; i < candidates.size(); ++i)
+		{
+			const RecruitCandidate& c = candidates[i];
+
+			if (c.Assigned || !c.Unit->IsAlive || c.Unit->InLimbo || c.Unit->Transporter)
+				continue;
+
+			pool.push_back(static_cast<int>(i));
+		}
+
+		if (pool.empty())
+			return 0;
+
+		std::vector<int> distance(pool.size(), -1);
+
+		size_t groupStart = 0;
+		while (groupStart < sortedVehicles.size())
+		{
+			TechnoClass* pGroupHead = sortedVehicles[groupStart];
+			TechnoTypeClass* pHeadType = pGroupHead->GetTechnoType();
+			const double groupLimit = pHeadType ? pHeadType->SizeLimit : 0.0;
+
+			size_t groupEnd = groupStart + 1;
+			while (groupEnd < sortedVehicles.size())
+			{
+				TechnoTypeClass* pNextType = sortedVehicles[groupEnd]->GetTechnoType();
+				if (!pNextType || pNextType->SizeLimit != groupLimit)
+					break;
+				groupEnd++;
+			}
 
 			bool anyAssigned = true;
 			while (anyAssigned)
 			{
 				anyAssigned = false;
-				for (size_t ti = groupStart; ti < groupEnd; ti++)
+
+				for (size_t vi = groupStart; vi < groupEnd; ++vi)
 				{
-					TechnoClass* pCurVeh = sortedKeys[ti];
-					TransportInfo& t = transports[pCurVeh];
-					if (t.UsedCapacity >= t.MaxCapacity)
+					TechnoClass* pCurVeh = sortedVehicles[vi];
+					TechnoTypeClass* pVehType = pCurVeh->GetTechnoType();
+					auto itInitial = initialCapacities.find(pCurVeh);
+
+					if (!pVehType || itInitial == initialCapacities.end())
 						continue;
 
-					int bestIdx = -1;
-					int bestDist = INT_MAX;
+					const int room = static_cast<int>(pVehType->Passengers)
+						- itInitial->second - state.Granted[pCurVeh];
+					if (room <= 0)
+						continue;
 
-					for (size_t i = 0; i < units.size(); ++i)
+					const CellStruct vehCell = pCurVeh->GetMapCoords();
+
+					for (size_t s = 0; s < pool.size(); ++s)
 					{
-						UnitInfo& u = units[i];
-						if (u.Assigned)
-							continue;
-						if (!u.Unit->IsAlive || u.Unit->InLimbo || u.Unit->Transporter)
-							continue;
-						if (u.Unit == pCurVeh)
-							continue;
-
-						if (transports.count(u.Unit) && transports.count(pCurVeh))
-						{
-							auto itU = initialCapacities.find(u.Unit);
-							auto itV = initialCapacities.find(pCurVeh);
-							if (itU != initialCapacities.end() && itV != initialCapacities.end()
-								&& transports[u.Unit].UsedCapacity == itU->second
-								&& transports[pCurVeh].UsedCapacity == itV->second)
-								continue;
-						}
-
-						if (u.Size > t.MaxCapacity - t.UsedCapacity)
-							continue;
-						if (u.Size > static_cast<int>(pCurVeh->GetTechnoType()->SizeLimit))
-							continue;
-
-						int dist = CellSpread::GetDistance(CellStruct{
-							static_cast<short>(u.Cell.X - t.Cell.X),
-							static_cast<short>(u.Cell.Y - t.Cell.Y)
+						const RecruitCandidate& c = candidates[pool[s]];
+						const int dist = CellSpread::GetDistance(CellStruct{
+							static_cast<short>(c.Cell.X - vehCell.X),
+							static_cast<short>(c.Cell.Y - vehCell.Y)
 						});
-						if (useRangeLimit && dist > recruitRange)
+
+						distance[s] = (!c.RangeLimited || dist <= recruitRange) ? dist : -1;	// -1 = 够不着
+					}
+
+					int bestSlot = -1;
+					int bestDist = INT_MAX;
+					int bestSize = INT_MAX;
+
+					for (size_t s = 0; s < pool.size(); ++s)
+					{
+						const int dist = distance[s];
+						if (dist < 0)
 							continue;
 
-						if (dist < bestDist || (bestIdx >= 0 && dist == bestDist && u.Size < units[bestIdx].Size))
+						const RecruitCandidate& c = candidates[pool[s]];
+						if (c.Assigned || c.Unit == pCurVeh || c.Size > room)
+							continue;
+						if (c.Size > static_cast<int>(pVehType->SizeLimit))
+							continue;
+						if (state.Departing.contains(c.Unit))
+							continue;
+
+						if (dist < bestDist || (dist == bestDist && c.Size < bestSize))
 						{
 							bestDist = dist;
-							bestIdx = static_cast<int>(i);
+							bestSize = c.Size;
+							bestSlot = static_cast<int>(s);
 						}
 					}
 
-					if (bestIdx >= 0)
+					if (bestSlot < 0)
+						continue;
+
+					RecruitCandidate& picked = candidates[pool[bestSlot]];
+
+					if (UnitClass* pUnit = abstract_cast<UnitClass*>(picked.Unit))
 					{
-						if (!HasOrderQueueRoom())
-							continue;
-
-						UnitInfo& u = units[bestIdx];
-
-						bool needUndeploy = false;
-
-						if (UnitClass* pUnit = abstract_cast<UnitClass*>(u.Unit))
-							needUndeploy = pUnit->Deployed;
-						else if (InfantryClass* pInf = abstract_cast<InfantryClass*>(u.Unit))
-							needUndeploy = pInf->IsDeployed();
-
-						if (needUndeploy)
-							QueueSelfOrder(u.Unit, EventType::Deploy);
-
-						u.Unit->ObjectClickedAction(Action::Enter, pCurVeh, false);
-						t.UsedCapacity += u.Size;
-						u.Assigned = true;
-						totalRecruited++;
-						anyAssigned = true;
+						if (pUnit->Deployed)
+							QueueSelfOrder(picked.Unit, EventType::Deploy);
 					}
+					else if (InfantryClass* pInf = abstract_cast<InfantryClass*>(picked.Unit))
+					{
+						if (pInf->IsDeployed())
+							QueueSelfOrder(picked.Unit, EventType::Deploy);
+					}
+
+					picked.Unit->ObjectClickedAction(Action::Enter, pCurVeh, false);
+
+					state.Granted[pCurVeh] += picked.Size;
+					picked.Assigned = true;
+					state.Departing.insert(picked.Unit);
+					totalRecruited++;
+					anyAssigned = true;
 				}
 			}
 
 			groupStart = groupEnd;
 		}
-	}
 
-	return totalRecruited;
+		return totalRecruited;
+	}
 }
 
-// 选中空载具按指定按键，自动招募附近单位上车
 class AutoPassengersLoad : public AresCommandClass
 {
 public:
@@ -390,10 +471,8 @@ public:
 		if (selected.empty())
 			return;
 
-		// 本机跑一遍招募即可：Scatter/Deploy/Enter 各自成事件下发，各机按事件复现结果。
 		RunRecruit(pPlayer, selected);
 
-		// 事件负载最多带 20 个目标，截断只作用于投递的副本，不影响上面已完成的招募。
 		if (selected.size() > EventExt::MAX_SELECTION)
 		{
 			Debug::Log("Auto passengers load: %zu selected, event keeps first %zu\n",
@@ -410,179 +489,173 @@ public:
 		std::vector<TechnoClass*> selectedNonTransports;
 		std::unordered_set<TechnoClass*> selectedSet;
 
-		// 1. 分拣选中对象：合法空载具记入 transports，其余作为乘客候选。
 		for (ObjectClass* pObj : selected)
 		{
 			if (!pObj || !pObj->IsAlive || pObj->InLimbo)
 				continue;
 
 			TechnoClass* pTechno = abstract_cast<TechnoClass*>(pObj);
-			if (!pTechno || !IsCommandableByLocalPlayer(pTechno, pPlayer))
+			if (!pTechno || !RecruitDetail::IsCommandableByLocalPlayer(pTechno, pPlayer))
 				continue;
 
 			selectedSet.insert(pTechno);
 
-			TechnoTypeClass* pType = pTechno->GetTechnoType();
-			bool isTransport = false;
-			if (pTechno->WhatAmI() == AbstractType::Unit)
-			{
-				if (pType && pType->Passengers > 0 && pTechno->IsControllable()
-					&& !pTechno->Deactivated && !pTechno->IsUnderEMP())
-				{
-					int used = pTechno->Passengers.GetTotalSize();
-					if (used < pType->Passengers)
-					{
-						CellStruct cell = CellClass::Coord2Cell(pTechno->GetCoords());
-						transports[pTechno] = { cell, used, pType->Passengers };
-						isTransport = true;
-					}
-				}
-			}
-
-			if (!isTransport)
+			TransportInfo info;
+			if (RecruitDetail::IsUsableTransport(pTechno, info))
+				transports[pTechno] = info;
+			else
 				selectedNonTransports.push_back(pTechno);
 		}
 
-		SortByCanonicalOrder(selectedNonTransports);
-
-		// 没有可用载具直接返回。
 		if (transports.empty())
 			return;
 
+		SortByCanonicalOrder(selectedNonTransports);
+
 		std::vector<TechnoClass*> sortedKeys;
-		CollectCanonicalOrder(transports, sortedKeys);
+		RecruitDetail::CollectCanonicalOrder(transports, sortedKeys);
 
 		std::stable_sort(sortedKeys.begin(), sortedKeys.end(), [](TechnoClass* a, TechnoClass* b) {
 			return a->GetTechnoType()->SizeLimit < b->GetTechnoType()->SizeLimit;
 		});
 
-		std::unordered_set<TechnoClass*> scattered;
+		std::unordered_map<TechnoClass*, int> initialCapacities;
+		initialCapacities.reserve(transports.size());
+		for (TechnoClass* pVeh : sortedKeys)
+			initialCapacities[pVeh] = transports[pVeh].UsedCapacity;
+
+		std::vector<RecruitCandidate> candidates;
+		RecruitDetail::CollectCandidates(selectedNonTransports, selectedSet, pPlayer, candidates);
+
+		RecruitState state;
+		state.Scattered.reserve(sortedKeys.size() * 4);
+		state.Departing.reserve(candidates.size());
+		state.Granted.reserve(sortedKeys.size());
+
+		std::unordered_set<TechnoClass*> whitelist;
+		whitelist.reserve(8);
 
 		for (TechnoClass* pVeh : sortedKeys)
-			ScatterFriendlyCell(transports[pVeh].Cell, pPlayer, pVeh, scattered);
-
-		int totalRecruited = 0;
-		std::unordered_map<TechnoClass*, int> initialCapacities;
-		for (auto& [pVeh, info] : transports)
-			initialCapacities[pVeh] = info.UsedCapacity;
-
-		totalRecruited += TryAssign(transports, sortedKeys, selectedNonTransports, pPlayer, initialCapacities, scattered, false);
-
 		{
-			std::vector<TechnoClass*> unselected;
-			for (FootClass* pFoot : FootClass::Array)
-			{
-				if (!pFoot || !pFoot->IsAlive || pFoot->InLimbo)
-					continue;
-				if (!IsCommandableByLocalPlayer(pFoot, pPlayer))
-					continue;
-				if (pFoot->Transporter)
-					continue;
-				if (selectedSet.contains(pFoot))
-					continue;
+			whitelist.clear();
+			RecruitDetail::CollectWhitelist(whitelist, pVeh);
 
-				// 已在去载具路上的跳过。
-				if (pFoot->Destination)
-				{
-					TechnoClass* pDestTechno = abstract_cast<TechnoClass*>(pFoot->Destination);
-					if (pDestTechno && pDestTechno->WhatAmI() == AbstractType::Unit)
-						continue;
-				}
-
-				unselected.push_back(pFoot);
-			}
-			totalRecruited += TryAssign(transports, sortedKeys, unselected, pPlayer, initialCapacities, scattered, true);
+			RecruitDetail::ScatterFriendlyCell(
+				transports[pVeh].Cell, pPlayer, pVeh, whitelist, state.Scattered);
 		}
 
+		int totalRecruited = RecruitDetail::TryAssign(
+			sortedKeys, initialCapacities, candidates, state);
+
+		std::vector<TechnoClass*> failedTransports;
+		bool hasSuccessful = false;
+
+		for (TechnoClass* pVeh : sortedKeys)
 		{
-			int nonTransportCount = 0;
-			for (FootClass* pFoot : FootClass::Array)
-			{
-				if (!pFoot || !pFoot->IsAlive || pFoot->InLimbo || pFoot->Transporter)
-					continue;
-				if (!IsCommandableByLocalPlayer(pFoot, pPlayer))
-					continue;
-				TechnoTypeClass* pType = pFoot->GetTechnoType();
-				if (!pType || pType->Passengers > 0 || pType->ConsideredAircraft)
-					continue;
-				if (pFoot->WhatAmI() == AbstractType::AircraftType || pFoot->IsInAir())
-					continue;
-				nonTransportCount++;
-			}
-			std::vector<TechnoClass*> failedTransports;
-			bool hasSuccessful = false;
+			const int granted = state.Granted[pVeh];
 
-			for (TechnoClass* pVeh : sortedKeys)
+			if (granted > 0)
 			{
-				const TransportInfo& info = transports[pVeh];
-				int initCap = initialCapacities.at(pVeh);
-				bool isFailed = (nonTransportCount == 0)
-					? (info.UsedCapacity < info.MaxCapacity)
-					: (info.UsedCapacity == initCap && info.UsedCapacity < info.MaxCapacity);
-
-				if (isFailed)
-				{
-					if (pVeh->IsAlive && !pVeh->InLimbo && !pVeh->Transporter)
-						failedTransports.push_back(pVeh);
-				}
-				else if (info.UsedCapacity > initCap)
-				{
-					hasSuccessful = true;
-				}
+				hasSuccessful = true;
+				continue;
 			}
 
-			if (failedTransports.empty())
-				return;
+			if (pVeh->IsAlive && !pVeh->InLimbo && !pVeh->Transporter)
+				failedTransports.push_back(pVeh);
+		}
 
-			if (hasSuccessful)
+		if (failedTransports.empty())
+			return;
+
+		if (hasSuccessful)
+		{
+			std::vector<RecruitCandidate> emptyTransports;
+			emptyTransports.reserve(failedTransports.size());
+
+			for (TechnoClass* pVeh : failedTransports)
 			{
-				totalRecruited += TryAssign(transports, sortedKeys, failedTransports, pPlayer, initialCapacities, scattered, false);
+				TechnoTypeClass* pType = pVeh->GetTechnoType();
+				if (!pType)
+					continue;
+
+				int size = static_cast<int>(pType->Size);
+				if (size <= 0)
+					size = 1;
+
+				emptyTransports.push_back(RecruitCandidate{
+					pVeh, size, pVeh->GetMapCoords(), false, false });
 			}
-			else if (failedTransports.size() >= 2)
+
+			if (!emptyTransports.empty())
+				totalRecruited += RecruitDetail::TryAssign(
+					sortedKeys, initialCapacities, emptyTransports, state);
+
+			return;
+		}
+
+		if (failedTransports.size() < 2)
+			return;
+		
+		TechnoClass* pReceiver = nullptr;
+		int bestRemaining = 0;
+
+		for (TechnoClass* pVeh : sortedKeys)
+		{
+			const TransportInfo& info = transports[pVeh];
+			const int rem = info.MaxCapacity - info.UsedCapacity - state.Granted[pVeh];
+
+			if (rem > bestRemaining)
 			{
-				TechnoClass* pReceiver = nullptr;
-				int bestRemaining = 0;
-				for (TechnoClass* pVeh : sortedKeys)
-				{
-					const TransportInfo& info = transports[pVeh];
-					int rem = info.MaxCapacity - info.UsedCapacity;
-					if (rem > bestRemaining)
-					{
-						bestRemaining = rem;
-						pReceiver = pVeh;
-					}
-				}
-
-				TransportInfo& receiver = transports[pReceiver];
-
-				for (TechnoClass* pFailed : failedTransports)
-				{
-					if (pFailed == pReceiver)
-						continue;
-					if (!HasOrderQueueRoom())
-						continue;
-
-					TechnoTypeClass* pFailedType = pFailed->GetTechnoType();
-					if (!pFailedType)
-						continue;
-					int failedSize = static_cast<int>(pFailedType->Size);
-					if (failedSize <= 0) failedSize = 1;
-
-					if (failedSize > receiver.MaxCapacity - receiver.UsedCapacity)
-						continue;
-					if (failedSize > static_cast<int>(pReceiver->GetTechnoType()->SizeLimit))
-						continue;
-
-					if (UnitClass* pUnit = abstract_cast<UnitClass*>(pFailed))
-					{
-						if (pUnit->Deployed)
-							QueueSelfOrder(pFailed, EventType::Deploy);
-					}
-
-					pFailed->ObjectClickedAction(Action::Enter, pReceiver, false);
-					receiver.UsedCapacity += failedSize;
-				}
+				bestRemaining = rem;
+				pReceiver = pVeh;
 			}
 		}
+
+		if (!pReceiver)
+			return;
+
+		TechnoTypeClass* pReceiverType = pReceiver->GetTechnoType();
+		if (!pReceiverType)
+			return;
+
+		for (TechnoClass* pFailed : failedTransports)
+		{
+			if (pFailed == pReceiver)
+				continue;
+
+			TechnoTypeClass* pFailedType = pFailed->GetTechnoType();
+			if (!pFailedType)
+				continue;
+
+			int failedSize = static_cast<int>(pFailedType->Size);
+			if (failedSize <= 0)
+				failedSize = 1;
+
+			const int room = transports[pReceiver].MaxCapacity
+				- transports[pReceiver].UsedCapacity - state.Granted[pReceiver];
+
+			if (failedSize > room)
+				continue;
+
+			if (failedSize > static_cast<int>(pReceiverType->SizeLimit))
+				continue;
+
+			if (UnitClass* pUnit = abstract_cast<UnitClass*>(pFailed))
+			{
+				if (pUnit->Deployed)
+					QueueSelfOrder(pFailed, EventType::Deploy);
+			}
+			else if (InfantryClass* pInf = abstract_cast<InfantryClass*>(pFailed))
+			{
+				if (pInf->IsDeployed())
+					QueueSelfOrder(pFailed, EventType::Deploy);
+			}
+
+			pFailed->ObjectClickedAction(Action::Enter, pReceiver, false);
+			state.Granted[pReceiver] += failedSize;
+			totalRecruited++;
+		}
+
+		(void)totalRecruited;
 	}
 };
