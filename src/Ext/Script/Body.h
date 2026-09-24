@@ -31,6 +31,11 @@ enum class ScaffoldScripts : unsigned int
 	PatrolToEnemyRally = 5505,             // 巡逻到敌方基地集结点
 	PatrolToFriendlyBuildingNearby = 5506, // 巡逻到己方指定建筑物附近
 	PatrolToFriendlyRally = 5507,          // 巡逻到己方基地集结点
+
+	// AE相关
+	ApplyAttachEffect = 5509,         // 给全队施加 AE
+	RemoveAttachEffect = 5510,        // 按 AE 类型名移除
+	RemoveAllAttachEffects = 5511,    // 清空全队所有 AE
 };
 
 class ScriptExt
@@ -102,4 +107,9 @@ public:
 	// 巡逻系
 	static void PatrolToBuildingNearby(TeamClass* pTeam, int typeIndex, int selectionMode, bool fresh, bool wantEnemy);
 	static void PatrolToRally(TeamClass* pTeam, bool fresh, bool wantEnemy);
+
+	// AttachEffect: 
+	static void ApplyAttachEffect(TeamClass* pTeam, int nameIndex, int durationOverride);
+	static void RemoveAttachEffect(TeamClass* pTeam, int nameIndex);
+	static void RemoveAllAttachEffects(TeamClass* pTeam);
 };

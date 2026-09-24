@@ -22,6 +22,7 @@
 #include <New/ChoiceBox/ScreenChoiceBoxClass.h>
 #include <New/ChoiceBox/ChoiceBoxTypeClass.h>
 #include <New/TriggerGroup/TriggerGroupClass.h>
+#include <New/AttachEffect/AttachEffectTypeClass.h>
 
 #include <utility>
 
@@ -204,7 +205,8 @@ using ScaffoldTypeRegistry = TypeRegistry <
 	WaypointChoiceBoxClass,
 	ScreenChoiceBoxClass,
 	FootPathVisualizer,
-	TriggerGroupClass
+	TriggerGroupClass,
+	AttachEffectTypeClass
 	// other classes
 > ;
 

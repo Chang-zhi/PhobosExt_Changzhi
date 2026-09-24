@@ -4,6 +4,8 @@
 #include <Ext/ScriptType/Body.h>
 #include <Ext/Rules/Body.h>
 
+#include <Interop/AttachEffectService.h>
+
 #include <CellSpread.h>
 #include <Helpers/Cast.h>
 #include <Utilities/Stream.h>
@@ -106,6 +108,18 @@ void ScriptExt::ProcessAction(TeamClass* pTeam)
 
 	case ScaffoldScripts::PatrolToFriendlyRally:
 		ScriptExt::PatrolToRally(pTeam, fresh, false);
+		break;
+
+	case ScaffoldScripts::ApplyAttachEffect:
+		ScriptExt::ApplyAttachEffect(pTeam, node.Argument & 0xFFFF, static_cast<unsigned>(node.Argument) >> 16);
+		break;
+
+	case ScaffoldScripts::RemoveAttachEffect:
+		ScriptExt::RemoveAttachEffect(pTeam, node.Argument & 0xFFFF);
+		break;
+
+	case ScaffoldScripts::RemoveAllAttachEffects:
+		ScriptExt::RemoveAllAttachEffects(pTeam);
 		break;
 
 	default:
@@ -898,4 +912,30 @@ void ScriptExt::PatrolToRally(TeamClass* pTeam, bool fresh, bool wantEnemy)
 
 	// 巡逻进行中:留在本动作
 	pTeam->StepCompleted = false;
+}
+
+void ScriptExt::ApplyAttachEffect(TeamClass* pTeam, int nameIndex, int durationOverride)
+{
+	const int attached = AttachEffectService::ApplyToTeam(pTeam, nameIndex, durationOverride);
+
+	Debug::Log("[Scaffold] ApplyAttachEffect: team=[%s] nameIndex=%d durationOverride=%d attached=%d\n",
+		pTeam->Type ? pTeam->Type->get_ID() : "<none>", nameIndex, durationOverride, attached);
+}
+
+void ScriptExt::RemoveAttachEffect(TeamClass* pTeam, int nameIndex)
+{
+	const int removed = AttachEffectService::RemoveFromTeam(pTeam, nameIndex);
+
+	Debug::Log("[Scaffold] RemoveAttachEffect: team=[%s] nameIndex=%d removed=%d\n",
+		pTeam->Type ? pTeam->Type->get_ID() : "<none>", nameIndex, removed);
+}
+
+
+
+void ScriptExt::RemoveAllAttachEffects(TeamClass* pTeam)
+{
+	const int removed = AttachEffectService::RemoveAllFromTeam(pTeam);
+
+	Debug::Log("[Scaffold] RemoveAllAttachEffects: team=[%s] removed=%d\n",
+		pTeam->Type ? pTeam->Type->get_ID() : "<none>", removed);
 }

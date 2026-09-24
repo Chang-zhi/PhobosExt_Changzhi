@@ -281,6 +281,16 @@ bool TActionExt::Execute(TActionClass* pThis, HouseClass* pHouse, ObjectClass* p
 	case ScaffoldTriggerAction::DisableAITriggerById:
 		return TActionExt::DisableAITriggerById(pThis, pHouse, pObject, pTrigger, location);
 
+	// ---- AttachEffect Actions ----
+	case ScaffoldTriggerAction::ApplyAttachEffectToTeamType:
+		return TActionExt::ApplyAttachEffectToTeamType(pThis, pHouse, pObject, pTrigger, location);
+	case ScaffoldTriggerAction::RemoveAttachEffectFromTeamType:
+		return TActionExt::RemoveAttachEffectFromTeamType(pThis, pHouse, pObject, pTrigger, location);
+	case ScaffoldTriggerAction::RemoveAttachEffectByGroupFromTeamType:
+		return TActionExt::RemoveAttachEffectByGroupFromTeamType(pThis, pHouse, pObject, pTrigger, location);
+	case ScaffoldTriggerAction::RemoveAllAttachEffectsFromTeamType:
+		return TActionExt::RemoveAllAttachEffectsFromTeamType(pThis, pHouse, pObject, pTrigger, location);
+
 	// case ScaffoldTriggerAction::testAction:
 	// 	return TActionExt::testAction(pThis, pHouse, pObject, pTrigger, location);
 

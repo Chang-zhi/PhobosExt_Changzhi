@@ -62,7 +62,7 @@ typedef HRESULT(__stdcall* fnAE_Attach)(
 	void* pTarget, void* pInvokerHouse, void* pInvoker, void* pSource,
 	const char** effectTypeNames, int typeCount,
 	int durationOverride, int delay, int initialDelay, int recreationDelay,
-	int* pAttachedCount
+	int* pAttachedCount, bool selfOwned, bool hasDelay
 );
 
 typedef HRESULT(__stdcall* fnAE_Detach)(
@@ -154,7 +154,7 @@ struct InteropStdCallArgBytes<R(__stdcall*)(Args...)>
 	static constexpr size_t value = (InteropStdCallSlot(sizeof(Args)) + ... + size_t { 0 });
 };
 
-// "AE_Attach" + 44 -> "_AE_Attach@44"
+// "AE_Attach" + 52 -> "_AE_Attach@52"（13 个参数 x 4 字节栈槽）
 inline std::string InteropDecoratedName(const char* exportName, size_t argBytes)
 {
 	std::string name;
@@ -188,3 +188,23 @@ inline FnT ResolveInteropExport(HMODULE hModule, const char* exportName)
 
 	return reinterpret_cast<FnT>(::GetProcAddress(hModule, decorated.c_str()));
 }
+
+// ============================================================================
+// 签名守卫
+//
+// 提供方(Phobos)以 `extern "C" __declspec(dllexport) ... __stdcall` 导出, 符号名因此
+// 编码了参数总字节数。签名一旦漂移, 上面查找的修饰名就会与提供方脱节, 而解析失败只
+// 产生运行期告警(见 InteropModule::ReportUnresolvedExport)—— 很容易被忽略。
+// 这里用编译期断言把脱节提前变成构建错误。
+//
+// 断言值与 Phobos 仓库 src/Interop/AttachEffect.h 的导出签名一一对应, 改动提供方
+// 签名时必须同步更新。
+// ============================================================================
+static_assert(InteropStdCallArgBytes<fnAE_Attach>::value == 52,
+	"AE_Attach 签名与提供方导出 _AE_Attach@52 不一致");
+static_assert(InteropStdCallArgBytes<fnAE_Detach>::value == 16,
+	"AE_Detach 签名与提供方导出 _AE_Detach@16 不一致");
+static_assert(InteropStdCallArgBytes<fnAE_DetachByGroups>::value == 16,
+	"AE_DetachByGroups 签名与提供方导出 _AE_DetachByGroups@16 不一致");
+static_assert(InteropStdCallArgBytes<fnAE_TransferEffects>::value == 8,
+	"AE_TransferEffects 签名与提供方导出 _AE_TransferEffects@8 不一致");

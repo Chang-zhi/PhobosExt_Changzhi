@@ -10,6 +10,7 @@
 #include <New/ChoiceBox/ChoiceBoxTypeClass.h>
 #include <New/TextBox/TextBoxTypeClass.h>
 #include <New/TriggerGroup/TriggerGroupClass.h>
+#include <New/AttachEffect/AttachEffectTypeClass.h>
 #include <Utilities/Patch.h>
 
 std::unique_ptr<RulesExt::ExtData> RulesExt::Data = nullptr;
@@ -34,6 +35,7 @@ void RulesExt::LoadBeforeTypeData(RulesClass* pThis, CCINIClass* pINI)
 	TextBoxTypeClass::LoadFromINIList(pINI);
 	ChoiceBoxTypeClass::LoadFromINIList(pINI);
 	TriggerGroupClass::LoadFromINIList(pINI);
+	AttachEffectTypeClass::LoadFromINIList(pINI);
 
 	Data->LoadBeforeTypeData(pThis, pINI);
 }
@@ -102,6 +104,7 @@ void RulesExt::ExtData::LoadAfterTypeData(RulesClass* pThis, CCINIClass* pINI)
 		this->AITargetTypesLists = std::move(lists);
 		Debug::Log("[Scaffold] AITargetTypes: parsed %d lists\n", static_cast<int>(this->AITargetTypesLists.size()));
 	}
+
 }
 
 // this runs between the before and after type data loading methods for rules ini

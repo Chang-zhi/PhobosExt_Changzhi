@@ -5,31 +5,23 @@
 
 #include <Utilities/Debug.h>
 
-namespace
+bool ApplyAITriggerEnabled(TActionClass* pThis, bool enable)
 {
-
-	// 694 / 695 共用的实现
-	bool ApplyAITriggerEnabled(TActionClass* pThis, bool enable)
+	AITriggerTypeClass* pType = nullptr;
+	for(auto const& pCur : AITriggerTypeClass::Array)
 	{
-		AITriggerTypeClass* pType = nullptr;
-		for(auto const& pCur : AITriggerTypeClass::Array)
+		if(strcmp(pCur->get_ID(), pThis->Text) == 0)
 		{
-			if(strcmp(pCur->get_ID(), pThis->Text) == 0)
-			{
-				pType = pCur;
-				break;
-			}
+			pType = pCur;
+			break;
 		}
-
-		if(!pType)
-		{
-			return false;
-		}
-
-		pType->IsEnabled = enable;
-
-		return true;
 	}
+
+	if (!pType)
+		return false;
+	
+	pType->IsEnabled = enable;
+	return true;
 }
 
 bool TActionExt::EnableAITriggerById(TActionClass* pThis, HouseClass* pHouse, ObjectClass* pObject, TriggerClass* pTrigger, CellStruct const& location)
